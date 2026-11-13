@@ -6,15 +6,17 @@ refusal by name. Stdlib only, like the rest of scripts/; no database driver is a
 
     refdata.py init                                   create the database from the schema
     refdata.py propose <proposal.json> [--version N]  open a version with its changes (or add to proposed version N)
-    refdata.py review <dataset> <version> --as NAME --reason TEXT
+    refdata.py review <dataset> <version> --as NAME --reason TEXT --inspected DIGEST
     refdata.py reopen <dataset> <version> --as NAME --reason TEXT
     refdata.py stamp  <dataset> <version> --as NAME --reason TEXT
     refdata.py list                                   datasets and their versions with status
     refdata.py show <dataset> [<version>]             a version's entries and meanings, with sources
-    refdata.py changes <dataset> <version>            what a version changes against the last stamped one before it
+    refdata.py changes <dataset> <version>            what a version changes against the last stamped one before it,
+                                                      and the digest a review of what it shows names
     refdata.py history <dataset>                      the changelog
     refdata.py backup <file>                          dump the database (schema, routines, data) to a file
     refdata.py restore <file> --database NAME         load a dump into a new database of that name
+    refdata.py upgrade --database OLD --to NEW        copy a database at an older schema revision into NEW at this one
     refdata.py --self-test [--schema FILE]            prove the workflow on a database of its own
 
 Connection details come only from a MySQL option file outside the repository: client.cnf beside local.cnf in
@@ -27,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import ctypes
 import io
 import json
 import os
@@ -35,6 +38,7 @@ import secrets
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -47,10 +51,16 @@ CLIENT_CNF = HOME / "client.cnf"
 DEFAULT_DATABASE = "refdata"
 SYSTEM_DATABASES = ("mysql", "information_schema", "performance_schema", "sys")
 TIMEOUT_SECONDS = 120
+# The schema revision this tool and data/refdata/schema.sql are at (its schema_info row). A database without the
+# table is at revision 1, the schema before D00 T06 section 1's Repair 1.
+SCHEMA_REVISION = 2
 
 
 class Refused(Exception):
     """A refusal by name: the workflow's, the connection's, or the tool's."""
+
+
+SENT = [0]   # client sessions started, so the self-test can show a refusal sent nothing
 
 
 def client_path(name: str = "mysql") -> Path:
@@ -107,6 +117,18 @@ def _unescape(field: str):
     return "".join(out)
 
 
+def marked(column: str) -> str:
+    """A nullable column as the client cannot confuse it with text: 'N' for SQL NULL, 'V' then the value otherwise.
+    The batch client prints SQL NULL and the text NULL alike, so an entry whose text is NULL would read back as none."""
+    return f"IF({column} IS NULL, 'N', CONCAT('V', {column}))"
+
+
+def unmark(field: str | None) -> str | None:
+    if field is None or field[:1] not in ("N", "V") or (field[:1] == "N" and field != "N"):
+        raise Refused(f"refused: a marked value read back as {field!r}, which is neither NULL nor a value")
+    return None if field == "N" else field[1:]
+
+
 def _end_tree(proc: subprocess.Popen) -> None:
     subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True, check=False)
     proc.wait(timeout=30)
@@ -131,6 +153,7 @@ def _classify(stderr: str, database: str | None) -> str:
 
 def run_sql(sql: str, *, options: Path, database: str | None = None, tool: str = "mysql", extra: tuple[str, ...] = ()) -> list[list]:
     """Runs SQL through the client in one session; returns the rows of every result set, or raises Refused."""
+    SENT[0] += 1
     exe = client_path(tool)
     if not exe.is_file():
         raise Refused(f"refused: no {tool} client at {exe} (run tools/refdata/server.ps1 -Install, or set RESOLUTE_REFDATA_CLIENT)")
@@ -168,6 +191,23 @@ class Session:
         return rows[0][0] == "1"
 
 
+def schema_revision(s: Session) -> int:
+    has = s.sql(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = {sql_str(s.database)} AND table_name = 'schema_info';")
+    if has[0][0] == "0":
+        return 1
+    rows = s.sql("SELECT MAX(revision) FROM schema_info;")
+    return int(rows[0][0]) if rows and rows[0][0] is not None else 1
+
+
+def require_current(s: Session) -> None:
+    revision = schema_revision(s)
+    if revision < SCHEMA_REVISION:
+        raise Refused(f"refused: the database '{s.database}' is at schema revision {revision}, older than this tool's {SCHEMA_REVISION}; "
+                      f"copy it to this revision with refdata.py upgrade --database {s.database} --to <a new name>; nothing was changed")
+    if revision > SCHEMA_REVISION:
+        raise Refused(f"refused: the database '{s.database}' is at schema revision {revision}, newer than this tool's {SCHEMA_REVISION}; update this checkout")
+
+
 # ----- commands ---------------------------------------------------------------------------------------------------
 
 def cmd_init(s: Session, schema: Path = SCHEMA) -> int:
@@ -183,10 +223,46 @@ def cmd_init(s: Session, schema: Path = SCHEMA) -> int:
     return 0
 
 
+VERBS = ("add", "reword", "rename")
+
+
+def validate_proposal(proposal) -> None:
+    """Refuses a proposal whose shape is wrong, naming the change and the field, before any SQL is built or sent."""
+    if not isinstance(proposal, dict):
+        raise Refused(f"refused: the proposal is {type(proposal).__name__}, not an object; nothing was sent")
+    for field in ("dataset", "author"):
+        if not isinstance(proposal.get(field), str) or not proposal[field].strip():
+            raise Refused(f"refused: the proposal's '{field}' is missing or not text; nothing was sent")
+    for field in ("create", "reason"):
+        if proposal.get(field) is not None and not isinstance(proposal[field], str):
+            raise Refused(f"refused: the proposal's '{field}' is not text; nothing was sent")
+    if "changes" not in proposal:
+        raise Refused("refused: the proposal has no 'changes'; nothing was sent")
+    if not isinstance(proposal["changes"], list):
+        raise Refused(f"refused: the proposal's 'changes' is {type(proposal['changes']).__name__}, not a list; nothing was sent")
+    for number, change in enumerate(proposal["changes"], 1):
+        label = f"change {number}"
+        if not isinstance(change, dict):
+            raise Refused(f"refused: {label} is {type(change).__name__}, not an object; nothing was sent")
+        verbs = [v for v in VERBS if v in change]
+        if not verbs:
+            raise Refused(f"refused: {label} names none of add, reword, rename; nothing was sent")
+        if len(verbs) > 1:
+            raise Refused(f"refused: {label} names more than one of add, reword, rename ({', '.join(verbs)}); nothing was sent")
+        verb = verbs[0]
+        if not isinstance(change[verb], str) or not change[verb].strip():
+            raise Refused(f"refused: {label}'s '{verb}' is missing or not a key; nothing was sent")
+        label = f"{label} ({verb} {change[verb]})"
+        needed = "to" if verb == "rename" else "text"
+        if not isinstance(change.get(needed), str) or not change[needed].strip():
+            raise Refused(f"refused: {label} has no '{needed}', which a {verb} needs; nothing was sent")
+        for field in ("reason", "source"):
+            if change.get(field) is not None and not isinstance(change[field], str):
+                raise Refused(f"refused: {label}'s '{field}' is not text; nothing was sent")
+
+
 def proposal_sql(proposal: dict, version: int | None) -> str:
-    for field in ("dataset", "author", "changes"):
-        if field not in proposal:
-            raise Refused(f"refused: the proposal has no '{field}'")
+    validate_proposal(proposal)
     ds, author = proposal["dataset"], proposal["author"]
     lines = ["SET autocommit = 0;", "START TRANSACTION;"]
     if proposal.get("create") is not None:
@@ -202,10 +278,8 @@ def proposal_sql(proposal: dict, version: int | None) -> str:
             lines.append(f"CALL rd_add({sql_str(ds)}, @v, {sql_str(change['add'])}, {sql_str(change.get('text'))}, {sql_str(source)}, {sql_str(reason)}, {sql_str(author)});")
         elif "reword" in change:
             lines.append(f"CALL rd_reword({sql_str(ds)}, @v, {sql_str(change['reword'])}, {sql_str(change.get('text'))}, {sql_str(source)}, {sql_str(reason)}, {sql_str(author)});")
-        elif "rename" in change:
-            lines.append(f"CALL rd_rename({sql_str(ds)}, {sql_str(change['rename'])}, {sql_str(change.get('to'))});")
         else:
-            raise Refused("refused: a change names none of add, reword, rename")
+            lines.append(f"CALL rd_rename({sql_str(ds)}, {sql_str(change['rename'])}, {sql_str(change.get('to'))});")
     lines += ["SELECT @v;", "COMMIT;"]
     return "\n".join(lines) + "\n"
 
@@ -215,23 +289,30 @@ def cmd_propose(s: Session, path: str, version: int | None) -> int:
         proposal = json.loads(Path(path).read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         raise Refused(f"refused: the proposal {path} could not be read: {exc}") from None
-    rows = s.sql(proposal_sql(proposal, version))
+    sql = proposal_sql(proposal, version)
+    require_current(s)
+    rows = s.sql(sql)
     print(f"proposed: {proposal['dataset']} version {rows[-1][0]}, {len(proposal['changes'])} change(s)")
     return 0
 
 
-def cmd_step(s: Session, step: str, dataset: str, number: int, actor: str | None, reason: str) -> int:
+def cmd_step(s: Session, step: str, dataset: str, number: int, actor: str | None, reason: str, inspected: str | None = None) -> int:
+    require_current(s)
     procedure = {"review": "rd_review", "reopen": "rd_reopen", "stamp": "rd_stamp"}[step]
-    # One transaction: the check, the status change and the changelog row land together or not at all.
-    s.sql(f"SET autocommit = 0;\nSTART TRANSACTION;\nCALL {procedure}({sql_str(dataset)}, {int(number)}, {sql_str(actor)}, {sql_str(reason)});\nCOMMIT;\n")
+    arguments = f"{sql_str(dataset)}, {int(number)}, {sql_str(actor)}, {sql_str(reason)}" + (f", {sql_str(inspected)}" if step == "review" else "")
+    # One transaction: the check, the status change and the changelog row land together or not at all. READ
+    # COMMITTED, so what the procedure reads after the version's lock is what is committed then (rd_review).
+    s.sql(f"SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;\nSET autocommit = 0;\nSTART TRANSACTION;\nCALL {procedure}({arguments});\nCOMMIT;\n")
     print(f"{step}: {dataset} version {number} by {actor}")
     return 0
 
 
 def cmd_list(s: Session) -> int:
+    require_current(s)
     rows = s.sql(
-        "SELECT d.name, v.number, v.status, v.author, v.reviewer FROM datasets d LEFT JOIN versions v ON v.dataset_id = d.id ORDER BY d.name, v.number;"
+        f"SELECT d.name, v.number, v.status, v.author, {marked('v.reviewer')} FROM datasets d LEFT JOIN versions v ON v.dataset_id = d.id ORDER BY d.name, v.number;"
     )
+    rows = [[name, number, status, author, None if reviewer is None else unmark(reviewer)] for name, number, status, author, reviewer in rows]
     if not rows:
         print("no datasets")
     for name, number, status, author, reviewer in rows:
@@ -251,9 +332,10 @@ def latest_version(s: Session, dataset: str) -> int:
 
 def version_text(s: Session, dataset: str, number: int) -> list[tuple]:
     rows = s.sql(
-        f"SELECT entry_key, text, source, meaning_from FROM rd_version_text WHERE dataset = {sql_str(dataset)} AND as_of = {int(number)} ORDER BY entry_key;"
+        f"SELECT {marked('entry_key')}, {marked('text')}, {marked('source')}, meaning_from FROM rd_version_text "
+        f"WHERE dataset = {sql_str(dataset)} AND as_of = {int(number)} ORDER BY entry_key;"
     )
-    return [(k, t, src, int(m)) for k, t, src, m in rows]
+    return [(unmark(k), unmark(t), unmark(src), int(m)) for k, t, src, m in rows]
 
 
 def require_version(s: Session, dataset: str, number: int) -> str:
@@ -264,6 +346,7 @@ def require_version(s: Session, dataset: str, number: int) -> str:
 
 
 def cmd_show(s: Session, dataset: str, number: int | None) -> int:
+    require_current(s)
     number = latest_version(s, dataset) if number is None else number
     status = require_version(s, dataset, number)
     print(f"{dataset} v{number} ({status})")
@@ -272,45 +355,71 @@ def cmd_show(s: Session, dataset: str, number: int | None) -> int:
     return 0
 
 
-def changes_between(s: Session, dataset: str, number: int) -> tuple[int | None, list[str]]:
-    require_version(s, dataset, number)
+def changes_between(s: Session, dataset: str, number: int) -> tuple[int | None, list[str], str]:
+    """What a version changes against the last stamped version before it, and the version's digest, all read from one
+    snapshot, so the digest a reviewer passes to review is the digest of exactly what was printed."""
+    ds, n = sql_str(dataset), int(number)
+    text = f"SELECT {marked('entry_key')}, {marked('text')}, {marked('source')} FROM rd_version_text WHERE dataset = {ds} AND as_of ="
     rows = s.sql(
-        f"SELECT MAX(v.number) FROM versions v JOIN datasets d ON d.id = v.dataset_id WHERE d.name = {sql_str(dataset)} AND v.status = 'stamped' AND v.number < {int(number)};"
-    )
-    base = int(rows[0][0]) if rows and rows[0][0] is not None else None
-    before = {k: (t, src) for k, t, src, _ in version_text(s, dataset, base)} if base else {}
-    after = {k: (t, src) for k, t, src, _ in version_text(s, dataset, number)}
+        "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;\nSTART TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY;\n"
+        f"SELECT 'status', v.status FROM versions v JOIN datasets d ON d.id = v.dataset_id WHERE d.name = {ds} AND v.number = {n};\n"
+        f"SET @rd_base = (SELECT MAX(v.number) FROM versions v JOIN datasets d ON d.id = v.dataset_id WHERE d.name = {ds} AND v.status = 'stamped' AND v.number < {n});\n"
+        "SELECT 'base', IFNULL(@rd_base, 0);\n"
+        f"SELECT 'before', t.* FROM ({text} @rd_base) t;\n"
+        f"SELECT 'after', t.* FROM ({text} {n}) t;\n"
+        f"CALL rd_version_digest({ds}, {n}, @rd_digest);\nSELECT 'digest', @rd_digest;\nCOMMIT;\n")
+    if not any(r[0] == "status" for r in rows):
+        raise Refused(f"refused: {dataset} has no version {number}")
+    base = next(int(r[1]) for r in rows if r[0] == "base") or None
+    before = {unmark(r[1]): (unmark(r[2]), unmark(r[3])) for r in rows if r[0] == "before"}
+    after = {unmark(r[1]): (unmark(r[2]), unmark(r[3])) for r in rows if r[0] == "after"}
+    digest = next(r[1] for r in rows if r[0] == "digest")
     out = []
     for key in sorted(after):
         if key not in before:
             out.append(f"added {key}: {after[key][0]}  [source: {after[key][1] or 'none'}]")
         elif before[key] != after[key]:
             out.append(f"reworded {key}: {before[key][0]}  ->  {after[key][0]}  [source: {after[key][1] or 'none'}]")
-    return base, out
+    return base, out, digest
 
 
 def cmd_changes(s: Session, dataset: str, number: int) -> int:
-    base, lines = changes_between(s, dataset, number)
+    require_current(s)
+    base, lines, digest = changes_between(s, dataset, number)
     print(f"{dataset} v{number} against " + (f"v{base}, the last stamped before it" if base else "nothing stamped before it"))
     for line in lines or ["no changes"]:
         print(f"  {line}")
+    print(f"digest: {digest}  (a review of what is shown here names it: review ... --inspected {digest})")
     return 0
 
 
-def history_rows(s: Session, dataset: str) -> list[tuple]:
+def history_detail(s: Session, dataset: str) -> list[tuple]:
+    """Every changelog row: version, action, key, actor, reason, whether its contents were recorded, text, source."""
+    current = schema_revision(s) >= 2
+    recorded = "c.contents_recorded" if current else "0"
+    contents = f"{marked('c.text')}, {marked('c.source')}" if current else "'N', 'N'"
     rows = s.sql(
-        "SELECT v.number, c.action, e.entry_key, c.actor, c.reason FROM changelog c JOIN versions v ON v.id = c.version_id "
+        f"SELECT v.number, c.action, {marked('e.entry_key')}, {marked('c.actor')}, {marked('c.reason')}, {recorded}, {contents} "
+        "FROM changelog c JOIN versions v ON v.id = c.version_id "
         f"JOIN datasets d ON d.id = v.dataset_id LEFT JOIN entries e ON e.id = c.entry_id WHERE d.name = {sql_str(dataset)} ORDER BY c.id;"
     )
-    return [(int(n), a, k, actor, r) for n, a, k, actor, r in rows]
+    return [(int(n), a, unmark(k), unmark(actor), unmark(r), rec == "1", unmark(t), unmark(src)) for n, a, k, actor, r, rec, t, src in rows]
+
+
+def history_rows(s: Session, dataset: str) -> list[tuple]:
+    return [row[:5] for row in history_detail(s, dataset)]
 
 
 def cmd_history(s: Session, dataset: str) -> int:
-    rows = history_rows(s, dataset)
+    require_current(s)
+    rows = history_detail(s, dataset)
     if not rows:
         raise Refused(f"refused: the dataset '{dataset}' has no changelog")
-    for number, action, key, actor, reason in rows:
-        print(f"v{number} {action}" + (f" {key}" if key else "") + f" by {actor}: {reason}")
+    for number, action, key, actor, reason, recorded, text, source in rows:
+        line = f"v{number} {action}" + (f" {key}" if key is not None else "") + f" by {actor}: {reason}"
+        if action in ("add", "reword"):
+            line += f'  -> "{text}" [source: {source if source is not None else "none"}]' if recorded else "  (contents not recorded: written before schema revision 2)"
+        print(line)
     return 0
 
 
@@ -322,13 +431,20 @@ def cmd_backup(s: Session, path: str) -> int:
     if not exe.is_file():
         raise Refused(f"refused: no mysqldump at {exe}")
     partial = target.with_name(target.name + ".partial")
-    with open(partial, "wb") as out:
+    kept = f"the earlier backup at {target} was kept unchanged" if target.exists() else f"there was no earlier backup at {target}"
+    try:
+        out = open(partial, "wb")
+    except OSError as exc:
+        raise Refused(f"refused: backup could not write {partial} ({exc.strerror or exc}); nothing was written and {kept}; "
+                      "choose a destination folder this account can write to") from None
+    with out:
         proc = subprocess.Popen(
             [str(exe), f"--defaults-extra-file={s.options.name}", "--default-character-set=utf8mb4",
              # The data only: a restore builds the schema from data/refdata/schema.sql, the repository's own, and loads
              # these rows as a user that can do nothing else (cmd_restore).
              "--no-create-info", "--skip-triggers", "--skip-disable-keys", "--complete-insert", "--single-transaction",
-             "--skip-dump-date", s.database],
+             # schema_info is the schema's own row, which a restore's schema.sql writes; a backup carries data alone.
+             "--skip-dump-date", f"--ignore-table={s.database}.schema_info", s.database],
             stdout=out, stderr=subprocess.PIPE, cwd=str(s.options.parent))
         try:
             _, err = proc.communicate(timeout=TIMEOUT_SECONDS)
@@ -339,7 +455,16 @@ def cmd_backup(s: Session, path: str) -> int:
     if proc.returncode != 0:
         partial.unlink()
         raise Refused(_classify(err.decode("utf-8", "replace"), s.database) + "; nothing was written")
-    os.replace(partial, target)
+    try:
+        os.replace(partial, target)
+    except OSError as exc:
+        try:
+            partial.unlink()
+            left = "the new dump was removed"
+        except OSError:
+            left = f"the new dump is left at {partial}"
+        raise Refused(f"refused: backup could not replace {target} ({exc.strerror or exc}); {kept}, and {left}; "
+                      f"close whatever holds {target.name} and run backup again") from None
     print(f"backed up '{s.database}' to {target} ({target.stat().st_size} bytes)")
     return 0
 
@@ -380,7 +505,14 @@ def cmd_restore(s: Session, path: str, schema: Path = SCHEMA) -> int:
         raise Refused(f"refused: no backup at {dump}")
     if s.exists():
         raise Refused(f"refused: the database '{s.database}' already exists; restore into a new name")
-    text = dump.read_text(encoding="utf-8")
+    try:
+        text = dump.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise Refused(f"refused: restore could not read {dump} ({exc.strerror or exc}); nothing was restored and no database was created; "
+                      "close whatever holds the file, or name a backup this account can read") from None
+    except UnicodeDecodeError:
+        raise Refused(f"refused: restore could not read {dump}: it is not UTF-8 text, so it is not a backup refdata.py wrote; "
+                      "nothing was restored and no database was created") from None
     reaches = dump_reaches_out(text)
     if reaches:
         raise Refused(f"refused: the dump {reaches}, so it would write outside '{s.database}'; take the backup with refdata.py backup, which names no database")
@@ -412,6 +544,66 @@ def cmd_restore(s: Session, path: str, schema: Path = SCHEMA) -> int:
             if not restored:
                 run_sql(f"DROP DATABASE IF EXISTS `{s.database}`;", options=s.options)
     print(f"restored {dump} into '{s.database}'")
+    return 0
+
+
+# What an upgrade must carry over unchanged, read the same way from both databases.
+UPGRADE_READBACK = {
+    "datasets": f"SELECT {marked('name')}, {marked('description')} FROM datasets ORDER BY name;",
+    "versions": f"SELECT {marked('d.name')}, v.number, v.status, {marked('v.author')}, {marked('v.reviewer')}, {marked('v.opened_at')}, {marked('v.stamped_at')} "
+                "FROM versions v JOIN datasets d ON d.id = v.dataset_id ORDER BY d.name, v.number;",
+    "version texts": f"SELECT {marked('dataset')}, as_of, {marked('entry_key')}, {marked('text')}, {marked('source')}, meaning_from "
+                     "FROM rd_version_text ORDER BY dataset, as_of, entry_key;",
+    "changelog": f"SELECT {marked('d.name')}, v.number, c.action, {marked('e.entry_key')}, {marked('c.actor')}, {marked('c.reason')}, {marked('c.at')} "
+                 "FROM changelog c JOIN versions v ON v.id = c.version_id JOIN datasets d ON d.id = v.dataset_id "
+                 "LEFT JOIN entries e ON e.id = c.entry_id ORDER BY c.id;",
+}
+
+
+def upgrade_difference(old: Session, new: Session) -> str | None:
+    """The first way the new database reads back differently from the old, or None."""
+    for name, query in UPGRADE_READBACK.items():
+        a, b = old.sql(query), new.sql(query)
+        for number, (x, y) in enumerate(zip(a, b), 1):
+            if x != y:
+                return f"{name} row {number} reads {x} in the old and {y} in the new"
+        if len(a) != len(b):
+            return f"{name} has {len(a)} rows in the old and {len(b)} in the new"
+    return None
+
+
+def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None) -> int:
+    """Copies a database at an older schema revision into a new one at this revision: a backup of the old, restored into
+    the new name from the current schema, then every version's text and every changelog row read back from both and
+    compared. The old database is never changed; a difference drops the new one. after_restore is the self-test's
+    stand-in for a restore that lost something."""
+    if not s.exists():
+        raise Refused(f"refused: the database '{s.database}' does not exist")
+    revision = schema_revision(s)
+    if revision >= SCHEMA_REVISION:
+        raise Refused(f"refused: the database '{s.database}' is already at schema revision {revision}; there is nothing to upgrade")
+    new = Session(s.options, to)
+    if new.exists():
+        raise Refused(f"refused: the database '{to}' already exists; upgrade into a new name; nothing was changed")
+    with tempfile.TemporaryDirectory(prefix="refdata-upgrade-") as tmp:
+        dump = Path(tmp) / "upgrade.sql"
+        with contextlib.redirect_stdout(io.StringIO()):
+            cmd_backup(s, str(dump))
+            cmd_restore(new, str(dump), schema)
+    try:
+        if after_restore:
+            after_restore(new)
+        difference = upgrade_difference(s, new)
+    except Refused:
+        run_sql(f"DROP DATABASE IF EXISTS `{to}`;", options=s.options)
+        raise
+    if difference:
+        run_sql(f"DROP DATABASE IF EXISTS `{to}`;", options=s.options)
+        raise Refused(f"refused: the upgraded copy differs from '{s.database}': {difference}; '{to}' was dropped and '{s.database}' is unchanged")
+    print(f"upgraded '{s.database}' (schema revision {revision}) into '{to}' (revision {SCHEMA_REVISION}); every version and changelog row reads back the same.")
+    print(f"'{s.database}' is unchanged. Work in '{to}' from now on (--database {to}, or RESOLUTE_REFDATA_DATABASE={to}); "
+          f"once it is checked, drop '{s.database}' with: DROP DATABASE `{s.database}`;")
+    print("changelog rows written before the upgrade show their contents as not recorded: revision 1 kept only the latest text.")
     return 0
 
 
@@ -471,6 +663,21 @@ def self_test(schema: Path) -> int:
             code, out = call(argv + base)
             checks.check(f"refused: {label}", code == 1 and expected in out, f"exit {code}, said {out.strip()!r}")
 
+        def safe_call(argv: list[str]) -> tuple[int | None, str]:
+            # A refusal that is not handled ends in a traceback; that is reported as a failure, not raised.
+            try:
+                return call(argv)
+            except Exception as exc:  # noqa: BLE001 -- the self-test reports any unhandled error as the failure it is
+                return None, f"unhandled {type(exc).__name__}: {exc}"
+
+        def digest_of(number: int) -> str:
+            _, out = call(["changes", "fixture", str(number)] + base)
+            found = re.search(r"digest: ([0-9a-f]{64})", out)
+            return found.group(1) if found else "no digest printed"
+
+        def review(number: int, who: str, reason: str, digest: str | None = None) -> tuple[int, str]:
+            return call(["review", "fixture", str(number), "--as", who, "--reason", reason, "--inspected", digest or digest_of(number)] + base)
+
         try:
             code, out = call(["init", "--schema", str(schema)] + base)
             created = code == 0
@@ -482,9 +689,9 @@ def self_test(schema: Path) -> int:
             v1 = str(FIXTURES / "fixture-v1.json")
             code, out = call(["propose", v1] + base)
             checks.check("version 1 is proposed from the fixture", code == 0 and "version 1" in out, out.strip())
-            refused("a reviewer who is the author", ["review", "fixture", "1", "--as", "author-one", "--reason", "self"], "the reviewer is the author")
+            refused("a reviewer who is the author", ["review", "fixture", "1", "--as", "author-one", "--reason", "self", "--inspected", digest_of(1)], "the reviewer is the author")
             refused("stamping an unreviewed version", ["stamp", "fixture", "1", "--as", "author-one", "--reason", "early"], "the version is not reviewed")
-            code, _ = call(["review", "fixture", "1", "--as", "author-two", "--reason", "checked against both manuals"] + base)
+            code, _ = review(1, "author-two", "checked against both manuals")
             code2, _ = call(["stamp", "fixture", "1", "--as", "author-one", "--reason", "release the first version"] + base)
             checks.check("version 1 is reviewed by another author and stamped", code == 0 and code2 == 0)
             refused("editing a stamped version", ["propose", proposal("stamped", {"dataset": "fixture", "author": "author-one", "changes": [
@@ -499,7 +706,7 @@ def self_test(schema: Path) -> int:
                 {"add": "beep-1-long", "text": "again", "reason": "reuse"}]}), "--version", "2"], "keys are never reused")
             refused("a key renamed", ["propose", proposal("rename", {"dataset": "fixture", "author": "author-one", "changes": [
                 {"rename": "beep-1-long", "to": "beep-long", "reason": "rename"}]}), "--version", "2"], "keys are never renamed")
-            code, _ = call(["review", "fixture", "2", "--as", "author-two", "--reason", "the rewording matches the revised manual"] + base)
+            code, _ = review(2, "author-two", "the rewording matches the revised manual")
             code2, _ = call(["stamp", "fixture", "2", "--as", "author-one", "--reason", "release the second version"] + base)
             checks.check("version 2 is reviewed and stamped", code == 0 and code2 == 0)
 
@@ -529,7 +736,7 @@ def self_test(schema: Path) -> int:
                 checks.check(f"the changelog reads back exactly ({label})", history_rows(session, "fixture")[:len(expected_log)] == expected_log, repr(history_rows(session, "fixture")))
 
             read_back("after stamping")
-            _, lines = changes_between(session, "fixture", 2)
+            _, lines, _ = changes_between(session, "fixture", 2)
             checks.check("changes names the one rewording against version 1", len(lines) == 1 and lines[0].startswith("reworded beep-1-long"), repr(lines))
 
             # A proposal of three changes whose third is refused leaves nothing behind.
@@ -555,7 +762,7 @@ def self_test(schema: Path) -> int:
             # A reviewed version is frozen; reopen clears its review, so stamp is refused until it is reviewed again.
             call(["propose", proposal("v3", {"dataset": "fixture", "author": "author-one", "reason": "a third version", "changes": [
                 {"add": "beep-a", "text": "A", "reason": "a new entry"}]})] + base)
-            call(["review", "fixture", "3", "--as", "author-two", "--reason", "looks right"] + base)
+            review(3, "author-two", "looks right")
             refused("changing a reviewed version", ["propose", proposal("frozen", {"dataset": "fixture", "author": "author-one", "changes": [
                 {"reword": "beep-a", "text": "A, reworded", "reason": "after review"}]}), "--version", "3"], "reviewed and frozen")
             code, _ = call(["reopen", "fixture", "3", "--as", "author-one", "--reason", "one more change"] + base)
@@ -563,7 +770,7 @@ def self_test(schema: Path) -> int:
                 {"reword": "beep-a", "text": "A, reworded", "reason": "after reopening"}]}), "--version", "3"] + base)
             checks.check("reopen returns the version to proposed and it changes", code == 0 and code2 == 0)
             refused("stamping a reopened version before it is reviewed again", ["stamp", "fixture", "3", "--as", "author-one", "--reason", "on the old approval"], "the version is not reviewed")
-            code, _ = call(["review", "fixture", "3", "--as", "author-two", "--reason", "the change after reopening is right"] + base)
+            code, _ = review(3, "author-two", "the change after reopening is right")
             code2, _ = call(["stamp", "fixture", "3", "--as", "author-one", "--reason", "release the third version"] + base)
             checks.check("the reopened version is stamped after a second review", code == 0 and code2 == 0)
 
@@ -573,7 +780,7 @@ def self_test(schema: Path) -> int:
                 {"add": "beep-d", "text": "D", "reason": "a new entry"}]})] + base)
             refused_step = None
             try:
-                cmd_step(session, "review", "fixture", 4, None, "a reviewer the changelog cannot record")
+                cmd_step(session, "review", "fixture", 4, None, "a reviewer the changelog cannot record", digest_of(4))
             except Refused as refusal:
                 refused_step = str(refusal)
             log_rows = [r for r in history_rows(session, "fixture") if r[0] == 4]
@@ -583,8 +790,8 @@ def self_test(schema: Path) -> int:
             code, _ = call(["propose", proposal("v4-contribution", {"dataset": "fixture", "author": "author-two", "changes": [
                 {"add": "beep-c", "text": "C", "reason": "a contribution to version 4"}]}), "--version", "4"] + base)
             checks.check("a second author can add to a proposed version", code == 0)
-            refused("a reviewer who changed the version", ["review", "fixture", "4", "--as", "author-two", "--reason", "my contribution looks right"], "the reviewer changed this version")
-            code, _ = call(["review", "fixture", "4", "--as", "author-three", "--reason", "neither of us wrote it"] + base)
+            refused("a reviewer who changed the version", ["review", "fixture", "4", "--as", "author-two", "--reason", "my contribution looks right", "--inspected", digest_of(4)], "the reviewer changed this version")
+            code, _ = review(4, "author-three", "neither of us wrote it")
             checks.check("a reviewer who changed nothing reviews it", code == 0)
 
             # A backup round trip: the rows come back in a database of their own, with the schema's rules.
@@ -597,7 +804,7 @@ def self_test(schema: Path) -> int:
             refused_copy = None
             if copied.exists():
                 try:
-                    copied.sql("CALL rd_review('fixture', 4, 'author-one', 'the restored rules still hold');")
+                    copied.sql("CALL rd_review('fixture', 4, 'author-one', 'the restored rules still hold', NULL);")
                 except Refused as refusal:
                     refused_copy = str(refusal)
                 run_sql(f"DROP DATABASE `{copy}`;", options=options)
@@ -645,6 +852,178 @@ def self_test(schema: Path) -> int:
             checks.check("a dump that names a database is refused, restoring nothing and leaving that database as it was",
                          code == 1 and "selects, creates or drops a database (line 2" in out and not Session(options, target).exists() and changelog_after == len(history_rows(session, "fixture")),
                          out.strip())
+
+            # ---- Repair 1: an approval covers exactly what was inspected, and every edit stays in the history.
+            call(["stamp", "fixture", "4", "--as", "author-one", "--reason", "release the fourth version"] + base)
+            call(["propose", proposal("v5", {"dataset": "fixture", "author": "author-one", "reason": "a fifth version", "changes": [
+                {"add": "beep-e", "text": "E", "source": "Manual E, first printing", "reason": "a new entry"},
+                {"add": "NULL", "text": "NULL", "source": "NULL", "reason": "an entry whose key, text and source are the word NULL"}]})] + base)
+            seen = digest_of(5)
+            for printing in ("second", "third"):
+                call(["propose", proposal(f"v5-{printing}", {"dataset": "fixture", "author": "author-two", "changes": [
+                    {"reword": "beep-e", "text": f"E, {printing}", "source": f"Manual E, {printing} printing", "reason": f"the {printing} printing"}]}), "--version", "5"] + base)
+            code, out = review(5, "author-three", "approved on what I saw", seen)
+            now = digest_of(5)
+            checks.check("a review naming the digest of contents another author has since changed is refused, the version staying proposed",
+                         code == 1 and "changed since it was inspected" in out and require_version(session, "fixture", 5) == "proposed" and now != seen, out.strip())
+
+            detail = [(r[1], r[4], r[6], r[7]) for r in history_detail(session, "fixture") if r[0] == 5 and r[2] == "beep-e"]
+            code, out = call(["history", "fixture"] + base)
+            checks.check("two rewordings of one entry in one version both stay in history, each with its text, source and reason",
+                         detail == [("add", "a new entry", "E", "Manual E, first printing"),
+                                    ("reword", "the second printing", "E, second", "Manual E, second printing"),
+                                    ("reword", "the third printing", "E, third", "Manual E, third printing")]
+                         and 'v5 reword beep-e by author-two: the second printing  -> "E, second" [source: Manual E, second printing]' in out
+                         and 'v5 reword beep-e by author-two: the third printing  -> "E, third" [source: Manual E, third printing]' in out,
+                         f"{detail!r}; history said {out[-500:]!r}")
+
+            texts = version_text(session, "fixture", 5)
+            _, lines, _ = changes_between(session, "fixture", 5)
+            _, shown = call(["show", "fixture", "5"] + base)
+            null_rows = [(r[2], r[6], r[7]) for r in history_detail(session, "fixture") if r[0] == 5 and r[1] == "add" and r[4].startswith("an entry whose")]
+            checks.check("an entry whose key, text and source are the word NULL reads back as that text in show, changes and history",
+                         ("NULL", "NULL", "NULL", 5) in texts and "added NULL: NULL  [source: NULL]" in lines
+                         and "  NULL: NULL  [source: NULL; meaning from v5]" in shown and null_rows == [("NULL", "NULL", "NULL")],
+                         f"text {texts!r}; changes {lines!r}; show {shown!r}; history {null_rows!r}")
+
+            code, out = review(5, "author-three", "approved on what is there now", now)
+            checks.check("a review naming the digest of the contents as they are passes", code == 0 and require_version(session, "fixture", 5) == "reviewed", out.strip())
+            call(["stamp", "fixture", "5", "--as", "author-one", "--reason", "release the fifth version"] + base)
+
+            # A second author's edit in flight when the review is called: the review waits for its lock and is refused.
+            call(["propose", proposal("v6", {"dataset": "fixture", "author": "author-one", "reason": "a sixth version", "changes": [
+                {"add": "beep-f", "text": "F", "reason": "a new entry"}]})] + base)
+            seen = digest_of(6)
+            hold = subprocess.Popen([str(client_path()), f"--defaults-extra-file={options.name}", "--batch", database],
+                                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=str(options.parent))
+            hold.stdin.write(b"SET autocommit = 0;\nSTART TRANSACTION;\n"
+                             b"CALL rd_reword('fixture', 6, 'beep-f', 'F, changed while under review', NULL, 'a concurrent edit', 'author-two');\n"
+                             b"DO SLEEP(4);\nCOMMIT;\n")
+            hold.stdin.close()
+            holding, deadline = False, time.monotonic() + 15
+            while time.monotonic() < deadline and hold.poll() is None:
+                if run_sql("SELECT COUNT(*) FROM information_schema.innodb_trx WHERE trx_rows_locked > 0;", options=options)[0][0] != "0":
+                    holding = True
+                    break
+                time.sleep(0.1)
+            started = time.monotonic()
+            code, out = review(6, "author-three", "approved on what I saw", seen)
+            waited = time.monotonic() - started
+            try:
+                _, held_err = hold.communicate(timeout=60)
+            except subprocess.TimeoutExpired:
+                _end_tree(hold)
+                held_err = b"the editing session did not finish within 60s and was ended"
+            checks.check("a review called while a second author's edit holds the version waits for it and is refused, the version staying proposed",
+                         holding and hold.returncode == 0 and waited > 1 and code == 1 and "changed since it was inspected" in out
+                         and require_version(session, "fixture", 6) == "proposed",
+                         f"edit holding {holding}, edit exit {hold.returncode} {held_err.decode('utf-8', 'replace').strip()!r}, waited {waited:.1f}s, review said {out.strip()!r}")
+
+            # A malformed proposal is refused naming the change and the field, and no SQL is sent.
+            for label, body, expected in (
+                    ("not an object", [1, 2], "the proposal is list, not an object"),
+                    ("no changes", {"dataset": "fixture", "author": "author-one"}, "the proposal has no 'changes'"),
+                    ("changes not a list", {"dataset": "fixture", "author": "author-one", "changes": {"add": "k"}}, "'changes' is dict, not a list"),
+                    ("a change not an object", {"dataset": "fixture", "author": "author-one", "changes": ["add k"]}, "change 1 is str, not an object"),
+                    ("a change naming no verb", {"dataset": "fixture", "author": "author-one", "changes": [{"text": "x", "reason": "r"}]}, "change 1 names none of add, reword, rename"),
+                    ("a change naming two verbs", {"dataset": "fixture", "author": "author-one", "changes": [{"add": "k", "reword": "k", "text": "x", "reason": "r"}]},
+                     "change 1 names more than one of add, reword, rename (add, reword)"),
+                    ("an add without text", {"dataset": "fixture", "author": "author-one", "changes": [{"add": "beep-g", "reason": "r"}]}, "change 1 (add beep-g) has no 'text'"),
+                    ("a rename without a new key", {"dataset": "fixture", "author": "author-one", "changes": [{"rename": "beep-f"}]},
+                     "change 1 (rename beep-f) has no 'to'")):
+                sent = SENT[0]
+                code, out = safe_call(["propose", proposal(f"malformed-{label}", body), "--version", "6"] + base)
+                checks.check(f"refused before anything runs: {label}", code == 1 and expected in out and "nothing was sent" in out and SENT[0] == sent,
+                             f"exit {code}, sessions started {SENT[0] - sent}, said {out.strip()!r}")
+
+            # File errors in backup and restore are refused naming the action and the path; earlier files are kept.
+            kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            kernel32.CreateFileW.restype = ctypes.c_void_p
+            kernel32.CreateFileW.argtypes = [ctypes.c_wchar_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p]
+            kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
+
+            def held(path: Path, share: int):
+                # GENERIC_READ, OPEN_EXISTING; share 1 lets others read but not replace or delete it, share 0 lets nobody open it.
+                handle = kernel32.CreateFileW(str(path), 0x80000000, share, None, 3, 0x80, None)
+                if handle in (None, ctypes.c_void_p(-1).value):
+                    raise Refused(f"refused: the self-test could not hold {path} (error {ctypes.get_last_error()})")
+                return handle
+
+            folder = Path(tmp) / "unwritable"
+            folder.mkdir()
+            earlier = folder / "refdata.sql"
+            earlier.write_bytes(b"-- an earlier backup\n")
+            (folder / "refdata.sql.partial").mkdir()   # the dump's own file cannot be created there
+            code, out = safe_call(["backup", str(earlier)] + base)
+            checks.check("a backup whose destination cannot be written is refused by name, the earlier backup kept",
+                         code == 1 and "backup could not write" in out and str(earlier) in out and "was kept unchanged" in out
+                         and earlier.read_bytes() == b"-- an earlier backup\n", f"exit {code}, said {out.strip()!r}")
+
+            locked = Path(tmp) / "locked.sql"
+            locked.write_bytes(b"-- the backup an editor holds open\n")
+            handle = held(locked, 1)
+            try:
+                code, out = safe_call(["backup", str(locked)] + base)
+            finally:
+                kernel32.CloseHandle(handle)
+            checks.check("a backup over an earlier one held open is refused by name, the earlier one byte-identical and no partial dump left",
+                         code == 1 and "backup could not replace" in out and "the new dump was removed" in out
+                         and locked.read_bytes() == b"-- the backup an editor holds open\n" and not locked.with_name("locked.sql.partial").exists(),
+                         f"exit {code}, said {out.strip()!r}")
+
+            unreadable = Path(tmp) / "unreadable.sql"
+            unreadable.write_bytes(b"SELECT 1;\n")
+            target = f"{database}_unread"
+            handle = held(unreadable, 0)
+            try:
+                code, out = safe_call(["restore", str(unreadable), "--options", str(options), "--database", target])
+            finally:
+                kernel32.CloseHandle(handle)
+            checks.check("a backup that cannot be read is refused by name, no database created",
+                         code == 1 and "restore could not read" in out and str(unreadable) in out and not Session(options, target).exists(),
+                         f"exit {code}, said {out.strip()!r}")
+
+            # A database at schema revision 1 is upgraded with nothing lost; until then, commands on it are refused.
+            old_schema = Path(tmp) / "schema-revision-1.sql"
+            old_schema.write_text(subprocess.run(["git", "-C", str(REPO), "show", "61d88277:data/refdata/schema.sql"], capture_output=True,
+                                                 check=True, encoding="utf-8").stdout, encoding="utf-8")
+            old = Session(options, f"{database}_r1")
+            upgraded, lossy = f"{database}_r2", f"{database}_r2lossy"
+            try:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    cmd_init(old, old_schema)
+                for fixture in ("fixture-v1.json", "fixture-v2.json"):
+                    old.sql(proposal_sql(json.loads((FIXTURES / fixture).read_text(encoding="utf-8")), None))
+                    if fixture == "fixture-v1.json":
+                        old.sql("SET autocommit = 0;\nSTART TRANSACTION;\nCALL rd_review('fixture', 1, 'author-two', 'checked against both manuals');\nCOMMIT;\n")
+                        old.sql("SET autocommit = 0;\nSTART TRANSACTION;\nCALL rd_stamp('fixture', 1, 'author-one', 'release the first version');\nCOMMIT;\n")
+                old_state = {name: old.sql(query) for name, query in UPGRADE_READBACK.items()}
+                code, out = call(["list", "--options", str(options), "--database", old.database])
+                refused_old = code == 1 and f"upgrade --database {old.database}" in out
+
+                lossy_said = None
+                try:
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        cmd_upgrade(old, lossy, after_restore=lambda new: new.sql("DELETE FROM changelog ORDER BY id DESC LIMIT 1;"))
+                except Refused as refusal:
+                    lossy_said = str(refusal)
+                checks.check("an upgrade whose copy lost a changelog row is refused naming it, the copy dropped and the old database unchanged",
+                             lossy_said is not None and "changelog has" in lossy_said and not Session(options, lossy).exists()
+                             and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state, repr(lossy_said))
+
+                code, out = call(["upgrade", "--options", str(options), "--database", old.database, "--to", upgraded])
+                new = Session(options, upgraded)
+                code2, said = call(["history", "fixture", "--options", str(options), "--database", upgraded]) if new.exists() else (None, "")
+                checks.check("a revision 1 database with a stamped and a proposed version upgrades with every version and changelog row the same, "
+                             "earlier edits named as not recorded, and a command on the old one refused naming the upgrade",
+                             refused_old and code == 0 and new.exists() and version_text(new, "fixture", 1) == expected_v1
+                             and version_text(new, "fixture", 2) == expected_v2 and require_version(new, "fixture", 2) == "proposed"
+                             and code2 == 0 and "v1 add beep-1-long by author-one: first entry  (contents not recorded" in said
+                             and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state,
+                             f"old refused {refused_old}; upgrade exit {code} {out.strip()!r}; history {said.strip()[:400]!r}")
+            finally:
+                for name in (old.database, upgraded, lossy):
+                    run_sql(f"DROP DATABASE IF EXISTS `{name}`;", options=options)
 
             # The inspection commands read the persisted records.
             for argv, want in ((["list"], "fixture v3: stamped"), (["show", "fixture", "2"], "beep-1-long: One long beep: no memory detected in any slot"),
@@ -717,6 +1096,8 @@ def parser() -> argparse.ArgumentParser:
         sp.add_argument("number", type=int)
         sp.add_argument("--as", dest="actor", required=True)
         sp.add_argument("--reason", required=True)
+        if step == "review":
+            sp.add_argument("--inspected", required=True, help="the digest refdata.py changes printed for what was reviewed")
     sub.add_parser("list", parents=[common])
     sh = sub.add_parser("show", parents=[common])
     sh.add_argument("dataset")
@@ -730,6 +1111,8 @@ def parser() -> argparse.ArgumentParser:
     bk.add_argument("file")
     rs = sub.add_parser("restore", parents=[common])
     rs.add_argument("file")
+    up = sub.add_parser("upgrade", parents=[common])
+    up.add_argument("--to", required=True)
     return p
 
 
@@ -747,7 +1130,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "propose":
             return cmd_propose(session, args.file, args.version)
         if args.command in ("review", "reopen", "stamp"):
-            return cmd_step(session, args.command, args.dataset, args.number, args.actor, args.reason)
+            return cmd_step(session, args.command, args.dataset, args.number, args.actor, args.reason, getattr(args, "inspected", None))
         if args.command == "list":
             return cmd_list(session)
         if args.command == "show":
@@ -760,6 +1143,8 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_backup(session, args.file)
         if args.command == "restore":
             return cmd_restore(session, args.file)
+        if args.command == "upgrade":
+            return cmd_upgrade(session, check_name(args.to))
     except Refused as refusal:
         print(refusal)
         return 1

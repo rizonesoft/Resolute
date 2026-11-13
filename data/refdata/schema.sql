@@ -14,6 +14,15 @@
 -- The workflow's rules are here, in the procedures, and each refusal is a SIGNAL whose text names it, so no client
 -- can step around them. A proposal of several changes runs in one transaction in one client session: a refused change
 -- leaves no row of the others.
+--
+-- Revision 2 (D00 T06 section 1, Repair 1): the schema records its revision, every add and reword keeps the text and
+-- source it set in its changelog row, and a review names the digest of the contents its reviewer inspected, which the
+-- database compares under the version's lock. A database at revision 1 is moved here with refdata.py upgrade.
+
+CREATE TABLE schema_info (
+    revision INT UNSIGNED NOT NULL PRIMARY KEY
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+INSERT INTO schema_info (revision) VALUES (2);
 
 CREATE TABLE datasets (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -71,6 +80,10 @@ CREATE TABLE changelog (
     reason VARCHAR(1000) NOT NULL,
     actor VARCHAR(100) NOT NULL,
     at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- What an add or reword set. A row written before revision 2 has contents_recorded 0: its contents were not kept.
+    text VARCHAR(2000) NULL,
+    source VARCHAR(500) NULL,
+    contents_recorded TINYINT(1) NOT NULL DEFAULT 0,
     CONSTRAINT changelog_version FOREIGN KEY (version_id) REFERENCES versions (id),
     CONSTRAINT changelog_entry FOREIGN KEY (entry_id) REFERENCES entries (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -164,7 +177,7 @@ BEGIN
     INSERT INTO entries (dataset_id, entry_key, created_version_id) VALUES (v_dataset, p_key, v_version);
     SET v_entry = LAST_INSERT_ID();
     INSERT INTO meanings (entry_id, version_id, text, source_id) VALUES (v_entry, v_version, p_text, v_source);
-    INSERT INTO changelog (version_id, entry_id, action, reason, actor) VALUES (v_version, v_entry, 'add', p_reason, p_actor);
+    INSERT INTO changelog (version_id, entry_id, action, reason, actor, text, source, contents_recorded) VALUES (v_version, v_entry, 'add', p_reason, p_actor, p_text, p_source, 1);
 END //
 
 CREATE PROCEDURE rd_reword (IN p_dataset VARCHAR(64), IN p_number INT UNSIGNED, IN p_key VARCHAR(64), IN p_text VARCHAR(2000), IN p_source VARCHAR(500), IN p_reason VARCHAR(1000), IN p_actor VARCHAR(100))
@@ -187,7 +200,7 @@ BEGIN
     CALL rd_source_id(p_source, v_source);
     INSERT INTO meanings (entry_id, version_id, text, source_id) VALUES (v_entry, v_version, p_text, v_source)
         ON DUPLICATE KEY UPDATE text = VALUES(text), source_id = VALUES(source_id);
-    INSERT INTO changelog (version_id, entry_id, action, reason, actor) VALUES (v_version, v_entry, 'reword', p_reason, p_actor);
+    INSERT INTO changelog (version_id, entry_id, action, reason, actor, text, source, contents_recorded) VALUES (v_version, v_entry, 'reword', p_reason, p_actor, p_text, p_source, 1);
 END //
 
 -- A key is the entry's name for good: there is no rename, and asking for one is refused by name.
@@ -196,11 +209,39 @@ BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: keys are never renamed; add a new key and leave the old one';
 END //
 
-CREATE PROCEDURE rd_review (IN p_dataset VARCHAR(64), IN p_number INT UNSIGNED, IN p_reviewer VARCHAR(100), IN p_reason VARCHAR(1000))
+-- A version's digest: SHA-256 chained over its entries in key order, each key, text and source written with its length
+-- so no two contents share one. It covers what `changes` and `show` print of the version, inherited entries included.
+CREATE PROCEDURE rd_version_digest (IN p_dataset VARCHAR(64), IN p_number INT UNSIGNED, OUT p_digest CHAR(64))
+BEGIN
+    DECLARE v_done INT DEFAULT 0;
+    DECLARE v_key VARCHAR(64);
+    DECLARE v_text VARCHAR(2000);
+    DECLARE v_source VARCHAR(500);
+    DECLARE v_rows CURSOR FOR SELECT entry_key, text, source FROM rd_version_text WHERE dataset = p_dataset AND as_of = p_number ORDER BY entry_key;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = 1;
+    SET p_digest = SHA2(CONCAT('refdata digest 1:', CHAR_LENGTH(p_dataset), ':', p_dataset, ':', p_number), 256);
+    OPEN v_rows;
+    each_row: LOOP
+        FETCH v_rows INTO v_key, v_text, v_source;
+        IF v_done THEN
+            LEAVE each_row;
+        END IF;
+        SET p_digest = SHA2(CONCAT(p_digest, CHAR_LENGTH(v_key), ':', v_key, CHAR_LENGTH(v_text), ':', v_text,
+            IF(v_source IS NULL, '-', CONCAT(CHAR_LENGTH(v_source), ':', v_source))), 256);
+    END LOOP;
+    CLOSE v_rows;
+END //
+
+-- A review approves the contents its reviewer inspected, named by their digest (refdata.py changes prints it). The
+-- version row is locked first (rd_version reads it FOR UPDATE, as every edit does), so an edit in flight finishes
+-- before the digest is taken, and the digest is taken at READ COMMITTED so it reads what that edit committed rather
+-- than the snapshot the transaction began with; a different digest refuses the review.
+CREATE PROCEDURE rd_review (IN p_dataset VARCHAR(64), IN p_number INT UNSIGNED, IN p_reviewer VARCHAR(100), IN p_reason VARCHAR(1000), IN p_inspected CHAR(64))
 BEGIN
     DECLARE v_version INT UNSIGNED;
     DECLARE v_status VARCHAR(10);
     DECLARE v_author VARCHAR(100);
+    DECLARE v_digest CHAR(64);
     CALL rd_require_reason(p_reason);
     CALL rd_version(p_dataset, p_number, v_version, v_status, v_author);
     IF v_status <> 'proposed' THEN
@@ -212,6 +253,13 @@ BEGIN
     -- Anyone who changed the version is one of its authors, whoever opened it.
     IF EXISTS (SELECT 1 FROM changelog WHERE version_id = v_version AND action IN ('open', 'add', 'reword') AND actor = p_reviewer) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: the reviewer changed this version';
+    END IF;
+    IF @@SESSION.transaction_isolation <> 'READ-COMMITTED' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: a review runs at READ COMMITTED, so it reads the contents it approves';
+    END IF;
+    CALL rd_version_digest(p_dataset, p_number, v_digest);
+    IF p_inspected IS NULL OR p_inspected <> v_digest THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: the version changed since it was inspected; run changes again and review what it shows';
     END IF;
     UPDATE versions SET status = 'reviewed', reviewer = p_reviewer WHERE id = v_version AND status = 'proposed';
     IF ROW_COUNT() <> 1 THEN

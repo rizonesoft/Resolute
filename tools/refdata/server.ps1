@@ -33,6 +33,9 @@ param(
     # A drill: a first start stops after the server answers and before root's password is set, as an
     # interrupted start would, so the next -Start is shown to finish the credentials.
     [switch]$DrillStopAfterInit,
+    # A drill: a first start ends initialization part way, as a closed window or a power cut would, so the next
+    # -Start is shown to discard what it left and initialize cleanly.
+    [switch]$DrillStopDuringInit,
     # Check the option-file writer without a server.
     [switch]$SelfTest
 )
@@ -43,6 +46,11 @@ $InstallDir = Join-Path $RepoRoot 'reskit\mysql'
 $Home_ = $HomeDir
 $ServerDir = Join-Path $Home_ 'server'
 $DataDir = Join-Path $ServerDir 'data'
+# Initialization runs into the staging folder, and the mark is written before the staging folder becomes the data
+# folder, so a data folder beside the mark is always one whose initialization finished. A cut-short initialization
+# leaves only the staging folder, which the next start discards.
+$Staging = Join-Path $ServerDir 'data.staging'
+$Initialized = Join-Path $ServerDir 'data.initialized'
 $StateFile = Join-Path $ServerDir 'state.json'
 $IniFile = Join-Path $ServerDir 'my.ini'
 $LocalCnf = Join-Path $Home_ 'local.cnf'
@@ -156,7 +164,7 @@ function Invoke-Install {
 }
 
 function Read-State {
-    if (-not (Test-Path -LiteralPath $StateFile)) { return $null }
+    if (-not (Test-Path -LiteralPath $StateFile -PathType Leaf)) { return $null }
     return (Get-Content -LiteralPath $StateFile -Raw | ConvertFrom-Json)
 }
 
@@ -340,17 +348,54 @@ function Invoke-Start {
         Protect-Home
         New-Item -ItemType Directory -Force -Path $ServerDir | Out-Null
         Write-Ini $port
+        $adopt = $false
         if (-not (Test-Path -LiteralPath $DataDir)) {
+            if (Test-Path -LiteralPath $Staging) {
+                # Only an initialization that did not finish leaves this; it never held data.
+                Say 'discarding an initialization that did not finish'
+                Remove-Item -LiteralPath $Staging -Recurse -Force
+            }
             # The marker first: from here until the password is set, any start finishes the credentials.
             Set-Content -LiteralPath $Pending -Encoding ascii -Value 'root has no password yet'
             Say 'initializing the data directory'
-            & $Mysqld "--defaults-file=$IniFile" --initialize-insecure 2>&1 | Out-Null
-            if ($LASTEXITCODE -ne 0) { Say "refused: initialization failed (see $(Join-Path $ServerDir 'mysqld.log'))"; return 2 }
+            $init = [System.Diagnostics.ProcessStartInfo]::new($Mysqld)
+            foreach ($a in "--defaults-file=$IniFile", "--datadir=$Staging", '--initialize-insecure') { $init.ArgumentList.Add($a) }
+            $init.UseShellExecute = $false
+            $init.CreateNoWindow = $true
+            $initProc = [System.Diagnostics.Process]::Start($init)
+            if ($DrillStopDuringInit) {
+                Start-Sleep -Milliseconds 1500
+                if (-not $initProc.HasExited) { $initProc.Kill($true) }
+                $null = $initProc.WaitForExit(30000)
+                Say 'drill: initialization was ended part way'
+                return 3
+            }
+            $initProc.WaitForExit()
+            if ($initProc.ExitCode -ne 0) { Say "refused: initialization failed (exit $($initProc.ExitCode); see $(Join-Path $ServerDir 'mysqld.log')); the next -Start begins it again"; return 2 }
+            Set-Content -LiteralPath $Initialized -Encoding ascii -Value "initialized $((Get-Date).ToUniversalTime().ToString('o'))"
+            Move-Item -LiteralPath $Staging -Destination $DataDir
             # Until the generated password is set, root has none: a client file without one reaches it.
             Write-OptionFile $LocalCnf @('[client]', 'user=root', 'host=127.0.0.1', "port=$port")
+        } elseif (-not (Test-Path -LiteralPath $Initialized)) {
+            # A data folder an earlier version of this script made, initializing in place: it wrote the credentials
+            # marker before initializing and the client file only once initialization had finished. With the marker
+            # and no client file, initialization may have been cut short, and nothing can tell a whole folder from a
+            # partial one without starting a server on it, which could change it.
+            if ((Test-Path -LiteralPath $Pending) -and -not (Test-Path -LiteralPath $LocalCnf)) {
+                Say "refused: $DataDir was left by an initialization that may not have finished (an earlier version of this script made it, and its first start never wrote $LocalCnf); nothing was changed or deleted. Move the folder aside and -Start initializes a new one"
+                return 2
+            }
+            $adopt = $true
         }
         $proc = Get-Process -Id ([Daemon]::Start($Mysqld, "`"$Mysqld`" `"--defaults-file=$IniFile`""))
-        @{ pid = $proc.Id; path = $Mysqld; port = $port; started = (Get-Date).ToUniversalTime().ToString('o') } | ConvertTo-Json | Set-Content -LiteralPath $StateFile -Encoding utf8
+        try {
+            @{ pid = $proc.Id; path = $Mysqld; port = $port; started = (Get-Date).ToUniversalTime().ToString('o') } | ConvertTo-Json | Set-Content -LiteralPath $StateFile -Encoding utf8
+        } catch {
+            # Without the record no -Stop or -Status can find this server, so it is not left running.
+            if (-not $proc.HasExited) { $proc.Kill($true); $null = $proc.WaitForExit(10000) }
+            Say "refused: the process record $StateFile could not be written ($($_.Exception.Message)); the server this start launched was ended"
+            return 2
+        }
         $deadline = (Get-Date).AddSeconds($StartTimeoutSeconds)
         while (-not (Test-Answers $port)) {
             if ($proc.HasExited -or (Get-Date) -gt $deadline) {
@@ -360,6 +405,10 @@ function Invoke-Start {
                 return 2
             }
             Start-Sleep -Milliseconds 500
+        }
+        if ($adopt) {
+            Set-Content -LiteralPath $Initialized -Encoding ascii -Value "adopted $((Get-Date).ToUniversalTime().ToString('o')): made by an earlier version of this script"
+            Say "adopted $DataDir, which an earlier version of this script initialized"
         }
     }
     if ($DrillStopAfterInit -and (Test-Path -LiteralPath $Pending)) {

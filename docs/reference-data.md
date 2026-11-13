@@ -27,7 +27,7 @@ python tools/refdata/refdata.py init      # create the authoring database 'refda
 ```
 
 - A download whose SHA-256 differs from the pin is refused with nothing installed. `-Install -From <zip>` installs from a local copy under the same check.
-- The server's data lives in `%LOCALAPPDATA%\Resolute\refdata\server\`, outside the repository and outside `build/`. Back it up with `refdata.py backup <file>`, which writes the rows only; `refdata.py restore <file> --database <new name>` builds the new database's tables and rules from `data/refdata/schema.sql` and loads the rows as a MySQL user made for that restore alone, allowed only to read, insert and lock tables in the new database. A backup that reaches anywhere else is refused by the server, and the half-made database is dropped; the user is dropped however the restore ends. A restore never goes over an existing database, and a dump that selects, creates or drops a database (one taken with `mysqldump --databases`) is refused before anything is touched.
+- The server's data lives in `%LOCALAPPDATA%\Resolute\refdata\server\`, outside the repository and outside `build/`. A first start initializes it in `data.staging` and makes it `data` only once initialization finished, beside a `data.initialized` mark, so a start cut short leaves nothing the next start mistakes for finished: the next `-Start` discards the staging folder and initializes again. A `data` folder an earlier version of the script made has no mark: it is adopted when its first start had finished (its client file was written), and otherwise refused by name, with nothing deleted; move it aside and `-Start` initializes afresh. A start that cannot write its process record ends the server it launched rather than leave one nothing can stop. Back it up with `refdata.py backup <file>`, which writes the rows only; `refdata.py restore <file> --database <new name>` builds the new database's tables and rules from `data/refdata/schema.sql` and loads the rows as a MySQL user made for that restore alone, allowed only to read, insert and lock tables in the new database. A backup that reaches anywhere else is refused by the server, and the half-made database is dropped; the user is dropped however the restore ends. A restore never goes over an existing database, and a dump that selects, creates or drops a database (one taken with `mysqldump --databases`) is refused before anything is touched. A backup writes `<file>.partial` and replaces `<file>` only when the dump finished; a destination that cannot be written, or an earlier backup held open by another program, is refused naming the path, the earlier backup kept byte for byte and the partial dump removed. A backup that cannot be read is refused naming it, and no database is created.
 - `-Status` and `-Stop` act only on the process `-Start` recorded, by its id and image path, so a MySQL server that belongs to something else is never touched. A start on a port another listener holds is refused, and that listener is left alone.
 - The server is started with no handle of its caller's and no console window, so a script that reads `-Start`'s output gets its end.
 
@@ -47,6 +47,8 @@ The file is handed to the client as `--defaults-extra-file`. No password is ever
 - **A meaning** is an entry's text in one version, with its source. Rewording adds a meaning in the new version and keeps the key, so every older version still reads as it was stamped.
 - **A version** is proposed, then reviewed, then stamped. It changes only while proposed. A reviewed version is frozen; `reopen` takes it back to proposed and clears its review, so nothing is stamped on an approval given before a change. The reviewer is never the version's author. A dataset has one open version at a time.
 - **Every change and every step has a reason**, written to the changelog with who made it.
+- **An approval covers exactly what was inspected.** `changes` prints a version's changes and its digest, both read from one snapshot of the database, and `review` names that digest (`--inspected`). The database takes the version's lock, recomputes the digest and refuses the review when it differs, so an edit another author made after you read `changes`, or one still in flight when you review, is never approved unseen: read `changes` again and review what it shows.
+- **Every edit stays in the history.** Each add and reword records the text and source it set, so rewording an entry twice in one version leaves both in `history`.
 - **A step is one transaction.** Review, reopen and stamp each check the status, change it only from the status they checked, and write their changelog row together, so two authors acting on one version at once cannot both succeed.
 
 The rules live in the database, as stored procedures in `data/refdata/schema.sql`, and each refusal names itself (`refused: the reviewer is the author`). The tables, procedures and view use only what MySQL 8.4 and MariaDB 11 both run, so a shared server may be either.
@@ -71,12 +73,13 @@ Write a proposal file and propose it. A proposal runs in one transaction: if any
 ```powershell
 python tools/refdata/refdata.py propose proposal.json                  # opens the next version with these changes
 python tools/refdata/refdata.py propose more.json --version 3          # adds changes to proposed version 3
-python tools/refdata/refdata.py review fixture 3 --as author-two --reason "checked against the manual"
+python tools/refdata/refdata.py changes fixture 3                     # read what you approve; note the digest it prints
+python tools/refdata/refdata.py review fixture 3 --as author-two --reason "checked against the manual" --inspected <digest>
 python tools/refdata/refdata.py reopen fixture 3 --as author-one --reason "one more change"
 python tools/refdata/refdata.py stamp  fixture 3 --as author-one --reason "release"
 ```
 
-`data/refdata/fixtures/fixture-v1.json` and `fixture-v2.json` are worked examples.
+`data/refdata/fixtures/fixture-v1.json` and `fixture-v2.json` are worked examples. A proposal whose shape is wrong (not an object, `changes` missing or not a list, a change that is not an object, names no verb or more than one of `add`, `reword` and `rename`, or lacks its `text` or `to`) is refused naming the change and the field before anything is sent to the server.
 
 ## How do I see what a version holds?
 
@@ -87,7 +90,17 @@ python tools/refdata/refdata.py changes fixture 3      # what version 3 adds or 
 python tools/refdata/refdata.py history fixture        # the changelog: every change and step, by whom, and why
 ```
 
-Read `changes` before you review: it is exactly what the approval covers.
+Read `changes` before you review: its digest is exactly what the approval covers. Values are read back as text even when they are the word `NULL`, which the client would otherwise print for an empty field.
+
+## How do I move a database to a newer schema?
+
+The schema records its revision (`schema_info`). Every command on a database at an older revision is refused, naming the upgrade:
+
+```powershell
+python tools/refdata/refdata.py upgrade --database refdata --to refdata_r2
+```
+
+`upgrade` backs the old database up, restores the rows into the new name built from the current `data/refdata/schema.sql`, then reads every dataset, version, version text and changelog row back from both and refuses at the first difference, dropping the new database. The old database is never changed, so recovery is to keep using it. On success, work in the new one (`--database refdata_r2`, or `RESOLUTE_REFDATA_DATABASE=refdata_r2`), and drop the old one once you have checked it. Revision 1 kept only an entry's latest text, so changelog rows written before the upgrade say their contents were not recorded.
 
 ## What happens when something is wrong?
 
@@ -99,6 +112,6 @@ Every command exits 1 with a named refusal and writes nothing when the option fi
 python tools/refdata/refdata.py --self-test
 ```
 
-It runs against the private server in a database of its own, `refdata_selftest_<random>`, which it refuses to reuse and drops when it ends, pass or fail. It records every other database's tables and checksums before and after and fails if any changed, so it never touches real authoring data. In between it creates the schema, proposes, reviews and stamps the fixture's two versions and reads both back exactly (keys, meanings, sources and changelog), proves each refusal, proves a refused proposal leaves nothing, proves reopen and re-review, checks the three connection failures, and reads the stamped data back after stopping and starting the server. `--schema <file>` runs it against another copy of the schema: with one refusal removed, it fails naming that refusal.
+It runs against the private server in a database of its own, `refdata_selftest_<random>`, which it refuses to reuse and drops when it ends, pass or fail. It records every other database's tables and checksums before and after and fails if any changed, so it never touches real authoring data. In between it creates the schema, proposes, reviews and stamps the fixture's two versions and reads both back exactly (keys, meanings, sources and changelog), proves each refusal, proves a refused proposal leaves nothing, proves reopen and re-review, proves a review is refused on contents changed since they were inspected (one edit made before the review, and one held open in a second session while the review waits), keeps both rewordings of one entry in one version, reads back the word `NULL` as text, refuses each malformed proposal shape with nothing sent, refuses the three file errors with the earlier files kept, upgrades a revision 1 database with nothing lost and refuses an upgrade whose copy lost a row, checks the three connection failures, and reads the stamped data back after stopping and starting the server. `--schema <file>` runs it against another copy of the schema: with one refusal removed, it fails naming that refusal.
 
 Nothing here runs on CI or on a user's machine.
