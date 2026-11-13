@@ -21,7 +21,9 @@
 
     The operator comes first (docs/testing.md, the fence). The driver takes
     the desktop only after the operator has been idle for -IdleSeconds, and
-    before it launches anything; from then on any input, or an input query
+    before it launches anything. It then sends one input event of its own
+    (a one-pixel move and back), because Windows lets a background process
+    bring a window to the front only after it sent the last input event; from then on any input, or an input query
     that fails, stands the whole run down: every process the driver started
     is ended with its children, the interrupted shot's files are removed,
     and no later shot is attempted.
@@ -318,6 +320,18 @@ if (-not $admitted) {
     Write-Host "stood down before launching anything: the operator was not idle for ${IdleSeconds}s within ${IdleWaitSeconds}s (docs/testing.md stand-down rule)" -ForegroundColor Yellow
     exit 3
 }
+# Windows lets a background process bring a window to the front only when it
+# sent the last input event (measured 2026-11-13: SetForegroundWindow from
+# this driver returned false until it had sent one). So the driver sends one
+# event of its own, a one-pixel move and back that leaves the cursor where it
+# was, after admission and before the baseline: the baseline is that event,
+# the operator has been idle past the threshold, and any input after it is
+# the operator's and stands the run down as before.
+if ([Touch]::Nudge() -ne 2) {
+    Write-Host 'stood down before launching anything: the input event that lets the driver take the foreground could not be sent' -ForegroundColor Yellow
+    exit 3
+}
+Start-Sleep -Milliseconds 100
 $script:Baseline = Get-InputTick
 if ($null -eq $script:Baseline) {
     Write-Host 'stood down before launching anything: the input query failed, so the operator cannot be seen' -ForegroundColor Yellow
