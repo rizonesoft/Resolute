@@ -436,6 +436,15 @@ function Restore-Interrupted([string]$OutDir) {
     return $said
 }
 
+# A capture child that refused says why on its own output (D00 T02 section 14:
+# the covering window's title and process); the stand-down repeats that line,
+# so the driver's own message names what stopped the shot.
+function Get-CaptureFailure([string]$Name, [int]$Code, [string]$Output) {
+    $said = @($Output -split "`r?`n" | Where-Object { $_ -match '^capture-window: ' })
+    $why = if ($said.Count) { $said[-1].Trim() } else { 'it printed no refusal' }
+    "capture-window failed for $Name with ${Code}: $why"
+}
+
 function Test-InputResumed($Baseline, $Now) {
     # True when the operator's event count moved after the baseline. A
     # watch that answered nothing is not "no input": the run cannot see the
@@ -468,6 +477,8 @@ function Invoke-SelfTest {
     $threw = $false
     try { $null = Test-InputResumed $null 0 } catch { $threw = $true }
     Check 'a missing baseline is a stand-down' $threw
+    $refused = "captured nothing yet`r`ncapture-window: refused before the copy: the target is covered by 'Cover' (pwsh, pid 9)`r`n"
+    Check 'a refused capture stands down repeating the child''s refusal' ((Get-CaptureFailure 'shot' 3 $refused) -eq "capture-window failed for shot with 3: capture-window: refused before the copy: the target is covered by 'Cover' (pwsh, pid 9)" -and (Get-CaptureFailure 'shot' 1 '') -like '*with 1: it printed no refusal')
     Check "the driver's own marked injected event is not the operator's" (-not [Watch]::IsOperator($true, [Watch]::Mark))
     Check 'an event Windows did not inject is the operator''s, whatever its mark' ([Watch]::IsOperator($false, [Watch]::Mark))
     Check 'an injected event without the mark (the drill, or other software) is the operator''s' ([Watch]::IsOperator($true, 0))
@@ -684,9 +695,14 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
         $info = [System.Diagnostics.ProcessStartInfo]::new((Get-Process -Id $PID).Path)
         foreach ($a in @('-NoProfile', '-File', $CaptureScript, '-ProcessId', "$($proc.Id)", '-Appearance', $Mode, '-Out', $out, '-Describes', $describes, '-Fixture', $fixture, '-LaunchContext', $context, '-FixtureFiles', 'none beside Bin/Release (launcher only build)')) { $info.ArgumentList.Add($a) }
         $info.UseShellExecute = $false
+        $info.RedirectStandardOutput = $true
+        $info.RedirectStandardError = $true
         Assert-NoInput "the capture of $name"
         $null = Assert-OnScreen $hwnd "the capture of $name" 'capture'
         $cap = [System.Diagnostics.Process]::Start($info)
+        # Both streams read as they come, so a child that writes much never blocks on a full pipe.
+        $capOut = $cap.StandardOutput.ReadToEndAsync()
+        $capErr = $cap.StandardError.ReadToEndAsync()
         Invoke-Drill 'capture'
         $deadline = [DateTime]::UtcNow.AddSeconds($CaptureTimeoutSeconds)
         while (-not $cap.WaitForExit(200)) {
@@ -696,7 +712,9 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
         # Input that arrived as the capture finished counts too, and so does a display that changed under it.
         Assert-NoInput "the capture of $name"
         $null = Assert-OnScreen $hwnd "the capture of $name" 'captured'
-        if ($cap.ExitCode -ne 0) { throw "capture-window failed for $name with $($cap.ExitCode)" }
+        $said = $capOut.GetAwaiter().GetResult() + $capErr.GetAwaiter().GetResult()
+        if ($said) { Write-Host $said.TrimEnd() }
+        if ($cap.ExitCode -ne 0) { throw (Get-CaptureFailure $name $cap.ExitCode $said) }
         $script:Shots += $name
         Write-Output "SHOT $name ok"
     } finally {
