@@ -110,19 +110,56 @@ Set-StrictMode -Version Latest
 $script:AfterWrite = $null   # the self-test's way to make a write land other bytes
 $script:SwitchHook = $null   # the self-test's stand-in for the writer ending between the two switches
 
+function Enter-PairLock([string]$Image, [int]$TimeoutMs = 30000) {
+    # One writer per output pair, from recovery to the last switch: two
+    # captures to the same path would otherwise share the *.new files and
+    # could publish one capture's image with the other's sidecar.
+    $key = [System.BitConverter]::ToString([System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes($Image.ToLowerInvariant()))).Replace('-', '').Substring(0, 32)
+    $mutex = [System.Threading.Mutex]::new($false, "Local\ResoluteCapturePair-$key")
+    try {
+        if (-not $mutex.WaitOne($TimeoutMs)) { $mutex.Dispose(); throw "another capture is writing $Image" }
+    } catch [System.Threading.AbandonedMutexException] {
+        # A writer that ended while it held the pair: this one owns it now, and recovery repairs what it left.
+    }
+    return $mutex
+}
+
+function Undo-Switch([string]$Image, [string]$Sidecar) {
+    # Puts the earlier image back, or removes a lone new one, after the
+    # image switched and the sidecar did not. Restartable: the sidecar's
+    # *.new is first renamed to a marker that records which of the two this
+    # undo is, so an undo cut short is finished the same way next time.
+    $imageOld = "$Image.old"
+    $restore = "$Sidecar.undo-restore"; $remove = "$Sidecar.undo-remove"
+    if (-not (Test-Path -LiteralPath $restore) -and -not (Test-Path -LiteralPath $remove)) {
+        $marker = if (Test-Path -LiteralPath $imageOld) { $restore } else { $remove }
+        if (Test-Path -LiteralPath "$Sidecar.new") { [System.IO.File]::Move("$Sidecar.new", $marker) } else { [System.IO.File]::WriteAllBytes($marker, [byte[]]@()) }
+    }
+    if (Test-Path -LiteralPath $restore) {
+        if (Test-Path -LiteralPath $imageOld) { [System.IO.File]::Move($imageOld, $Image, $true) }
+        [System.IO.File]::Delete($restore)
+    }
+    if (Test-Path -LiteralPath $remove) {
+        if (Test-Path -LiteralPath $Image) { [System.IO.File]::Delete($Image) }
+        [System.IO.File]::Delete($remove)
+    }
+}
+
 function Restore-Pair([string]$Image, [string]$Sidecar) {
-    # A writer that ended between the switches left a state the files
-    # alone describe. Returns what it found, or $null when nothing was left.
+    # A writer that ended between the switches, or inside an undo, left a
+    # state the files alone describe. Returns what it found, or $null.
     $imageNew = "$Image.new"; $sidecarNew = "$Sidecar.new"; $imageOld = "$Image.old"; $sidecarOld = "$Sidecar.old"
     $said = $null
-    if (Test-Path -LiteralPath $imageNew) {
+    if ((Test-Path -LiteralPath "$Sidecar.undo-restore") -or (Test-Path -LiteralPath "$Sidecar.undo-remove")) {
+        Undo-Switch $Image $Sidecar
+        $said = 'an undo cut short was finished; the earlier pair is back'
+    } elseif (Test-Path -LiteralPath $imageNew) {
         # The switch never began: the live pair is untouched.
         foreach ($f in $imageNew, $sidecarNew) { if (Test-Path -LiteralPath $f) { [System.IO.File]::Delete($f) } }
         $said = 'a capture that never switched in was removed'
     } elseif (Test-Path -LiteralPath $sidecarNew) {
-        # The image switched and the sidecar did not: the earlier image comes back, or the lone new one goes.
-        if (Test-Path -LiteralPath $imageOld) { [System.IO.File]::Move($imageOld, $Image, $true) } elseif (Test-Path -LiteralPath $Image) { [System.IO.File]::Delete($Image) }
-        [System.IO.File]::Delete($sidecarNew)
+        # The image switched and the sidecar did not.
+        Undo-Switch $Image $Sidecar
         $said = 'a capture cut short between its switches was undone; the earlier pair is back'
     }
     foreach ($f in $imageOld, $sidecarOld) {
@@ -171,14 +208,12 @@ function Write-CapturePair([string]$Image, [byte[]]$ImageBytes, [string]$Sidecar
     } catch {
         $why = $_.Exception.Message
         try {
-            if ($imageSwitched) {
-                # The new image is live beside the old sidecar: put the old image back.
-                if ($imageOld) { [System.IO.File]::Move($imageOld, $Image, $true) } else { [System.IO.File]::Delete($Image) }
-            }
+            # The new image is live beside the old sidecar: put the old image back, or remove the lone new one.
+            if ($imageSwitched) { Undo-Switch $Image $Sidecar }
         } catch {
             throw "the capture pair was not written, and the previous image could not be put back ($($_.Exception.Message)); it is at ${imageOld}: $why"
         } finally {
-            foreach ($f in $made) { if ($f -ne $imageOld -and (Test-Path -LiteralPath $f -PathType Leaf)) { Remove-Item -LiteralPath $f -Force } }
+            foreach ($f in $made) { if ($f -ne $imageOld -and (Test-Path -LiteralPath $f -PathType Leaf)) { [System.IO.File]::Delete($f) } }
         }
         throw "the capture pair was not written, and the previous pair is unchanged: $why"
     }
@@ -232,6 +267,32 @@ function Invoke-SelfTest {
         $null = Restore-Pair $lonePng $loneTxt
         Check 'a first capture stopped between the switches is recovered to no files' (-not (Test-Path -LiteralPath $lonePng) -and -not (Test-Path -LiteralPath $loneTxt) -and (Leftovers) -eq 0)
 
+        # An undo cut short after the earlier image came back: finished the same way, the earlier image kept.
+        $script:SwitchHook = { 'stop' }
+        try { Write-CapturePair $png $newPng $txt $newTxt } finally { $script:SwitchHook = $null }
+        [System.IO.File]::Move("$txt.new", "$txt.undo-restore")
+        [System.IO.File]::Move("$png.old", $png, $true)
+        $null = Restore-Pair $png $txt
+        Check 'an undo cut short is finished at the next start, keeping the earlier image' ("$(Hash $png) $(Hash $txt)" -eq $before -and @(Get-ChildItem -LiteralPath $dir -File).Count -eq 2)
+
+        # Two writers to one pair: the second waits for the first and is refused by name when it does not finish in time.
+        $holderInfo = [System.Diagnostics.ProcessStartInfo]::new((Get-Process -Id $PID).Path, @('-NoProfile', '-Command', "`$m = [System.Threading.Mutex]::new(`$false, 'Local\ResoluteCapturePair-' + [System.BitConverter]::ToString([System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes('$($png.ToLowerInvariant())'))).Replace('-', '').Substring(0, 32)); [void]`$m.WaitOne(); [Console]::Out.WriteLine('held'); Start-Sleep -Seconds 20"))
+        $holderInfo.RedirectStandardOutput = $true
+        $holderInfo.CreateNoWindow = $true
+        $holder = [System.Diagnostics.Process]::Start($holderInfo)
+        try {
+            Start-Sleep -Seconds 3
+            $said = $null
+            try { $lock = Enter-PairLock $png 500; $lock.ReleaseMutex(); $lock.Dispose() } catch { $said = $_.Exception.Message }
+            Check 'a second writer to the same pair is refused by name while the first holds it' ($said -like '*another capture is writing*')
+        } finally {
+            & taskkill.exe /T /F /PID $holder.Id 2>&1 | Out-Null
+            $null = $holder.WaitForExit(10000)
+        }
+        $lock = Enter-PairLock $png 5000
+        Check 'a writer that ended while holding the pair does not block the next' ($null -ne $lock)
+        $lock.ReleaseMutex(); $lock.Dispose()
+
         Write-CapturePair $png $newPng $txt $newTxt
         Check 'a replacing write leaves the new pair and no *.new or *.old' ((Leftovers) -eq 0 -and [System.Linq.Enumerable]::SequenceEqual([System.IO.File]::ReadAllBytes($png), $newPng) -and [System.Linq.Enumerable]::SequenceEqual([System.IO.File]::ReadAllBytes($txt), $newTxt))
     } finally {
@@ -247,6 +308,12 @@ if ($SelfTest) { exit (Invoke-SelfTest) }
 if (-not $Out) {
     Write-Host "capture-window: give -Out, the PNG to write." -ForegroundColor Red
     exit 2
+}
+try {
+    $script:PairLock = Enter-PairLock ([System.IO.Path]::GetFullPath($Out))
+} catch {
+    Write-Host "capture-window: refused: $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
 }
 $recovered = Restore-Pair ([System.IO.Path]::GetFullPath($Out)) ([System.IO.Path]::ChangeExtension([System.IO.Path]::GetFullPath($Out), '.txt'))
 if ($recovered) { Write-Host "capture-window: $recovered ($Out)" -ForegroundColor Yellow }
