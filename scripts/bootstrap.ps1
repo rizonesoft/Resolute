@@ -208,7 +208,7 @@ foreach ($c in $Pins.components) {
         Write-Host "          The archive at that URL is not the archive this" -ForegroundColor DarkGray
         Write-Host "          repository pinned. Either the release was re-cut in" -ForegroundColor DarkGray
         Write-Host "          place, or the download is not what it claims to be." -ForegroundColor DarkGray
-        Write-Host "          reskit/ is unchanged." -ForegroundColor DarkGray
+        Write-Host "          Nothing of $($c.name) was written to reskit/." -ForegroundColor DarkGray
         exit 1
     }
 
