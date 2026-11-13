@@ -76,7 +76,7 @@ Every setting is a script parameter; there is no configuration file to write.
 | `build.ps1 <Name>` | none | Builds one target: `Resolute` (the launcher) or any folder under `extensions/` |
 | `build.ps1 -All` | none | Builds the launcher and every tool |
 | `build.ps1 -Config` | `Release` | `Debug` or `Release` |
-| `build.ps1 -ResetMovedTrees` | off | Removes build trees that a clone at another path made, and builds nothing. An ordinary build does the same cleanup first, so this is only for seeing what would go: `pwsh scripts/build.ps1 -ResetMovedTrees` |
+| `build.ps1 -ResetMovedTrees` | off | Deletes the build trees that a clone at another path made, and builds nothing. It is the cleanup alone, not a preview: an ordinary build does the same cleanup first and then builds. `pwsh scripts/build.ps1 -ResetMovedTrees` |
 | `check-all.ps1 -SkipBuild` | off | Skips the build and tidy gates, for a change to documents only |
 
 The pinned versions and their hashes live in [`toolchain.json`](toolchain.json); a download whose hash differs is refused.
@@ -134,7 +134,7 @@ The plan is the contract: every section is built, proven by a check from a real 
 
 ## How is it built?
 
-Every tool consumes two shared layers, and the one rule between them is that a tool never reimplements what a layer below it provides.
+Every tool consumes the framework, and the repair tools also consume the repair contract. The one rule between the layers is that a tool never reimplements what a layer below it provides.
 
 ```mermaid
 flowchart TB
@@ -143,7 +143,7 @@ flowchart TB
     repair["Repair contract: src/repair/<br/>diagnose, result list, restore record, undo<br/>(D02 T01)"]
     framework["Framework: src/framework/<br/>startup, settings, logging, language, update, About<br/>(D01 T01)"]
     ui["UI library: shared/resolute-ui/<br/>every control, theming, DPI, typography"]
-    tools --> repair
+    tools -- repair tools only --> repair
     tools --> framework
     launcher --> framework
     repair --> framework

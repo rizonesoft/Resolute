@@ -53,3 +53,27 @@ OVERALL: needs-attention
 
 HIGHEST: P1
 OVERALL: needs-attention
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T17:18:39Z
+- Effort: low
+- Writer model: claude-fable-5-2
+- Policy: e8b906daa9506dcc5b59865ae7b0f6f04c641721
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 8
+- Digest: fd7ecd96e68023b0
+
+## consistency: needs-attention
+
+1. **P3, README.md:79:** “only for seeing what would go” implies a preview, but `-ResetMovedTrees` performs deletion. Reproduce on a relocated checkout with existing build trees: the documented command calls `Reset-MovedBuildTrees` at `scripts/build.ps1:336`, which recursively removes those trees and `build/deps` at lines 204 and 209. Describe it as cleanup without rebuilding.
+
+2. **P3, README.md:137:** “Every tool consumes two shared layers” contradicts AGENTS.md’s architecture contract and the README’s own later clarification: only repair tools consume the repair contract. Reproduce by comparing this sentence and the unconditional `tools --> repair` diagram edge with AGENTS.md’s “The two shared layers” table. Qualify both the sentence and diagram to distinguish repair tools.
+
+HIGHEST: P3
+OVERALL: needs-attention
