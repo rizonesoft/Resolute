@@ -61,6 +61,18 @@ $JournalFile = Join-Path $HashDir 'registration.journal'
 # One registration or recovery at a time, machine-wide. A mutex and not a file: the system releases it when its
 # holder dies, which is exactly when the journal it leaves is abandoned and may be recovered.
 $RegistrationLockName = 'Global\Resolute-ElevatedSmoke-Registration'
+# The refusals the elevated registration copy can give before its directory
+# exists, each with its own exit code: that copy's console closes when it
+# exits, the log it keeps lives in the directory, and a file the operator's
+# own process could read would be a path an ordinary account chose for an
+# elevated process to write. The code carries the reason instead.
+$RefusalCodes = @{   # a plain hashtable: an ordered one reads an integer key as a position
+    10 = 'refused: the registration copy is not elevated'
+    11 = 'refused: the consent was given as another account; the task must run as the account that asked for it. Sign in as an administrator, or give this account administrator rights, and register again'
+    12 = 'refused: the pinned Python is not installed in reskit\python (run pwsh scripts/bootstrap.ps1)'
+    13 = 'refused: the elevated smoke task is running or queued; let it finish or run -Remove first'
+    14 = 'refused: registering the elevated smoke task is not possible now: another elevated smoke operation (a registration, a recovery, a run or a removal) holds the lock; try again when it has finished'
+}
 $AdminsSid = 'S-1-5-32-544'
 $SystemSid = 'S-1-5-18'
 $DriverFiles = @('scripts\smoke-run.py', 'scripts\conformance-check.py')
@@ -824,6 +836,14 @@ function Invoke-SelfTest {
                 JournalTrusted = { $trust.Value }
             }
 
+            # A first registration refused before its directory exists says why in its exit code, and writes nothing.
+            $missing = $script:Registration.Source
+            $script:Registration.Source = { Join-Path $td 'no-runtime-here' }
+            $code = Invoke-RegisterElevated 6>$null
+            $script:Registration.Source = $missing
+            Check 'a first registration refused before its directory exists returns the code that names the refusal, and writes nothing' (
+                $code -eq 12 -and (Get-RefusalForExitCode $code) -match 'pinned Python is not installed' -and -not (Test-Path -LiteralPath $box) -and -not (Get-TaskOrNull))
+
             # A first registration abandoned after its switch is recovered to nothing: no task, no directory.
             $said = Register-InSandbox -AbandonAfter 'commit'
             $abandoned = (Test-Path -LiteralPath $script:JournalFile) -and [bool](Get-TaskOrNull)
@@ -1059,6 +1079,15 @@ function Invoke-SelfTest {
         Check 'the sandbox task is gone and the real task was never touched' (
             -not (Get-ScheduledTask -TaskName 'ResoluteSelfTest-*' -ErrorAction SilentlyContinue) -and $TaskName -eq 'ElevatedSmoke' -and $HashDir -eq 'C:\ProgramData\Resolute\ElevatedSmoke')
 
+        # Every refusal the elevated copy can give before its directory exists has a code -Register can read.
+        Check 'each early refusal of the elevated copy has its own exit code and message, and other codes have none' (
+            (@(10, 11, 12, 13, 14 | Where-Object { -not ((Get-RefusalForExitCode $_) -match '^refused: ') })).Count -eq 0 -and
+            (Get-RefusalForExitCode 2) -eq '' -and (Get-RefusalForExitCode 0) -eq '' -and
+            (Get-RefusalForExitCode 14) -eq (Get-BusyRefusal 'registering the elevated smoke task'))
+        $registerSource = (Get-Command Invoke-Register).ScriptBlock.ToString()
+        Check '-Register prints the refusal its exit code names when the elevated copy left no log' (
+            $registerSource.Contains('Get-RefusalForExitCode $proc.ExitCode') -and $registerSource.Contains('Write-Host "elevated: $reason"'))
+
         # -Register answers from an existing task only when no interrupted registration is waiting for it.
         Check '-Register goes on to recover an interrupted registration even when a task is there and -Replace is not given' (
             (Test-KeepsExistingTask $true $false $false) -and -not (Test-KeepsExistingTask $true $false $true) -and
@@ -1211,6 +1240,13 @@ function Invoke-ElevatedRegistration {
     }
 }
 
+function Get-RefusalForExitCode([int]$Code) {
+    # What the elevated copy refused, from its exit code alone; nothing for a
+    # code it does not give.
+    if ($RefusalCodes.Contains($Code)) { return $RefusalCodes[$Code] }
+    return ''
+}
+
 function Get-BusyRefusal([string]$Action) {
     # The one refusal every holder of the lock gives: it says what was refused
     # and what holds the lock, which is one of four operations and is not
@@ -1245,7 +1281,7 @@ function Invoke-RegisterElevated {
     # second registration started meanwhile is refused instead of taking
     # the first one's journal for an abandoned one and undoing it.
     $lock = Enter-RegistrationLock $script:RegistrationLockName
-    if (-not $lock) { Write-Registration (Get-BusyRefusal 'registering the elevated smoke task'); return 2 }
+    if (-not $lock) { Write-Registration (Get-BusyRefusal 'registering the elevated smoke task'); return 14 }
     try {
         return (Invoke-RegistrationTransaction)
     } finally {
@@ -1263,24 +1299,24 @@ function Invoke-RegistrationTransaction {
     # included, puts back the previous task, hashes, runtime and directory
     # permissions. Exit code says the outcome.
     $mode = $script:Registration
-    if ($mode.RequireElevation -and -not (Test-IsElevated)) { Write-Registration 'refused: the registration copy is not elevated'; return 2 }
+    if ($mode.RequireElevation -and -not (Test-IsElevated)) { Write-Registration 'refused: the registration copy is not elevated'; return 10 }
     function Step([string]$Name) { Invoke-StepPoint $Name }
     if ($OperatorSid -and $OperatorSid -ne (Get-CurrentSid)) {
         # Consent given with another administrator's credentials: this copy
         # runs as that administrator, so the task and the HKCU it reads would
         # be theirs, and the operator's -Run could never feed it.
         Write-Registration "refused: the consent was given as another account ($([Security.Principal.WindowsIdentity]::GetCurrent().Name)); the task must run as the account that asked for it. Sign in as an administrator, or give this account administrator rights, and register again"
-        return 2
+        return 11
     }
     $pinnedPython = & $mode.Source
     if (-not (Test-Path (Join-Path $pinnedPython 'python.exe'))) {
         Write-Registration "refused: the pinned Python is not installed at $pinnedPython (run pwsh scripts/bootstrap.ps1)"
-        return 2
+        return 12
     }
     $prior = Get-TaskOrNull
     if ($prior -and (Test-TaskNeedsStop $prior.State)) {
         Write-Registration 'refused: the elevated smoke task is running or queued; let it finish or run -Remove first'
-        return 2
+        return 13
     }
     # An earlier registration that never reached its commit comes first.
     Resolve-Journal
@@ -1507,7 +1543,12 @@ function Invoke-Register {
             return 2
         }
         # What the elevated copy said, from the log it keeps in the protected directory.
-        Read-RegistrationLog $logFrom | ForEach-Object { Write-Host "elevated: $_" }
+        $said = @(Read-RegistrationLog $logFrom)
+        $said | ForEach-Object { Write-Host "elevated: $_" }
+        # A refusal given before the directory existed left no log: its exit
+        # code says which it was.
+        $reason = Get-RefusalForExitCode $proc.ExitCode
+        if ($reason -and -not $said) { Write-Host "elevated: $reason" }
         if ($proc.ExitCode -ne 0) {
             Write-Host "refused: elevated registration failed with exit code $($proc.ExitCode); nothing is registered by this run"
             return 2
