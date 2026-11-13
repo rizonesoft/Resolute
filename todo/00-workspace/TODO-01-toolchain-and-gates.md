@@ -52,7 +52,7 @@ track: W1
 |   8   |   §8    | Run the unit suite under release             | §5         |  [x]   |
 |   9   |   §9    | Remove the Linux execution surface         | §5         |  [x]   |
 |  10   |   §10   | CI runs the full gate set on every push      | §5         |  [x]   |
-|  11   |   §11   | CI reader tests go through the real helpers  | §10        |  [ ]   |
+|  11   |   §11   | CI reader tests go through the real helpers  | §10        |  [x]   |
 
 ---
 
@@ -959,6 +959,14 @@ No surface of its own: the self-test of `scripts/ci-status.py`.
 -> SOURCE: review-2026-11-13-d00-t01-s10-repair2-round3 (P3 failed-listing test bypasses the helper)
 
 **Test checkpoint:** `python scripts/ci-status.py --self-test` passes, and fails by name with `changed_paths()` reduced to `return []` and with it made to list the head commit alone (quoted from a real run each way).
+
+> **Verified:** 2026-11-13 | §11 | `D00 T01 §11` at `c651fa61`: `python scripts/ci-status.py --self-test` "38 cases, 0 failed", exit 0; with `changed_paths()` reduced to `return []`, exit 1 with "FAIL a failed listing of the push's paths is exit 3, never green: got (0, False), want (3, True)" and "FAIL the push's paths are listed base to head, and a path under the filter owes plan-gates"; with it listing the head commit alone, exit 1 with the base-to-head case failing on `diff-tree ... c0ffee` where `diff --name-only ba5e c0ffee` is wanted; `python scripts/ci-status.py` on `c651fa61`: `gates` success (run 43337026632), `plan-gates` success (run 43337026637); `validate` 0 fatal
+> **Review:** round 1 astra (medium), candidate `c651fa61`(round 1) -- `adversarial` approve. Raw findings: docs/reviews/00-workspace/D00-T01-s11.md
+> **Completion:** astra (medium), candidate `c651fa61` -- COMPLETION: complete. Repair records: none
+> **Plan review:** astra (medium) on `04f8b7e7`, 1 gap planned in `3c2cc3f0`
+> **CRUD:** not applicable (self-test cases; nothing is written)
+> **Duration:** 2026-11-13T00:25:02Z to 2026-11-13T00:34:31Z
+> **Implementer:** Claude Fable 5.2 (claude-fable-5-2)
 
 ## Verification
 
