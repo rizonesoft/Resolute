@@ -86,7 +86,7 @@ Four. Each is one call to the message layer; the window's title is the tool's na
 | --- | --- |
 | Severity | Error |
 | Summary | `Update_Failed_Title` ("The update check did not finish") |
-| Body | One of the four reasons below, then `Update_Failed_Unchanged` ("%{Program.Name} is unchanged. You have version %1.") |
+| Body | One of the seven reasons below, then `Update_Failed_Unchanged` ("%{Program.Name} is unchanged. You have version %1.") |
 | Buttons | `Button_Update_Retry` (`&Try again`), the default; `Button_Update_Page` (`&Open download page`), which opens the tool's own page from its descriptor, so the user can look for themselves; `Button_Close` |
 | Shown | Only to the user who asked. The schedule leaves `Update_Result_Failed` ("Update check did not finish: %1") in the state segment and the log, and the Updates page shows it beside Last checked ([`preferences.md`](preferences.md#what-is-on-the-updates-page)) |
 
@@ -95,7 +95,10 @@ Four. Each is one call to the message layer; the window's title is the tool's na
 | No connection: the name does not resolve, or no route | `Label_Message_Error` ("The latest version could not be looked up.") and `Label_Message_Internet` ("Check your Internet connection and try again.") |
 | The server refused or failed: any answer but success | `Update_Failed_Server` ("The update server answered with an error (%1)."), %1 the status |
 | The answer is not an update file: cut short, not text, no `[Update]` section, no version or build in it | `Update_Failed_File` ("The update server's answer could not be read.") |
+| The connection was not completed: refused, reset, or closed before an answer arrived | `Update_Failed_Connection` ("The connection to the update server was not completed: %1"), %1 the Windows reason. No status is shown, because none was received |
+| The server's identity could not be verified: its certificate is refused, expired, or for another name | `Update_Failed_Secure` ("The update server's identity could not be verified, so nothing was read from it."). The check never goes on without that verification and never falls back to an unprotected request |
 | Timed out | `Update_Failed_Timeout` ("The update server did not answer within 15 seconds.") |
+| Anything else | `Update_Failed_Other` ("The check failed: %1"), %1 the Windows reason. Every failure is one of these seven: there is no failure without a notice |
 
 A failure never reads as "latest": the three outcomes have three summaries and two severities, and `UpdateLastCheck` is left as it was, so the Updates page does not claim a check that did not complete.
 
@@ -195,7 +198,7 @@ In `[Update]` unless marked. Every text above has a key here.
 | `Update_Newer_Than_Published` | The newest published version is %1. | New |
 | `Update_Failed_Title` | The update check did not finish | New; replaces `Window_Title_Error` |
 | `Update_Failed_Unchanged` | %{Program.Name} is unchanged. You have version %1. | New |
-| `Update_Failed_Server`, `Update_Failed_File`, `Update_Failed_Timeout` | As the failures table gives them | New |
+| `Update_Failed_Server`, `Update_Failed_File`, `Update_Failed_Timeout`, `Update_Failed_Connection`, `Update_Failed_Secure`, `Update_Failed_Other` | As the failures table gives them | New |
 | `Button_Update_Retry` | `&Try again` | New |
 | `Button_Update_Page` | `&Open download page` | New: the same label, for the tool's own page |
 | `Update_Task` | Checking for updates | New |
@@ -231,6 +234,9 @@ Every row is one behavioural check in `D01 T01 §7`, driven against the built to
 | Server error | Ask with the server answering 404, then 500 | | `Update_Failed_Server` with the status | The stated result is the failure presentation | `update: a server error names its status` |
 | Not an update file | Ask with an answer cut short, a page of HTML, and a file with no `[Update]` section | Each | `Update_Failed_File`; nothing from the answer is shown | The stated result is the failure presentation | `update: an unreadable answer is refused whole` |
 | Timed out | Ask with a server that never answers | | After 15 seconds `Update_Failed_Timeout`; the tool usable throughout | The stated result is the failure presentation | `update: a silent server ends at the limit` |
+| Connection not completed | Ask with the fixture server refusing the connection, then accepting it and resetting it before any header | Refused; reset | `Update_Failed_Connection` with the Windows reason and no status; `UpdateLastCheck` unchanged | The stated result is the failure presentation | `update: a broken connection is named without a status` |
+| Identity not verified | Ask with the fixture server presenting an expired certificate, then one for another name | Each | `Update_Failed_Secure`; nothing from the answer is read or shown; no request is made without protection | The stated result is the failure presentation | `update: an unverified server is never read` |
+| Any other failure | Seed a failure of a kind not listed (the request cannot be created) | | `Update_Failed_Other` with the Windows reason | The stated result is the failure presentation | `update: every failure has a notice` |
 | Try again | On the failed notice, with the server now answering | | The notice closes and a new check runs, ending in its own notice | The check failing again: the failed notice again | `update: try again runs the check again` |
 | The failed notice's page button | Press `Button_Update_Page` | | The descriptor's product page opens, unelevated | `Link_Open_Failed` | `update: a failed check still offers the tool's page` |
 | Recording the check | Ask with the settings file read-only (seeded), the server giving latest | | The latest notice as normal; `Update_Log_Record_Failed`; the Updates page still shows the earlier time; the saved value unchanged; a scheduled check is due at the next start | The stated results are the failure presentation | `update: a result is shown even when it cannot be recorded` |
