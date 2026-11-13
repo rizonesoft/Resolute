@@ -87,7 +87,11 @@ param(
     [int]$CaptureTimeoutSeconds = 120,
     [switch]$SelfTest,
     [ValidateSet('', 'positioning', 'theme', 'view', 'settling', 'capture')][string]$DrillInterruptAt = '',
-    [switch]$DrillFailQuery
+    [switch]$DrillFailQuery,
+    # Drills through the display checks: a work area in place of the
+    # display's (left,top,right,bottom), and a placed window moved partly off it.
+    [int[]]$DrillWorkArea = @(),
+    [switch]$DrillMoveOffscreen
 )
 
 $ErrorActionPreference = 'Stop'
@@ -101,6 +105,17 @@ public class Shot {
     [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int cx, int cy, uint flags);
     [StructLayout(LayoutKind.Sequential)] public struct RECT { public int Left, Top, Right, Bottom; }
     [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr h, out RECT r);
+    [StructLayout(LayoutKind.Sequential)] public struct POINT { public int X, Y; }
+    [StructLayout(LayoutKind.Sequential)] public struct MONITORINFO { public int cbSize; public RECT Monitor; public RECT Work; public uint Flags; }
+    [DllImport("user32.dll")] public static extern IntPtr MonitorFromPoint(POINT pt, uint flags);
+    [DllImport("user32.dll")] public static extern bool GetMonitorInfoW(IntPtr mon, ref MONITORINFO info);
+    // The primary monitor's work area, in physical pixels (the driver is per-monitor DPI aware), or null.
+    public static RECT? PrimaryWorkArea() {
+        var mon = MonitorFromPoint(new POINT(), 1);   // MONITOR_DEFAULTTOPRIMARY
+        var info = new MONITORINFO(); info.cbSize = Marshal.SizeOf(typeof(MONITORINFO));
+        if (mon == IntPtr.Zero || !GetMonitorInfoW(mon, ref info)) return null;
+        return info.Work;
+    }
     [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
     [DllImport("user32.dll", SetLastError = true)] public static extern IntPtr SendMessageTimeoutW(IntPtr h, uint msg, IntPtr w, IntPtr l, uint flags, uint timeoutMs, out UIntPtr result);
 }
@@ -268,6 +283,15 @@ function Assert-NoInput([string]$What) {
     if ($resumed) { throw "stood down during ${What}: operator input resumed (docs/testing.md stand-down rule)" }
 }
 
+function Test-FitsDisplay([int[]]$Work, [int]$Inset, [int]$Width, [int]$Height) {
+    # $Work is left, top, right, bottom. Returns $null when a window of this
+    # size at $Inset from the work area's corner lies wholly inside it, and
+    # the refusal otherwise, naming both sizes.
+    $workWidth = $Work[2] - $Work[0]; $workHeight = $Work[3] - $Work[1]
+    if ($Inset + $Width -le $workWidth -and $Inset + $Height -le $workHeight) { return $null }
+    return "the display's work area is $workWidth x $workHeight, too small for a $Width x $Height window at $Inset from its corner, so part of each shot would be off the screen"
+}
+
 function Set-Position([IntPtr]$Hwnd, [int]$X, [int]$Y, [int]$Width, [int]$Height, [string]$What, [int]$TimeoutMs = 5000) {
     # Asked, not waited on: SWP_ASYNCWINDOWPOS posts the request to the
     # launcher's thread instead of blocking on it. The driver then waits, as
@@ -424,6 +448,10 @@ function Invoke-SelfTest {
     $said = $null
     try { Set-Position $hung 40 40 300 200 'positioning' 1000 } catch { $said = $_.Exception.Message }
     $clock.Stop()
+    $small = Test-FitsDisplay @(0, 0, 1366, 728) 40 1600 1000
+    $large = Test-FitsDisplay @(0, 0, 2560, 1392) 40 1600 1000
+    Check 'a display too small for the window is refused, naming both sizes' ($small -like '*1366 x 728*1600 x 1000*')
+    Check 'a display large enough for the window is accepted' ($null -eq $large)
     Check 'positioning a window that does not answer returns by its deadline, naming the step' ($clock.ElapsedMilliseconds -lt 3000 -and $said -like '*during positioning*did not take its position*')
 
     # A set published over an earlier one while one destination sidecar is locked by another handle.
@@ -587,7 +615,17 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
         }
         if ($hwnd -eq [IntPtr]::Zero) { throw "no main window for $name" }
         Assert-NoInput 'positioning'
-        Set-Position $hwnd 40 40 1600 1000 'positioning'
+        Set-Position $hwnd ($script:Work[0] + 40) ($script:Work[1] + 40) 1600 1000 'positioning'
+        if ($DrillMoveOffscreen) {
+            # The drill's launcher moving itself: half its width past the work area's right edge.
+            [void][Shot]::SetWindowPos($hwnd, [IntPtr]::Zero, $script:Work[2] - 800, $script:Work[1] + 40, 1600, 1000, 0x4000)
+            Start-Sleep -Milliseconds 500
+            Write-Host 'drill: the window was moved partly off the work area'
+        }
+        $placed = New-Object Shot+RECT
+        if (-not [Shot]::GetWindowRect($hwnd, [ref]$placed) -or $placed.Left -lt $script:Work[0] -or $placed.Top -lt $script:Work[1] -or $placed.Right -gt $script:Work[2] -or $placed.Bottom -gt $script:Work[3]) {
+            throw "stood down during positioning: the window is not wholly inside the display's work area"
+        }
         Invoke-Drill 'positioning'
         Wait-Checked 500 'positioning'
         # The launcher starts in System appearance; its theme command
@@ -636,6 +674,18 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
 
 $script:KeepStaging = $false
 
+$workArea = [Shot]::PrimaryWorkArea()
+if ($null -eq $workArea) {
+    Write-Host 'stood down before launching anything: the display''s work area could not be read' -ForegroundColor Yellow
+    exit 3
+}
+$script:Work = @($workArea.Left, $workArea.Top, $workArea.Right, $workArea.Bottom)
+if ($DrillWorkArea.Count -eq 4) { $script:Work = $DrillWorkArea; Write-Host "drill: the work area is $($DrillWorkArea -join ',')" }
+$tooSmall = Test-FitsDisplay $script:Work 40 1600 1000
+if ($tooSmall) {
+    Write-Host "stood down before launching anything: $tooSmall" -ForegroundColor Yellow
+    exit 3
+}
 $bindFailure = [Lifetime]::Bind()
 if ($bindFailure) {
     Write-Host "stood down before launching anything: the processes this run would start could not be bound to its lifetime ($bindFailure)" -ForegroundColor Yellow
