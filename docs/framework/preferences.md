@@ -78,7 +78,7 @@ One group, Logging (`Group_Logging`).
 | --- | --- | --- | --- | --- |
 | Enable logging, a checkbox | `Checkbox_Enable_Logging` (`&Enable logging`) | `LoggingEnabled`, 1 or 0 | 1 | Unchecked disables the size input. Clear stays enabled while there is a log to clear. |
 | Keep the log under, a numeric input with the unit MB | `Label_Log_Limit` (`Keep the &log under`), new; unit `Unit_MB` ("MB"), new | `LoggingStorageSize`, in bytes | 5 MB (5242880, the AutoIt default at `ReBar.au3:866`) | Whole numbers from 1 to 100. Empty, zero, a fraction or a larger number is not allowed: `Error_Value_Range` ("Enter a whole number from %1 to %2."). A stored value outside the range, or not a whole number of megabytes, shows rounded up to the next megabyte within the range and is written back only at Save. |
-| Current size, a label | `Label_Logging_Size` ("The log is using %1."), reworded | none | | The size of this tool's log files, in KB under 1 MB and MB above, refreshed when the page shows, every 2 seconds while it shows, and after a clear. "The log is empty." (`Label_Logging_Empty`, new) when there is none. |
+| Current size, a label | `Label_Logging_Size` ("The log is using %1."), reworded | none | | The size of this tool's log files, in KB under 1 MB and MB above, refreshed when the page shows, every 2 seconds while it shows, and after a clear. "The log is empty." (`Label_Logging_Empty`, new) when there is none. When the folder cannot be read, `Label_Logging_Size_Unavailable` ("The log's size could not be read: %1"), new, with the Windows reason, and never "empty"; Clear log stays available and reports what it could not delete. |
 | Clear log, a button, with a line beneath it | `Button_Logging_Clear` (`&Clear log`), reworded; `Label_Logging_Clear_Note` ("Deletes the log files now. This cannot be undone, and Cancel does not bring them back."), new | none | | Below. |
 
 ### What does Clear log do?
@@ -116,14 +116,14 @@ Two groups.
 - **Why Normal is the default.** The AutoIt suite started at Above Normal (`ReBar.au3:860`) while its dialog treated Normal as the unchanged value (`:1204`), so a user who never opened Preferences ran above everything else on the machine without being told. A utility has no claim on more than its share until the user asks; the cost of changing this back is one constant.
 - **When it applies.** At Save, after the file has been written and read back, the framework sets the process's priority class and reads it back from Windows. At startup `D01 T01 §1` applies the stored value the same way.
 - **Realtime without the checkbox.** The process runs at Realtime for this session, the file stores High (4), and the saved notice says so: `Label_Realtime_Session` ("Saved. Realtime applies until this tool closes; it will start at High."). The combo keeps showing Realtime while the tool runs.
-- **When Windows refuses.** Realtime needs a privilege a standard user does not hold, and Windows then gives High without reporting an error; any other refusal leaves the priority as it was. After Save, the framework compares what it asked for with what Windows reports:
+- **When Windows refuses.** Realtime needs a privilege a standard user does not hold, and Windows then gives High without reporting an error; any other refusal leaves the priority as it was. After Save, the framework compares what it asked for with what Windows reports. The request is what is stored and shown, so the tool gets it whenever Windows will grant it (run elevated, for instance), and the note says what the tool is running at meanwhile. The same note shows when the dialog opens on a tool whose stored and actual priorities differ:
 
 | State | After a refusal |
 | --- | --- |
 | The process's priority | What Windows reports: High for a refused Realtime, the earlier priority otherwise |
 | The stored value | What was asked for, capped by the Realtime rule above |
-| The combo | The priority Windows reports, with `Label_Priority_Refused` ("Windows set %1 instead of %2.") beneath it, announced |
-| The dialog | Not dirty: Save is disabled, and the notice stands until the next edit |
+| The combo | What was asked for, which is what the file holds, so the edited and persisted values agree; beneath it `Label_Priority_Refused` ("Windows is running this tool at %1 instead of %2."), announced, for as long as the two differ |
+| The dialog | Not dirty, by the one dirty rule: the edited value equals the persisted one. A later save of another setting writes the priority as it stands, the value asked for, and applies it again |
 
 ### Memory (`Group_Memory`)
 
@@ -195,7 +195,8 @@ Each of these raises a UI Automation notification with its text, and none is car
 | Alt and a control's access key | Dialog | Focuses the control, and toggles a checkbox. Access keys are unique within a page and never collide with `&Save`. |
 | Space | A checkbox or a button | Toggles or presses. |
 | F4, Alt+Down; Up, Down; a typed letter | A combo | Opens it; changes the selection; type-ahead. |
-| Enter | Anywhere but an open combo | Save, when it is enabled. |
+| Enter | A button focused | Presses that button: Enter on Cancel takes the way out, never Save. |
+| Enter | Anywhere else but an open combo | Save, the default button, when it is enabled. |
 | Esc | An open combo | Closes the combo, keeping the value. |
 | Esc; Alt+F4 | Otherwise | The way out, as above. |
 
@@ -224,6 +225,7 @@ Every string on these pages is a pack string in `[Preferences]`, except the mess
 | `Unit_MB` | MB | New |
 | `Label_Logging_Size` | The log is using %1. | Reworded from "Logging Size: %s KB" |
 | `Label_Logging_Empty` | The log is empty. | New |
+| `Label_Logging_Size_Unavailable` | The log's size could not be read: %1 | New |
 | `Button_Logging_Clear` | `&Clear log` | Reworded from "Clear Logging" |
 | `Label_Logging_Clear_Note` | Deletes the log files now. This cannot be undone, and Cancel does not bring them back. | New |
 | `Label_Logging_Cleared` | Log cleared: %1 freed. | Reworded from "Logging cleared" |
@@ -234,7 +236,7 @@ Every string on these pages is a pack string in `[Preferences]`, except the mess
 | `Checkbox_SaveRealtime` | `&Keep Realtime after a restart (not recommended)` | Reworded from "Save priority above high (not recommended)."; only Realtime is above High |
 | `Label_Realtime_Warning` | Realtime can make Windows stop responding to the mouse and keyboard. | New |
 | `Label_Realtime_Session` | Saved. Realtime applies until this tool closes; it will start at High. | New |
-| `Label_Priority_Refused` | Windows set %1 instead of %2. | New |
+| `Label_Priority_Refused` | Windows is running this tool at %1 instead of %2. | New |
 | `Checkbox_ReduceMemory` | `&Reduce memory use when Windows is short of memory` | Reworded from "Reduce memory on low memory systems." |
 | `Label_Update_Frequency`, `Update_Every_Start`, `Update_Daily`, `Update_Weekly`, `Update_Never` | `Check for &updates`; Every time the tool starts, Once a day, Once a week, Never | New |
 | `Label_Update_Last`, `Label_Update_Never_Checked` | Last checked: %1; Not checked yet. | New |
@@ -270,11 +272,11 @@ Every row is one behavioural check in `D01 T01 §7`, driven against the built di
 | The way out with a change | The same four | Dirty | The prompt; Save saves and closes, Discard drops and closes, Cancel returns | A failed Save from the prompt leaves the dialog open with its failure | `prefs: the unsaved prompt's three answers` |
 | Enable logging | Click; Space; Alt+E | Checked, unchecked | The size input enables or disables; at Save `LoggingEnabled` is written and the log writer starts or stops | Save's failures | `prefs: logging turns off and on in the running tool` |
 | Log size | Type; paste | 1 to 100 | At Save `LoggingStorageSize` is written in bytes and the writer rotates a file already over the limit | A value not allowed, as above | `prefs: a smaller limit rotates the log at once` |
-| Current size | The page shown; every 2 seconds; after a clear | A log, or none | The size, or "The log is empty." | An unreadable log folder shows "The log is empty." and the reason goes to the log | `prefs: the size label follows the log` |
+| Current size | The page shown; every 2 seconds; after a clear | A log, none, or a folder that cannot be read | The size, or "The log is empty." | A folder that cannot be listed shows `Label_Logging_Size_Unavailable` with the reason, not "empty" | `prefs: the size label follows the log, and says when it cannot read it` |
 | Clear log | Click; Space; Alt+C | Logging on or off; a log, or none; a file held open | Cleared, nothing to clear, or partly cleared, announced; logging carries on into a new file | Partly cleared names the file and the reason | `prefs: clear, with nothing to clear and with a held file` |
 | Priority | Choose a value, then Save | Six values | The file holds the value and Windows reports the class, both read back, and again after a restart | A refusal, below | `prefs: priority reads back from the file and from Windows` |
 | Realtime without the checkbox | Choose Realtime, leave the checkbox clear, Save | | Realtime for the session, High stored, the Realtime notice; High after a restart | A refusal, below | `prefs: realtime is for the session unless kept` |
-| A refused priority | Save Realtime as a standard user | | Windows reports High; the combo shows High with `Label_Priority_Refused`; the dialog is not dirty | The stated result is the failure presentation | `prefs: a refused priority is shown as it is` |
+| A refused priority | Save Realtime with Keep Realtime as a standard user; then save an unrelated setting | | Windows reports High; the file holds 5; the combo shows Realtime with `Label_Priority_Refused` naming High; Save is disabled; the later save leaves the file's priority at 5 | The stated result is the failure presentation | `prefs: a refused priority is shown as it is, and stays as asked` |
 | Keep Realtime | Click; Space; Alt+K | Enabled only with Realtime chosen | At Save `SaveRealtime` is written and Realtime survives a restart | Save's failures | `prefs: realtime kept across a restart` |
 | Reduce memory | Click; Space; Alt+R | Checked, unchecked | At Save `ReduceMemory` is written and the trim timer starts or stops | Save's failures | `prefs: the memory trim starts and stops` |
 | Update frequency | Choose a value, then Save | Four values; a file with only `CheckForUpdates` | `UpdateFrequency` written; a scheduled check rescheduled or cancelled | Save's failures | `prefs: update frequency reschedules, and reads the AutoIt key` |
@@ -283,5 +285,5 @@ Every row is one behavioural check in `D01 T01 §7`, driven against the built di
 | Theme and density | Choose a value | Three values each | The window and the dialog change at once, announced; kept at Save | A value the scale lacks falls back to the default, logged | `prefs: previews apply, and save keeps them` |
 | Preview, then Discard | Preview, Save, preview again, Discard | | The tool shows what was saved | None can occur | `prefs: discard returns to the last save` |
 | Announcements | Each notice above | | Each raises a UI Automation notification with its text | None can occur | `prefs: every notice is announced` |
-| Keyboard | Every key in the table above | | Every control reached and operated without a mouse; focus as stated | None can occur | `prefs: keyboard reaches every control` |
+| Keyboard | Every key in the table above, and Enter with Cancel focused after an edit | | Every control reached and operated without a mouse; focus as stated; Enter on Cancel opens the unsaved prompt and saves nothing | None can occur | `prefs: keyboard reaches every control` |
 | Density and size | The minimum size at each density, and 200 percent text | | Nothing clipped; every target at least 24 x 24 | A label that does not fit wraps | `prefs: nothing clips at the minimum size` |
