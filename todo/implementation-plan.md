@@ -211,11 +211,11 @@ The framework every tool consumes, the repair contract the destructive half cons
 | :-: | ------------- | --------------------------------------------- | :---: |
 | [ ] | `D01 T01 §1`  | Application shell and lifecycle               |   9   |
 | [ ] | `D01 T01 §2`  | Settings: one writer, one path                |  11   |
-| [ ] | `D01 T01 §4`  | Localization and the pack loader              |   8   |
+| [ ] | `D01 T01 §4`  | Localization and the pack loader              |  10   |
 | [x] | `D01 T03 §1`  | Standard window, menus, message layer         |  23   |
 | [x] | `D01 T03 §2`  | Preferences shell, general, performance       |  27   |
-| [ ] | `D01 T03 §3`  | Language page and tool-page contract          |   6   |
-| [ ] | `D01 T01 §7`  | Standard window, About, and preferences       |  14   |
+| [ ] | `D01 T03 §3`  | Language page and tool-page contract          |  12   |
+| [ ] | `D01 T01 §7`  | Standard window, About, and preferences       |  16   |
 | [ ] | `D01 T01 §8`  | DPI awareness and system theme                |   7   |
 | [ ] | `D01 T03 §4`  | Per-tool log surface                          |   6   |
 | [ ] | `D01 T01 §3`  | Logging and the log surface                   |   8   |
@@ -224,7 +224,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T01 §9`  | Standalone proof in an empty folder           |   7   |
 | [ ] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown           |   6   |
 | [ ] | `D01 T01 §6`  | Elevation and its refusal path                |   8   |
-| [ ] | `D01 T01 §10` | Crash Handling and Single Instance            |  10   |
+| [ ] | `D01 T01 §10` | Crash Handling and Single Instance            |  11   |
 | [ ] | `D01 T01 §11` | Command Line and Exit Codes                   |  10   |
 | [ ] | `D02 T01 §1`  | The repair item and the run loop              |   7   |
 | [ ] | `D02 T01 §2`  | Diagnose before repair                        |  10   |
@@ -238,7 +238,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T02 §4`  | Window chrome and shell integration           |   7   |
 | [ ] | `D01 T02 §5`  | The accessibility floor                       |  11   |
 | [ ] | `D01 T02 §6`  | Performance floor                             |   8   |
-| [ ] | `D01 T02 §7`  | Text presentation and machine values          |   5   |
+| [ ] | `D01 T02 §7`  | Text presentation and machine values          |   6   |
 | [ ] | `D01 T02 §8`  | Menu bar and the complete popup menu          |   6   |
 | [ ] | `D01 T02 §9`  | Form controls: button, checkbox, input, combo |   7   |
 | [ ] | `D01 T03 §7`  | Splash, donate, string audit                  |   4   |

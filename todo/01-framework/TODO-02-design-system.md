@@ -209,9 +209,11 @@ Small rules, and the ones a user notices when they are wrong: a path they cannot
 - [ ] Show a tooltip with the full value **only** when text is actually truncated. Done when: a truncated value shows one and an untruncated value does not, both driven.
 - [ ] Use monospace for machine values: registry paths, file paths, numbers, and hex codes. Done when: every such surface renders monospace and prose renders proportional, captured.
 - [ ] Make machine values selectable and copyable. Done when: a value is selected and copied from the result list and the status bar, both driven.
+- [ ] Render right-to-left text (`D01 T03 §3`): a string from a right-to-left pack (Arabic, Persian and Hebrew are among the 35 in `resolute_au3/Resolute/Language/Firemin/`) is shaped and laid out with right-to-left reading direction and aligned to the leading edge of its control, in labels, list rows, inputs and messages; mixed text keeps a machine value (a path, a number) left to right inside it. The layout itself is not mirrored in this version, which the Language page states. Done when: a fixture string in each of the three languages renders against a captured baseline in a label, a list row and an input, and a mixed string keeps its path readable. **Filed 2026-11-13** from `D01 T03 §3`.
 - [ ] Commit: `"design: text truncation, monospace values, and copyable text"`
 
 **Test checkpoint:** A long value truncates with an ellipsis, captured. A truncated value shows a tooltip and an untruncated one does not, both driven. Machine values render monospace and prose proportional, captured. A value is selected and copied from two surfaces, both driven.
+-> XREF: D01 T03 §3 -- the Language page that offers right-to-left packs
 
 ## 8. Menu Bar and the Complete Popup Menu
 
