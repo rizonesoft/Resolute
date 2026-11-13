@@ -94,12 +94,99 @@ param(
     [string]$LaunchContext = '',
     [string]$FixtureFiles = '',
 
-    # Check the pair writer without a desktop (D00 T02 section 13).
-    [switch]$SelfTest
+    # Check the pair writer and the covered-window rule without a desktop (D00 T02 sections 13 and 14).
+    [switch]$SelfTest,
+
+    # A drill (D00 T02 section 14): an always-on-top window of another
+    # process laid over the target before the first check, or between the
+    # first check and the copy, so each check is proven as it runs.
+    [ValidateSet('', 'before', 'between')][string]$DrillCoverAt = ''
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+
+# ---- covered windows (D00 T02 section 14) -----------------------------------
+# Owning the foreground does not mean nothing covers the target: an
+# always-on-top window of another application can lie over it. Before the
+# copy and again after it, the windows above the target in z-order are read,
+# and any that could show in the target's frame refuses the capture.
+
+if (-not ('ZOrder' -as [type])) {
+    Add-Type @'
+using System;
+using System.Text;
+using System.Runtime.InteropServices;
+public class ZOrder {
+    [StructLayout(LayoutKind.Sequential)] public struct RECT { public int Left, Top, Right, Bottom; }
+    [DllImport("user32.dll")] static extern IntPtr GetWindow(IntPtr h, uint cmd);
+    [DllImport("user32.dll")] static extern bool IsWindow(IntPtr h);
+    [DllImport("user32.dll")] static extern bool IsWindowVisible(IntPtr h);
+    [DllImport("user32.dll")] static extern bool IsIconic(IntPtr h);
+    [DllImport("user32.dll")] static extern bool GetWindowRect(IntPtr h, out RECT r);
+    [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr h, out uint pid);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern int GetWindowTextW(IntPtr h, StringBuilder s, int n);
+    [DllImport("dwmapi.dll")] static extern int DwmGetWindowAttribute(IntPtr h, int a, out RECT r, int size);
+    [DllImport("dwmapi.dll")] static extern int DwmGetWindowAttribute(IntPtr h, int a, out int v, int size);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern IntPtr FindWindowW(string cls, string title);
+    // Every window above this one in z-order, nearest first.
+    public static IntPtr[] Above(IntPtr target) {
+        var list = new System.Collections.Generic.List<IntPtr>();
+        for (IntPtr h = GetWindow(target, 3); h != IntPtr.Zero && list.Count < 100000; h = GetWindow(h, 3)) list.Add(h);   // GW_HWNDPREV
+        return list.ToArray();
+    }
+    public class Info { public bool Visible; public bool Cloaked; public RECT Frame; public uint Pid; public string Title; }
+    // What the walk needs of one window, or null when it cannot be read.
+    public static Info Inspect(IntPtr h) {
+        if (!IsWindow(h)) return null;
+        var info = new Info();
+        info.Visible = IsWindowVisible(h) && !IsIconic(h);
+        GetWindowThreadProcessId(h, out info.Pid);
+        var t = new StringBuilder(256); GetWindowTextW(h, t, 256); info.Title = t.ToString();
+        if (!info.Visible) return info;
+        int cloaked;
+        if (DwmGetWindowAttribute(h, 14, out cloaked, 4) != 0) return null;   // DWMWA_CLOAKED
+        info.Cloaked = cloaked != 0;
+        if (DwmGetWindowAttribute(h, 9, out info.Frame, 16) != 0 && !GetWindowRect(h, out info.Frame)) return null;   // DWMWA_EXTENDED_FRAME_BOUNDS, then the window rectangle
+        if (!IsWindow(h)) return null;   // gone while it was read
+        return info;
+    }
+}
+'@
+}
+
+function Test-Overlap([int[]]$A, [int[]]$B) {
+    # Left, top, right, bottom each; true when the two share any pixel.
+    return ($A[0] -lt $B[2] -and $B[0] -lt $A[2] -and $A[1] -lt $B[3] -and $B[1] -lt $A[3])
+}
+
+function Get-Covering([IntPtr[]]$Above, [int[]]$Frame, [uint32]$TargetPid, [scriptblock]$Inspect) {
+    # The windows that could show in the target's frame, as "title (process id)"
+    # lines; throws, naming the window, when one cannot be read.
+    $found = @()
+    foreach ($h in $Above) {
+        $info = & $Inspect $h
+        if ($null -eq $info) { throw "window $h could not be read, so whether it covers the target is unknown" }
+        if (-not $info.Visible -or $info.Cloaked -or $info.Pid -eq $TargetPid) { continue }
+        $f = @($info.Frame.Left, $info.Frame.Top, $info.Frame.Right, $info.Frame.Bottom)
+        if ($f[2] -le $f[0] -or $f[3] -le $f[1]) { continue }
+        if (Test-Overlap $f $Frame) {
+            $name = try { (Get-Process -Id $info.Pid -ErrorAction Stop).ProcessName } catch { "process $($info.Pid)" }   # a process that has gone is named by its id
+            $found += "'$($info.Title)' ($name, pid $($info.Pid))"
+        }
+    }
+    return $found
+}
+
+function Assert-Uncovered([IntPtr]$Hwnd, [int[]]$Frame, [uint32]$TargetPid, [string]$When) {
+    try {
+        $covering = @(Get-Covering ([ZOrder]::Above($Hwnd)) $Frame $TargetPid { param($h) [ZOrder]::Inspect($h) })
+    } catch {
+        return "capture-window: refused $When the copy: $($_.Exception.Message)"
+    }
+    if ($covering.Count) { return "capture-window: refused $When the copy: the target is covered by $($covering -join ', ')" }
+    return $null
+}
 
 # ---- the pair writer (D00 T02 section 13) -----------------------------------
 # A capture is two files that prove each other: the image and the sidecar that
@@ -351,6 +438,22 @@ function Invoke-SelfTest {
     } finally {
         Remove-Item -LiteralPath $dir -Recurse -Force
     }
+
+    # The covered-window rule, over window records given to it.
+    $frame = @(100, 100, 900, 700)
+    $record = { param($l, $t, $r, $b, $procId) [pscustomobject]@{ Visible = $true; Cloaked = $false; Frame = [pscustomobject]@{ Left = $l; Top = $t; Right = $r; Bottom = $b }; Pid = [uint32]$procId; Title = "w$l" } }
+    $over = & $record 800 600 1000 800 4242
+    $beside = & $record 900 100 1100 700 4242
+    $own = & $record 200 200 400 400 7
+    $flat = & $record 300 300 300 500 4242
+    $table = @{ 1 = $over; 2 = $beside; 3 = $own; 4 = $flat }
+    $covering = @(Get-Covering @([IntPtr]1) $frame 7 { param($h) $table[[int]$h] })
+    Check 'a window that overlaps the target refuses it, named' ($covering.Count -eq 1 -and $covering[0] -like "*'w800'*pid 4242*")
+    Check 'a window beside the target, of no area, or of the target''s own process does not' (@(Get-Covering @([IntPtr]2, [IntPtr]3, [IntPtr]4) $frame 7 { param($h) $table[[int]$h] }).Count -eq 0)
+    $said = $null
+    try { $null = Get-Covering @([IntPtr]2, [IntPtr]9) $frame 7 { param($h) $table[[int]$h] } } catch { $said = $_.Exception.Message }
+    Check 'a window that cannot be read refuses the capture, named' ($said -like '*window 9 could not be read*')
+
     if ($failed.Count) { Write-Host ("self-test: FAIL " + ($failed -join '; ')); return 1 }
     Write-Host 'self-test: all pass'
     return 0
@@ -516,10 +619,41 @@ if ($width -le 0 -or $height -le 0) {
     exit 1
 }
 
-$bitmap = New-Object System.Drawing.Bitmap $width, $height
-$graphics = [System.Drawing.Graphics]::FromImage($bitmap)
-$graphics.CopyFromScreen($rect.Left, $rect.Top, 0, 0, $bitmap.Size)
-$graphics.Dispose()
+$targetFrame = @($rect.Left, $rect.Top, $rect.Right, $rect.Bottom)
+$targetPid = [uint32]$target.Id
+$cover = $null
+function Start-Cover {
+    # The drill's covering window: another process's always-on-top window over the target's lower right quarter.
+    $l = $rect.Left + [int]($width / 2); $t = $rect.Top + [int]($height / 2)
+    # Shown without activation (SWP_NOACTIVATE), so the target keeps the foreground, as an always-on-top overlay does.
+    $code = "Add-Type -AssemblyName System.Windows.Forms; Add-Type 'using System; using System.Runtime.InteropServices; public class P { [DllImport(`"user32.dll`")] public static extern bool SetWindowPos(IntPtr h, IntPtr a, int x, int y, int w, int hh, uint f); }'; `$f = New-Object System.Windows.Forms.Form; `$f.Text = 'Resolute capture drill cover'; `$f.ShowInTaskbar = `$false; `$f.FormBorderStyle = 'None'; `$f.BackColor = 'Magenta'; [void][P]::SetWindowPos(`$f.Handle, [IntPtr](-1), $l, $t, $([int]($width / 3)), $([int]($height / 3)), 0x0050); `$end = (Get-Date).AddSeconds(60); while ((Get-Date) -lt `$end) { [System.Windows.Forms.Application]::DoEvents(); Start-Sleep -Milliseconds 50 }"
+    $info = [System.Diagnostics.ProcessStartInfo]::new((Get-Process -Id $PID).Path)
+    foreach ($a in '-NoProfile', '-Command', $code) { $info.ArgumentList.Add($a) }
+    $info.UseShellExecute = $false
+    $info.CreateNoWindow = $true
+    $proc = [System.Diagnostics.Process]::Start($info)
+    $deadline = (Get-Date).AddSeconds(20)
+    while ((Get-Date) -lt $deadline -and [ZOrder]::FindWindowW($null, 'Resolute capture drill cover') -eq [IntPtr]::Zero) { Start-Sleep -Milliseconds 100 }
+    Start-Sleep -Milliseconds 300
+    Write-Host "drill: a covering window of process $($proc.Id) is over the target ($DrillCoverAt)"
+    return $proc
+}
+function Stop-Cover { if ($script:cover -and -not $script:cover.HasExited) { & taskkill.exe /T /F /PID $script:cover.Id 2>&1 | Out-Null; $null = $script:cover.WaitForExit(10000) } }
+if ($DrillCoverAt -eq 'before') { $script:cover = Start-Cover }
+try {
+    $refusal = Assert-Uncovered $hwnd $targetFrame $targetPid 'before'
+    if ($refusal) { Write-Host $refusal -ForegroundColor Red; Stop-Ours; exit 3 }
+    if ($DrillCoverAt -eq 'between') { $script:cover = Start-Cover }
+    $bitmap = New-Object System.Drawing.Bitmap $width, $height
+    $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+    $graphics.CopyFromScreen($rect.Left, $rect.Top, 0, 0, $bitmap.Size)
+    $graphics.Dispose()
+    # A window that arrived while the copy was made is in the copy: checked again before anything is written.
+    $refusal = Assert-Uncovered $hwnd $targetFrame $targetPid 'after'
+    if ($refusal) { $bitmap.Dispose(); Write-Host $refusal -ForegroundColor Red; Stop-Ours; exit 3 }
+} finally {
+    Stop-Cover
+}
 
 $outDir = Split-Path $Out -Parent
 if ($outDir -and -not (Test-Path $outDir)) { New-Item -ItemType Directory -Force -Path $outDir | Out-Null }
