@@ -90,7 +90,7 @@ param(
     [switch]$DrillFailQuery,
     # Drills through the display checks: a work area in place of the
     # display's (left,top,right,bottom), and a placed window moved partly off it.
-    [int[]]$DrillWorkArea = @(),
+    [string]$DrillWorkArea = '',
     [switch]$DrillMoveOffscreen
 )
 
@@ -680,7 +680,11 @@ if ($null -eq $workArea) {
     exit 3
 }
 $script:Work = @($workArea.Left, $workArea.Top, $workArea.Right, $workArea.Bottom)
-if ($DrillWorkArea.Count -eq 4) { $script:Work = $DrillWorkArea; Write-Host "drill: the work area is $($DrillWorkArea -join ',')" }
+if ($DrillWorkArea) {
+    $script:Work = @($DrillWorkArea -split ',' | ForEach-Object { [int]$_ })
+    if ($script:Work.Count -ne 4) { Write-Host "capture-launcher-readme: -DrillWorkArea takes left,top,right,bottom" -ForegroundColor Red; exit 2 }
+    Write-Host "drill: the work area is $DrillWorkArea"
+}
 $tooSmall = Test-FitsDisplay $script:Work 40 1600 1000
 if ($tooSmall) {
     Write-Host "stood down before launching anything: $tooSmall" -ForegroundColor Yellow
