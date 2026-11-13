@@ -220,7 +220,8 @@ def cmd_propose(s: Session, path: str, version: int | None) -> int:
 
 def cmd_step(s: Session, step: str, dataset: str, number: int, actor: str, reason: str) -> int:
     procedure = {"review": "rd_review", "reopen": "rd_reopen", "stamp": "rd_stamp"}[step]
-    s.sql(f"CALL {procedure}({sql_str(dataset)}, {int(number)}, {sql_str(actor)}, {sql_str(reason)});")
+    # One transaction: the check, the status change and the changelog row land together or not at all.
+    s.sql(f"SET autocommit = 0;\nSTART TRANSACTION;\nCALL {procedure}({sql_str(dataset)}, {int(number)}, {sql_str(actor)}, {sql_str(reason)});\nCOMMIT;\n")
     print(f"{step}: {dataset} version {number} by {actor}")
     return 0
 
@@ -338,15 +339,32 @@ def cmd_backup(s: Session, path: str) -> int:
     return 0
 
 
+DATABASE_STATEMENT = re.compile(r"^\s*(USE\s|CREATE\s+(DATABASE|SCHEMA)\b|DROP\s+(DATABASE|SCHEMA)\b|ALTER\s+(DATABASE|SCHEMA)\b)", re.IGNORECASE)
+
+
+def dump_reaches_out(text: str) -> str | None:
+    """Why a dump would act on a database other than the one it is restored into, or None. mysqldump writes these as
+    lines of their own when it was given --databases or --all-databases; refdata.py backup gives it neither."""
+    for number, line in enumerate(text.splitlines(), 1):
+        if DATABASE_STATEMENT.match(line):
+            return f"selects, creates or drops a database (line {number}: {line.strip()[:80]})"
+    return None
+
+
 def cmd_restore(s: Session, path: str) -> int:
     dump = Path(path)
     if not dump.is_file():
         raise Refused(f"refused: no backup at {dump}")
     if s.exists():
         raise Refused(f"refused: the database '{s.database}' already exists; restore into a new name")
+    text = dump.read_text(encoding="utf-8")
+    reaches = dump_reaches_out(text)
+    if reaches:
+        raise Refused(f"refused: the dump {reaches}, so it would write outside '{s.database}'; take the backup with refdata.py backup, which names no database")
     run_sql(f"CREATE DATABASE `{s.database}` CHARACTER SET utf8mb4;", options=s.options)
     try:
-        run_sql(dump.read_text(encoding="utf-8"), options=s.options, database=s.database)
+        # --one-database as well: the client skips any statement for another database the check above did not see.
+        run_sql(text, options=s.options, database=s.database, extra=("--one-database",))
     except Refused:
         run_sql(f"DROP DATABASE `{s.database}`;", options=s.options)
         raise
@@ -481,6 +499,16 @@ def self_test(schema: Path) -> int:
             checks.check("a refused proposal leaves no row and no changelog row", leftovers == "0" and versions == "2" and len(history_rows(session, "fixture")) == log_before,
                          f"entries {leftovers}, versions {versions}, changelog {len(history_rows(session, 'fixture'))} against {log_before}")
 
+            # A step whose changelog row cannot be written leaves the version as it was: one transaction.
+            refused_step = None
+            try:
+                cmd_step(session, "review", "fixture", 2, None, "a reviewer the changelog cannot record")
+            except Refused as refusal:
+                refused_step = str(refusal)
+            checks.check("a step whose changelog row fails leaves the version unchanged",
+                         refused_step is not None and require_version(session, "fixture", 2) == "stamped",
+                         f"refused {refused_step!r}, status {require_version(session, 'fixture', 2)}")
+
             # A reviewed version is frozen; reopen clears its review, so stamp is refused until it is reviewed again.
             call(["propose", proposal("v3", {"dataset": "fixture", "author": "author-one", "reason": "a third version", "changes": [
                 {"add": "beep-a", "text": "A", "reason": "a new entry"}]})] + base)
@@ -496,6 +524,29 @@ def self_test(schema: Path) -> int:
             code2, _ = call(["stamp", "fixture", "3", "--as", "author-one", "--reason", "release the third version"] + base)
             checks.check("the reopened version is stamped after a second review", code == 0 and code2 == 0)
 
+            # A step whose changelog row cannot be written, on a proposed version: still proposed afterwards.
+            call(["propose", proposal("v4", {"dataset": "fixture", "author": "author-one", "reason": "a fourth version", "changes": [
+                {"add": "beep-d", "text": "D", "reason": "a new entry"}]})] + base)
+            refused_step = None
+            try:
+                cmd_step(session, "review", "fixture", 4, None, "a reviewer the changelog cannot record")
+            except Refused as refusal:
+                refused_step = str(refusal)
+            log_rows = [r for r in history_rows(session, "fixture") if r[0] == 4]
+            checks.check("a review whose changelog row fails leaves the version proposed, with no row of it",
+                         refused_step is not None and require_version(session, "fixture", 4) == "proposed" and [r[1] for r in log_rows] == ["open", "add"],
+                         f"refused {refused_step!r}, status {require_version(session, 'fixture', 4)}, changelog {log_rows}")
+
+            # A dump that names a database is refused before anything is restored.
+            named = Path(tmp) / "named.sql"
+            named.write_text(f"-- a mysqldump --databases dump\nCREATE DATABASE /*!32312 IF NOT EXISTS*/ `{database}`;\nUSE `{database}`;\nDROP TABLE IF EXISTS `changelog`;\n", encoding="utf-8")
+            target = f"{database}_restored"
+            code, out = call(["restore", str(named), "--options", str(options), "--database", target])
+            changelog_after = len(history_rows(session, "fixture"))
+            checks.check("a dump that names a database is refused, restoring nothing and leaving that database as it was",
+                         code == 1 and "selects, creates or drops a database (line 2" in out and not Session(options, target).exists() and changelog_after == len(history_rows(session, "fixture")),
+                         out.strip())
+
             # The inspection commands read the persisted records.
             for argv, want in ((["list"], "fixture v3: stamped"), (["show", "fixture", "2"], "beep-1-long: One long beep: no memory detected in any slot"),
                                (["changes", "fixture", "3"], "added beep-a: A, reworded"), (["history", "fixture"], "v3 reopen by author-one: one more change")):
@@ -503,6 +554,7 @@ def self_test(schema: Path) -> int:
                 checks.check(f"{argv[0]} reads the persisted records", code == 0 and want in out, out.strip()[:300])
 
             # Connection failures: named, non-zero, nothing written, no secret printed.
+            versions_before = session.sql("SELECT COUNT(*) FROM versions;")[0][0]
             fake = "wrong-" + secrets.token_hex(6)
             missing = Path(tmp) / "absent.cnf"
             silent = Path(tmp) / "silent.cnf"
@@ -514,7 +566,7 @@ def self_test(schema: Path) -> int:
                                           ("failed authentication", badauth, "authentication failed")):
                 code, out = call(["propose", v1, "--options", str(path), "--database", database])
                 checks.check(f"refused: {label}", code == 1 and expected in out and fake not in out, out.strip())
-            checks.check("the connection failures wrote nothing", session.sql("SELECT COUNT(*) FROM versions;")[0][0] == "3")
+            checks.check("the connection failures wrote nothing", session.sql("SELECT COUNT(*) FROM versions;")[0][0] == versions_before)
 
             # The stamped data survives a stop and start of the private server.
             for flag in ("-Stop", "-Start"):

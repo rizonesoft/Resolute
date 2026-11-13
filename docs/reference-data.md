@@ -27,7 +27,7 @@ python tools/refdata/refdata.py init      # create the authoring database 'refda
 ```
 
 - A download whose SHA-256 differs from the pin is refused with nothing installed. `-Install -From <zip>` installs from a local copy under the same check.
-- The server's data lives in `%LOCALAPPDATA%\Resolute\refdata\server\`, outside the repository and outside `build/`. Back it up with `refdata.py backup <file>`; `refdata.py restore <file> --database <new name>` loads a backup into a new database and never over an existing one.
+- The server's data lives in `%LOCALAPPDATA%\Resolute\refdata\server\`, outside the repository and outside `build/`. Back it up with `refdata.py backup <file>`; `refdata.py restore <file> --database <new name>` loads a backup into a new database and never over an existing one. A dump that selects, creates or drops a database (one taken with `mysqldump --databases`) is refused before anything is restored, because it would write outside the database named.
 - `-Status` and `-Stop` act only on the process `-Start` recorded, by its id and image path, so a MySQL server that belongs to something else is never touched. A start on a port another listener holds is refused, and that listener is left alone.
 - The server is started with no handle of its caller's and no console window, so a script that reads `-Start`'s output gets its end.
 
@@ -35,7 +35,7 @@ python tools/refdata/refdata.py init      # create the authoring database 'refda
 
 Only into a MySQL option file outside the repository, in `%LOCALAPPDATA%\Resolute\refdata\`, a folder readable by your account and SYSTEM alone:
 
-- `local.cnf` is written by `-Start` when it first initializes the private server, with a generated root password that is never printed.
+- `local.cnf` is written by `-Start` when it first initializes the private server, with a generated root password that is never printed. The password is written to `local.cnf.pending` before it is set, and a first start cut short is finished by the next `-Start`; every `-Start` ends only on a server whose root refuses a login without a password.
 - `client.cnf` is yours to write for a shared server (`[client]` with `host`, `port`, `user`, `password`). When it exists, `refdata.py` uses it instead of `local.cnf`, and nothing ever overwrites it.
 
 The file is handed to the client as `--defaults-extra-file`. No password is ever an argument, in a tracked file or in a log, and no command prints anything read from it. `--options <file>` names another option file for one command.
@@ -47,6 +47,7 @@ The file is handed to the client as `--defaults-extra-file`. No password is ever
 - **A meaning** is an entry's text in one version, with its source. Rewording adds a meaning in the new version and keeps the key, so every older version still reads as it was stamped.
 - **A version** is proposed, then reviewed, then stamped. It changes only while proposed. A reviewed version is frozen; `reopen` takes it back to proposed and clears its review, so nothing is stamped on an approval given before a change. The reviewer is never the version's author. A dataset has one open version at a time.
 - **Every change and every step has a reason**, written to the changelog with who made it.
+- **A step is one transaction.** Review, reopen and stamp each check the status, change it only from the status they checked, and write their changelog row together, so two authors acting on one version at once cannot both succeed.
 
 The rules live in the database, as stored procedures in `data/refdata/schema.sql`, and each refusal names itself (`refused: the reviewer is the author`). The tables, procedures and view use only what MySQL 8.4 and MariaDB 11 both run, so a shared server may be either.
 

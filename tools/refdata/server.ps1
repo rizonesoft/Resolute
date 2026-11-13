@@ -27,18 +27,29 @@ param(
     [int]$Port = 33061,
     [string]$Manifest = (Join-Path $PSScriptRoot 'server.json'),
     [string]$From = '',   # with -Install: a local copy of the archive, verified against the pin like a download
-    [int]$StartTimeoutSeconds = 90
+    [int]$StartTimeoutSeconds = 90,
+    # Where the server's data and option files live; a drill points this at a folder of its own.
+    [string]$HomeDir = (Join-Path $env:LOCALAPPDATA 'Resolute\refdata'),
+    # A drill: a first start stops after the server answers and before root's password is set, as an
+    # interrupted start would, so the next -Start is shown to finish the credentials.
+    [switch]$DrillStopAfterInit
 )
 
 $ErrorActionPreference = 'Stop'
 $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $InstallDir = Join-Path $RepoRoot 'reskit\mysql'
-$Home_ = Join-Path $env:LOCALAPPDATA 'Resolute\refdata'
+$Home_ = $HomeDir
 $ServerDir = Join-Path $Home_ 'server'
 $DataDir = Join-Path $ServerDir 'data'
 $StateFile = Join-Path $ServerDir 'state.json'
 $IniFile = Join-Path $ServerDir 'my.ini'
 $LocalCnf = Join-Path $Home_ 'local.cnf'
+# Root's credentials are set in steps a start can be cut between: the marker
+# exists from before the data is initialized until the generated password is
+# set and local.cnf holds it, and the password is written to the pending
+# option file before it is set, so it is never lost.
+$Pending = Join-Path $ServerDir 'credentials.pending'
+$PendingCnf = "$LocalCnf.pending"
 $Mysqld = Join-Path $InstallDir 'bin\mysqld.exe'
 $Admin = Join-Path $InstallDir 'bin\mysqladmin.exe'
 $Client = Join-Path $InstallDir 'bin\mysql.exe'
@@ -197,48 +208,108 @@ function Write-LocalCnf([int]$OnPort, [string]$Password) {
     Set-Content -LiteralPath $LocalCnf -Encoding ascii -Value @('[client]', 'user=root', "password=$Password", 'host=127.0.0.1', "port=$OnPort")
 }
 
+function Invoke-Sql([string]$Options, [string]$Sql, [string[]]$Extra = @()) {
+    # Exit code of the client running $Sql; nothing it prints is shown, so no secret can be.
+    $prev = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    $Sql | & $Client "--defaults-extra-file=$Options" --connect-timeout=5 --batch @Extra 2>&1 | Out-Null
+    $code = $LASTEXITCODE
+    $ErrorActionPreference = $prev
+    return $code
+}
+
+function Test-RootOpen([int]$OnPort) {
+    # True when root logs in with no password at all: the state no start may report as running.
+    $prev = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    'SELECT 1;' | & $Client --no-defaults --user=root --host=127.0.0.1 "--port=$OnPort" --skip-password --connect-timeout=5 --batch 2>&1 | Out-Null
+    $open = ($LASTEXITCODE -eq 0)
+    $ErrorActionPreference = $prev
+    return $open
+}
+
+function Complete-Credentials([int]$OnPort) {
+    # Finishes what the marker says is unfinished; returns $null or the refusal.
+    if (-not (Test-Path -LiteralPath $Pending)) { return $null }
+    if (-not (Test-Path -LiteralPath $PendingCnf)) {
+        Set-Content -LiteralPath $PendingCnf -Encoding ascii -Value @('[client]', 'user=root', "password=$(New-Password)", 'host=127.0.0.1', "port=$OnPort")
+    }
+    if ((Invoke-Sql $PendingCnf 'SELECT 1;' @("--port=$OnPort")) -ne 0) {
+        # Not set yet: set it, as the passwordless root the marker says it still is.
+        $password = ((Get-Content -LiteralPath $PendingCnf | Where-Object { $_ -like 'password=*' }) -replace '^password=', '')
+        if ((Invoke-Sql $LocalCnf "ALTER USER 'root'@'localhost' IDENTIFIED BY '$password';" @("--port=$OnPort")) -ne 0) {
+            return 'the generated password could not be set: root accepts neither no password nor the pending one'
+        }
+    }
+    [System.IO.File]::Move($PendingCnf, $LocalCnf, $true)
+    Remove-Item -LiteralPath $Pending -Force
+    Say "a generated root password was written to $LocalCnf (not shown)"
+    return $null
+}
+
+function Stop-Started([System.Diagnostics.Process]$Proc) {
+    if ($Proc -and -not $Proc.HasExited) { $Proc.Kill($true); $null = $Proc.WaitForExit(10000) }
+    if (Test-Path -LiteralPath $StateFile) { Remove-Item -LiteralPath $StateFile -Force }
+}
+
 function Invoke-Start {
     if (-not (Test-Path -LiteralPath $Mysqld)) { Say 'refused: the server is not installed (run tools/refdata/server.ps1 -Install)'; return 2 }
     $owned = Get-OwnedProcess
-    if ($owned) { Say "already running: pid $($owned.ProcessId) on 127.0.0.1:$((Read-State).port)"; return 0 }
-    if (-not (Test-PortFree $Port)) { Say "refused: port $Port on 127.0.0.1 is held by another listener; it was left alone. Choose another with -Port"; return 2 }
-    Protect-Home
-    New-Item -ItemType Directory -Force -Path $ServerDir | Out-Null
-    Write-Ini $Port
-    $fresh = -not (Test-Path -LiteralPath $DataDir)
-    if ($fresh) {
-        Say 'initializing the data directory'
-        & $Mysqld "--defaults-file=$IniFile" --initialize-insecure 2>&1 | Out-Null
-        if ($LASTEXITCODE -ne 0) { Say "refused: initialization failed (see $(Join-Path $ServerDir 'mysqld.log'))"; return 2 }
-    }
-    $proc = Get-Process -Id ([Daemon]::Start($Mysqld, "`"$Mysqld`" `"--defaults-file=$IniFile`""))
-    @{ pid = $proc.Id; path = $Mysqld; port = $Port; started = (Get-Date).ToUniversalTime().ToString('o') } | ConvertTo-Json | Set-Content -LiteralPath $StateFile -Encoding utf8
-    if ($fresh) {
-        # Until the generated password is set, root has none: a client file without one reaches it.
-        Set-Content -LiteralPath $LocalCnf -Encoding ascii -Value @('[client]', 'user=root', 'host=127.0.0.1', "port=$Port")
-    }
-    $deadline = (Get-Date).AddSeconds($StartTimeoutSeconds)
-    while (-not (Test-Answers $Port)) {
-        if ($proc.HasExited -or (Get-Date) -gt $deadline) {
-            $why = if ($proc.HasExited) { "the server exited as it started (exit $($proc.ExitCode))" } else { $proc.Kill($true); "the server did not answer within ${StartTimeoutSeconds}s and was ended" }
-            Remove-Item -LiteralPath $StateFile -Force
-            Say "refused: $why (see $(Join-Path $ServerDir 'mysqld.log'))"
-            return 2
-        }
-        Start-Sleep -Milliseconds 500
-    }
-    if ($fresh) {
-        $password = New-Password
-        "ALTER USER 'root'@'localhost' IDENTIFIED BY '$password';" | & $Client "--defaults-extra-file=$LocalCnf" --batch 2>&1 | Out-Null
-        if ($LASTEXITCODE -ne 0) { Say 'refused: the generated password could not be set'; return 2 }
-        Write-LocalCnf $Port $password
-        Say "a generated root password was written to $LocalCnf (not shown)"
+    $proc = $null
+    if ($owned) {
+        $port = [int](Read-State).port
     } else {
+        $port = $Port
+        if (-not (Test-PortFree $port)) { Say "refused: port $port on 127.0.0.1 is held by another listener; it was left alone. Choose another with -Port"; return 2 }
+        Protect-Home
+        New-Item -ItemType Directory -Force -Path $ServerDir | Out-Null
+        Write-Ini $port
+        if (-not (Test-Path -LiteralPath $DataDir)) {
+            # The marker first: from here until the password is set, any start finishes the credentials.
+            Set-Content -LiteralPath $Pending -Encoding ascii -Value 'root has no password yet'
+            Say 'initializing the data directory'
+            & $Mysqld "--defaults-file=$IniFile" --initialize-insecure 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) { Say "refused: initialization failed (see $(Join-Path $ServerDir 'mysqld.log'))"; return 2 }
+            # Until the generated password is set, root has none: a client file without one reaches it.
+            Set-Content -LiteralPath $LocalCnf -Encoding ascii -Value @('[client]', 'user=root', 'host=127.0.0.1', "port=$port")
+        }
+        $proc = Get-Process -Id ([Daemon]::Start($Mysqld, "`"$Mysqld`" `"--defaults-file=$IniFile`""))
+        @{ pid = $proc.Id; path = $Mysqld; port = $port; started = (Get-Date).ToUniversalTime().ToString('o') } | ConvertTo-Json | Set-Content -LiteralPath $StateFile -Encoding utf8
+        $deadline = (Get-Date).AddSeconds($StartTimeoutSeconds)
+        while (-not (Test-Answers $port)) {
+            if ($proc.HasExited -or (Get-Date) -gt $deadline) {
+                $why = if ($proc.HasExited) { "the server exited as it started (exit $($proc.ExitCode))" } else { "the server did not answer within ${StartTimeoutSeconds}s and was ended" }
+                Stop-Started $proc
+                Say "refused: $why (see $(Join-Path $ServerDir 'mysqld.log'))"
+                return 2
+            }
+            Start-Sleep -Milliseconds 500
+        }
+    }
+    if ($DrillStopAfterInit -and (Test-Path -LiteralPath $Pending)) {
+        Say 'drill: stopped after the server answered and before root''s password was set'
+        return 3
+    }
+    $unfinished = Complete-Credentials $port
+    if ($unfinished) { Stop-Started $proc; Say "refused: $unfinished; the server was not left running for it"; return 2 }
+    if (-not $owned) {
         # The server answers on this port, so clients are pointed at it now, not before.
-        $lines = @(Get-Content -LiteralPath $LocalCnf) | ForEach-Object { if ($_ -match '^port=') { "port=$Port" } else { $_ } }
+        $lines = @(Get-Content -LiteralPath $LocalCnf) | ForEach-Object { if ($_ -match '^port=') { "port=$port" } else { $_ } }
         Set-Content -LiteralPath $LocalCnf -Encoding ascii -Value $lines
     }
-    Say "running: pid $($proc.Id) on 127.0.0.1:$Port"
+    # Every start, already running or not, ends only on a server that refuses a passwordless root and accepts local.cnf.
+    if (Test-RootOpen $port) {
+        Stop-Started $proc
+        Say "refused: root on 127.0.0.1:$port accepts no password; $(if ($proc) { 'the server was stopped' } else { 'stop it with -Stop and start it again to set one' })"
+        return 2
+    }
+    if ((Invoke-Sql $LocalCnf 'SELECT 1;' @("--port=$port")) -ne 0) {
+        Stop-Started $proc
+        Say "refused: $LocalCnf does not authenticate to 127.0.0.1:$port"
+        return 2
+    }
+    if ($owned) { Say "already running: pid $($owned.ProcessId) on 127.0.0.1:$port, root needs its password"; return 0 }
+    Say "running: pid $($proc.Id) on 127.0.0.1:$port, root needs its password"
     return 0
 }
 

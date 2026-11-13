@@ -8,6 +8,9 @@
 -- reopen takes it back to proposed and clears its review. Every change and every step writes one changelog row with
 -- its reason.
 --
+-- A step (review, reopen, stamp) runs in one transaction from the client, and its status change applies only to the
+-- status it checked, so two authors acting on one version at once cannot both succeed on a stale reading.
+--
 -- The workflow's rules are here, in the procedures, and each refusal is a SIGNAL whose text names it, so no client
 -- can step around them. A proposal of several changes runs in one transaction in one client session: a refused change
 -- leaves no row of the others.
@@ -206,7 +209,10 @@ BEGIN
     IF p_reviewer = v_author THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: the reviewer is the author';
     END IF;
-    UPDATE versions SET status = 'reviewed', reviewer = p_reviewer WHERE id = v_version;
+    UPDATE versions SET status = 'reviewed', reviewer = p_reviewer WHERE id = v_version AND status = 'proposed';
+    IF ROW_COUNT() <> 1 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: the version changed while it was being reviewed';
+    END IF;
     INSERT INTO changelog (version_id, action, reason, actor) VALUES (v_version, 'review', p_reason, p_reviewer);
 END //
 
@@ -221,7 +227,10 @@ BEGIN
     IF v_status <> 'reviewed' THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: only a reviewed version can be reopened';
     END IF;
-    UPDATE versions SET status = 'proposed', reviewer = NULL WHERE id = v_version;
+    UPDATE versions SET status = 'proposed', reviewer = NULL WHERE id = v_version AND status = 'reviewed';
+    IF ROW_COUNT() <> 1 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: the version changed while it was being reopened';
+    END IF;
     INSERT INTO changelog (version_id, action, reason, actor) VALUES (v_version, 'reopen', p_reason, p_actor);
 END //
 
@@ -237,7 +246,10 @@ BEGIN
     ELSEIF v_status <> 'reviewed' THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: the version is not reviewed';
     END IF;
-    UPDATE versions SET status = 'stamped', stamped_at = CURRENT_TIMESTAMP WHERE id = v_version;
+    UPDATE versions SET status = 'stamped', stamped_at = CURRENT_TIMESTAMP WHERE id = v_version AND status = 'reviewed';
+    IF ROW_COUNT() <> 1 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: the version changed while it was being stamped';
+    END IF;
     INSERT INTO changelog (version_id, action, reason, actor) VALUES (v_version, 'stamp', p_reason, p_actor);
 END //
 
