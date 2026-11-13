@@ -137,20 +137,24 @@ public class ZOrder {
         for (IntPtr h = GetWindow(target, 3); h != IntPtr.Zero && list.Count < 100000; h = GetWindow(h, 3)) list.Add(h);   // GW_HWNDPREV
         return list.ToArray();
     }
-    public class Info { public bool Visible; public bool Cloaked; public RECT Frame; public uint Pid; public string Title; }
-    // What the walk needs of one window, or null when it cannot be read.
+    public class Info { public bool Visible; public bool Cloaked; public RECT Frame; public uint Pid; public string Title; public string Error; public bool Gone; }
+    // What the walk needs of one window. When a step fails, Error names it
+    // and Gone says whether the window no longer exists, so a refusal can say
+    // which; whatever was read before the failure (title, process) is kept.
     public static Info Inspect(IntPtr h) {
-        if (!IsWindow(h)) return null;
         var info = new Info();
+        if (!IsWindow(h)) { info.Error = "it no longer exists"; info.Gone = true; return info; }
         info.Visible = IsWindowVisible(h) && !IsIconic(h);
         GetWindowThreadProcessId(h, out info.Pid);
         var t = new StringBuilder(256); GetWindowTextW(h, t, 256); info.Title = t.ToString();
         if (!info.Visible) return info;
         int cloaked;
-        if (DwmGetWindowAttribute(h, 14, out cloaked, 4) != 0) return null;   // DWMWA_CLOAKED
+        int hr = DwmGetWindowAttribute(h, 14, out cloaked, 4);   // DWMWA_CLOAKED
+        if (hr != 0) { info.Error = string.Format("its compositor state could not be read (DWMWA_CLOAKED, 0x{0:X8})", hr); return info; }
         info.Cloaked = cloaked != 0;
-        if (DwmGetWindowAttribute(h, 9, out info.Frame, 16) != 0 && !GetWindowRect(h, out info.Frame)) return null;   // DWMWA_EXTENDED_FRAME_BOUNDS, then the window rectangle
-        if (!IsWindow(h)) return null;   // gone while it was read
+        hr = DwmGetWindowAttribute(h, 9, out info.Frame, 16);   // DWMWA_EXTENDED_FRAME_BOUNDS, then the window rectangle
+        if (hr != 0 && !GetWindowRect(h, out info.Frame)) { info.Error = string.Format("its frame could not be read (DWMWA_EXTENDED_FRAME_BOUNDS 0x{0:X8}, then GetWindowRect)", hr); return info; }
+        if (!IsWindow(h)) { info.Error = "it disappeared while it was read"; info.Gone = true; return info; }
         return info;
     }
 }
@@ -169,6 +173,10 @@ function Get-Covering([IntPtr[]]$Above, [int[]]$Frame, [uint32]$TargetPid, [scri
     foreach ($h in $Above) {
         $info = & $Inspect $h
         if ($null -eq $info) { throw "window $h could not be read, so whether it covers the target is unknown" }
+        if ($info.Error) {
+            $who = if ($info.Title -or $info.Pid) { " ('$($info.Title)', pid $($info.Pid))" } else { '' }
+            throw "window $h$who could not be read: $($info.Error), so whether it covers the target is unknown"
+        }
         if (-not $info.Visible -or $info.Cloaked -or $info.Pid -eq $TargetPid) { continue }
         $f = @($info.Frame.Left, $info.Frame.Top, $info.Frame.Right, $info.Frame.Bottom)
         if ($f[2] -le $f[0] -or $f[3] -le $f[1]) { continue }
@@ -185,6 +193,8 @@ function Test-Target($Info, [int[]]$Frame) {
     # measured; the refusal otherwise. A target that closed has nothing
     # above it, so the walk alone would call it uncovered.
     if ($null -eq $Info) { return 'the target window is gone' }
+    if ($Info.Error -and $Info.Gone) { return "the target window is gone ($($Info.Error))" }
+    if ($Info.Error) { return "the target window could not be read: $($Info.Error)" }
     if (-not $Info.Visible -or $Info.Cloaked) { return 'the target window is no longer visible' }
     $now = @($Info.Frame.Left, $Info.Frame.Top, $Info.Frame.Right, $Info.Frame.Bottom)
     if (($now -join ',') -ne ($Frame -join ',')) { return "the target window moved (it was at $($Frame -join ','), it is at $($now -join ','))" }
@@ -456,7 +466,7 @@ function Invoke-SelfTest {
 
     # The covered-window rule, over window records given to it.
     $frame = @(100, 100, 900, 700)
-    $record = { param($l, $t, $r, $b, $procId) [pscustomobject]@{ Visible = $true; Cloaked = $false; Frame = [pscustomobject]@{ Left = $l; Top = $t; Right = $r; Bottom = $b }; Pid = [uint32]$procId; Title = "w$l" } }
+    $record = { param($l, $t, $r, $b, $procId) [pscustomobject]@{ Visible = $true; Cloaked = $false; Frame = [pscustomobject]@{ Left = $l; Top = $t; Right = $r; Bottom = $b }; Pid = [uint32]$procId; Title = "w$l"; Error = $null; Gone = $false } }
     $over = & $record 800 600 1000 800 4242
     $beside = & $record 900 100 1100 700 4242
     $own = & $record 200 200 400 400 7
@@ -468,6 +478,14 @@ function Invoke-SelfTest {
     $said = $null
     try { $null = Get-Covering @([IntPtr]2, [IntPtr]9) $frame 7 { param($h) $table[[int]$h] } } catch { $said = $_.Exception.Message }
     Check 'a window that cannot be read refuses the capture, named' ($said -like '*window 9 could not be read*')
+    $unreadable = & $record 0 0 0 0 4242; $unreadable.Title = 'Overlay'; $unreadable.Error = 'its frame could not be read (DWMWA_EXTENDED_FRAME_BOUNDS 0x80070006, then GetWindowRect)'
+    $table[10] = $unreadable
+    $said = $null
+    try { $null = Get-Covering @([IntPtr]10) $frame 7 { param($h) $table[[int]$h] } } catch { $said = $_.Exception.Message }
+    Check 'a window above the target that cannot be read is refused naming its handle, title, process and the step' ($said -like "*window 10 ('Overlay', pid 4242) could not be read: its frame could not be read*")
+    $vanished = & $record 0 0 0 0 7; $vanished.Error = 'it no longer exists'; $vanished.Gone = $true
+    $blind = & $record 0 0 0 0 7; $blind.Error = 'its compositor state could not be read (DWMWA_CLOAKED, 0x80070006)'
+    Check 'a target that no longer exists is gone, and one that cannot be read is unreadable, naming the step' ((Test-Target $vanished $frame) -like '*target window is gone (it no longer exists)*' -and (Test-Target $blind $frame) -like '*could not be read: its compositor state could not be read*' -and (Test-Target $blind $frame) -notlike '*gone*')
     $here = & $record 100 100 900 700 7
     $hidden = & $record 100 100 900 700 7; $hidden.Visible = $false
     $moved = & $record 140 100 940 700 7
