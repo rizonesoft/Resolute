@@ -188,21 +188,24 @@ function Get-Covering([IntPtr[]]$Above, [int[]]$Frame, [uint32]$TargetPid, [scri
     return $found
 }
 
-function Test-Target($Info, [int[]]$Frame) {
+function Test-Target($Info, [int[]]$Frame, [IntPtr]$Hwnd = [IntPtr]::Zero) {
     # $null when the target is still there, visible, and where it was
-    # measured; the refusal otherwise. A target that closed has nothing
-    # above it, so the walk alone would call it uncovered.
-    if ($null -eq $Info) { return 'the target window is gone' }
-    if ($Info.Error -and $Info.Gone) { return "the target window is gone ($($Info.Error))" }
-    if ($Info.Error) { return "the target window could not be read: $($Info.Error)" }
-    if (-not $Info.Visible -or $Info.Cloaked) { return 'the target window is no longer visible' }
+    # measured; the refusal otherwise, naming the target's handle and, when
+    # they were read, its title and process. A target that closed has
+    # nothing above it, so the walk alone would call it uncovered.
+    $who = "the target window $Hwnd"
+    if ($null -ne $Info -and ($Info.Title -or $Info.Pid)) { $who += " ('$($Info.Title)', pid $($Info.Pid))" }
+    if ($null -eq $Info) { return "$who is gone" }
+    if ($Info.Error -and $Info.Gone) { return "$who is gone ($($Info.Error))" }
+    if ($Info.Error) { return "$who could not be read: $($Info.Error)" }
+    if (-not $Info.Visible -or $Info.Cloaked) { return "$who is no longer visible" }
     $now = @($Info.Frame.Left, $Info.Frame.Top, $Info.Frame.Right, $Info.Frame.Bottom)
-    if (($now -join ',') -ne ($Frame -join ',')) { return "the target window moved (it was at $($Frame -join ','), it is at $($now -join ','))" }
+    if (($now -join ',') -ne ($Frame -join ',')) { return "$who moved (it was at $($Frame -join ','), it is at $($now -join ','))" }
     return $null
 }
 
 function Assert-Uncovered([IntPtr]$Hwnd, [int[]]$Frame, [uint32]$TargetPid, [string]$When) {
-    $gone = Test-Target ([ZOrder]::Inspect($Hwnd)) $Frame
+    $gone = Test-Target ([ZOrder]::Inspect($Hwnd)) $Frame $Hwnd
     if ($gone) { return "capture-window: refused $When the copy: $gone" }
     try {
         $covering = @(Get-Covering ([ZOrder]::Above($Hwnd)) $Frame $TargetPid { param($h) [ZOrder]::Inspect($h) })
@@ -485,11 +488,12 @@ function Invoke-SelfTest {
     Check 'a window above the target that cannot be read is refused naming its handle, title, process and the step' ($said -like "*window 10 ('Overlay', pid 4242) could not be read: its frame could not be read*")
     $vanished = & $record 0 0 0 0 7; $vanished.Error = 'it no longer exists'; $vanished.Gone = $true
     $blind = & $record 0 0 0 0 7; $blind.Error = 'its compositor state could not be read (DWMWA_CLOAKED, 0x80070006)'
-    Check 'a target that no longer exists is gone, and one that cannot be read is unreadable, naming the step' ((Test-Target $vanished $frame) -like '*target window is gone (it no longer exists)*' -and (Test-Target $blind $frame) -like '*could not be read: its compositor state could not be read*' -and (Test-Target $blind $frame) -notlike '*gone*')
+    $vanished.Title = 'Launcher'; $blind.Title = 'Launcher'
+    Check 'a target that no longer exists is gone, and one that cannot be read is unreadable, naming the step' ((Test-Target $vanished $frame ([IntPtr]77)) -like "*target window 77 ('Launcher', pid 7) is gone (it no longer exists)*" -and (Test-Target $blind $frame ([IntPtr]77)) -like "*target window 77 ('Launcher', pid 7) could not be read: its compositor state could not be read*" -and (Test-Target $blind $frame ([IntPtr]77)) -notlike '*gone*')
     $here = & $record 100 100 900 700 7
     $hidden = & $record 100 100 900 700 7; $hidden.Visible = $false
     $moved = & $record 140 100 940 700 7
-    Check 'a target that is gone, hidden or moved is refused, and one where it was is not' ((Test-Target $null $frame) -like '*gone*' -and (Test-Target $hidden $frame) -like '*no longer visible*' -and (Test-Target $moved $frame) -like '*moved*' -and $null -eq (Test-Target $here $frame))
+    Check 'a target that is gone, hidden or moved is refused naming it, and one where it was is not' ((Test-Target $null $frame ([IntPtr]77)) -like '*target window 77 is gone*' -and (Test-Target $hidden $frame ([IntPtr]77)) -like "*target window 77 ('w100', pid 7) is no longer visible*" -and (Test-Target $moved $frame ([IntPtr]77)) -like "*target window 77 ('w140', pid 7) moved*" -and $null -eq (Test-Target $here $frame ([IntPtr]77)))
 
     # The pair lock is released however the script ends, even run in this process, where exit does not end the thread.
     $lockDir = Join-Path ([System.IO.Path]::GetTempPath()) ("capture-lock-selftest-" + [Guid]::NewGuid().ToString('N'))
