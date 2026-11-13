@@ -389,7 +389,10 @@ def cmd_restore(s: Session, path: str, schema: Path = SCHEMA) -> int:
             restricted.write_text(f"[client]\nuser={user}\npassword={password}\nhost={option_value(s.options, 'host') or '127.0.0.1'}\n"
                                   f"port={option_value(s.options, 'port') or '3306'}\n", encoding="ascii")
             try:
-                run_sql(text, options=restricted, database=s.database)
+                # The backup is untrusted text, and the client has commands of its own that no database privilege
+                # governs (\! runs a shell command as this Windows user): --binary-mode turns them off for the input,
+                # and --skip-system-command turns off \! itself.
+                run_sql(text, options=restricted, database=s.database, extra=("--binary-mode", "--skip-system-command"))
             except Refused as refusal:
                 raise Refused(f"refused: the backup could not be loaded as rows into '{s.database}' alone ({refusal}); nothing outside it was changed") from None
             restored = True
@@ -602,6 +605,15 @@ def self_test(schema: Path) -> int:
             checks.check("a backup that reaches into another database is refused, that database untouched, no target or user left",
                          code == 1 and "could not be loaded as rows" in out and len(history_rows(session, "fixture")) == before_rows
                          and not Session(options, target).exists() and users == "0", out.strip())
+
+            # A backup that asks the client to run a shell command is refused, and the command never runs.
+            marker = Path(tmp) / "shell-ran.txt"
+            shell = Path(tmp) / "shell.sql"
+            shell.write_text(f"SELECT 1;\n\\! cmd /c echo ran> \"{marker}\"\nSELECT 2;\n", encoding="utf-8")
+            target = f"{database}_shell"
+            code, out = call(["restore", str(shell), "--options", str(options), "--database", target])
+            checks.check("a backup that asks the client to run a shell command is refused, and the command does not run",
+                         code == 1 and not marker.exists() and not Session(options, target).exists(), f"exit {code}, marker {marker.exists()}, said {out.strip()!r}")
 
             # A dump that names a database is refused before anything is restored.
             named = Path(tmp) / "named.sql"
