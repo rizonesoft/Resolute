@@ -133,7 +133,7 @@ When Windows cannot start the second instance, or it has not answered within 10 
 | Buttons | Close, the default |
 | After | Focus returns to "Restart now". The note stays. The failure is logged. |
 
-A shutdown that cannot write the settings is shutdown's own message (`D01 T03 §6`), as for File, Close.
+A shutdown that cannot write the settings is shutdown's own message (`D01 T03 §6`, [`notices.md`](notices.md#what-if-settings-cannot-be-saved-at-closing)), as for File, Close. Its Cancel ends the restart as well: the second instance is ended and the tool stays as it was, the restart note still showing.
 
 ## What if a pack is wrong?
 

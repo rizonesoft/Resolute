@@ -153,12 +153,14 @@ The part users actually need and the part nobody builds. A repair with no revers
 - [ ] Give records a findable identity: what run they came from, what they cover, and when. Done when: a user with several records can pick one without opening it, captured.
 - [ ] Handle the irreversible item honestly: the contract refuses to let it claim a reverse, and the surface says so before the user commits. Done when: a fixture item declared irreversible shows the statement on the surface, not only in the documentation.
 - [ ] Give restore records a retention rule and a delete (groom 2026-09-23 gap scan) : records are created per run, listed, and undone, but never pruned or deleted, so they accumulate forever and Repair History (`D05 T04 §2`) has no delete to offer. Done when: a retention setting bounds the store, deleting one record goes through the destructive confirmation, warns that the run can no longer be undone, and writes one log line, and a fixture proves prune and delete leave every other record intact, quoted.
+- [ ] Open on the interrupted run's record after a crash (`D01 T03 §6`, `docs/framework/notices.md`): a tool restarted from the crash notice after a repair that changed something opens with that run's record selected, so Undo is one press away, and the record tells the notice which of its items cannot be undone, by the names the repair shows. Done when: a fixture repair faulted after a reversible and an irreversible item hands the notice both lists, and the restarted tool opens on that record with Undo restoring the reversible item. **Filed 2026-11-13** from `D01 T03 §6`.
 - [ ] Commit: `"repair: restore records and a real undo"`
 
 **Freeze check:** The contract changes no tool's repair effect. What changes is that the prior state is recorded first. Evidence is a fixture run before and after the change producing byte-identical effects. Fixture source: `tests/fixtures/`.
 
 - [ ] Extend `scripts/conformance-check.py` with evaluators for `C27`, `C29` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C27`, `C29` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A fixture run followed by undo restores every value and type, asserted. A corrupted record is refused with the fixture byte-identical afterwards. An irreversible item states so on the surface. The record list is captured. All quoted.
+-> XREF: D01 T03 §6 -- the crash notice that reads this record's reversible and irreversible items
 
 ## 5. Transcript the User Can Carry
 
