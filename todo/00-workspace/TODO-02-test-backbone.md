@@ -55,6 +55,7 @@ track: W1
 |  10   |   §10   | Focus-free UI suite conversion             | §7             |  [x]   |
 |  11   |   §11   | Nightly full-suite regression run          | §10            |  [x]   |
 |  12   |   §12   | Port-vs-port visual comparison             | §9, §10        |  [x]   |
+|  13   |   §13   | Capture pairs are replaced atomically       | §3             |  [ ]   |
 
 ---
 
@@ -725,6 +726,19 @@ Why this section exists: `D00 T02 §4` compares what two implementations DID, fi
 > **Deferred:** the live AutoIt half of the launcher pair (elevated session, surfaces not yet equivalent) -> XREF: D03 T02 §7
 > **Duration:** 2026-11-09T14:53:59Z to 2026-11-09T17:49:33Z
 > **Implementer:** muse (muse-wonder-1.0)
+
+## 13. Capture Pairs Are Replaced Atomically
+
+**Filed 2026-11-13** from the completion review of the `D00 T05 §1` repair (`docs/reviews/00-workspace/D00-T05-s1-repair.md`, gap 4, out of scope there, never filed by that run). `scripts/capture-window.ps1` writes a capture's PNG in place and then its provenance sidecar: a locked sidecar, a full disk or an interrupted run can leave a new image beside the previous image's sidecar, and the pair then proves something it does not show. Nothing reads either file back. -> XREF: §3
+
+No surface of its own: the capture writer `scripts/capture-window.ps1` and its self-test.
+
+- [ ] Write the pair beside the live one and switch it in: the PNG and the sidecar are written as `*.new`, each read back against what was written, and only then renamed over the live pair; a failure before the rename leaves the previous pair as it was and removes the `*.new` files, and the script exits non-zero naming what failed. Done when: the capture writer's self-test (or a new one in `scripts/tests`) shows a refused sidecar write leaving the previous pair byte for byte, and a successful write leaving a matching pair and no `*.new`.
+- [ ] Commit: `"workspace: capture pairs are replaced atomically"`
+
+-> SOURCE: review-2026-11-09-d00-t05-s1-repair-completion (gap 4, out of scope)
+
+**Test checkpoint:** the self-test case for a refused sidecar write passes and fails with the readback removed, quoted; one real capture through `scripts/capture-window.ps1` still writes a matching pair. All from real runs.
 
 ## Verification
 
