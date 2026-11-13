@@ -36,6 +36,9 @@ param(
     # A drill: a first start ends initialization part way, as a closed window or a power cut would, so the next
     # -Start is shown to discard what it left and initialize cleanly.
     [switch]$DrillStopDuringInit,
+    # A drill: a first start ends the moment its data folder is published, so the next -Start is shown to find
+    # everything a published folder needs.
+    [switch]$DrillStopAfterPublish,
     # Check the option-file writer without a server.
     [switch]$SelfTest
 )
@@ -372,10 +375,13 @@ function Invoke-Start {
             }
             $initProc.WaitForExit()
             if ($initProc.ExitCode -ne 0) { Say "refused: initialization failed (exit $($initProc.ExitCode); see $(Join-Path $ServerDir 'mysqld.log')); the next -Start begins it again"; return 2 }
+            # Everything a published folder needs is written before it is published: until the generated password is
+            # set, root has none, and a client file without one reaches it. Cut short before the move, the next start
+            # discards the staging folder and writes this again.
+            Write-OptionFile $LocalCnf @('[client]', 'user=root', 'host=127.0.0.1', "port=$port")
             Set-Content -LiteralPath $Initialized -Encoding ascii -Value "initialized $((Get-Date).ToUniversalTime().ToString('o'))"
             Move-Item -LiteralPath $Staging -Destination $DataDir
-            # Until the generated password is set, root has none: a client file without one reaches it.
-            Write-OptionFile $LocalCnf @('[client]', 'user=root', 'host=127.0.0.1', "port=$port")
+            if ($DrillStopAfterPublish) { Say 'drill: stopped as the data folder was published'; return 3 }
         } elseif (-not (Test-Path -LiteralPath $Initialized)) {
             # A data folder an earlier version of this script made, initializing in place: it wrote the credentials
             # marker before initializing and the client file only once initialization had finished. With the marker
