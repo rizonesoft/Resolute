@@ -54,12 +54,25 @@ $PythonDir = Join-Path $HashDir 'python'
 $EnvFile = Join-Path $HashDir 'run\elevated-smoke-env.txt'
 $ManifestKey = 'HKCU:\Software\Resolute\ElevatedSmoke\Manifest'
 $ManifestName = 'HKCU\Software\Resolute\ElevatedSmoke\Manifest'   # as the driver's winreg reads it
-$KnownEntries = @('trusted-hashes.txt', 'python', 'python.new', 'python.old', 'run', 'register-log.txt')
+$KnownEntries = @('trusted-hashes.txt', 'trusted-hashes.txt.new', 'trusted-hashes.txt.old', 'python', 'python.new', 'python.old', 'run', 'register-log.txt')
 $RegisterLog = Join-Path $HashDir 'register-log.txt'
 $AdminsSid = 'S-1-5-32-544'
 $SystemSid = 'S-1-5-18'
 $DriverFiles = @('scripts\smoke-run.py', 'scripts\conformance-check.py')
 $AckTimeoutSec = 60
+# How a registration is carried out. The real one is elevated, registers at
+# highest privilege, protects its directory and takes the pinned Python; the
+# self-test swaps this for a sandbox (a throwaway limited task, a temporary
+# directory, no protection) so the whole transaction and its rollback run for
+# real without a consent prompt.
+$Registration = [pscustomobject]@{
+    RequireElevation = $true
+    RunLevel = 'Highest'
+    Protect = $true
+    Source = { Join-Path $Root 'reskit\python' }
+    Action = $null
+    Readiness = { Get-RunRefusals (Get-TaskOrNull) }
+}
 $StopTimeoutSec = 30
 
 function Test-IsElevated {
@@ -358,31 +371,41 @@ function Restore-Task([string]$Path, [string]$Name, [string]$Xml) {
     Register-ScheduledTask -TaskPath $Path -TaskName $Name -Xml $Xml -Force -ErrorAction Stop | Out-Null
 }
 
-function Switch-Runtime([string]$New, [string]$Live, [scriptblock]$Move = { param($from, $to) Move-Item -LiteralPath $from -Destination $to },
-                        [scriptblock]$Discard = { param($path) Remove-Item -LiteralPath $path -Recurse -Force }) {
-    # Puts the new runtime in place of the live one and keeps the old one
-    # until the new one is there and has its python.exe: a failure on the
-    # way puts the old one back, so the task is never left without a runtime.
-    # Once the new one is in place the swap has happened, and nothing after
-    # that point throws: an old copy that cannot be removed is returned as a
-    # note (the next registration removes it), never as a failure that would
-    # roll the task and hashes back under a runtime that is already new.
+function Switch-Path([string]$New, [string]$Live) {
+    # Puts $New in place of $Live, a file or a directory, and keeps what was
+    # there beside it as "$Live.old". Both moves are renames inside one
+    # directory. The kept copy is what a rollback puts back, so it stays
+    # until the registration has passed its readiness checks.
     $old = "$Live.old"
     if (Test-Path -LiteralPath $old) { Remove-Item -LiteralPath $old -Recurse -Force }
-    $hadLive = Test-Path -LiteralPath $Live
-    if ($hadLive) { & $Move $Live $old }
+    if (Test-Path -LiteralPath $Live) { Move-Item -LiteralPath $Live -Destination $old }
     try {
-        & $Move $New $Live
-        if (-not (Test-Path -LiteralPath (Join-Path $Live 'python.exe'))) { throw "the runtime at $Live has no python.exe after the swap" }
+        Move-Item -LiteralPath $New -Destination $Live
     } catch {
-        if (Test-Path -LiteralPath $Live) { Remove-Item -LiteralPath $Live -Recurse -Force }
-        if ($hadLive) { & $Move $old $Live }
+        if (Test-Path -LiteralPath $old) { Move-Item -LiteralPath $old -Destination $Live }
         throw
     }
-    if ($hadLive) {
-        try { & $Discard $old } catch { return "the previous runtime could not be removed from $old ($($_.Exception.Message)); the next registration removes it" }
+}
+
+function Undo-Switch([string]$Live, [bool]$HadLive) {
+    # Reverses a Switch-Path: the kept copy goes back, or, when nothing was
+    # there before, what the switch put there is removed.
+    $old = "$Live.old"
+    if (Test-Path -LiteralPath $old) {
+        if (Test-Path -LiteralPath $Live) { Remove-Item -LiteralPath $Live -Recurse -Force }
+        Move-Item -LiteralPath $old -Destination $Live
+    } elseif (-not $HadLive -and (Test-Path -LiteralPath $Live)) {
+        Remove-Item -LiteralPath $Live -Recurse -Force
     }
-    return ''
+}
+
+function Remove-Kept([string]$Live, [scriptblock]$Discard = { param($path) Remove-Item -LiteralPath $path -Recurse -Force -ErrorAction Stop }) {
+    # After the registration has committed: the kept copy is no longer
+    # needed. One that cannot be removed is a note, never a failure, because
+    # nothing after the commit may undo it.
+    $old = "$Live.old"
+    if (-not (Test-Path -LiteralPath $old)) { return '' }
+    try { & $Discard $old; return '' } catch { return "the previous copy could not be removed from $old ($($_.Exception.Message)); the next registration removes it" }
 }
 
 function Wait-TaskStopped([scriptblock]$GetState, [int]$TimeoutSec) {
@@ -579,18 +602,6 @@ function Invoke-SelfTest {
             -not (Test-DriverProcessesGone @($hidden) $true $fakeDriver @('RegStudio.exe') $stage) -and
             (Test-DriverProcessesGone @($mine) $true $fakeDriver @('RegStudio.exe') $stage))
 
-        # The runtime swap keeps the old runtime until the new one is in place.
-        $live = Join-Path $td 'python'; $new = Join-Path $td 'python.new'
-        New-Item -ItemType Directory -Path $live, $new | Out-Null
-        Set-Content (Join-Path $live 'python.exe') 'old'; Set-Content (Join-Path $new 'python.exe') 'new'
-        $threw = $false
-        try {
-            $null = Switch-Runtime $new $live { param($from, $to) if ($from -eq $new) { throw 'the disk refused the rename' }; Move-Item -LiteralPath $from -Destination $to }
-        } catch { $threw = $true }
-        Check 'a failed runtime swap puts the old runtime back' ($threw -and (Get-Content (Join-Path $live 'python.exe')) -eq 'old' -and -not (Test-Path "$live.old"))
-        $null = Switch-Runtime $new $live
-        Check 'a runtime swap that succeeds leaves the new runtime and no old copy' ((Get-Content (Join-Path $live 'python.exe')) -eq 'new' -and -not (Test-Path "$live.old") -and -not (Test-Path $new))
-
         # Ownership is part of the boundary: only Administrators or SYSTEM may own the directory.
         Check 'Administrators and SYSTEM are trusted owners, an ordinary account is not' (
             (Test-TrustedOwner $AdminsSid) -and (Test-TrustedOwner $SystemSid) -and -not (Test-TrustedOwner 'S-1-5-21-1-2-3-1001'))
@@ -624,13 +635,80 @@ function Invoke-SelfTest {
         Check 'every success of -Register goes through the readiness list' (
             ([regex]::Matches($registerSource, 'return 0')).Count -eq 0 -and ([regex]::Matches($registerSource, 'Confirm-Registration')).Count -eq 2)
 
-        # The swap has happened once the new runtime is in place: a previous copy that cannot be removed is a note.
-        $live2 = Join-Path $td 'rt'; $new2 = Join-Path $td 'rt.new'
-        New-Item -ItemType Directory -Path $live2, $new2 | Out-Null
-        Set-Content (Join-Path $live2 'python.exe') 'old'; Set-Content (Join-Path $new2 'python.exe') 'new'
-        $note = Switch-Runtime $new2 $live2 -Discard { param($path) throw 'the old copy is held open' }
-        Check 'an old runtime that cannot be removed is a note after the swap, not a failure' (
-            $note -match 'could not be removed' -and (Get-Content (Join-Path $live2 'python.exe')) -eq 'new')
+        # After the commit a kept copy that cannot be removed is a note, never a failure.
+        $keptLive = Join-Path $td 'kept'
+        New-Item -ItemType Directory -Path $keptLive, "$keptLive.old" | Out-Null
+        Check 'a kept copy that cannot be removed after the commit is a note' (
+            (Remove-Kept $keptLive { param($path) throw 'the old copy is held open' }) -match 'could not be removed' -and (Remove-Kept $keptLive) -eq '' -and -not (Test-Path "$keptLive.old"))
+
+        # The registration transaction itself, run for real in a sandbox: a throwaway task of this account at
+        # limited privilege whose action only exits, and a temporary directory in place of the protected one.
+        # The same function registers, fails where it is told to, and rolls back; nothing here is a stand-in for it.
+        $saved = @{ TaskPath = $TaskPath; TaskName = $TaskName; HashDir = $HashDir; HashFile = $HashFile; SnapshotDir = $SnapshotDir
+                    PythonDir = $PythonDir; EnvFile = $EnvFile; RegisterLog = $RegisterLog; Registration = $script:Registration; FailAfterStep = $script:FailAfterStep }
+        $box = Join-Path $td 'registration'
+        $source = Join-Path $td 'runtime-source'
+        New-Item -ItemType Directory -Path $source | Out-Null
+        Set-Content (Join-Path $source 'python.exe') 'runtime one'
+        $verdict = @{ Refusals = @() }
+        function Register-InSandbox([string]$FailAfter = '') {
+            # 'ok', or the failure's message. What the registration prints is not part of the self-test's output.
+            $script:FailAfterStep = $FailAfter
+            try { $code = Invoke-RegisterElevated 6>$null; if ($code -eq 0) { return 'ok' }; return "exit $code" }
+            catch { return $_.Exception.Message }
+            finally { $script:FailAfterStep = '' }
+        }
+        function Get-Leftovers { @(Get-ChildItem -LiteralPath $box -Force -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '\.(new|old)$' } | ForEach-Object Name) }
+        try {
+            $script:TaskPath = '\'
+            $script:TaskName = 'ResoluteSelfTest-' + [Guid]::NewGuid().ToString('N')
+            $script:HashDir = $box
+            $script:HashFile = Join-Path $box 'trusted-hashes.txt'
+            $script:SnapshotDir = Join-Path $box 'run\scripts'
+            $script:PythonDir = Join-Path $box 'python'
+            $script:EnvFile = Join-Path $box 'run\elevated-smoke-env.txt'
+            $script:RegisterLog = Join-Path $box 'register-log.txt'
+            $script:Registration = [pscustomobject]@{
+                RequireElevation = $false; RunLevel = 'Limited'; Protect = $false
+                Source = { $source }
+                Action = (New-ScheduledTaskAction -Execute (Join-Path $env:SystemRoot 'System32\cmd.exe') -Argument '/c exit 0')
+                Readiness = { $verdict.Refusals }
+            }
+
+            # A first registration that fails after the switch leaves nothing: no task, no directory.
+            $said = Register-InSandbox 'commit'
+            Check 'a first registration that fails after the switch leaves no task and no directory' (
+                $said -match "injected failure after step 'commit'" -and -not (Get-TaskOrNull) -and -not (Test-Path -LiteralPath $box))
+
+            $said = Register-InSandbox
+            $registered = Get-RegistrationState
+            Check 'a registration in the sandbox registers the task, the pinned hashes and the runtime, and keeps no spare copy' (
+                $said -eq 'ok' -and (Get-TaskOrNull) -and @(Get-Content -LiteralPath $script:HashFile).Count -eq 2 -and
+                (Get-Content (Join-Path $script:PythonDir 'python.exe')) -eq 'runtime one' -and (Get-Leftovers).Count -eq 0)
+
+            # From here every failed replacement must leave exactly that registration.
+            Set-Content (Join-Path $source 'python.exe') 'runtime two'
+            foreach ($step in 'directory', 'hashes', 'task', 'commit', 'report') {
+                $said = Register-InSandbox $step
+                $differs = Compare-RegistrationState $registered (Get-RegistrationState)
+                Check "a replacement that fails after '$step' leaves the previous task, hashes and runtime, and no spare copy" (
+                    $said -match "injected failure after step '$step'" -and $differs.Count -eq 0 -and (Get-Leftovers).Count -eq 0)
+            }
+            $verdict.Refusals = @('the task can be changed by another principal: S-1-5-11')
+            $said = Register-InSandbox
+            $differs = Compare-RegistrationState $registered (Get-RegistrationState)
+            Check 'a replacement its readiness checks refuse is rolled back like any other failure' (
+                $said -match 'does not pass its readiness checks: the task can be changed by another principal' -and $differs.Count -eq 0 -and (Get-Leftovers).Count -eq 0)
+            $verdict.Refusals = @()
+            $said = Register-InSandbox
+            Check 'a replacement that passes takes the new runtime and keeps no spare copy' (
+                $said -eq 'ok' -and (Get-Content (Join-Path $script:PythonDir 'python.exe')) -eq 'runtime two' -and (Get-Leftovers).Count -eq 0)
+        } finally {
+            if (Get-TaskOrNull) { Unregister-ScheduledTask -TaskPath $script:TaskPath -TaskName $script:TaskName -Confirm:$false }
+            foreach ($name in $saved.Keys) { Set-Variable -Scope Script -Name $name -Value $saved[$name] }
+        }
+        Check 'the sandbox task is gone and the real task was never touched' (
+            -not (Get-ScheduledTask -TaskName 'ResoluteSelfTest-*' -ErrorAction SilentlyContinue) -and $TaskName -eq 'ElevatedSmoke' -and $HashDir -eq 'C:\ProgramData\Resolute\ElevatedSmoke')
 
         # The task restoration the rollback relies on, run for real on a throwaway task of this account
         # (limited privilege, an action that only exits, no trigger), which is removed before the case ends.
@@ -728,13 +806,14 @@ function Compare-RegistrationState($Before, $After) {
 }
 
 function Invoke-ProveRollback {
-    # Elevated. Fails a registration on purpose after it has changed the
-    # directory, the hashes and the task, and reads back that the previous
+    # Elevated. Fails a registration on purpose after it has registered the
+    # task and switched the new hashes and runtime in, the furthest point a
+    # rollback has to come back from, and reads back that the previous
     # task, hashes, runtime and directory permissions are what they were.
     $before = Get-RegistrationState
     $failed = $false
     try {
-        $script:FailAfterStep = 'task'
+        $script:FailAfterStep = 'commit'
         [void](Invoke-RegisterElevated)
     } catch {
         $failed = $true
@@ -767,10 +846,15 @@ function Invoke-ElevatedRegistration {
 }
 
 function Invoke-RegisterElevated {
-    # Runs elevated (one consent prompt from -Register). Protects the
-    # directory, copies the pinned Python in, writes the pinned hashes and
-    # registers the task. Exit code says the outcome.
-    if (-not (Test-IsElevated)) { Write-Host 'refused: the registration copy is not elevated'; return 2 }
+    # One transaction. It prepares everything beside what is live (the new
+    # Python, the new pinned hashes), registers the task, switches the new
+    # files in while keeping the previous ones, and then asks the same
+    # readiness list a run is refused on. Only when that passes are the kept
+    # copies dropped. A failure anywhere before that, the readiness refusal
+    # included, puts back the previous task, hashes, runtime and directory
+    # permissions. Exit code says the outcome.
+    $mode = $script:Registration
+    if ($mode.RequireElevation -and -not (Test-IsElevated)) { Write-Host 'refused: the registration copy is not elevated'; return 2 }
     function Step([string]$Name) {
         # Only ever makes a registration fail: the rollback proof's fault.
         if ($script:FailAfterStep -eq $Name) { throw "injected failure after step '$Name'" }
@@ -782,7 +866,7 @@ function Invoke-RegisterElevated {
         Write-Host "refused: the consent was given as another account ($([Security.Principal.WindowsIdentity]::GetCurrent().Name)); the task must run as the account that asked for it. Sign in as an administrator, or give this account administrator rights, and register again"
         return 2
     }
-    $pinnedPython = Join-Path $Root 'reskit\python'
+    $pinnedPython = & $mode.Source
     if (-not (Test-Path (Join-Path $pinnedPython 'python.exe'))) {
         Write-Host "refused: the pinned Python is not installed at $pinnedPython (run pwsh scripts/bootstrap.ps1)"
         return 2
@@ -794,41 +878,52 @@ function Invoke-RegisterElevated {
     }
     $priorXml = $null
     if ($prior) { $priorXml = Export-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName }
-    $priorHash = if (Test-Path $HashFile) { Get-Content $HashFile -Raw } else { $null }
-    $hadHashDir = Test-Path $HashDir
+    $hadHashDir = Test-Path -LiteralPath $HashDir
+    $hadHashes = Test-Path -LiteralPath $HashFile
+    $hadRuntime = Test-Path -LiteralPath $PythonDir
     $priorDirSddl = if ($hadHashDir) { (Get-Acl -LiteralPath $HashDir).Sddl } else { $null }
     $parentDir = Split-Path $HashDir -Parent
     $priorParentOwner = if (Test-Path -LiteralPath $parentDir) { (Get-Acl -LiteralPath $parentDir).GetOwner([Security.Principal.SecurityIdentifier]).Value } else { $null }
     $removedEntries = @()
-    $newPython = Join-Path $HashDir 'python.new'
+    $newPython = "$PythonDir.new"
+    $newHashes = "$HashFile.new"
+    $switchedHashes = $false
+    $switchedRuntime = $false
     try {
-        $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
-        $expected = Get-ExpectedAction $Root
-        $action = New-ScheduledTaskAction -Execute $expected.Execute -Argument $expected.Argument -WorkingDirectory $expected.WorkingDirectory
+        $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel $mode.RunLevel
+        if ($mode.Action) {
+            $action = $mode.Action
+        } else {
+            $expected = Get-ExpectedAction $Root
+            $action = New-ScheduledTaskAction -Execute $expected.Execute -Argument $expected.Argument -WorkingDirectory $expected.WorkingDirectory
+        }
         New-Item -ItemType Directory -Force -Path $HashDir | Out-Null
-        # The directory itself: Administrators and SYSTEM write, Users read,
-        # inherited by everything under it and nothing inherited from
-        # ProgramData, which lets ordinary users create files in a new folder.
-        $dacl = New-Object Security.AccessControl.DirectorySecurity
-        $dacl.SetAccessRuleProtection($true, $false)
-        foreach ($sid in $AdminsSid, $SystemSid) {
+        if ($mode.Protect) {
+            # The directory itself: Administrators and SYSTEM write, Users read,
+            # inherited by everything under it and nothing inherited from
+            # ProgramData, which lets ordinary users create files in a new folder.
+            $dacl = New-Object Security.AccessControl.DirectorySecurity
+            $dacl.SetAccessRuleProtection($true, $false)
+            foreach ($sid in $AdminsSid, $SystemSid) {
+                $dacl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule(
+                    (New-Object Security.Principal.SecurityIdentifier($sid)), 'FullControl', 'ContainerInherit, ObjectInherit', 'None', 'Allow')))
+            }
             $dacl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule(
-                (New-Object Security.Principal.SecurityIdentifier($sid)), 'FullControl', 'ContainerInherit, ObjectInherit', 'None', 'Allow')))
+                (New-Object Security.Principal.SecurityIdentifier('S-1-5-32-545')), 'ReadAndExecute', 'ContainerInherit, ObjectInherit', 'None', 'Allow')))
+            # Administrators own it and everything in it: an ordinary account that
+            # created this folder first would otherwise keep the right to rewrite
+            # the ACL just set. The folder that holds it gets the same owner
+            # when its own is not already Administrators or SYSTEM.
+            $dacl.SetOwner((New-Object Security.Principal.SecurityIdentifier($AdminsSid)))
+            Set-Acl -Path $HashDir -AclObject $dacl
+            if (-not (Test-TrustedOwner (Get-Acl -LiteralPath $parentDir).GetOwner([Security.Principal.SecurityIdentifier]).Value)) {
+                $parentAcl = Get-Acl -LiteralPath $parentDir
+                $parentAcl.SetOwner((New-Object Security.Principal.SecurityIdentifier($AdminsSid)))
+                Set-Acl -LiteralPath $parentDir -AclObject $parentAcl
+            }
+            & icacls.exe $HashDir /setowner "*$AdminsSid" /T /C /Q | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "icacls could not give Administrators ownership of everything under $HashDir (exit $LASTEXITCODE)" }
         }
-        $dacl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule(
-            (New-Object Security.Principal.SecurityIdentifier('S-1-5-32-545')), 'ReadAndExecute', 'ContainerInherit, ObjectInherit', 'None', 'Allow')))
-        # Administrators own it and everything in it: an ordinary account that
-        # created this folder first would otherwise keep the right to rewrite
-        # the ACL just set. The folder that holds it gets the same owner.
-        $dacl.SetOwner((New-Object Security.Principal.SecurityIdentifier($AdminsSid)))
-        Set-Acl -Path $HashDir -AclObject $dacl
-        if (-not (Test-TrustedOwner (Get-Acl -LiteralPath $parentDir).GetOwner([Security.Principal.SecurityIdentifier]).Value)) {
-            $parentAcl = Get-Acl -LiteralPath $parentDir
-            $parentAcl.SetOwner((New-Object Security.Principal.SecurityIdentifier($AdminsSid)))
-            Set-Acl -LiteralPath $parentDir -AclObject $parentAcl
-        }
-        & icacls.exe $HashDir /setowner "*$AdminsSid" /T /C /Q | Out-Null
-        if ($LASTEXITCODE -ne 0) { throw "icacls could not give Administrators ownership of everything under $HashDir (exit $LASTEXITCODE)" }
         # Whatever is here that registration did not put here was put by
         # someone else while the folder was open to them: it goes.
         foreach ($entry in Get-ChildItem -LiteralPath $HashDir -Force) {
@@ -844,34 +939,37 @@ function Invoke-RegisterElevated {
         if (Test-Path $runDir) { Remove-Item -LiteralPath $runDir -Recurse -Force }
         New-Item -ItemType Directory -Force -Path $SnapshotDir | Out-Null
         Step 'directory'
-        # The pinned Python, copied beside the old copy and swapped in last.
-        if (Test-Path $newPython) { Remove-Item -LiteralPath $newPython -Recurse -Force }
+        # The new runtime and the new pinned hashes are written beside the
+        # live ones, which are not touched until the switch below. The
+        # hashes are read back before anything depends on them.
+        if (Test-Path -LiteralPath $newPython) { Remove-Item -LiteralPath $newPython -Recurse -Force }
         Copy-Item -LiteralPath $pinnedPython -Destination $newPython -Recurse
-        $lines = foreach ($rel in $DriverFiles) {
+        if (-not (Test-Path -LiteralPath (Join-Path $newPython 'python.exe'))) { throw "the copy of the runtime at $newPython has no python.exe" }
+        $lines = @(foreach ($rel in $DriverFiles) {
             '{0}  {1}' -f (Get-FileHash -Algorithm SHA256 -Path (Join-Path $Root $rel)).Hash, $rel
-        }
-        if (Test-Path $HashFile) { Remove-Item -LiteralPath $HashFile -Force }  # a new file takes the inherited ACL
-        Set-Content -Path $HashFile -Value $lines
+        })
+        if (Test-Path -LiteralPath $newHashes) { Remove-Item -LiteralPath $newHashes -Force }
+        Set-Content -LiteralPath $newHashes -Value $lines
+        if ((@(Get-Content -LiteralPath $newHashes) -join "`n") -ne ($lines -join "`n")) { throw "the pinned hashes written to $newHashes did not read back as written" }
         Step 'hashes'
         Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Action $action -Principal $principal `
             -Description 'Resolute unattended elevated smoke (D07 T01 S7). Fixed action, hash-pinned driver; remove with tools/elevated-smoke.ps1 -Remove.' -Force | Out-Null
         Step 'task'
-        $untrusted = @(Get-DirectoryRefusals)
-        if ($untrusted) { throw ("the directory is not protected after registration: " + ($untrusted -join '; ')) }
-        # Everything that can fail is done before the swap, the report too:
-        # a full disk or a held log after it would roll the task and hashes
-        # back under a runtime that is already the new one.
-        Write-Registration "python: $((Get-FileHash -Algorithm SHA256 -Path (Join-Path $newPython 'python.exe')).Hash) $(Join-Path $PythonDir 'python.exe')"
+        # The switch. The previous hashes and runtime are kept as *.old.
+        Switch-Path $newHashes $HashFile
+        $switchedHashes = $true
+        Switch-Path $newPython $PythonDir
+        $switchedRuntime = $true
+        Step 'commit'
+        # The same list a run is refused on. A registration that would not
+        # be allowed to run is not a registration: it is rolled back.
+        $refusals = @(& $mode.Readiness)
+        if ($refusals) { throw ("the registration does not pass its readiness checks: " + ($refusals -join '; ')) }
+        Write-Registration "python: $((Get-FileHash -Algorithm SHA256 -Path (Join-Path $PythonDir 'python.exe')).Hash) $(Join-Path $PythonDir 'python.exe')"
         foreach ($line in $lines) { Write-Registration "pinned: $line" }
         Step 'report'
-        # Last, because it is the one step that discards something: until
-        # here a failure restores the previous task, hashes and runtime, and
-        # after it nothing throws.
-        $swapNote = Switch-Runtime $newPython $PythonDir
     } catch {
-        # Roll back: a failed registration leaves neither a half-registered
-        # task nor new pinned hashes behind. Every step runs whatever the
-        # others do, what this run created is removed, and a step that
+        # Roll back. Every step runs whatever the others do, and a step that
         # fails is said beside the original error.
         $cause = $_
         $notRestored = Invoke-RollbackSteps @(
@@ -883,27 +981,28 @@ function Invoke-RegisterElevated {
                 }
             },
             {
-                if ($priorHash) { Set-Content -Path $HashFile -Value $priorHash -ErrorAction Stop }
-                elseif (Test-Path $HashFile) { Remove-Item $HashFile -ErrorAction Stop }
+                if ($switchedHashes) { Undo-Switch $HashFile $hadHashes }
+                if (Test-Path -LiteralPath $newHashes) { Remove-Item -LiteralPath $newHashes -Force -ErrorAction Stop }
             },
             {
-                if (Test-Path $newPython) { Remove-Item -LiteralPath $newPython -Recurse -Force -ErrorAction Stop }
-                if (-not $hadHashDir -and (Test-Path $HashDir)) { Remove-Item $HashDir -Recurse -Force -ErrorAction Stop }
+                if ($switchedRuntime) { Undo-Switch $PythonDir $hadRuntime }
+                if (Test-Path -LiteralPath $newPython) { Remove-Item -LiteralPath $newPython -Recurse -Force -ErrorAction Stop }
             },
             {
                 # The directory's owner and permissions as they were, and the
                 # owner of the folder that holds it when this run changed it.
-                if ($priorDirSddl -and (Test-Path -LiteralPath $HashDir)) {
+                if ($mode.Protect -and $priorDirSddl -and (Test-Path -LiteralPath $HashDir)) {
                     $was = Get-Acl -LiteralPath $HashDir
                     $was.SetSecurityDescriptorSddlForm($priorDirSddl)
                     Set-Acl -LiteralPath $HashDir -AclObject $was -ErrorAction Stop
                 }
-                if ($priorParentOwner -and (Test-Path -LiteralPath $parentDir) -and
+                if ($mode.Protect -and $priorParentOwner -and (Test-Path -LiteralPath $parentDir) -and
                     (Get-Acl -LiteralPath $parentDir).GetOwner([Security.Principal.SecurityIdentifier]).Value -ne $priorParentOwner) {
                     $was = Get-Acl -LiteralPath $parentDir
                     $was.SetOwner((New-Object Security.Principal.SecurityIdentifier($priorParentOwner)))
                     Set-Acl -LiteralPath $parentDir -AclObject $was -ErrorAction Stop
                 }
+                if (-not $hadHashDir -and (Test-Path -LiteralPath $HashDir)) { Remove-Item -LiteralPath $HashDir -Recurse -Force -ErrorAction Stop }
             }
         )
         if ($notRestored.Count) {
@@ -913,13 +1012,14 @@ function Invoke-RegisterElevated {
         if ($hadHashDir) {
             $kept = "not restored by the rollback: the run directory's staged copies (the next run stages them again), and Administrators' ownership of the files inside $HashDir"
             if ($removedEntries) { $kept += "; and the entries removed as unexpected, which are gone: " + ($removedEntries -join ', ') }
-            Write-Registration $kept
+            try { Write-Registration $kept } catch { Write-Host $kept }
         }
         throw $cause
     }
-    if ($swapNote) {
-        # Said after the transaction, where a failure to say it changes nothing.
-        try { Write-Registration $swapNote } catch { Write-Host $swapNote }
+    # Committed. The kept copies go; one that cannot be removed is a note.
+    foreach ($live in $HashFile, $PythonDir) {
+        $note = Remove-Kept $live
+        if ($note) { try { Write-Registration $note } catch { Write-Host $note } }
     }
     return 0
 }
