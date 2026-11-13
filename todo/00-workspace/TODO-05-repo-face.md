@@ -51,7 +51,7 @@ track: N0
 | :---: | :-----: | ----------- | ---------- | :----: |
 |   1   |   §1    | Visual proof capture with provenance | D00 T01 §4, D00 T02 §3 |  [x]   |
 |   2   |   §2    | README rewrite plus repo-face files | §1 |  [x]   |
-|   3   |   §3    | Setup-path CI plus reproducibility record | §2 |  [ ]   |
+|   3   |   §3    | Setup-path CI plus reproducibility record | §2 |  [x]   |
 |   4   |   §4    | Sidecar reproduction command carries -Visible | §1 |  [ ]   |
 
 ---
@@ -204,6 +204,14 @@ A CI lane runs the README quick start verbatim on every push, per build lane, so
 - [x] Commit: `"ci: setup-path lane running the quick start verbatim"` **Done 2026-11-13:** `ef4d1c0b`, then `455c6924` (round 1's P1) and `d409c5a7` (the session's output relayed).
 
 **Test checkpoint:** The lane fails when the quick start drifts, fails on a deliberately wrong pin, carries the recorded `.env` and seed facts, and has an observed green run URL. Cheaper substitute that fails the checkpoint: a workflow that was pushed but never watched green, which proves the YAML parses and nothing else.
+
+> **Verified:** 2026-11-13 | §3 | the README's quick start run as written on CI: run https://github.com/rizonesoft/Resolute/actions/runs/43487478123 on `d409c5a7` shows the five README commands (`quickstart> git clone https://github.com/rizonesoft/Resolute.git` to `quickstart> pwsh scripts/check-all.ps1 ...`), five `[VERIFY] sha256` each followed by `[OK] installed`, `check-all: 32 gate(s) ok`, `quickstart: ended 2 process(es) the quick start left running` and `quickstart: 5 command(s) ran as the README has them, on commit d409c5a7fc290861d2490fb8785053058964590e`, with the `.env` and first-run facts in its summary. The wrong-pin proof, run https://github.com/rizonesoft/Resolute/actions/runs/43487765650 (`quick-start (red proof)`, failure): `[ABORT] llvm-mingw hash mismatch. llvm-mingw was not installed`, `quickstart: refused: command 3 of 5: pwsh scripts/bootstrap.ps1 ... failed; the commands after it were not run`. Drift: `python scripts/quickstart.py --self-test`, `self-test: all pass`, with a missing heading, a missing block, a failed command, a clone at another commit and an unbuilt preset each refused by name, and the facts failing on a tracked `.env`, a script that reads one, a new fetching file and a tag-pinned `FetchContent_Declare`. `python scripts/ci-status.py --self-test`: `44 cases, 0 failed`. pyright on `scripts/quickstart.py`, `scripts/ci-status.py` and `scripts/lib/win_job.py`: `0 errors`. `python scripts/ci-status.py` for the final candidate `3a40f160`: `gates: success`, `plan-gates: success`, `quick-start: success` (run 43489308442). `todo-graph.py validate` `30 todos, 258 sections -- 0 fatal`.
+> **Review:** astra (gpt-6-astra via codex). `docs/reviews/00-workspace/D00-T05-s3.md`: plan gaps (one P1 and three P2, folded), round 1 (P1, fixed in `455c6924`), round 2 (medium, consistency) `HIGHEST: none`; the output relay (`d409c5a7`) came after the clean round and was first reviewed by the completion pass · Raw findings: docs/reviews/00-workspace/D00-T05-s3.md
+> **Completion:** astra (medium), candidate 3a40f160 -- COMPLETION: gaps (0 in scope; 2 out of scope, branch protection owned by `D10 T01 §2`, and the Preferences dialog, no part of this section, owned by `D01 T01 §2`, `§4` and `§7`)
+> **Plan review:** astra -- gaps (4, folded)
+> **CRUD:** not applicable: the lane reads the README and the tree and reports a verdict; it creates, changes and deletes nothing that is kept
+> **Duration:** 2026-11-13T18:29:24Z to 2026-11-13T19:18:42Z
+> **Implementer:** claude (claude-fable-5-2)
 
 -> XREF: D00 T05 §2 -- the quick start this lane executes
 -> XREF: D10 T01 §2 -- the rule that guards this workflow
