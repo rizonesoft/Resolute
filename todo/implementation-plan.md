@@ -214,7 +214,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T01 §4`  | Localization and the pack loader              |  11   |
 | [x] | `D01 T03 §1`  | Standard window, menus, message layer         |  23   |
 | [x] | `D01 T03 §2`  | Preferences shell, general, performance       |  27   |
-| [ ] | `D01 T03 §3`  | Language page and tool-page contract          |  12   |
+| [ ] | `D01 T03 §3`  | Language page and tool-page contract          |  15   |
 | [ ] | `D01 T01 §7`  | Standard window, About, and preferences       |  16   |
 | [ ] | `D01 T01 §8`  | DPI awareness and system theme                |   7   |
 | [ ] | `D01 T03 §4`  | Per-tool log surface                          |   6   |
