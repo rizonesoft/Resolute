@@ -34,10 +34,14 @@
 
     Shots are written into a staging folder of this run's own inside
     -OutDir and published, all four together, only when every shot
-    succeeded. A run that stands down removes its staging folder and
-    leaves -OutDir as it found it.
+    succeeded, and all or nothing: a publication that fails puts back
+    every earlier file it moved aside. A run that stands down removes its
+    staging folder and leaves -OutDir as it found it.
 
-    The driver ends only the processes it started.
+    Every command sent to the launcher has a deadline, so a launcher that
+    stops answering stands the run down. The driver puts itself in a job
+    that ends every process it started when the driver ends, however it
+    ends; processes that were running before it are never touched.
 
 .PARAMETER Exe
     The built launcher to capture.
@@ -95,8 +99,50 @@ using System.Runtime.InteropServices;
 public class Shot {
     [DllImport("user32.dll")] public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr ctx);
     [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int cx, int cy, uint flags);
-    [DllImport("user32.dll")] public static extern IntPtr SendMessageW(IntPtr h, uint msg, IntPtr w, IntPtr l);
     [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
+    [DllImport("user32.dll", SetLastError = true)] public static extern IntPtr SendMessageTimeoutW(IntPtr h, uint msg, IntPtr w, IntPtr l, uint flags, uint timeoutMs, out UIntPtr result);
+}
+// A window whose thread never answers: the self-test's stand-in for a launcher that stopped responding.
+public class Hung {
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern IntPtr CreateWindowExW(uint ex, string cls, string name, uint style, int x, int y, int w, int h, IntPtr parent, IntPtr menu, IntPtr inst, IntPtr param);
+    [DllImport("user32.dll")] static extern bool DestroyWindow(IntPtr h);
+    public static IntPtr Start(int blockMs) {
+        IntPtr made = IntPtr.Zero;
+        var ready = new ManualResetEvent(false);
+        var t = new Thread(() => {
+            made = CreateWindowExW(0, "STATIC", "hung", 0, 0, 0, 10, 10, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+            ready.Set();
+            Thread.Sleep(blockMs);   // no message pump: every message sent to it waits
+            DestroyWindow(made);
+        });
+        t.IsBackground = true;
+        t.Start();
+        ready.WaitOne(5000);
+        return made;
+    }
+}
+// The driver's lifetime: a job the driver puts itself in before it starts
+// anything, which ends every process in it when its last handle closes, that
+// is, when the driver ends, however it ends. Processes started before the
+// driver are never in it.
+public class Lifetime {
+    [StructLayout(LayoutKind.Sequential)] struct BASIC { public long a, b; public uint flags; public UIntPtr min, max; public uint active; public UIntPtr affinity; public uint priority, sched; }
+    [StructLayout(LayoutKind.Sequential)] struct IO { public ulong a, b, c, d, e, f; }
+    [StructLayout(LayoutKind.Sequential)] struct EXTENDED { public BASIC basic; public IO io; public UIntPtr procMem, jobMem, peakProc, peakJob; }
+    [DllImport("kernel32.dll", SetLastError = true)] static extern IntPtr CreateJobObjectW(IntPtr attrs, string name);
+    [DllImport("kernel32.dll", SetLastError = true)] static extern bool SetInformationJobObject(IntPtr job, int cls, ref EXTENDED info, int size);
+    [DllImport("kernel32.dll", SetLastError = true)] static extern bool AssignProcessToJobObject(IntPtr job, IntPtr process);
+    [DllImport("kernel32.dll")] static extern IntPtr GetCurrentProcess();
+    static IntPtr job;   // held for the driver's whole life, never closed by it
+    public static string Bind() {
+        job = CreateJobObjectW(IntPtr.Zero, null);
+        if (job == IntPtr.Zero) return "CreateJobObject failed with " + Marshal.GetLastWin32Error();
+        var info = new EXTENDED();
+        info.basic.flags = 0x2000;   // JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+        if (!SetInformationJobObject(job, 9, ref info, Marshal.SizeOf(typeof(EXTENDED)))) return "SetInformationJobObject failed with " + Marshal.GetLastWin32Error();
+        if (!AssignProcessToJobObject(job, GetCurrentProcess())) return "AssignProcessToJobObject failed with " + Marshal.GetLastWin32Error();
+        return null;
+    }
 }
 public class Idle {
     [StructLayout(LayoutKind.Sequential)] public struct LASTINPUTINFO { public uint cbSize; public uint dwTime; }
@@ -187,6 +233,102 @@ function Get-ReproductionCommand([string]$Driver, [string]$Exe, [string]$Capture
     return "pwsh -NoProfile -File $(ConvertTo-Quoted $Driver) -Visible -Exe $(ConvertTo-Quoted $Exe) -CaptureScript $(ConvertTo-Quoted $CaptureScript) -OutDir $(ConvertTo-Quoted $OutDir) -Date $Date"
 }
 
+function Send-Command([IntPtr]$Hwnd, [int]$Command, [string]$What, [int]$TimeoutMs = 5000) {
+    # WM_COMMAND, bounded: a launcher that stopped answering stands the run
+    # down instead of holding the driver where no input check or deadline can act.
+    $result = [UIntPtr]::Zero
+    $answered = [Shot]::SendMessageTimeoutW($Hwnd, 0x0111, [IntPtr]$Command, [IntPtr]::Zero, 0x0002, [uint32]$TimeoutMs, [ref]$result)   # SMTO_ABORTIFHUNG
+    if ($answered -eq [IntPtr]::Zero) { throw "stood down during ${What}: the launcher did not answer command $Command within $($TimeoutMs / 1000) s" }
+}
+
+$script:PublishHook = $null   # the self-test's seam: called after each new file is moved in
+
+function Write-Journal([string]$Staging, [object[]]$Entries, [bool]$Complete) {
+    $journal = Join-Path $Staging 'publish.json'
+    @{ files = $Entries; complete = $Complete } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath "$journal.tmp" -Encoding utf8
+    [System.IO.File]::Move("$journal.tmp", $journal, $true)
+}
+
+function Publish-Set([string]$Staging, [string]$OutDir, [string[]]$Files) {
+    # All or nothing. A journal names every file of the set and whether an
+    # earlier file of that name is live, before anything moves. Every earlier
+    # file is moved aside inside the staging folder, the new files are moved
+    # in, every published file is read back against its staged hash, and the
+    # journal is marked complete. A failure at any step removes the new files
+    # and puts every aside file back; a file that cannot be put back is named
+    # with where it is, and the caller keeps the staging folder that holds it.
+    # A publication cut short with no chance to run this undo is recovered by
+    # Restore-Interrupted at the driver's next start, from the journal.
+    $aside = Join-Path $Staging 'aside'
+    New-Item -ItemType Directory -Force -Path $aside | Out-Null
+    $hashes = @{}
+    foreach ($f in $Files) { $hashes[$f] = (Get-FileHash -LiteralPath (Join-Path $Staging $f)).Hash }
+    $entries = @($Files | ForEach-Object { @{ name = $_; earlier = (Test-Path -LiteralPath (Join-Path $OutDir $_)) } })
+    Write-Journal $Staging $entries $false
+    $movedAside = [System.Collections.Generic.List[string]]::new()
+    $movedIn = [System.Collections.Generic.List[string]]::new()
+    try {
+        foreach ($f in $Files) {
+            $live = Join-Path $OutDir $f
+            if (Test-Path -LiteralPath $live) { [System.IO.File]::Move($live, (Join-Path $aside $f)); $movedAside.Add($f) }
+        }
+        foreach ($f in $Files) {
+            [System.IO.File]::Move((Join-Path $Staging $f), (Join-Path $OutDir $f))
+            $movedIn.Add($f)
+            if ($script:PublishHook -and (& $script:PublishHook $OutDir $movedIn.Count) -eq 'stop') { return }   # the self-test's stand-in for the driver ending here
+        }
+        foreach ($f in $Files) {
+            if ((Get-FileHash -LiteralPath (Join-Path $OutDir $f)).Hash -ne $hashes[$f]) { throw "$f read back differently from what was staged" }
+        }
+        Write-Journal $Staging $entries $true
+    } catch {
+        $why = $_.Exception.Message
+        foreach ($f in $movedIn) { Remove-Item -LiteralPath (Join-Path $OutDir $f) -Force }
+        $lost = @()
+        foreach ($f in $movedAside) {
+            try { [System.IO.File]::Move((Join-Path $aside $f), (Join-Path $OutDir $f)) } catch { $lost += $f }
+        }
+        if ($lost) {
+            $script:KeepStaging = $true
+            throw "publication failed ($why) and $($lost -join ', ') could not be put back; the earlier files are in $aside"
+        }
+        throw "publication failed, nothing was published, and the earlier files are as they were: $why"
+    }
+    Remove-Item -LiteralPath $aside -Recurse -Force
+}
+
+function Restore-Interrupted([string]$OutDir) {
+    # A staging folder whose run is gone: its journal says what to do. Not
+    # complete: every earlier file it moved aside goes back, and every new
+    # file it moved in where no earlier file was is removed. Complete, or no
+    # journal (publication never began): the folder is only removed. A
+    # staging folder whose run is alive is left alone.
+    $said = @()
+    foreach ($dir in @(Get-ChildItem -LiteralPath $OutDir -Directory -Force -Filter '.capture-staging-*')) {
+        if ($dir.Name -notmatch '^\.capture-staging-(\d+)-') { continue }
+        $owner = Get-Process -Id ([int]$Matches[1]) -ErrorAction SilentlyContinue   # none is the answer "the run is gone"
+        if ($owner) { continue }
+        $journal = Join-Path $dir.FullName 'publish.json'
+        if (Test-Path -LiteralPath $journal) {
+            $record = Get-Content -LiteralPath $journal -Raw | ConvertFrom-Json
+            if (-not $record.complete) {
+                foreach ($entry in $record.files) {
+                    $kept = Join-Path $dir.FullName "aside\$($entry.name)"
+                    $live = Join-Path $OutDir $entry.name
+                    if (Test-Path -LiteralPath $kept) {
+                        [System.IO.File]::Move($kept, $live, $true)
+                    } elseif (-not $entry.earlier -and (Test-Path -LiteralPath $live) -and -not (Test-Path -LiteralPath (Join-Path $dir.FullName $entry.name))) {
+                        Remove-Item -LiteralPath $live -Force
+                    }
+                }
+                $said += "recovered the interrupted publication in $($dir.Name): the earlier files are back"
+            }
+        }
+        Remove-Item -LiteralPath $dir.FullName -Recurse -Force
+    }
+    return $said
+}
+
 function Test-InputResumed($Baseline, $Now) {
     # True when the operator's event count moved after the baseline. A
     # watch that answered nothing is not "no input": the run cannot see the
@@ -222,6 +364,58 @@ function Invoke-SelfTest {
     Check "the driver's own marked injected event is not the operator's" (-not [Watch]::IsOperator($true, [Watch]::Mark))
     Check 'an event Windows did not inject is the operator''s, whatever its mark' ([Watch]::IsOperator($false, [Watch]::Mark))
     Check 'an injected event without the mark (the drill, or other software) is the operator''s' ([Watch]::IsOperator($true, 0))
+    # A window whose thread does not answer: the send returns by its deadline, naming the command.
+    $hung = [Hung]::Start(8000)
+    $clock = [System.Diagnostics.Stopwatch]::StartNew()
+    $said = $null
+    try { Send-Command $hung 1030 'the theme change' 1000 } catch { $said = $_.Exception.Message }
+    $clock.Stop()
+    Check 'a command to a window that does not answer returns by its deadline, naming the command' ($clock.ElapsedMilliseconds -lt 3000 -and $said -like '*did not answer command 1030*')
+
+    # A set published over an earlier one while one destination sidecar is locked by another handle.
+    $root = Join-Path ([System.IO.Path]::GetTempPath()) ("capture-publish-selftest-" + [Guid]::NewGuid().ToString('N'))
+    $out = Join-Path $root 'out'; $stage = Join-Path $root 'stage'
+    New-Item -ItemType Directory -Path $out, $stage | Out-Null
+    try {
+        $files = @('a.png', 'a.txt', 'b.png', 'b.txt')
+        foreach ($f in $files) { Set-Content -LiteralPath (Join-Path $out $f) -Value "earlier $f"; Set-Content -LiteralPath (Join-Path $stage $f) -Value "new $f" }
+        $state = { @(Get-ChildItem -LiteralPath $out -File | Sort-Object Name | ForEach-Object { "$($_.Name) $((Get-FileHash -LiteralPath $_.FullName).Hash)" }) -join ';' }
+        $earlier = & $state
+        $lock = [System.IO.File]::Open((Join-Path $out 'b.txt'), 'Open', 'Read', 'None')
+        $said = $null
+        $script:KeepStaging = $false
+        try { Publish-Set $stage $out $files } catch { $said = $_.Exception.Message } finally { $lock.Dispose() }
+        Check 'a refused publication says nothing was published' ($said -like '*nothing was published*')
+        Check 'a refused publication leaves the earlier set byte for byte, with no new or aside file' ((& $state) -eq $earlier -and -not $script:KeepStaging)
+        $restage = { foreach ($f in $files) { if (-not (Test-Path -LiteralPath (Join-Path $stage $f))) { Set-Content -LiteralPath (Join-Path $stage $f) -Value "new $f" } } }
+        & $restage
+
+        # (b) a published file reads back differently after the new files were moved in.
+        $script:PublishHook = { param($dir, $count) if ($count -eq $files.Count) { Set-Content -LiteralPath (Join-Path $dir 'a.txt') -Value 'damaged' } }
+        $said = $null
+        try { Publish-Set $stage $out $files } catch { $said = $_.Exception.Message } finally { $script:PublishHook = $null }
+        Check 'a publication that reads back differently after installing says nothing was published' ($said -like '*nothing was published*a.txt read back differently*')
+        Check 'a publication that reads back differently leaves the earlier set byte for byte' ((& $state) -eq $earlier)
+        # The caller removes its staging folder after a failure; this case reuses it, so its empty aside folder goes here.
+        if (Test-Path -LiteralPath (Join-Path $stage 'aside')) { Remove-Item -LiteralPath (Join-Path $stage 'aside') -Recurse -Force }
+        & $restage
+
+        # (c) a publication stopped after two new files were moved in, as a driver ended there would leave it, then recovered as the next start does.
+        $dead = Join-Path $out '.capture-staging-999999-selftest'
+        New-Item -ItemType Directory -Path $dead | Out-Null
+        foreach ($f in $files) { Copy-Item -LiteralPath (Join-Path $stage $f) -Destination $dead }
+        $script:PublishHook = { param($dir, $count) if ($count -eq 2) { 'stop' } }
+        try { Publish-Set $dead $out $files } finally { $script:PublishHook = $null }
+        $cut = & $state
+        $recovered = Restore-Interrupted $out
+        Check 'a publication cut short is recovered at the next start: the earlier set byte for byte, no staging, aside or journal left' ($cut -ne $earlier -and (& $state) -eq $earlier -and -not (Test-Path -LiteralPath $dead) -and $recovered.Count -eq 1)
+
+        Publish-Set $stage $out $files
+        $now = @(Get-ChildItem -LiteralPath $out -File | Sort-Object Name | ForEach-Object { "$($_.Name)=$((Get-Content -LiteralPath $_.FullName -Raw).Trim())" }) -join ';'
+        Check 'a publication over an earlier set leaves only the new set' ($now -eq 'a.png=new a.png;a.txt=new a.txt;b.png=new b.png;b.txt=new b.txt' -and @(Get-ChildItem -LiteralPath $stage -Recurse -File | Where-Object Name -ne 'publish.json').Count -eq 0)
+    } finally {
+        Remove-Item -LiteralPath $root -Recurse -Force
+    }
     if ($script:selfFailures.Count) { Write-Host ("self-test: FAIL " + ($script:selfFailures -join ', ')); return 1 }
     Write-Host 'self-test: all pass'
     return 0
@@ -316,6 +510,7 @@ $OutDir = (Resolve-Path $OutDir).Path
 $WorkingDir = Split-Path (Split-Path $Exe -Parent) -Parent
 $HostName = $env:COMPUTERNAME
 $DriverPath = $PSCommandPath
+foreach ($line in (Restore-Interrupted $OutDir)) { Write-Host $line -ForegroundColor Yellow }
 # This run's own staging folder, on the same volume as -OutDir so
 # publishing is a rename; nothing outside it is written until every shot
 # succeeded.
@@ -345,11 +540,11 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
         # The launcher starts in System appearance; its theme command
         # cycles System, Dark, Light, so one press is dark, two light.
         foreach ($i in 1..$Presses) {
-            [Shot]::SendMessageW($hwnd, 0x0111, [IntPtr]1030, [IntPtr]::Zero) | Out-Null
+            Send-Command $hwnd 1030 'the theme change'
             Invoke-Drill 'theme'
             Wait-Checked 900 'the theme change'
         }
-        [Shot]::SendMessageW($hwnd, 0x0111, [IntPtr]$ViewCmd, [IntPtr]::Zero) | Out-Null
+        Send-Command $hwnd $ViewCmd 'the view change'
         Invoke-Drill 'view'
         Wait-Checked 700 'the view change'
         Send-OwnInput 'foreground settling'
@@ -386,15 +581,13 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
     }
 }
 
-function Publish-Shots {
-    # Every shot succeeded: move the set out of staging, replacing earlier files of the same names.
-    foreach ($name in $script:Shots) {
-        foreach ($ext in '.png', '.txt') {
-            [System.IO.File]::Move((Join-Path $Staging "$name$ext"), (Join-Path $OutDir "$name$ext"), $true)
-        }
-    }
-}
+$script:KeepStaging = $false
 
+$bindFailure = [Lifetime]::Bind()
+if ($bindFailure) {
+    Write-Host "stood down before launching anything: the processes this run would start could not be bound to its lifetime ($bindFailure)" -ForegroundColor Yellow
+    exit 3
+}
 if (-not [Watch]::Start()) {
     Write-Host 'stood down before launching anything: the input watch could not be installed, so the operator cannot be seen' -ForegroundColor Yellow
     exit 3
@@ -422,14 +615,18 @@ try {
         Take-Shot 'details' 'light' 2 1004
         Take-Shot 'large-icons' 'dark' 1 1001
         Take-Shot 'large-icons' 'light' 2 1001
-        Publish-Shots
+        Publish-Set $Staging $OutDir @($script:Shots | ForEach-Object { "$_.png"; "$_.txt" })
         Write-Output "published $($script:Shots.Count) shots to $OutDir"
     } catch {
         Write-Host $_.Exception.Message -ForegroundColor Yellow
-        Write-Host "no further shot was attempted, nothing was published, and every process the driver started was ended" -ForegroundColor Yellow
+        if ($script:KeepStaging) {
+            Write-Host "every process the driver started was ended; the staging folder $Staging is kept because it holds earlier files" -ForegroundColor Yellow
+        } else {
+            Write-Host "no further shot was attempted, nothing was published, and every process the driver started was ended" -ForegroundColor Yellow
+        }
         $code = 3
     } finally {
-        Remove-Item -LiteralPath $Staging -Recurse -Force
+        if (-not $script:KeepStaging) { Remove-Item -LiteralPath $Staging -Recurse -Force }
     }
 } finally {
     [Watch]::Stop()
