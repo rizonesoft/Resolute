@@ -371,18 +371,20 @@ function Restore-Task([string]$Path, [string]$Name, [string]$Xml) {
     Register-ScheduledTask -TaskPath $Path -TaskName $Name -Xml $Xml -Force -ErrorAction Stop | Out-Null
 }
 
-function Switch-Path([string]$New, [string]$Live) {
+function Switch-Path([string]$New, [string]$Live, [scriptblock]$Move = { param($from, $to) Move-Item -LiteralPath $from -Destination $to }) {
     # Puts $New in place of $Live, a file or a directory, and keeps what was
     # there beside it as "$Live.old". Both moves are renames inside one
     # directory. The kept copy is what a rollback puts back, so it stays
     # until the registration has passed its readiness checks.
     $old = "$Live.old"
     if (Test-Path -LiteralPath $old) { Remove-Item -LiteralPath $old -Recurse -Force }
-    if (Test-Path -LiteralPath $Live) { Move-Item -LiteralPath $Live -Destination $old }
+    if (Test-Path -LiteralPath $Live) { & $Move $Live $old }
     try {
-        Move-Item -LiteralPath $New -Destination $Live
+        & $Move $New $Live
     } catch {
-        if (Test-Path -LiteralPath $old) { Move-Item -LiteralPath $old -Destination $Live }
+        # The second rename was refused with the live copy already moved
+        # aside: it goes straight back, so the live path is never left empty.
+        if (Test-Path -LiteralPath $old) { & $Move $old $Live }
         throw
     }
 }
@@ -634,6 +636,19 @@ function Invoke-SelfTest {
         $registerSource = (Get-Command Invoke-Register).ScriptBlock.ToString()
         Check 'every success of -Register goes through the readiness list' (
             ([regex]::Matches($registerSource, 'return 0')).Count -eq 0 -and ([regex]::Matches($registerSource, 'Confirm-Registration')).Count -eq 2)
+
+        # A rename refused between moving the live copy aside and putting the new one in its place.
+        $switchLive = Join-Path $td 'switch'
+        $switchNew = "$switchLive.new"
+        New-Item -ItemType Directory -Path $switchLive, $switchNew | Out-Null
+        Set-Content (Join-Path $switchLive 'python.exe') 'old'; Set-Content (Join-Path $switchNew 'python.exe') 'new'
+        $threw = $false
+        try {
+            Switch-Path $switchNew $switchLive { param($from, $to) if ($from -eq $switchNew) { throw 'the disk refused the rename' }; Move-Item -LiteralPath $from -Destination $to }
+        } catch { $threw = $true }
+        Check 'a switch whose second rename is refused puts the previous copy back and leaves the live path filled' (
+            $threw -and (Test-Path (Join-Path $switchLive 'python.exe')) -and (Get-Content (Join-Path $switchLive 'python.exe')) -eq 'old' -and
+            -not (Test-Path "$switchLive.old") -and (Test-Path $switchNew))
 
         # After the commit a kept copy that cannot be removed is a note, never a failure.
         $keptLive = Join-Path $td 'kept'
