@@ -667,6 +667,11 @@ def upgrade_difference(old: Session, new: Session) -> str | None:
     return None
 
 
+def powershell_literal(text: str) -> str:
+    """A PowerShell single-quoted string: nothing inside is expanded, and a single quote is written twice."""
+    return "'" + text.replace("'", "''") + "'"
+
+
 def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, restricted_override: dict | None = None,
                 before_cleanup=None, before_restore=None) -> int:
     """Copies a database at an older schema revision into a new one at this revision: a backup of the old, restored into
@@ -686,9 +691,12 @@ def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, 
     if new.exists():
         raise Refused(f"refused: the database '{to}' already exists; upgrade into a new name; nothing was changed")
     # Every command refuses the old database, so the next step is the upgrade again, once the cause is fixed.
-    keep_old = (f"'{s.database}' is unchanged and keeps every version; fix the cause named here and run "
-                # The option file this upgrade used, so the retry connects to the same server in the same way.
-                f'refdata.py upgrade --database {s.database} --options "{s.options.resolve()}" --to <a new name> again')
+    # The retry as a PowerShell command, run as written once a name is put in: the interpreter, this tool's full path and
+    # the option file this upgrade used, so it reaches the same server in the same way, each path a single-quoted
+    # literal so a $ or a backtick in it is passed as it is.
+    retry = (f"python {powershell_literal(str(Path(__file__).resolve()))} upgrade --database {s.database} "
+             f"--options {powershell_literal(str(s.options.resolve()))} --to <a new name>")
+    keep_old = f"'{s.database}' is unchanged and keeps every version; fix the cause named here and run, in PowerShell: {retry}"
     with tempfile.TemporaryDirectory(prefix="refdata-upgrade-") as tmp:
         dump = Path(tmp) / "upgrade.sql"
         with contextlib.redirect_stdout(io.StringIO()):
@@ -1232,7 +1240,7 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
         refused_old = code == 1 and f"upgrade --database {old.database}" in out
 
         # Through an option file of the author's own choosing, which the advised retry must carry.
-        chosen = Path(tmp) / "chosen folder" / "my-server.cnf"
+        chosen = Path(tmp) / "chosen $folder `tick" / "my-server.cnf"   # a $ and a backtick, which PowerShell expands in double quotes
         chosen.parent.mkdir()
         chosen.write_bytes(options.read_bytes())
         lossy_said = None
@@ -1242,7 +1250,7 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
         except Refused as refusal:
             lossy_said = str(refusal)
         checks.check("an upgrade whose copy lost a changelog row is refused naming it, the copy dropped and the old database unchanged",
-                     lossy_said is not None and "changelog has" in lossy_said and f'--options "{chosen.resolve()}"' in lossy_said and not Session(options, lossy).exists()
+                     lossy_said is not None and "changelog has" in lossy_said and f"--options {powershell_literal(str(chosen.resolve()))}" in lossy_said and not Session(options, lossy).exists()
                      and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state, repr(lossy_said))
 
         # A database already at this revision is told there is nothing to upgrade and to work in it, never to retry.
@@ -1287,7 +1295,7 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
             kernel32.CloseHandle(handle)
             path.unlink(missing_ok=True)
         checks.check("an upgrade whose restore could not clean up names its copy as unverified, with how to drop it, the old database unchanged",
-                     unverified_said is not None and f"'{unverified}' is loaded but unverified" in unverified_said and f"refdata.py upgrade --database {old.database} --options" in unverified_said
+                     unverified_said is not None and f"'{unverified}' is loaded but unverified" in unverified_said and f"upgrade --database {old.database} --options" in unverified_said
                      and f"DROP DATABASE IF EXISTS `{unverified}`;" in unverified_said
                      and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state, repr(unverified_said))
         run_sql(f"DROP DATABASE IF EXISTS `{unverified}`;", options=options)
@@ -1302,7 +1310,7 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
         except Refused as refusal:
             raced_said = str(refusal)
         checks.check("an upgrade whose new name another author took meanwhile is refused without advising a drop, that database left alone",
-                     raced_said is not None and "already exists" in raced_said and "DROP DATABASE" not in raced_said and f"refdata.py upgrade --database {old.database} --options" in raced_said
+                     raced_said is not None and "already exists" in raced_said and "DROP DATABASE" not in raced_said and f"upgrade --database {old.database} --options" in raced_said
                      and Session(options, taken).exists(), repr(raced_said))
         run_sql(f"DROP DATABASE IF EXISTS `{taken}`;", options=options)
 
@@ -1332,19 +1340,20 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
         if outage_up_said and command in outage_up_said:
             run_sql(command, options=options)   # the command the refusal gave, run as given
         checks.check("an upgrade's rollback keeps the comparison's reason, and on an outage names the copy it could not remove with the command that removes it",
-                     failed_said is not None and "the drill's comparison read failed" in failed_said and "was dropped" in failed_said and f"refdata.py upgrade --database {old.database} --options" in failed_said
+                     failed_said is not None and "the drill's comparison read failed" in failed_said and "was dropped" in failed_said and f"upgrade --database {old.database} --options" in failed_said
                      and not Session(options, f"{database}_cmpfail").exists()
                      and outage_up_said is not None and "could not be compared" in outage_up_said and "could not be confirmed removed" in outage_up_said
                      and command in outage_up_said and started.startswith("exit 0") and left_after_outage and not Session(options, outage_copy).exists(),
                      f"failed {failed_said!r}; outage {outage_up_said!r}; restart {started!r}; copy left {left_after_outage}")
 
-        # The upgrade that follows is the one the lossy refusal advised, run as written with a name put in.
-        advised = re.search(r'refdata\.py (upgrade --database \S+ --options "[^"]+" --to <a new name>)', lossy_said or "")
+        # The upgrade that follows is the one the lossy refusal advised: its PowerShell line, a name put in, run unedited.
+        advised = re.search(r"run, in PowerShell: (python '(?:[^']|'')*' upgrade --database \S+ --options '(?:[^']|'')*' --to <a new name>)", lossy_said or "")
         if advised:
-            words = [w.strip('"') for w in re.findall(r'"[^"]*"|\S+', advised.group(1).replace("<a new name>", upgraded))]
-            code, out = call(words)
+            proc = subprocess.run(["pwsh", "-NoProfile", "-Command", advised.group(1).replace("<a new name>", upgraded)],
+                                  capture_output=True, encoding="utf-8", errors="replace", timeout=600, check=False)
+            code, out = proc.returncode, proc.stdout + proc.stderr
         else:
-            code, out = None, f"no retry command with --options in the refusal: {lossy_said!r}"
+            code, out = None, f"no runnable PowerShell retry in the refusal: {lossy_said!r}"
         new = Session(options, upgraded)
         code2, said = call(["history", "fixture", "--options", str(options), "--database", upgraded]) if new.exists() else (None, "")
         checks.check("a revision 1 database with a stamped and a proposed version upgrades with every version and changelog row the same, "
@@ -1391,7 +1400,7 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
         checks.check("a restore and an upgrade whose restricted connection is given a CA that did not sign the server's certificate are refused "
                      "naming that connection, no database or restore user left and the source unchanged",
                      said_restore is not None and "restore user's connection" in said_restore and said_upgrade is not None
-                     and "restore user's connection" in said_upgrade and f"refdata.py upgrade --database {old.database} --options" in said_upgrade
+                     and "restore user's connection" in said_upgrade and f"upgrade --database {old.database} --options" in said_upgrade
                      and not Session(options, tls_refused).exists()
                      and not Session(options, tls_refused_up).exists() and users == "0"
                      and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state,
