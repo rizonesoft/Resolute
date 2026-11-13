@@ -139,16 +139,16 @@ Closing persists what the tool keeps between runs (`D01 T01 §1`). When that wri
 | --- | --- |
 | Severity | Warning |
 | Summary | `Shutdown_Save_Title` ("Your settings could not be saved") |
-| Body | `Shutdown_Save_Body` ("%1 could not be written: %2. If you close now, %{Program.Name} forgets what it would have saved on closing, such as where its window was."), %1 the settings file's path in monospace, %2 the Windows reason |
-| Buttons | `Button_Try_Again` (`&Try again`), the default; `Button_Close_Unsaved` (`Close &without saving`); `Button_Cancel` |
+| Body | Which of two things happened, told apart as [`preferences.md`](preferences.md#what-does-save-do) tells them apart for Save. The write was refused: `Shutdown_Save_Body` ("%1 could not be written: %2. If you close now, %{Program.Name} forgets what it would have saved on closing, such as where its window was."). The write went through but could not be read back: `Shutdown_Save_Unconfirmed_Body` ("%1 was written but could not be checked: %2. It may already hold your settings."). In both, %1 is the settings file's path in monospace and %2 the Windows reason |
+| Buttons | `Button_Try_Again` (`&Try again`), the default; `Button_Close_Anyway` (`Close &anyway`); `Button_Cancel` |
 
 | Choice | Result |
 | --- | --- |
 | Try again | The write is made again and read back. When it succeeds the tool closes. When it fails the notice is shown again with the new reason |
-| Close without saving | The tool closes. The settings file is as it was before closing began |
+| Close anyway | The tool closes and writes nothing more. After a refused write the settings file is as it was before closing began. After an unconfirmed one it is whatever the write left, which may be the new settings: the notice has said so, and nothing is promised |
 | Cancel, Esc, the caption's close button | The tool stays open, exactly as it was, with everything it meant to save still in memory. Nothing is discarded by a key meant to back out |
 
-- **During a restart** (the Language page's, or Restart as administrator) the first instance shows this notice before it exits. Cancel ends the restart too: the second instance, which is waiting for the first to exit, is ended, and the tool stays as it was. Close without saving lets the restart go on.
+- **During a restart** (the Language page's, or Restart as administrator) the first instance shows this notice before it exits. Cancel ends the restart too: the second instance, which is waiting for the first to exit, is ended, and the tool stays as it was. Close anyway lets the restart go on.
 - **When Windows is ending the session** (sign-out, shutdown, restart) no notice can be answered. The write is tried once; a failure goes to the log; the tool never delays or blocks the session's end.
 - Preferences are not at risk here: they were written, and read back, when Save was pressed ([`preferences.md`](preferences.md#what-does-save-do)).
 
@@ -183,6 +183,20 @@ One line per launch, naming the tool (`D03 T01 §3`). What the launcher shows on
 | `ExecuteTool_09` | | | Cut: "^ Sound the alarms and initiate a search party immediately!" |
 | `ExecuteTool_01`, `ExecuteTool_04`, `ExecuteTool_05` | | | Cut: "Starting", "Searching for" and "Executing" narrated a start that now takes one line |
 | `ExecuteTool_02`, `ExecuteTool_03` | | | Cut with `Compatible_Bit`: "Detecting Windows architecture" has one answer |
+
+## What happens when nobody is watching?
+
+A tool run unattended from a script (`D01 T01 §11`) has no window and must never wait for a button. **No notice on this page is shown in an unattended run.** Each has an unattended form: a line in the log, the same fact in the run's transcript, and an exit code a script can branch on. The texts are the notices' own, so the log reads the same either way.
+
+| Notice | In an unattended run |
+| --- | --- |
+| A refused action | Nothing is shown and no restart is offered or made. `Refuse_Log` goes to the log and the transcript, nothing is changed, and the run ends with the refused-for-privilege code |
+| A crash | The record is flushed and the report written as always. No second instance is started and no notice is shown. The process ends with the failed code, and the report's path is the last line of the transcript when it can still be written. The next attended start shows the notice with `Crash_Title_Last` |
+| A second start | Nothing is shown. One log line, and the run ends with the code `D01 T01 §11` gives a run that could not start because the tool is already running; the first instance is not brought forward |
+| Too old a Windows | Nothing is shown. `Compatible` and `Compatible_Body` go to the log and the transcript as one line, and the run ends with the failed code |
+| Settings that cannot be saved at closing | Nothing is shown. The write is tried once; a failure goes to the log and the transcript (`Shutdown_Save_Body` or `Shutdown_Save_Unconfirmed_Body`); the process ends at once. The run's exit code stays the one its action earned: failing to save a window's place does not turn a successful repair into a failed one |
+
+The registry lines and the launch lines are log lines already and are written the same in both.
 
 ## What about a notice with no window behind it?
 
@@ -220,9 +234,9 @@ In `[Messages]` unless marked.
 | `Crash_Changed_None`, `Crash_Changed_Undo`, `Crash_Changed_Partial`, `Crash_Changed_Partial_Next`, `Crash_Changed_More`, `Crash_Changed_Unrecorded` | As the four cases give them | New |
 | `Button_Crash_Restart` | `&Restart %{Program.Name}` | New |
 | `Button_Crash_Folder` | `&Open report folder` | New |
-| `Shutdown_Save_Title`, `Shutdown_Save_Body` | As the shutdown notice gives them | New |
+| `Shutdown_Save_Title`, `Shutdown_Save_Body`, `Shutdown_Save_Unconfirmed_Body` | As the shutdown notice gives them | New |
 | `Button_Try_Again` | `&Try again` | New |
-| `Button_Close_Unsaved` | `Close &without saving` | New |
+| `Button_Close_Anyway` | `Close &anyway` | New |
 | `Registry_Write_Error`, `Registry_Error_01` to `Registry_Error_06` | As the registry table gives them | Reworded (`en.lng:150-156`), every one |
 | `Registry_Need_Admin`, `Registry_Need_Owner` | This needs administrator rights. The key's permissions do not allow it, even for an administrator. | New |
 | `ExecuteTool_06`, `ExecuteTool_07`, `ExecuteTool_08`, in the launcher's `[Messages2]` | As the launch table gives them | Reworded |
@@ -256,8 +270,13 @@ Every row is one behavioural check in the section named in its last column, whic
 | A notice with no window | Each of the three windowless notices | | Centred on the pointer's monitor; its own taskbar button; not topmost; in the stored language | A stored language that cannot be read: English | `D01 T01 §10`: `notices: a windowless notice has a taskbar button` |
 | Shutdown, saved on retry | Close with the settings file locked; unlock; Try again | | The notice names the path and reason; after Try again the file reads back with the closing values and the tool has closed | The row below | `D01 T01 §1`: `shutdown: try again saves and closes` |
 | Shutdown, still failing | Try again with the file still locked | | The notice again, with the reason | The stated result is the failure presentation | `D01 T01 §1`: `shutdown: a second failure is said again` |
-| Shutdown, closed unsaved | Close without saving | | The tool closes; the file is byte for byte as before closing began | None can occur: nothing is written | `D01 T01 §1`: `shutdown: close without saving leaves the file` |
+| Shutdown, closed anyway after a refused write | Close with the settings file locked; Close anyway | Refused | The body is `Shutdown_Save_Body`; the tool closes; the file is byte for byte as before closing began | None can occur: nothing more is written | `D01 T01 §1`: `shutdown: close anyway leaves a refused file as it was` |
+| Shutdown, a write that cannot be confirmed | Move the window; close with the write let through and the read-back made to fail (seeded); Close anyway; start again | Unconfirmed | The body is `Shutdown_Save_Unconfirmed_Body`, which does not claim the file is unchanged; after the restart the tool uses what the file holds, here the new placement | Try again with the read-back still failing: the notice again | `D01 T01 §1`: `shutdown: an unconfirmed save promises nothing` |
 | Shutdown, cancelled | Cancel; Esc; the caption's close button; and Cancel during a Language restart | | The tool is open and unchanged; in the restart case the second instance is ended and one instance remains | None can occur: cancelling changes nothing | `D01 T01 §1`: `shutdown: cancel keeps the tool and ends a restart` |
 | Windows ending the session | Send the session-end messages with the file locked | | No notice; one attempt; one log line; the process does not delay the end | The stated result is the failure presentation | `D01 T01 §1`: `shutdown: a session end is never blocked` |
+| Unattended: a refused action | Run the fixture repair unattended without administrator rights | | No window at any moment; `Refuse_Log` in the log and the transcript; the refused-for-privilege code; the fixture unchanged | None can occur: an unattended run shows nothing | `D01 T01 §11`: `unattended: a refusal returns its code and shows nothing` |
+| Unattended: a crash | Fault the fixture repair in an unattended run; then start the tool attended | | No window and no second instance; the report and the record written; the failed code; the attended start shows `Crash_Title_Last` | The report cannot be written: the failed code still, and the log says why | `D01 T01 §11`: `unattended: a crash writes its report and returns` |
+| Unattended: settings that cannot be saved | Run the fixture repair unattended to success with the settings file locked | | No window; one attempt; the failure in the log and the transcript; the success code | None can occur: the run never waits | `D01 T01 §11`: `unattended: a failed save does not change the result` |
+| Unattended: a second start, and too old a Windows | Run unattended with the tool already running; and with the Windows version seeded too low | Each | No window; one line each; the documented code each; the first instance not brought forward | None can occur: an unattended run shows nothing | `D01 T01 §11`: `unattended: startup refusals return codes` |
 | Registry lines | Drive each of the seven failures against fixture keys: a denied write, a denied open, an unloaded hive, an absent value, an unhandled type, a denied value delete, a denied key delete | Each; elevated and not | One error line each, with the key's full path, the value's name, Windows' reason in words and its code; `Registry_Need_Admin` or `Registry_Need_Owner` on a denial; no second line; no value data | None can occur: every failure has its line | `D02 T01 §6`: `registry: a failure names action, target and reason in one line` |
 | Launch lines | Launch a fixture tool; one whose start is refused; one whose executable is missing | Each | One line each naming the tool: the process id; the path and Windows' reason; the path | None can occur: every launch ends in one of the three | `D03 T01 §3`: `launch: one line per launch names the tool` |
