@@ -90,6 +90,10 @@ $Registration = [pscustomobject]@{
     Action = $null
     Readiness = { Get-TransactionRefusals }
     JournalTrusted = { Test-JournalTrusted @(Get-DirectoryRefusals) (Get-JournalOwner) }
+    # Whether -Register can register in this process, and how it starts the
+    # consented copy when it cannot; the self-test replaces the launch.
+    IsElevated = { Test-IsElevated }
+    Launch = { param([string]$Arguments) Start-Process powershell.exe -Verb RunAs -ArgumentList $Arguments -Wait -PassThru -ErrorAction Stop }
 }
 $StopTimeoutSec = 30
 
@@ -834,6 +838,8 @@ function Invoke-SelfTest {
                 Action = (New-ScheduledTaskAction -Execute (Join-Path $env:SystemRoot 'System32\cmd.exe') -Argument '/c exit 0')
                 Readiness = { Get-TransactionRefusals @({ $verdict.Refusals }) }
                 JournalTrusted = { $trust.Value }
+                IsElevated = { $false }
+                Launch = { param([string]$Arguments) [pscustomobject]@{ ExitCode = 12 } }
             }
 
             # A first registration refused before its directory exists says why in its exit code, and writes nothing.
@@ -843,6 +849,21 @@ function Invoke-SelfTest {
             $script:Registration.Source = $missing
             Check 'a first registration refused before its directory exists returns the code that names the refusal, and writes nothing' (
                 $code -eq 12 -and (Get-RefusalForExitCode $code) -match 'pinned Python is not installed' -and -not (Test-Path -LiteralPath $box) -and -not (Get-TaskOrNull))
+
+            # -Register itself, with the consented copy exiting 12 having logged nothing: the operator's window shows
+            # why, -Register fails, and it does not go on to confirm a registration that did not happen.
+            $savedReplace = $script:Replace
+            $script:Replace = $true
+            try {
+                $shown = @(Invoke-Register 6>&1)
+            } finally {
+                $script:Replace = $savedReplace
+            }
+            $answer = @($shown | Where-Object { $_ -is [int] })
+            $text = ($shown | Where-Object { $_ -isnot [int] } | ForEach-Object { "$_" }) -join "`n"
+            Check '-Register shows a refusal the consented copy gave only in its exit code, fails, and confirms nothing' (
+                $text.Contains("elevated: $(Get-RefusalForExitCode 12)") -and $answer.Count -eq 1 -and $answer[0] -ne 0 -and
+                -not $text.Contains('readiness checks') -and -not $text.Contains('registered:'))
 
             # A first registration abandoned after its switch is recovered to nothing: no task, no directory.
             $said = Register-InSandbox -AbandonAfter 'commit'
@@ -1084,9 +1105,24 @@ function Invoke-SelfTest {
             (@(10, 11, 12, 13, 14 | Where-Object { -not ((Get-RefusalForExitCode $_) -match '^refused: ') })).Count -eq 0 -and
             (Get-RefusalForExitCode 2) -eq '' -and (Get-RefusalForExitCode 0) -eq '' -and
             (Get-RefusalForExitCode 14) -eq (Get-BusyRefusal 'registering the elevated smoke task'))
-        $registerSource = (Get-Command Invoke-Register).ScriptBlock.ToString()
-        Check '-Register prints the refusal its exit code names when the elevated copy left no log' (
-            $registerSource.Contains('Get-RefusalForExitCode $proc.ExitCode') -and $registerSource.Contains('Write-Host "elevated: $reason"'))
+        # What the operator's window shows, read from the output itself.
+        $savedLog = $script:RegisterLog
+        try {
+            $script:RegisterLog = Join-Path $td 'no-log-here.txt'
+            $shown = @(Write-ElevatedOutcome 12 0 6>&1)
+            $answer = @($shown | Where-Object { $_ -is [int] })
+            $text = ($shown | Where-Object { $_ -isnot [int] } | ForEach-Object { "$_" }) -join "`n"
+            Check '-Register shows the refusal its exit code names when the elevated copy left no log, and fails' (
+                $text.Contains("elevated: $(Get-RefusalForExitCode 12)") -and $answer.Count -eq 1 -and $answer[0] -eq 12)
+            $script:RegisterLog = Join-Path $td 'a-log.txt'
+            Set-Content -LiteralPath $script:RegisterLog -Value 'refused: what the elevated copy said itself'
+            $shown = @(Write-ElevatedOutcome 12 0 6>&1)
+            $text = ($shown | Where-Object { $_ -isnot [int] } | ForEach-Object { "$_" }) -join "`n"
+            Check '-Register shows what the elevated copy logged, and not the exit code''s refusal on top of it' (
+                $text.Contains('elevated: refused: what the elevated copy said itself') -and -not $text.Contains((Get-RefusalForExitCode 12)))
+        } finally {
+            $script:RegisterLog = $savedLog
+        }
 
         # -Register answers from an existing task only when no interrupted registration is waiting for it.
         Check '-Register goes on to recover an interrupted registration even when a task is there and -Replace is not given' (
@@ -1164,6 +1200,19 @@ function Invoke-SelfTest {
     }
     Write-Host 'self-test: all pass'
     return 0
+}
+
+function Write-ElevatedOutcome([int]$ExitCode, [int]$LogFrom) {
+    # What the operator's window shows once the elevated copy has exited:
+    # what that copy said, from the log it keeps; when that log has nothing
+    # new, the refusal its exit code names (a refusal given before the
+    # directory existed); and the failure. Returns the copy's exit code.
+    $said = @(Read-RegistrationLog $LogFrom)
+    $said | ForEach-Object { Write-Host "elevated: $_" }
+    $reason = Get-RefusalForExitCode $ExitCode
+    if ($reason -and -not $said) { Write-Host "elevated: $reason" }
+    if ($ExitCode -ne 0) { Write-Host "refused: elevated registration failed with exit code $ExitCode; nothing is registered by this run" }
+    return $ExitCode
 }
 
 function Read-RegistrationLog([int]$From) {
@@ -1528,7 +1577,7 @@ function Invoke-Register {
     # by itself later, so it is refused here, by name.
     $drift = @(Get-DriftRefusals $Root)
     if ($drift) { Write-Host ("refused: " + ($drift -join '; ')); return 2 }
-    if (Test-IsElevated) {
+    if (& $script:Registration.IsElevated) {
         $code = Invoke-ElevatedRegistration
         if ($code -ne 0) { return $code }
     } else {
@@ -1537,22 +1586,13 @@ function Invoke-Register {
         if ($ProveRollback) { $args += ' -ProveRollback' }
         $logFrom = if (Test-Path -LiteralPath $RegisterLog) { @(Get-Content -LiteralPath $RegisterLog).Count } else { 0 }
         try {
-            $proc = Start-Process powershell.exe -Verb RunAs -ArgumentList $args -Wait -PassThru -ErrorAction Stop
+            $proc = & $script:Registration.Launch $args
         } catch {
             Write-Host "blocked: elevation consent declined or the elevated registration could not start: $($_.Exception.Message)"
             return 2
         }
         # What the elevated copy said, from the log it keeps in the protected directory.
-        $said = @(Read-RegistrationLog $logFrom)
-        $said | ForEach-Object { Write-Host "elevated: $_" }
-        # A refusal given before the directory existed left no log: its exit
-        # code says which it was.
-        $reason = Get-RefusalForExitCode $proc.ExitCode
-        if ($reason -and -not $said) { Write-Host "elevated: $reason" }
-        if ($proc.ExitCode -ne 0) {
-            Write-Host "refused: elevated registration failed with exit code $($proc.ExitCode); nothing is registered by this run"
-            return 2
-        }
+        if ((Write-ElevatedOutcome $proc.ExitCode $logFrom) -ne 0) { return 2 }
     }
     return (Confirm-Registration (Get-RunRefusals (Get-TaskOrNull)))
 }
