@@ -488,6 +488,24 @@ function Invoke-SelfTest {
         $answer = $child.StandardOutput.ReadToEnd().Trim()
         $null = $child.WaitForExit(15000)
         Check 'a capture that ended, run in this process, leaves the pair free for another' ($answer -eq 'free')
+
+        # A capture stopped while it holds the pair, as Ctrl+C stops it: rundll32 starts and exits with no window, and the run waits on it.
+        $stopPng = Join-Path $lockDir 'stop.png'
+        $runner = [System.Management.Automation.PowerShell]::Create()
+        [void]$runner.AddCommand($PSCommandPath).AddParameter('Path', (Join-Path $env:SystemRoot 'System32\rundll32.exe')).AddParameter('WaitSeconds', 30).AddParameter('Out', $stopPng)
+        $pending = $runner.BeginInvoke()
+        Start-Sleep -Seconds 4
+        $runner.Stop()
+        $runner.Dispose()
+        $stopKey = [System.BitConverter]::ToString([System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes($stopPng.ToLowerInvariant()))).Replace('-', '').Substring(0, 32)
+        $probe = [System.Diagnostics.ProcessStartInfo]::new((Get-Process -Id $PID).Path)
+        foreach ($a in '-NoProfile', '-Command', "`$m = [System.Threading.Mutex]::new(`$false, 'Local\ResoluteCapturePair-$stopKey'); if (`$m.WaitOne(1000)) { 'free' } else { 'held' }") { $probe.ArgumentList.Add($a) }
+        $probe.RedirectStandardOutput = $true
+        $probe.CreateNoWindow = $true
+        $child = [System.Diagnostics.Process]::Start($probe)
+        $answer = $child.StandardOutput.ReadToEnd().Trim()
+        $null = $child.WaitForExit(15000)
+        Check 'a capture stopped while it holds the pair, as Ctrl+C stops it, leaves the pair free' ($answer -eq 'free')
     } finally {
         Remove-Item -LiteralPath $lockDir -Recurse -Force
     }
@@ -522,15 +540,19 @@ try {
     exit 1
 }
 function Exit-Capture([int]$Code) {
-    # Every way out from here releases the pair: run with & in a shell that
-    # stays open, exit does not end the thread that owns the mutex.
-    if ($script:PairLock) { $script:PairLock.ReleaseMutex(); $script:PairLock.Dispose(); $script:PairLock = $null }
+    # The finally below releases the pair on this way out as on every other.
     exit $Code
 }
 trap {
     Write-Host "capture-window: $($_.Exception.Message)" -ForegroundColor Red
     Exit-Capture 1
 }
+# Everything from here to the end holds the pair, and the finally at the end
+# releases it however the script stops: an exit, an error, or Ctrl+C, which
+# stops the pipeline without taking any exit path. Run with & in a shell
+# that stays open, the thread that owns the mutex lives on, so nothing but
+# this release frees the pair.
+try {
 $recovered = Restore-Pair ([System.IO.Path]::GetFullPath($Out)) ([System.IO.Path]::ChangeExtension([System.IO.Path]::GetFullPath($Out), '.txt'))
 if ($recovered) { Write-Host "capture-window: $recovered ($Out)" -ForegroundColor Yellow }
 
@@ -783,3 +805,6 @@ Write-Host ("captured {0}  {1}x{2}  monitor {3} dpi, window {4} dpi, aware={5}" 
 
 Stop-Ours
 Exit-Capture 0
+} finally {
+    if ($script:PairLock) { $script:PairLock.ReleaseMutex(); $script:PairLock.Dispose(); $script:PairLock = $null }
+}
