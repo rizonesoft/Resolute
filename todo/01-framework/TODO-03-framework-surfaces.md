@@ -106,6 +106,8 @@ The window every tool opens: the Direct2D caption and status bar per `D01 T02 §
 
 ## 2. Preferences Shell, General, and Performance
 
+> **Started:** 2026-11-13T14:09:48Z
+
 The 450x500 Preferences dialog (`ReBar.au3:1005-`, dialog title from `[Preferences] Window_Title`), owned by the framework and hosting one page per tool. This section specifies the shell (tabs, Save/Cancel, notices) plus the General page (logging group) and the Performance page (priority group, memory group). The Language page is §3.
 
 **Fidelity:** the Preferences dialog, against `DESIGN.md`; rebuilt, not reproduced: the AutoIt dialog is not DPI-aware.
