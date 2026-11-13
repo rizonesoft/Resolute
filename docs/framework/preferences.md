@@ -50,7 +50,9 @@ The AutoIt dialog is `_ShowPreferencesDlg` (`resolute_au3/SDK/Concrete/ReBar/ReB
 
 1. It validates every page, in page order. The first control whose value is not allowed stops the save: nothing is written, the dialog moves to that page, focus goes to the control, and its error shows beneath it.
 2. It writes every changed key through the settings writer in one atomic write (`D01 T01 §2`), then reads the file back.
-3. Only when the file reads back as written does it apply to the running tool the settings this save changed, and only those (below, per setting), show the saved notice and disable Save. A setting whose value this save did not change is not applied again, so saving one thing never disturbs another: an unrelated save leaves a session-only Realtime running. The edited values become the new baseline.
+3. Only when the file reads back as written does it reconcile the running tool with what was saved (the one rule below), show the saved notice and disable Save. The edited values become the new baseline.
+
+**Reconciling, the one rule for when a setting is applied.** Every setting has a target: its persisted value, or a session override where the page names one (Realtime without Keep Realtime, which lasts until the tool closes or a different priority is saved). After every confirmed save, and at startup, the framework compares each setting's effective value with its target and acts only where the two differ. Nothing else applies a setting. So a save that changes one setting never disturbs another whose effective value already matches its target (a session-only Realtime keeps running), and a setting that could not reach its target earlier is tried again at every save without the user having to touch it (a log writer that could not start, a priority Windows refused): if it still cannot, its note stays and nothing new is reported.
 
 A save whose write went through but whose read-back failed or differed leaves the save unconfirmed: the file may already hold the new values while the tool has not applied them. Until a save completes all three steps, the dialog counts as having unsaved changes whatever the file now holds: Save stays enabled, the way out asks, and the next Save writes every value of the unconfirmed save again, reads back, and then applies them all before it reports success. Discard leaves the file as it is and applies nothing; the tool takes the file's values at its next start.
 
@@ -86,7 +88,7 @@ One group, Logging (`Group_Logging`).
 
 ### What if logging cannot start?
 
-Saving a setting and starting the log writer are two things, and the second can fail when the first succeeded: the log folder is not writable, or the disk is full. Then `LoggingEnabled` is saved as 1 (persisted), the writer is not running (effective), and beside the checkbox `Label_Logging_Not_Running` ("Logging is on but cannot write: %1"), new, gives the path and the Windows reason, with a warning icon, announced. The saved notice still shows, because the preferences were saved. The writer tries again at the next Save, after a Clear log, and at the next start; the note goes when it succeeds. The same note shows when the dialog opens on a tool in that state.
+Saving a setting and starting the log writer are two things, and the second can fail when the first succeeded: the log folder is not writable, or the disk is full. Then `LoggingEnabled` is saved as 1 (persisted), the writer is not running (effective), and beside the checkbox `Label_Logging_Not_Running` ("Logging is on but cannot write: %1"), new, gives the path and the Windows reason, with a warning icon, announced. The saved notice still shows, because the preferences were saved. By the reconcile rule the writer is tried again at every confirmed save, whatever that save changed, and also after a Clear log and at the next start; the note goes when it succeeds. The same note shows when the dialog opens on a tool in that state.
 
 ### What does Clear log do?
 
@@ -121,7 +123,7 @@ Two groups.
 | Realtime | 5 | `REALTIME_PRIORITY_CLASS` | `Priority_Realtime` |
 
 - **Why Normal is the default.** The AutoIt suite started at Above Normal (`ReBar.au3:860`) while its dialog treated Normal as the unchanged value (`:1204`), so a user who never opened Preferences ran above everything else on the machine without being told. A utility has no claim on more than its share until the user asks; the cost of changing this back is one constant.
-- **When it applies.** At Save, after the file has been written and read back, the framework sets the process's priority class and reads it back from Windows. At startup `D01 T01 §1` applies the stored value the same way.
+- **When it applies.** By the reconcile rule: when the process's priority differs from its target after a confirmed save, the framework sets the priority class and reads it back from Windows. At startup `D01 T01 §1` does the same.
 - **Realtime without the checkbox.** The process runs at Realtime for this session and the file stores High (4). After the save the combo shows High, as the file holds, with `Label_Realtime_Session` ("Running at Realtime until this tool closes; it will start at High.") beneath it for as long as that is so, announced, including when the dialog is opened again in the same session. Save is disabled, and closing straight after asks nothing.
 - **When Windows refuses.** Realtime needs a privilege a standard user does not hold, and Windows then gives High without reporting an error; any other refusal leaves the priority as it was. After Save, the framework compares what it asked for with what Windows reports. The request is what is stored and shown, so the tool gets it whenever Windows will grant it (run elevated, for instance), and the note says what the tool is running at meanwhile. The same note shows when the dialog opens on a tool whose stored and actual priorities differ, and closing after such a save asks nothing:
 
@@ -130,7 +132,7 @@ Two groups.
 | The process's priority | What Windows reports: High for a refused Realtime, the earlier priority otherwise |
 | The stored value | What was asked for, capped by the Realtime rule above |
 | The combo | What was asked for, which is what the file holds, so the edited and persisted values agree; beneath it `Label_Priority_Refused` ("Windows is running this tool at %1 instead of %2."), announced, for as long as the two differ |
-| The dialog | Not dirty, by the one dirty rule: the edited value equals the persisted one. A later save of another setting writes the priority as it stands, the value asked for, and applies it again |
+| The dialog | Not dirty, by the one dirty rule: the edited value equals the persisted one. A later save of another setting leaves the stored priority as it is, and the reconcile rule asks Windows for it again because the effective priority still differs from the target; a second refusal changes nothing and the note stays |
 
 ### Memory (`Group_Memory`)
 
@@ -168,7 +170,7 @@ Both preview at once: choosing a value changes the tool's window and this dialog
 
 ## When does each setting take effect?
 
-No setting on these pages needs a restart. The language, which does, is `D01 T03 §3`'s.
+No setting on these pages needs a restart. The language, which does, is `D01 T03 §3`'s. "At Save" below means by the reconcile rule: after a confirmed save, and only when the setting's effective value differs from its target.
 
 | Setting | Takes effect | In the running tool |
 | --- | --- | --- |
@@ -276,7 +278,7 @@ Every row is one behavioural check in `D01 T01 §7`, driven against the built di
 | A value that is not allowed | Save with the size input empty, 0, 2.5 or 101 | | Nothing written; the page shown; focus on the input; `Error_Value_Range` beneath it, announced | The stated result is the failure presentation | `prefs: a bad value stops the save` |
 | A file that cannot be written | Save with the settings file read-only | | `Save_Failed` with the path; edits kept; file unchanged; Save enabled | The stated result is the failure presentation | `prefs: a refused write keeps the edits` |
 | A write that cannot be confirmed | Save with the read-back made to differ, and with the read-back made to fail after the write went through; then Save again with reads working | | `Save_Unverified`; no saved notice; nothing applied to the running tool; Save enabled and the way out asks; the second Save writes again, reads back, applies every value, then shows the saved notice | The stated result is the failure presentation | `prefs: an unconfirmed write is not a success, and the retry applies it` |
-| An unrelated save | Elevated: save Realtime without Keep Realtime, then change only Reduce memory and Save | | Windows still reports Realtime after the second save; only the trim timer changed | None can occur: only changed settings are applied | `prefs: a save applies only what it changed` |
+| An unrelated save | Elevated: save Realtime without Keep Realtime, then change only Reduce memory and Save. Separately: enable logging with its folder unwritable, make the folder writable, then change only Reduce memory and Save | | Windows still reports Realtime after the second save, because its effective value matches its session target; the log writer starts at the second save and its note goes, because it did not match | A setting that still cannot reach its target keeps its note; nothing new is reported | `prefs: a save reconciles only what differs from its target` |
 | The way out with no change | Cancel; Esc; Alt+F4; caption close | Clean | Closes at once | None can occur | `prefs: a clean dialog closes at once` |
 | The way out with a change | The same four | Dirty | The prompt; Save saves and closes, Discard drops and closes, Cancel returns | A failed Save from the prompt leaves the dialog open with its failure | `prefs: the unsaved prompt's three answers` |
 | Enable logging | Click; Space; Alt+E | Checked, unchecked | The size input enables or disables; at Save `LoggingEnabled` is written and the log writer starts or stops | Save's failures; logging that cannot start, below | `prefs: logging turns off and on in the running tool` |

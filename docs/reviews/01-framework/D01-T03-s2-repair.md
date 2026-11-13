@@ -56,3 +56,27 @@ OVERALL: needs-attention
 
 HIGHEST: P2
 OVERALL: needs-attention
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T14:23:09Z
+- Effort: low
+- Writer model: claude-fable-5-2
+- Policy: 164e2012ebe8c2d8bccd2c45652918958703312b
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 8
+- Digest: ad3506a75f9ff03a
+
+### consistency: needs-attention
+
+1. **P2: Logging recovery contradicts the Save transaction.** `docs/framework/preferences.md:89` promises that a stopped log writer retries at the next Save, but line 54 explicitly permits applying only changed settings. Reproduce: enable logging while its directory is unwritable, restore directory access, then change only Reduce memory and Save. Following line 54 leaves logging stopped; following line 89 restarts it. Specify an explicit recovery exception for an enabled but failed writer.
+
+2. **P3: The refused-priority contract still requires reapplying unchanged settings.** `docs/framework/preferences.md:133` says an unrelated save writes the retained priority and applies it again, contradicting line 54. Reproduce: save Realtime with Keep Realtime as a standard user, then change only Reduce memory and Save. The two rules require different writer and process-priority calls. Reconcile this paragraph with the changed-settings-only transaction.
+
+HIGHEST: P2
+OVERALL: needs-attention
