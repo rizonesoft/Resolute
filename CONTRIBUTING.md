@@ -24,7 +24,7 @@ There are two ways, and they differ.
 
 - **A pull request from a fork**, against `main`, rebased on it. This is the one place a branch and a pull request are used.
 - **Say what you ran.** Run what covers your change and quote it. You do not need the whole gate set locally: the `gates` workflow runs it on the pull request, and a red run blocks the merge.
-- The contributor licence position below applies first.
+- The contributor licence position under "Before you start" applies first.
 
 **For everyone:** no force-push to `main`, history on `main` is never rewritten, and no `--no-verify`: a hook that fails is telling you something.
 
