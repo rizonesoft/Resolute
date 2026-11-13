@@ -53,6 +53,8 @@ track: F1
 
 ## 1. Standard Window, Menus, and Message Layer
 
+> **Started:** 2026-11-13T13:30:34Z
+
 The window every tool opens: the Direct2D caption and status bar per `D01 T02 §4`, the File and Help menus, the heading block, and the single message layer every notice in §§5-6 renders through. The AutoIt framework defines itemless File/Help menu stubs (`ReBar.au3:525-526`); the item contract below comes from the Resolute usage plus the `[Menus]` pack keys. Tools add no menu items and draw no dialog of their own: a second menu item or message box is a defect per `DESIGN.md` §1.
 
 **Fidelity:** the standard window, against `DESIGN.md` sections 8 and 11.
