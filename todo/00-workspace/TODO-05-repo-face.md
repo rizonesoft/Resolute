@@ -43,7 +43,7 @@ track: N0
 
 | Order | Section | Deliverable | Depends On | Status |
 | :---: | :-----: | ----------- | ---------- | :----: |
-|   1   |   §1    | Visual proof capture with provenance | D00 T01 §4, D00 T02 §3 |  [ ]   |
+|   1   |   §1    | Visual proof capture with provenance | D00 T01 §4, D00 T02 §3 |  [x]   |
 |   2   |   §2    | README rewrite plus repo-face files | §1 |  [ ]   |
 |   3   |   §3    | Setup-path CI plus reproducibility record | §2 |  [ ]   |
 |   4   |   §4    | Sidecar reproduction command carries -Visible | §1 |  [ ]   |
@@ -100,6 +100,14 @@ The README shows real pixels from the shipped app, never mockups: the suite buil
 -> XREF: D00 T05 §2 -- the README these captures illustrate
 -> XREF: D00 T05 §4 -- the filed fix for the sidecar reproduction command
 -> XREF: D00 T02 §14 -- the capture writer's refusal of a covered window, which Repair 7 consumes
+
+> **Verified:** 2026-11-13 | §1 | the README's four launcher shots are real captures, each pair verifiable, and the driver publishes nothing a covering window spoils: a clean checkout builds by one command, CI's `gates` run on a fresh hosted checkout of 50e31cd4 (`ResKit bootstrap complete`, then `check-all: 24 gate(s) ok`, Debug and Release through `scripts/build.ps1 -All`); `python scripts/ci-status.py 50e31cd4` `gates: success`, `plan-gates: success`. Four shots at `1582 x 991 px` (above the 1280 px floor) in light and dark, restaked at 14cfde5c, `capture-window.ps1 -Verify` exit 0 for each, every sidecar naming its image sha256, exe hash, source revision `14cfde5c9f5b82fc3be5a6870f5a5ba7a0c55185`, geometry, appearance and launch context. Driver self-test 23 PASS; the driven covered-launcher run `capture-window failed for 2026-11-13-D00-T05-s1-launcher-details-dark with 3: capture-window: refused before the copy: the target is covered by 'Resolute drill foreign window' (pwsh, pid 8708)`, exit 3, earlier set unchanged, no launcher left. `todo-graph.py validate` `30 todos, 256 sections -- 0 fatal`.
+> **Review:** astra (gpt-6-astra via codex). `docs/reviews/00-workspace/D00-T05-s1.md`: plan gaps (folded), round 1 `HIGHEST: none`, completion gaps. `-repair.md`: plan approve, rounds 1 to 3 (P2, P2, P3), completion gaps. `-repair2.md`: plan gaps (its build moved to the third repair when the writer changed). `-repair3.md`: plan gaps, rounds 1 (P1) and 2 (`none`), completion gaps. `-repair4.md`: plan gaps, rounds 1 (P1) and 2 (`none`), completion gaps. `-repair5.md`: plan approve, round 1 `none`, completion gaps. `-repair6.md`: plan gaps, rounds 1 (P1) and 2 (`none`), completion gaps (filed as `D00 T02 §14`). `-repair7.md`: plan approve, round 1 (medium, adversarial) `HIGHEST: none` · Raw findings: docs/reviews/00-workspace/D00-T05-s1*.md
+> **Completion:** astra (medium), candidate 22a412f4b4976373727e5d3895ca6abb5f3f15d1 -- COMPLETION: complete · Repair records: -repair (16031ca8), -repair3 (d6d40512), -repair4 (f3d3d9a1), -repair5 (cc7931f9), -repair6 (b9909cba), -repair7 (22a412f4)
+> **Plan review:** astra -- gaps on the first record (folded), then each repair record's own plan pass, the last approve
+> **CRUD:** not applicable (captures and a capture driver; publication of a set is journalled and undone whole, Repair 4)
+> **Duration:** 2026-11-09T18:07:34Z to 2026-11-13T10:05:00Z
+> **Implementer:** muse to 2026-11-09, then claude (claude-opus-5-5)
 
 ## 2. README Rewrite Plus Repo-Face Files
 
