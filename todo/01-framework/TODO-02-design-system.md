@@ -47,6 +47,7 @@ track: F1
 |   6   |   §6    | Performance floor                          | §3             |  [ ]   |
 |   7   |   §7    | Text presentation and machine values       | §1             |  [ ]   |
 |   8   |   §8    | Menu bar and the complete popup menu       | --             |  [ ]   |
+|   9   |   §9    | Form controls: button, checkbox, input, combo | --             |  [ ]   |
 
 ---
 
@@ -233,6 +234,29 @@ Small rules, and the ones a user notices when they are wrong: a path they cannot
 
 -> XREF: D01 T03 §1 -- the standard window whose menus this builds
 -> XREF: D01 T01 §7 -- the window build that consumes it
+
+## 9. Form Controls: Button, Checkbox, Input, and Combo
+
+**Filed 2026-11-13** from `D01 T03 §2`, whose Preferences dialog needs a push button, a checkbox, a numeric and a text input, a combo box, a group heading and a page list. `shared/resolute-ui/include/resolute/controls/` holds the content view, list view, popup menu, sidebar, status bar and toolbar, and none of those; `D01 T01 §8` adds the result list, the progress surface and the message dialogs, and none of these either. No section owned them, and a dialog built on `comctl32` controls would be a second control layer in the suite.
+
+**Fidelity:** each control, against `DESIGN.md` sections 4, 5, 6 and 9, and `docs/framework/preferences.md` for the states the first consumer needs. No AutoIt baseline: the AutoIt dialogs use the system controls.
+**Job:** a user changes a setting with a control that looks and behaves like every other in the suite, by mouse or keyboard, at any scaling and in either appearance. Consumer: the Preferences dialog `D01 T01 §7` builds, then every tool's own pages.
+**Treatment:** Direct2D controls in the UI library, each with its states, its keyboard behaviour and its UI Automation pattern. Cheaper substitute that fails the checkpoint: subclassed `comctl32` controls restyled to look alike, which ignore the theme at the edges and the DPI scale under per-monitor changes.
+**Chrome:** extend `shared/resolute-ui`; no tool draws a form control.
+**Needs:** Windows host (build/test)
+
+- [ ] Add the push button: default, hover, pressed, focused, disabled, and the default-button and destructive variants. Done when: each state renders at 100 and 150 percent in both appearances against a captured baseline, and Space and Enter activate it, driven.
+- [ ] Add the checkbox: unchecked, checked, disabled in both, with its label as part of the hit target and an access key. Done when: each state renders against its baseline, and click, Space and the access key toggle it, driven, with the Toggle pattern read back.
+- [ ] Add the text input and its numeric form: caret, selection, clipboard, a unit suffix, a range with a stated result for an out-of-range or empty value, and an error state with its message beneath. Done when: typing, selection, paste and an out-of-range value are driven and read back through the Value pattern, and the error state renders against its baseline.
+- [ ] Add the combo box: closed, open, keyboard selection, type-ahead, and a disabled state. Done when: opening, arrow selection, type-ahead and Esc are driven, and the ExpandCollapse and Selection patterns read back.
+- [ ] Add the group heading and the page list a multi-page dialog uses, the page list reusing the shared sidebar's rows. Done when: a three-page dialog fixture renders, and Up, Down and Ctrl+Tab move between pages, driven.
+- [ ] Hold all of them to the floor: a 24 x 24 hit target at every density, a visible focus ring, a name and role for UI Automation, and the three densities. Done when: each control's target is measured at each density and a UI Automation walk reads every name, role and state.
+- [ ] Commit: `"ui: form controls: button, checkbox, input, and combo"`
+
+**Test checkpoint:** Every control renders each of its states against a baseline at 100 and 150 percent in both appearances; every keyboard path is driven and its result read back through the control's UI Automation pattern; every hit target measures at least 24 x 24 at each density. Cheaper substitute that fails the checkpoint: controls that render but cannot be reached or read without a mouse.
+
+-> XREF: D01 T03 §2 -- the Preferences specification whose controls these are
+-> XREF: D01 T01 §7 -- the dialog build that consumes them
 
 ## Verification
 

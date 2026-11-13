@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **88 of 248 sections complete (35%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **88 of 249 sections complete (35%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -207,40 +207,41 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 
 The framework every tool consumes, the repair contract the destructive half consumes, and the design system that makes `DESIGN.md` true. This is where roughly 21,000 lines of AutoIt duplication stop being reproduced. Nothing after this phase is affordable without it.
 
-|  ✔  | Section       | Deliverable                                  | Items |
-| :-: | ------------- | -------------------------------------------- | :---: |
-| [ ] | `D01 T01 §1`  | Application shell and lifecycle              |   9   |
-| [ ] | `D01 T01 §2`  | Settings: one writer, one path               |  11   |
-| [ ] | `D01 T01 §4`  | Localization and the pack loader             |   8   |
-| [x] | `D01 T03 §1`  | Standard window, menus, message layer        |  23   |
-| [ ] | `D01 T03 §2`  | Preferences shell, general, performance      |  15   |
-| [ ] | `D01 T03 §3`  | Language page and tool-page contract         |   5   |
-| [ ] | `D01 T01 §7`  | Standard window, About, and preferences      |  12   |
-| [ ] | `D01 T01 §8`  | DPI awareness and system theme               |   7   |
-| [ ] | `D01 T03 §4`  | Per-tool log surface                         |   6   |
-| [ ] | `D01 T01 §3`  | Logging and the log surface                  |   8   |
-| [ ] | `D01 T03 §5`  | Update dialog and announcement               |   5   |
-| [ ] | `D01 T01 §5`  | Update check and consolidation announcement  |   9   |
-| [ ] | `D01 T01 §9`  | Standalone proof in an empty folder          |   7   |
-| [ ] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown          |   6   |
-| [ ] | `D01 T01 §6`  | Elevation and its refusal path               |   8   |
-| [ ] | `D01 T01 §10` | Crash Handling and Single Instance           |  10   |
-| [ ] | `D01 T01 §11` | Command Line and Exit Codes                  |  10   |
-| [ ] | `D02 T01 §1`  | The repair item and the run loop             |   7   |
-| [ ] | `D02 T01 §2`  | Diagnose before repair                       |  10   |
-| [ ] | `D02 T01 §3`  | Per-item result and the surface              |   6   |
-| [ ] | `D02 T01 §4`  | Restore record and undo                      |   9   |
-| [ ] | `D02 T01 §5`  | Transcript the user can carry                |   6   |
-| [ ] | `D02 T01 §6`  | One log line per action and per refusal      |   6   |
-| [ ] | `D01 T02 §1`  | Tokens made unbypassable                     |   7   |
-| [ ] | `D01 T02 §2`  | Spacing grid, density, and responsive layout |   7   |
-| [ ] | `D01 T02 §3`  | Content area: virtualization and scrolling   |   6   |
-| [ ] | `D01 T02 §4`  | Window chrome and shell integration          |   7   |
-| [ ] | `D01 T02 §5`  | The accessibility floor                      |  11   |
-| [ ] | `D01 T02 §6`  | Performance floor                            |   8   |
-| [ ] | `D01 T02 §7`  | Text presentation and machine values         |   5   |
-| [ ] | `D01 T02 §8`  | Menu bar and the complete popup menu         |   6   |
-| [ ] | `D01 T03 §7`  | Splash, donate, string audit                 |   4   |
+|  ✔  | Section       | Deliverable                                   | Items |
+| :-: | ------------- | --------------------------------------------- | :---: |
+| [ ] | `D01 T01 §1`  | Application shell and lifecycle               |   9   |
+| [ ] | `D01 T01 §2`  | Settings: one writer, one path                |  11   |
+| [ ] | `D01 T01 §4`  | Localization and the pack loader              |   8   |
+| [x] | `D01 T03 §1`  | Standard window, menus, message layer         |  23   |
+| [ ] | `D01 T03 §2`  | Preferences shell, general, performance       |  15   |
+| [ ] | `D01 T03 §3`  | Language page and tool-page contract          |   5   |
+| [ ] | `D01 T01 §7`  | Standard window, About, and preferences       |  12   |
+| [ ] | `D01 T01 §8`  | DPI awareness and system theme                |   7   |
+| [ ] | `D01 T03 §4`  | Per-tool log surface                          |   6   |
+| [ ] | `D01 T01 §3`  | Logging and the log surface                   |   8   |
+| [ ] | `D01 T03 §5`  | Update dialog and announcement                |   5   |
+| [ ] | `D01 T01 §5`  | Update check and consolidation announcement   |   9   |
+| [ ] | `D01 T01 §9`  | Standalone proof in an empty folder           |   7   |
+| [ ] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown           |   6   |
+| [ ] | `D01 T01 §6`  | Elevation and its refusal path                |   8   |
+| [ ] | `D01 T01 §10` | Crash Handling and Single Instance            |  10   |
+| [ ] | `D01 T01 §11` | Command Line and Exit Codes                   |  10   |
+| [ ] | `D02 T01 §1`  | The repair item and the run loop              |   7   |
+| [ ] | `D02 T01 §2`  | Diagnose before repair                        |  10   |
+| [ ] | `D02 T01 §3`  | Per-item result and the surface               |   6   |
+| [ ] | `D02 T01 §4`  | Restore record and undo                       |   9   |
+| [ ] | `D02 T01 §5`  | Transcript the user can carry                 |   6   |
+| [ ] | `D02 T01 §6`  | One log line per action and per refusal       |   6   |
+| [ ] | `D01 T02 §1`  | Tokens made unbypassable                      |   7   |
+| [ ] | `D01 T02 §2`  | Spacing grid, density, and responsive layout  |   7   |
+| [ ] | `D01 T02 §3`  | Content area: virtualization and scrolling    |   6   |
+| [ ] | `D01 T02 §4`  | Window chrome and shell integration           |   7   |
+| [ ] | `D01 T02 §5`  | The accessibility floor                       |  11   |
+| [ ] | `D01 T02 §6`  | Performance floor                             |   8   |
+| [ ] | `D01 T02 §7`  | Text presentation and machine values          |   5   |
+| [ ] | `D01 T02 §8`  | Menu bar and the complete popup menu          |   6   |
+| [ ] | `D01 T02 §9`  | Form controls: button, checkbox, input, combo |   7   |
+| [ ] | `D01 T03 §7`  | Splash, donate, string audit                  |   4   |
 
 
 ### Phase 2 -- The launcher and the ports

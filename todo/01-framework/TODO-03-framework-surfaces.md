@@ -138,6 +138,7 @@ The 450x500 Preferences dialog (`ReBar.au3:1005-`, dialog title from `[Preferenc
 **Test checkpoint:** `docs/framework/preferences.md` exists; its matrix has a row, a failure entry and a named `D01 T01 §7` check for every control and button; the AutoIt inventory gives every part and every named defect a verdict; the shell names its pages, buttons, notices, save and the dirty rule for every way out; every group names every control with its setting key, default and behavior; the priority values map to Win32 classes with the Realtime rule exact; the dead Cache key is cut with reason; every string has a key. The `D01 T01 §7` checklist can be built from this section with no invented control. Cheaper substitute that fails the checkpoint: groups without setting keys, which ships a dialog that displays settings it cannot store.
 
 -> XREF: D01 T01 §7 -- the build that consumes this preferences spec
+-> XREF: D01 T02 §9 -- the form controls this dialog's pages are made of
 -> XREF: D07 T01 §4 -- the smoke run whose preferences step activates per tool when this shell ships
 
 ## 3. Preferences Language Page and Tool-Page Contract
