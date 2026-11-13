@@ -1,9 +1,9 @@
-capture       : 2026-11-09-D00-T05-s1-launcher-details-light.png
+capture       : 2026-11-13-D00-T05-s1-launcher-details-light.png
 describes     : the launcher details view, light, at 1600 px wide: visual proof for the README (D00 T05 section 1)
 window title  : Resolute
-target process: 45052 R:\resolute-clean-check\Bin\Release\Resolute.exe
+target process: 60244 D:\Resolute\Bin\Release\Resolute.exe
 attached      : attached to a process the caller started and owns
-source binary : R:\resolute-clean-check\Bin\Release\Resolute.exe
+source binary : D:\Resolute\Bin\Release\Resolute.exe
 file version  : 0.1.0.0
 size          : 1582 x 991 px
 monitor dpi   : 144  (150% scaling) -- what the image was rendered at
@@ -11,16 +11,16 @@ window dpi    : 144  (logical dpi the process sees)
 dpi aware     : True
 appearance    : light  (stated by the caller)
 fixture       : launcher built from a clean checkout (Bin/Release/Resolute.exe); host VENOM-PC; appearance light set by 2 theme-command press(es) from System; view set by WM_COMMAND 1004
-launch context: pwsh scripts/capture-launcher-readme.ps1 -Exe R:\resolute-clean-check\Bin\Release\Resolute.exe -CaptureScript R:\resolute-clean-check\scripts\capture-window.ps1 -OutDir D:\GitHub\Resolute\docs\captures (this shot: theme x2, view 1004, then capture-window.ps1 -ProcessId <pid> -Out D:\GitHub\Resolute\docs\captures\2026-11-09-D00-T05-s1-launcher-details-light.png)
+launch context: pwsh -NoProfile -File 'D:\Resolute\scripts\capture-launcher-readme.ps1' -Visible -Exe 'D:\Resolute\Bin\Release\Resolute.exe' -CaptureScript 'D:\Resolute\scripts\capture-window.ps1' -OutDir 'D:\Resolute\docs\captures' -Date 2026-11-13
 fixture files : none beside Bin/Release (launcher only build)
 launch args   : attached to a running process
 working dir   : (default)
 locale        : en-ZA / UI en-US
 geometry      : 49,40 1582x991
-exe sha256    : 2CD7AD0780FEB494AE5C2A6D524143434103A0BAD64F56B50664301E6EE99B4A
-source revision: c4f6fcde31af213ebf3b6e9309ffd3a5360f206d
+exe sha256    : 946A36572CFE36FD2E8013412522453159133B099920A3B2636149361668E4E2
+source revision: 18fd9c01e951fe0a93c66c8c3541532ef5639b58
 windows build : 10.0.26300.0
-captured      : 2026-11-09
+captured      : 2026-11-13
 
 Reproduce with scripts/capture-window.ps1. Where this capture and
 DESIGN.md disagree, the contract wins and this capture is restaked.
