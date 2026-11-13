@@ -1,0 +1,287 @@
+# The Preferences dialog
+
+Every Resolute tool has one Preferences dialog, owned by the framework. This page specifies its shell and four of its pages (General, Performance, Updates, Appearance) control by control, so that `D01 T01 §7` can build them without inventing a control. It is `D01 T03 §2` (`todo/01-framework/TODO-03-framework-surfaces.md`). The Language page and the contract for a tool's own pages are `D01 T03 §3`'s.
+
+A user changes a setting once and trusts it was kept. So every control is bound to one setting key, written only by the framework's settings writer (`D01 T01 §2`), and a page never writes a key itself. The setting names are the AutoIt ones, because the settings file stays the AutoIt `.ini`: a file the AutoIt tool wrote reads back the same here.
+
+The dialog is drawn with the form controls `D01 T02 §9` adds to the UI library, and its messages go through the message layer in [`standard-window.md`](standard-window.md). Sizes are base values at 96 DPI. A specification cannot prove behaviour, so the page ends in a matrix ([below](#what-must-the-build-prove-row-by-row)) whose every row is a check `D01 T01 §7` runs.
+
+## What does the AutoIt dialog have, and where does each part go?
+
+The AutoIt dialog is `_ShowPreferencesDlg` (`resolute_au3/SDK/Concrete/ReBar/ReBar.au3:989-1146`), a fixed 450 x 500 window that is not DPI-aware. Its strings load in the order set by `resolute_au3/SDK/Concrete/ReBar/Includes/Localization.au3:97-120`.
+
+| AutoIt part | Source | Here |
+| --- | --- | --- |
+| Window, 450 x 500, caption only, always on top (`$WS_EX_TOPMOST`), the main window disabled while it is open | `ReBar.au3:1005`, `:1000` | A dialog modal to the tool's window, resizable, never topmost over other applications. |
+| Tab strip: General, Performance, Language | `ReBar.au3:1011`, `:1013`, `:1035`, `:1071` | A page list at the left: General, Performance, Updates, Appearance, Language, then the tool's pages. A list, not tabs, because a tool may add pages and a tab strip of seven does not fit. |
+| Logging group: enable checkbox, size input in KB, current-size label, Clear button | `ReBar.au3:1014-1027` | General, Logging, below. The size is entered in MB. |
+| Priority group: label, combo of six English names, a 48 px icon that changes with the priority, save-above-high checkbox | `ReBar.au3:1036-1050` | Performance, Priority, below. The icon is cut: the combo already says the priority, and a second picture of it adds nothing. |
+| Save-above-high checkbox labelled from `Button_Cancel` | `ReBar.au3:1048` reads index 17; `Localization.au3:110` loads `Checkbox_SaveRealtime` at 13 and `:114` `Button_Cancel` at 17 | A defect, not ported: the checkbox read "Cancel". It takes its own key. |
+| Priority names and the unit "KB" as literals | `ReBar.au3:1041`, `:1022` | Not ported as literals: each is a pack string. |
+| Memory group: reduce-memory checkbox | `ReBar.au3:1056-1059` | Performance, Memory, below. |
+| Priority, save-above-high and reduce-memory disabled when the script is not compiled | `ReBar.au3:1062-1066` | Cut: a development-only branch. A built tool always has all three. |
+| Language group: flag, name, list, note | `ReBar.au3:1071-1127` | `D01 T03 §3`. |
+| Updated notice, hidden until a save, created with the priority label's text | `ReBar.au3:1130` reads index 12, `Label_SetPriority` | The saved notice, below. Its placeholder text was a defect and is not ported. |
+| Save, disabled until something changes; Cancel | `ReBar.au3:1133-1141`, `__CheckPreferenceChange` at `:1238` | Save and Cancel, below, with the same rule. |
+| Priority applied to the running process the moment the combo changes, before Save | `ReBar.au3:1177-1195` | Changed: a priority applies at Save, like every other setting, so Cancel leaves the process as it was. |
+| Clear removes the whole log folder at once | `ReBar.au3:1149-1163`, `DirRemove` at `:1152` | Changed: clearing removes this tool's log files through the log writer, never a folder. |
+| Startup default priority Above Normal; the dialog's own default Normal | `ReBar.au3:860` reads 3; `:1204` reads 2, `:1041` | One default: Normal. |
+| Language-changed and close-now prompts on Save | `ReBar.au3:1295-1312`, `:1344-1352` | `D01 T03 §3`. |
+| `MsgBox_Closing_Messag`, misspelled in the pack against the loader's `MsgBox_Closing_Message` | `resolute_au3/Resolute/Language/ReBar/en.lng:185`, `Localization.au3:120` | A defect: the pack's text never loaded. Handed to `D01 T03 §3`, which owns that prompt, and to `D01 T03 §7`'s string audit. |
+| `Tab_Cache` | `en.lng:163`; no line of `Localization.au3:97-120` loads it | Cut: a dead key. No dialog ever built a Cache page, and none is invented to use it. |
+
+## What does the shell hold?
+
+| Part | Contents | Rule |
+| --- | --- | --- |
+| Title | `Window_Title` ("Preferences"), then the tool's display name | So a user with two tools open knows whose preferences these are. |
+| Page list | General, Performance, Updates, Appearance, Language, then each page the tool adds, in the order it adds them | 200 wide at the left. The dialog opens on General, or on the page a caller names. |
+| Page | The chosen page's groups, each under a group heading | Scrolls vertically when the page is taller than the dialog; never horizontally. |
+| Saved notice | `Label_Updated` ("Preferences saved"), at the left of the button row, with a check icon | Appears after a successful Save, stays until the next edit, and is announced. |
+| Save | `Button_Save` (`&Save`) | Disabled until an edited value differs from the persisted one; the default button when enabled. |
+| Cancel | `Button_Cancel` ("Cancel") | Always enabled. |
+
+- **Size:** default 720 x 520, minimum 560 x 420, resizable; the size is remembered through the settings writer. The page list keeps its width and the page takes the rest.
+- **One dialog per tool:** asking for Preferences while it is open brings it forward, on the page it was on.
+- **Three values, kept apart.** For every setting the dialog knows the persisted value (what the settings file holds), the effective value (what the tool is using now) and the edited value (what the control shows). Save is enabled when any edited value differs from its persisted value.
+
+### What does Save do?
+
+1. It validates every page, in page order. The first control whose value is not allowed stops the save: nothing is written, the dialog moves to that page, focus goes to the control, and its error shows beneath it.
+2. It writes every changed key through the settings writer in one atomic write (`D01 T01 §2`), then reads the file back.
+3. Only when the file reads back as written does it apply the values to the running tool (below, per setting), show the saved notice and disable Save. The edited values become the new baseline.
+
+| Outcome | Persisted | Effective | Edited | The user sees |
+| --- | --- | --- | --- | --- |
+| Save succeeds | The edited values | The edited values | Unchanged; the new baseline | The saved notice; Save disabled |
+| A value is not allowed | Unchanged | Unchanged, except a preview already showing | Unchanged | The control's error (`Error_Value_Range`), focus on it; no notice |
+| The file cannot be written | Unchanged | Unchanged, except a preview already showing | Unchanged | The message layer's Error `Save_Failed` with the path and the Windows reason; Save stays enabled |
+| The file reads back differently | What the file now holds | Unchanged, except a preview already showing | Unchanged | Error `Save_Unverified` with the path; no saved notice; Save stays enabled |
+| Discard | Unchanged | The baseline, every preview undone | Dropped | The dialog closes |
+| Cancel in the prompt | Unchanged | Unchanged, previews still showing | Unchanged | The prompt closes; the dialog stays |
+
+### What happens on the way out?
+
+Cancel, Esc and the caption's close button do the same thing. With no unsaved change the dialog closes at once. With one, it asks once through the message layer: `Unsaved_Title` ("Save your changes?"), with Save (the default), Discard and Cancel.
+
+- **Save** saves as above and closes when the save succeeds; when it fails, the failure shows and the dialog stays.
+- **Discard** drops every edited value, undoes every preview so the tool looks as it did at the baseline, and closes.
+- **Cancel** returns to the dialog with every edited value and every preview as it was.
+
+A successful Save moves the baseline. So after preview, Save, a further preview and Discard, the tool shows what was saved, not what it showed before the dialog opened.
+
+## What is on the General page?
+
+One group, Logging (`Group_Logging`).
+
+| Control | Pack key | Setting | Default | Rule |
+| --- | --- | --- | --- | --- |
+| Enable logging, a checkbox | `Checkbox_Enable_Logging` (`&Enable logging`) | `LoggingEnabled`, 1 or 0 | 1 | Unchecked disables the size input. Clear stays enabled while there is a log to clear. |
+| Keep the log under, a numeric input with the unit MB | `Label_Log_Limit` (`Keep the &log under`), new; unit `Unit_MB` ("MB"), new | `LoggingStorageSize`, in bytes | 5 MB (5242880, the AutoIt default at `ReBar.au3:866`) | Whole numbers from 1 to 100. Empty, zero, a fraction or a larger number is not allowed: `Error_Value_Range` ("Enter a whole number from %1 to %2."). A stored value outside the range, or not a whole number of megabytes, shows rounded up to the next megabyte within the range and is written back only at Save. |
+| Current size, a label | `Label_Logging_Size` ("The log is using %1."), reworded | none | | The size of this tool's log files, in KB under 1 MB and MB above, refreshed when the page shows, every 2 seconds while it shows, and after a clear. "The log is empty." (`Label_Logging_Empty`, new) when there is none. |
+| Clear log, a button, with a line beneath it | `Button_Logging_Clear` (`&Clear log`), reworded; `Label_Logging_Clear_Note` ("Deletes the log files now. This cannot be undone, and Cancel does not bring them back."), new | none | | Below. |
+
+### What does Clear log do?
+
+It asks nothing: a log is expendable, and the line beneath the button has already said the deletion is immediate and final (`DESIGN.md` §11). It is not part of Save or Cancel.
+
+It goes through the log writer (`D01 T01 §3`), which closes its file, removes this tool's own log files and only those (never the folder, and never a file it did not write), and, when logging is enabled, opens a new file whose first line records the clear. The size label refreshes, and one of three results shows beside the button and is announced:
+
+| Result | Text | When |
+| --- | --- | --- |
+| Cleared | `Label_Logging_Cleared` ("Log cleared: %1 freed."), reworded | Every file was removed |
+| Nothing to clear | `Label_Logging_Nothing` ("There was no log to clear."), new | No log file existed |
+| Partly cleared | `Label_Logging_Partial` ("%1 of %2 log files could not be deleted: %3"), new, with the first file's name and the Windows reason, the rest in the log | A file was held open by another program, or could not be deleted |
+
+## What is on the Performance page?
+
+Two groups.
+
+### Priority (`Group_Priority`)
+
+| Control | Pack key | Setting | Default | Rule |
+| --- | --- | --- | --- | --- |
+| Process priority, a combo | `Label_SetPriority` (`Process &priority`), reworded | `ProcessPriority`, 0 to 5 | 2, Normal | The six values below. |
+| Keep Realtime after a restart, a checkbox with a warning line | `Checkbox_SaveRealtime` (`&Keep Realtime after a restart (not recommended)`), reworded; `Label_Realtime_Warning` ("Realtime can make Windows stop responding to the mouse and keyboard."), new | `SaveRealtime`, 1 or 0 | 0 | Enabled only while the combo shows Realtime. |
+
+| Value | Stored | Win32 class | Pack key, new |
+| --- | :-: | --- | --- |
+| Low | 0 | `IDLE_PRIORITY_CLASS` | `Priority_Low` |
+| Below normal | 1 | `BELOW_NORMAL_PRIORITY_CLASS` | `Priority_Below_Normal` |
+| Normal | 2 | `NORMAL_PRIORITY_CLASS` | `Priority_Normal` |
+| Above normal | 3 | `ABOVE_NORMAL_PRIORITY_CLASS` | `Priority_Above_Normal` |
+| High | 4 | `HIGH_PRIORITY_CLASS` | `Priority_High` |
+| Realtime | 5 | `REALTIME_PRIORITY_CLASS` | `Priority_Realtime` |
+
+- **Why Normal is the default.** The AutoIt suite started at Above Normal (`ReBar.au3:860`) while its dialog treated Normal as the unchanged value (`:1204`), so a user who never opened Preferences ran above everything else on the machine without being told. A utility has no claim on more than its share until the user asks; the cost of changing this back is one constant.
+- **When it applies.** At Save, after the file has been written and read back, the framework sets the process's priority class and reads it back from Windows. At startup `D01 T01 §1` applies the stored value the same way.
+- **Realtime without the checkbox.** The process runs at Realtime for this session, the file stores High (4), and the saved notice says so: `Label_Realtime_Session` ("Saved. Realtime applies until this tool closes; it will start at High."). The combo keeps showing Realtime while the tool runs.
+- **When Windows refuses.** Realtime needs a privilege a standard user does not hold, and Windows then gives High without reporting an error; any other refusal leaves the priority as it was. After Save, the framework compares what it asked for with what Windows reports:
+
+| State | After a refusal |
+| --- | --- |
+| The process's priority | What Windows reports: High for a refused Realtime, the earlier priority otherwise |
+| The stored value | What was asked for, capped by the Realtime rule above |
+| The combo | The priority Windows reports, with `Label_Priority_Refused` ("Windows set %1 instead of %2.") beneath it, announced |
+| The dialog | Not dirty: Save is disabled, and the notice stands until the next edit |
+
+### Memory (`Group_Memory`)
+
+| Control | Pack key | Setting | Default | Rule |
+| --- | --- | --- | --- | --- |
+| Reduce memory use when Windows is short of memory, a checkbox | `Checkbox_ReduceMemory` (`&Reduce memory use when Windows is short of memory`), reworded | `ReduceMemory`, 1 or 0 | 1 | Below. |
+
+When it is on, the tool checks how much of the system's physical memory is in use and, while that is above the threshold, trims its own working set (`EmptyWorkingSet` on itself), which gives memory back to Windows at the cost of the tool reloading pages when it is next used. The AutoIt suite checked every `ReduceEveryMill` (300 ms, `ReBar.au3:863`) against `MinSysMemoryPerc` (80 percent, `:864`); both stay settings in the file without a control, and `D01 T01 §1` owns the timer. Turning it off at Save stops the timer in this session; turning it on starts it.
+
+## What is on the Updates page?
+
+One group, Updates (`Group_Updates`, new).
+
+| Control | Pack key | Setting | Default | Rule |
+| --- | --- | --- | --- | --- |
+| Check for updates, a combo | `Label_Update_Frequency` (`Check for &updates`), new | `UpdateFrequency`: `Startup`, `Daily`, `Weekly`, `Never` | `Daily` | Values `Update_Every_Start`, `Update_Daily`, `Update_Weekly`, `Update_Never`, new. |
+| Last checked, a label | `Label_Update_Last` ("Last checked: %1"), `Label_Update_Never_Checked` ("Not checked yet."), new | `UpdateLastCheck`, read only here | | The date and time in the user's locale. |
+| Check now, a button | `Button_Update_Now` (`Check &now`), new | none | | Runs the check `D01 T01 §5` owns, as Help, Check for updates does; disabled while one runs. |
+| Skipped version, a label and a button, shown only when a version is skipped | `Label_Update_Skipped` ("You chose not to be told about version %1."), `Button_Update_Unskip` (`&Tell me again`), new | `UpdateSkipVersion`, written by the update dialog's don't-show-again choice (`D01 T03 §5`) | empty | The button clears the key at Save. |
+
+- **The AutoIt setting.** The AutoIt suite had one switch, `CheckForUpdates`, holding a checkbox state: 4 to check at every start, 1 never (`ReBar.au3:859`, `:614`; `resolute_au3/SDK/Includes/Update.au3:139`). A settings file with that key and no `UpdateFrequency` reads as `Never` for 1 and `Daily` otherwise, and the first Save writes `UpdateFrequency`.
+- **Why Daily is the default.** A check at every start contacts the server each time a tool opens, which a repair tool opened ten times in an hour does not need; daily still reaches a user within a day of a release. Cost of changing: one constant.
+- **When it applies.** At Save: a check already scheduled is rescheduled or cancelled to match, and one already running is never interrupted.
+
+## What is on the Appearance page?
+
+One group, Appearance (`Group_Appearance`, new).
+
+| Control | Pack key | Setting | Default | Rule |
+| --- | --- | --- | --- | --- |
+| Theme, a combo | `Label_Theme` (`&Theme`), new | `Theme`: `System`, `Light`, `Dark` | `System` | Values `Theme_System` ("Use the Windows setting"), `Theme_Light`, `Theme_Dark`, new. |
+| Density, a combo | `Label_Density` (`&Density`), new | `Density`: `Compact`, `Normal`, `Spacious` | `Normal` | Values `Density_Compact`, `Density_Normal`, `Density_Spacious`, new. |
+
+Both preview at once: choosing a value changes the tool's window and this dialog straight away, announced as `Label_Preview` ("Previewing %1. Save to keep it."), and it is kept only at Save. Discard and a closed tool return to the baseline.
+
+## When does each setting take effect?
+
+No setting on these pages needs a restart. The language, which does, is `D01 T03 §3`'s.
+
+| Setting | Takes effect | In the running tool |
+| --- | --- | --- |
+| `LoggingEnabled` | At Save | Off: the log writer writes one last line saying logging was turned off, then stops. On: it opens its file and writes from the next line. |
+| `LoggingStorageSize` | At Save | The log writer uses the new limit from the next line, and rotates at once when the file is already over it (`D01 T01 §3`). |
+| `ProcessPriority`, `SaveRealtime` | At Save | The process's priority class is set and read back. |
+| `ReduceMemory` | At Save | The trim timer starts or stops. |
+| `UpdateFrequency` | At Save | A scheduled check is rescheduled or cancelled; a running one finishes. |
+| `Theme`, `Density` | Previewed on change, kept at Save | The window and the dialog redraw. |
+
+## What is announced?
+
+Each of these raises a UI Automation notification with its text, and none is carried by colour alone (`DESIGN.md` §9): each has an icon or sits beside the control it concerns.
+
+| Notice | Announced when |
+| --- | --- |
+| The saved notice, and its Realtime form | A save succeeds |
+| A value that is not allowed, with its control's name | Save stops on it |
+| Cleared, nothing to clear, partly cleared | Clear log finishes |
+| Windows set another priority | A priority is refused |
+| Previewing a theme or density | A preview is applied |
+| Update check started and finished | Check now runs, through the status bar's task segment |
+
+## Which keys does the dialog answer?
+
+| Key | Where | Does |
+| --- | --- | --- |
+| Up, Down, Home, End | Page list | Chooses a page; the page shows at once. |
+| Ctrl+Tab, Ctrl+Shift+Tab | Anywhere in the dialog | The next or previous page, wrapping, with focus kept in the page list. |
+| Tab, Shift+Tab | Dialog | The page list, then the page's controls top to bottom, then Save, then Cancel, and round. |
+| Alt and a control's access key | Dialog | Focuses the control, and toggles a checkbox. Access keys are unique within a page and never collide with `&Save`. |
+| Space | A checkbox or a button | Toggles or presses. |
+| F4, Alt+Down; Up, Down; a typed letter | A combo | Opens it; changes the selection; type-ahead. |
+| Enter | Anywhere but an open combo | Save, when it is enabled. |
+| Esc | An open combo | Closes the combo, keeping the value. |
+| Esc; Alt+F4 | Otherwise | The way out, as above. |
+
+Focus starts on the page list when the dialog opens. After a failed save it goes to the control at fault, or to Save when the fault was the file.
+
+## How does it scale?
+
+The dialog follows the user's density (`D01 T02 §2`) for its row height (28, 32, 36 for Compact, Normal, Spacious) and group padding (`SpacingMD`, `SpacingLG`, `SpacingXL`); text and icon sizes do not change. At its minimum size, at every density, and at 200 percent text scaling, no control or label is clipped: a label that does not fit wraps, and a page taller than the dialog scrolls. Every control is a 24 x 24 target at least (`DESIGN.md` §9).
+
+## Which strings does the dialog use?
+
+Every string on these pages is a pack string in `[Preferences]`, except the message layer's own (`[Messages]`). `%1`, `%2` and `%3` are substitutions in the order given.
+
+| Key | English | Verdict |
+| --- | --- | --- |
+| `Window_Title` | Preferences | Kept |
+| `Tab_General`, `Tab_Performance`, `Tab_Language` | General, Performance, Language | Kept, as page names |
+| `Tab_Updates`, `Tab_Appearance` | Updates, Appearance | New |
+| `Tab_Cache` | | Cut: dead key |
+| `Group_Logging`, `Group_Priority`, `Group_Memory` | Logging, Priority, Memory | Kept |
+| `Group_Language` | Language | Kept, for `D01 T03 §3` |
+| `Group_Updates`, `Group_Appearance` | Updates, Appearance | New |
+| `Checkbox_Enable_Logging` | `&Enable logging` | Kept, gaining its access key |
+| `Label_Log_Exceed` | Log size must not exceed : | Cut: replaced by `Label_Log_Limit` (a stray space before the colon, and a rule phrased as a warning) |
+| `Label_Log_Limit` | `Keep the &log under` | New |
+| `Unit_MB` | MB | New |
+| `Label_Logging_Size` | The log is using %1. | Reworded from "Logging Size: %s KB" |
+| `Label_Logging_Empty` | The log is empty. | New |
+| `Button_Logging_Clear` | `&Clear log` | Reworded from "Clear Logging" |
+| `Label_Logging_Clear_Note` | Deletes the log files now. This cannot be undone, and Cancel does not bring them back. | New |
+| `Label_Logging_Cleared` | Log cleared: %1 freed. | Reworded from "Logging cleared" |
+| `Label_Logging_Nothing` | There was no log to clear. | New |
+| `Label_Logging_Partial` | %1 of %2 log files could not be deleted: %3 | New |
+| `Label_SetPriority` | `Process &priority` | Reworded from "Set process priority:" |
+| `Priority_Low`, `Priority_Below_Normal`, `Priority_Normal`, `Priority_Above_Normal`, `Priority_High`, `Priority_Realtime` | Low, Below normal, Normal, Above normal, High, Realtime | New: literals in the AutoIt suite |
+| `Checkbox_SaveRealtime` | `&Keep Realtime after a restart (not recommended)` | Reworded from "Save priority above high (not recommended)."; only Realtime is above High |
+| `Label_Realtime_Warning` | Realtime can make Windows stop responding to the mouse and keyboard. | New |
+| `Label_Realtime_Session` | Saved. Realtime applies until this tool closes; it will start at High. | New |
+| `Label_Priority_Refused` | Windows set %1 instead of %2. | New |
+| `Checkbox_ReduceMemory` | `&Reduce memory use when Windows is short of memory` | Reworded from "Reduce memory on low memory systems." |
+| `Label_Update_Frequency`, `Update_Every_Start`, `Update_Daily`, `Update_Weekly`, `Update_Never` | `Check for &updates`; Every time the tool starts, Once a day, Once a week, Never | New |
+| `Label_Update_Last`, `Label_Update_Never_Checked` | Last checked: %1; Not checked yet. | New |
+| `Button_Update_Now` | `Check &now` | New |
+| `Label_Update_Skipped`, `Button_Update_Unskip` | You chose not to be told about version %1.; `&Tell me again` | New |
+| `Label_Theme`, `Theme_System`, `Theme_Light`, `Theme_Dark` | `&Theme`; Use the Windows setting, Light, Dark | New |
+| `Label_Density`, `Density_Compact`, `Density_Normal`, `Density_Spacious` | `&Density`; Compact, Normal, Spacious | New |
+| `Label_Preview` | Previewing %1. Save to keep it. | New |
+| `Button_Save` | `&Save` | Kept, gaining its access key |
+| `Button_Cancel` | Cancel | Kept |
+| `Label_Updated` | Preferences saved | Reworded from "Preferences Updated" |
+| `Error_Value_Range` | Enter a whole number from %1 to %2. | New |
+| `Save_Failed`, in `[Messages]` | Your preferences could not be saved. | New; the body names the path and the Windows reason |
+| `Save_Unverified`, in `[Messages]` | Your preferences were written but could not be confirmed. | New; the body names the path |
+| `Unsaved_Title`, `Button_Discard`, in `[Messages]` | Save your changes?; `&Discard` | New |
+| `Label_Language_Message`, `MsgBox_Language_Title`, `MsgBox_Language_Message`, `MsgBox_Closing_Title`, `MsgBox_Closing_Messag` | | `D01 T03 §3`'s |
+
+Every reworded or cut key goes to `D01 T03 §7`'s string audit.
+
+## What must the build prove, row by row?
+
+Every row is one behavioural check in `D01 T01 §7`, driven against the built dialog; where a row names a setting, the check reads the settings file back as well as the control.
+
+| Element | Trigger | States | Result | Failure | Check in `D01 T01 §7` |
+| --- | --- | --- | --- | --- | --- |
+| Opening Preferences | File, Preferences; Ctrl+, | Closed, or already open | Opens on General with focus on the page list; a second request brings it forward | None can occur: the dialog is built from the framework's tables | `prefs: opens once, on General` |
+| Page list | Click; Up, Down; Ctrl+Tab | Each page | The page shows; edits on other pages are kept | A tool page that fails to build is `D01 T03 §3`'s | `prefs: pages switch and keep edits` |
+| Save | Click; Alt+S; Enter | Disabled until an edit differs | One atomic write, read back, values applied, the saved notice announced, Save disabled | The three save failures below | `prefs: save writes, reads back and applies` |
+| A value that is not allowed | Save with the size input empty, 0, 2.5 or 101 | | Nothing written; the page shown; focus on the input; `Error_Value_Range` beneath it, announced | The stated result is the failure presentation | `prefs: a bad value stops the save` |
+| A file that cannot be written | Save with the settings file read-only | | `Save_Failed` with the path; edits kept; file unchanged; Save enabled | The stated result is the failure presentation | `prefs: a refused write keeps the edits` |
+| A write that reads back differently | Save with the read-back made to differ | | `Save_Unverified`; no saved notice; Save enabled | The stated result is the failure presentation | `prefs: an unconfirmed write is not a success` |
+| The way out with no change | Cancel; Esc; Alt+F4; caption close | Clean | Closes at once | None can occur | `prefs: a clean dialog closes at once` |
+| The way out with a change | The same four | Dirty | The prompt; Save saves and closes, Discard drops and closes, Cancel returns | A failed Save from the prompt leaves the dialog open with its failure | `prefs: the unsaved prompt's three answers` |
+| Enable logging | Click; Space; Alt+E | Checked, unchecked | The size input enables or disables; at Save `LoggingEnabled` is written and the log writer starts or stops | Save's failures | `prefs: logging turns off and on in the running tool` |
+| Log size | Type; paste | 1 to 100 | At Save `LoggingStorageSize` is written in bytes and the writer rotates a file already over the limit | A value not allowed, as above | `prefs: a smaller limit rotates the log at once` |
+| Current size | The page shown; every 2 seconds; after a clear | A log, or none | The size, or "The log is empty." | An unreadable log folder shows "The log is empty." and the reason goes to the log | `prefs: the size label follows the log` |
+| Clear log | Click; Space; Alt+C | Logging on or off; a log, or none; a file held open | Cleared, nothing to clear, or partly cleared, announced; logging carries on into a new file | Partly cleared names the file and the reason | `prefs: clear, with nothing to clear and with a held file` |
+| Priority | Choose a value, then Save | Six values | The file holds the value and Windows reports the class, both read back, and again after a restart | A refusal, below | `prefs: priority reads back from the file and from Windows` |
+| Realtime without the checkbox | Choose Realtime, leave the checkbox clear, Save | | Realtime for the session, High stored, the Realtime notice; High after a restart | A refusal, below | `prefs: realtime is for the session unless kept` |
+| A refused priority | Save Realtime as a standard user | | Windows reports High; the combo shows High with `Label_Priority_Refused`; the dialog is not dirty | The stated result is the failure presentation | `prefs: a refused priority is shown as it is` |
+| Keep Realtime | Click; Space; Alt+K | Enabled only with Realtime chosen | At Save `SaveRealtime` is written and Realtime survives a restart | Save's failures | `prefs: realtime kept across a restart` |
+| Reduce memory | Click; Space; Alt+R | Checked, unchecked | At Save `ReduceMemory` is written and the trim timer starts or stops | Save's failures | `prefs: the memory trim starts and stops` |
+| Update frequency | Choose a value, then Save | Four values; a file with only `CheckForUpdates` | `UpdateFrequency` written; a scheduled check rescheduled or cancelled | Save's failures | `prefs: update frequency reschedules, and reads the AutoIt key` |
+| Check now | Click; Space; Alt+N | Disabled while a check runs | The check runs; Last checked updates | The update dialog's failure state (`D01 T03 §5`) | `prefs: check now is single-flight` |
+| Skipped version | Click Tell me again, then Save | Shown only with a version skipped | `UpdateSkipVersion` cleared | Save's failures | `prefs: a skipped version can be unskipped` |
+| Theme and density | Choose a value | Three values each | The window and the dialog change at once, announced; kept at Save | A value the scale lacks falls back to the default, logged | `prefs: previews apply, and save keeps them` |
+| Preview, then Discard | Preview, Save, preview again, Discard | | The tool shows what was saved | None can occur | `prefs: discard returns to the last save` |
+| Announcements | Each notice above | | Each raises a UI Automation notification with its text | None can occur | `prefs: every notice is announced` |
+| Keyboard | Every key in the table above | | Every control reached and operated without a mouse; focus as stated | None can occur | `prefs: keyboard reaches every control` |
+| Density and size | The minimum size at each density, and 200 percent text | | Nothing clipped; every target at least 24 x 24 | A label that does not fit wraps | `prefs: nothing clips at the minimum size` |
