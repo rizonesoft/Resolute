@@ -142,7 +142,7 @@ flowchart LR
     launcher["Launcher: src/<br/>finds tools and<br/>starts them"]
     repair["Repair contract:<br/>src/repair/<br/>diagnose, result list,<br/>restore record, undo<br/>(D02 T01)"]
     framework["Framework:<br/>src/framework/<br/>startup, settings, logging,<br/>language, update, About<br/>(D01 T01)"]
-    ui["UI library:<br/>shared/resolute-ui/<br/>every control, theming,<br/>DPI, typography"]
+    ui["UI library:<br/>shared/resolute-ui/"]
     tools -- repair tools only --> repair
     tools --> framework
     launcher --> framework
@@ -150,7 +150,7 @@ flowchart LR
     framework --> ui
 ```
 
-The repair contract is for the repair tools only. The framework and the repair contract are planned in [`D01 T01`](todo/01-framework/TODO-01-framework-core.md) and [`D02 T01`](todo/02-repair-contract/TODO-01-repair-contract.md); the UI library and the launcher exist today.
+The repair contract is for the repair tools only. The UI library draws every control and owns theming, DPI scaling and typography. The framework and the repair contract are planned in [`D01 T01`](todo/01-framework/TODO-01-framework-core.md) and [`D02 T01`](todo/02-repair-contract/TODO-01-repair-contract.md); the UI library and the launcher exist today.
 
 <details>
 <summary><b>Repository layout</b></summary>
