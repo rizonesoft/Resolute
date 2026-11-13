@@ -56,6 +56,9 @@ test_font.obj
 /reskit/ninja/
 /reskit/python/
 /reskit/sccache/
+# The authoring-only reference-data server (tools/refdata/server.ps1 -Install, D00 T06 section 1).
+/reskit/mysql/
+/reskit/mysql.new/
 
 # TODO graph derived cache (always reproducible from todo/*.md)
 build/

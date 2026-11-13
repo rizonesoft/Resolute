@@ -1,0 +1,10 @@
+{
+  "dataset": "fixture",
+  "create": "A fixture proving the authoring workflow end to end",
+  "author": "author-one",
+  "reason": "the first version of the fixture",
+  "changes": [
+    {"add": "beep-1-long", "text": "One long beep: memory not detected", "source": "Award BIOS 6.0 manual, appendix B", "reason": "first entry"},
+    {"add": "beep-3-short", "text": "Three short beeps: base memory read or write error", "source": "AMI BIOS 8 manual, table 4", "reason": "second entry"}
+  ]
+}

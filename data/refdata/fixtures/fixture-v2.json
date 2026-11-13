@@ -1,0 +1,8 @@
+{
+  "dataset": "fixture",
+  "author": "author-one",
+  "reason": "the second version of the fixture: one entry reworded, one left as it was",
+  "changes": [
+    {"reword": "beep-1-long", "text": "One long beep: no memory detected in any slot", "source": "Award BIOS 6.0 manual, appendix B, revised", "reason": "the manual's later printing names the slots"}
+  ]
+}

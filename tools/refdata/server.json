@@ -1,0 +1,15 @@
+{
+  "$comment": [
+    "The authoring-only database server for reference data (D00 T06 section 1).",
+    "tools/refdata/server.ps1 -Install reads this file; scripts/bootstrap.ps1 never does, so no build and no CI run downloads it.",
+    "The sha256 was taken from a real download on 2026-11-13, whose MD5 matched the one MySQL publishes on its download page (7b94489d5524dea9b27097068bea25a8)."
+  ],
+  "name": "mysql",
+  "version": "8.4.13",
+  "url": "https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-8.4.13-winx64.zip",
+  "sha256": "e9cd98b1d23f122987b1afca26ad942efec5891481103d48ae3cde237fa3ea54",
+  "bytes": 281154912,
+  "archiveFolder": "mysql-8.4.13-winx64",
+  "probe": "bin/mysqld.exe",
+  "versionMatch": "Ver 8\\.4\\.13"
+}
