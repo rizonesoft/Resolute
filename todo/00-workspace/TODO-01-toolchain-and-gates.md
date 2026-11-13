@@ -947,16 +947,18 @@ No surface of its own: a workflow file, a reader script, and the working rules. 
 
 ## 11. CI Reader Tests Go Through the Real Helpers
 
+> **Started:** 2026-11-13T00:25:02Z
+
 **Filed 2026-11-13** from the `D00 T01 §10` second repair review (round 3, `P3`, in `docs/reviews/00-workspace/D00-T01-s10-repair2.md`): the self-test case for a failed listing of a push's paths substitutes a function that already raises, and the whole-push cases supply precomputed paths, so replacing the body of `changed_paths()` in `scripts/ci-status.py` with `return []` leaves every case passing. That regression would let a push touching `scripts/` be read as owing no `plan-gates` run. The helper's behaviour is right today; what is missing is a test that would notice it going wrong. Small tooling follow-ups to the CI reader that later reviews file as `P3` join this section as items while it is open, so they cost one review cycle between them and not one each. -> XREF: §10
 
 No surface of its own: the self-test of `scripts/ci-status.py`.
 
-- [ ] Exercise `changed_paths()` itself in `python scripts/ci-status.py --self-test`: with `run_git` replaced by a fake that returns a non-zero exit, the real helper raises the named refusal and `status()` exits 3; with a fake that returns two paths, the real helper returns them and a push touching `scripts/` owes `plan-gates`. Done when: replacing the body of `changed_paths()` with `return []` makes the self-test fail, quoted.
+- [ ] Exercise `changed_paths()` itself in `python scripts/ci-status.py --self-test`: with `run_git` replaced by a fake that returns a non-zero exit, the real helper raises the named refusal and `status()` exits 3; with a fake that returns two paths, the real helper returns them and a push touching `scripts/` owes `plan-gates`, and the fake is asked for `diff --name-only <push base> <head>` and nothing else. **Corrected 2026-11-13 (plan review):** the range is asserted, because a helper that listed only the head commit would return the same two paths from a fake that ignores its arguments, and would miss a `scripts/` change earlier in a real multi-commit push. Done when: replacing the body of `changed_paths()` with `return []` makes the self-test fail, and so does making it list the head commit alone, both quoted.
 - [ ] Commit: `"workspace: the CI reader's path listing is tested through the helper itself"`
 
 -> SOURCE: review-2026-11-13-d00-t01-s10-repair2-round3 (P3 failed-listing test bypasses the helper)
 
-**Test checkpoint:** `python scripts/ci-status.py --self-test` passes, and fails by name with `changed_paths()` reduced to `return []` (quoted from a real run each way).
+**Test checkpoint:** `python scripts/ci-status.py --self-test` passes, and fails by name with `changed_paths()` reduced to `return []` and with it made to list the head commit alone (quoted from a real run each way).
 
 ## Verification
 
