@@ -24,3 +24,31 @@ OVERALL: needs-attention
 
 - Planned: finding 1 (P1), `-DrillWorkArea` and `-DrillMoveOffscreen` drive the pre-launch and post-position checks as they run, each into a folder holding an earlier set, and each is shown to fail with its check removed, in the section-correction commit that follows this record
 - Planned: finding 2 (P2), the fit rule's positive case uses a fixed 2560 x 1392 work area; the display's own fitness is the driven run's prerequisite, in the same commit
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T04:01:55Z
+- Effort: medium
+- Writer model: claude-opus-5-5
+- Policy: ff5a26445c9e803de5652ab66b2b8da4ebc2ac34
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 10
+- Digest: ebb8873e4c7aaba8
+
+### adversarial: needs-attention
+
+1. **P1, `scripts/capture-launcher-readme.ps1:677`: Display bounds become stale during admission.** The work area is read once before the idle wait, which can last 600 seconds. The post-position check at line 626 compares against that cached rectangle, so both checks can accept a window outside the current display.
+
+   **Reproduce:** Start `pwsh scripts/capture-launcher-readme.ps1 -Visible` on a 2560 × 1440 desktop while active. During its admission wait, change the display resolution to 1366 × 768 through Windows Settings, confirm it, then leave input idle for 120 seconds. Admission clears earlier input events and proceeds using the old bounds. A 1600 × 1000 window passes the cached containment check despite exceeding the actual display. The capture consumer performs no display-coverage check before `CopyFromScreen`, allowing incomplete screenshots to replace the previous set.
+
+   Refresh display bounds after admission and validate current coverage immediately before capture. This finding follows from source inspection; I did not change the display or run the capture driver.
+
+HIGHEST: P1
+OVERALL: needs-attention
+
+- Fixed: finding 1 (the display was read once, before a long admission wait). ecf69206: `Read-WorkArea` runs at the start, before each launch, after positioning, before the capture child starts and after it exits, and `-DrillShrinkAt launch|capture` shrinks the display at that point. Driven, each into a folder holding an earlier set: shrinking at launch printed `stood down during the launch of ...-details-dark: the display's work area is 1366 x 728, too small for a 1600 x 1000 window`, exit 3, earlier set unchanged, no process left; shrinking at capture printed `stood down during the capture of ...-details-dark: the display's work area is 1366 x 728 ...`, exit 3, unchanged; the same with the before-capture check removed printed `published 4 shots`, exit 0, set replaced. The README shots are restaked at ecf69206.
