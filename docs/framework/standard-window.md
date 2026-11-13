@@ -125,8 +125,9 @@ The menus' own keys are the popup menu's (`D01 T02 §8`); the choices here are t
 | Esc | Open submenu, open menu, menu bar | Closes one level: the submenu, then the menu, then leaves the bar for the control that was focused before. |
 | Esc | A message is open | The message's Cancel or Close (the message layer above). |
 | Esc | Nothing open | File, Minimize. Esc minimizes only when no menu or message is open, so closing a menu never minimizes the window. |
-| Ctrl+, | Anywhere | File, Preferences. |
-| Alt+F4 | Anywhere | File, Close. |
+| Ctrl+, | The main window active | File, Preferences. |
+| Alt+F4 | The main window active | File, Close. |
+| Alt+F4 | A message or another framework dialog active | That dialog's caption close, which is its Esc: Cancel, or Close where there is no Cancel. It never closes the tool from inside a dialog. |
 | F1 | Anywhere | Reserved for `D06 T01 §18`; nothing until it ships. |
 | Tab, Shift+Tab | Window | The content region first, then the status bar segments that act, then back; the heading icon is in the order as "About <display name>". |
 | Enter, Space | Heading icon focused | Opens About. |
@@ -152,14 +153,15 @@ The shared `StatusBar`, three segments, all written by the framework. A tool set
 | Task | Empty | Nothing; the segment collapses to no width | No task runs | A task starts |
 | Task | Running, determinate | The task's name (the caller's key) and the progress bar at its fraction | The task reports a total | It finishes, fails or is cancelled |
 | Task | Running, indeterminate | The task's name and the moving progress bar | The task starts without a total | It reports a total, finishes, fails or is cancelled |
-| Task | Done | Clears at once; the state segment shows the task's result line ("Update check finished: you have the latest version.") | The task succeeds | Immediately |
-| Task | Partly done | Clears; the state segment shows the result with what did not complete ("3 of 4 items repaired; see the log.") | The task ends with some work undone | Immediately |
-| Task | Cancelled | Clears; the state segment shows "Cancelled" with the task's name (`Status_Cancelled`, new) | The user cancels | Immediately |
-| Task | Failed | Clears; the state segment shows the failure in one line, and a failure the user must act on also opens the message layer | The task fails | Immediately |
+| Task | Done | Moves on (to the next running task, or empty); the state segment shows the task's result line ("Update check finished: you have the latest version.") | The task succeeds | Immediately |
+| Task | Partly done | Moves on; the state segment shows the result with what did not complete ("3 of 4 items repaired; see the log.") | The task ends with some work undone | Immediately |
+| Task | Cancelled | Moves on; the state segment shows "Cancelled" with the task's name (`Status_Cancelled`, new) | The user cancels | Immediately |
+| Task | Failed | Moves on; the state segment shows the failure in one line, and a failure the user must act on also opens the message layer | The task fails | Immediately |
 | Elevation | Administrator or Standard user | As above | The window opens | Never; elevation does not change while a process runs |
 
+- **More than one task:** a tool's action and an update check can run together (Check for updates stays enabled while a tool's action runs). The task segment shows one of them: the one that started first and is still running. A task that starts while another is shown runs without the segment and is named in its tooltip ("Also running: Checking for updates"). When the shown task ends, the segment shows the next running task, oldest first, or empties when none runs. A task that ends while not shown never clears or changes the segment: its result line still goes to the state segment and its announcement is still raised.
 - **Announced:** a task's start, its result line and a change of elevation each raise a UI Automation notification; progress is not announced at every step, only at its end.
-- **Keyboard:** the state segment is focusable and opens the log surface with Enter; the task segment is focusable while a task runs and its Enter offers to cancel when the task can be cancelled (`Status_Cancel_Task`, new); the elevation segment is focusable for its tooltip and acts on nothing.
+- **Keyboard:** the state segment is focusable and opens the log surface with Enter; the task segment is focusable while a task runs and its Enter offers to cancel the task it is showing, by name, when that task can be cancelled (`Status_Cancel_Task`, new), never one it is not showing; the elevation segment is focusable for its tooltip and acts on nothing.
 - **What the shared control offers and this window does not use:** the clickable segments are used as above, through `SetSegmentCommand`; the notification icons (`AddNotifyIcon`: spinner, success, warning) are not used, because the task segment's progress bar and the result line already say the same thing, and two signals for one state disagree when one lags; the slide-in notice (`ShowNotification`) is not used, because a message that disappears on a timer can be missed, and anything worth saying belongs in the state segment or the message layer.
 
 ## What must the build prove, row by row?
@@ -178,7 +180,8 @@ Every row is one behavioural check in `D01 T01 §7`, named in the last column, d
 | Help, About | Click; Alt+H, A | Always | The About dialog for this tool's descriptor | None can occur: the descriptor is compiled into the tool; an About already open is brought forward | `window: about shows this tool's descriptor` |
 | Heading icon | Click; Enter or Space when focused | Always | The About dialog | As Help, About | `window: heading icon opens about` |
 | Status, state segment | Click; Enter when focused | Always | The log surface opens | No log yet: the surface's empty state (`D01 T03 §4`) | `window: status opens the log` |
-| Status, task segment | Enter when focused | Focusable only while a task runs | Offers to cancel a cancellable task | A task that cannot be cancelled says so in its tooltip | `window: task segment cancels` |
-| Message buttons | Click; Enter; Esc; caption close | Default per the rules above | The button's action; focus returns | The action's own failure is its notice's (`D01 T03 §5`, `§6`); if the opener is gone, focus goes to the content region | `window: message keys, default and focus return` |
+| Status, task segment | Enter when focused | Focusable only while a task runs | Offers to cancel the task it shows, by name | A task that cannot be cancelled says so in its tooltip | `window: task segment cancels` |
+| Status, task segment with two tasks | Start a tool's action, then Check for updates, and let the check end first | Shows the tool's action throughout | The check's result line reaches the state segment; the segment keeps showing the action and its progress, then empties when the action ends | The check's failure is its update dialog's; the action's display is untouched | `window: overlapping tasks keep the shown one` |
+| Message buttons | Click; Enter; Esc; caption close; Alt+F4 | Default per the rules above | The button's action; focus returns; Alt+F4 acts as the caption close and the tool stays open | The action's own failure is its notice's (`D01 T03 §5`, `§6`); if the opener is gone, focus goes to the content region | `window: message keys, default and focus return` |
 | Menu bar | Alt; F10; arrows; Esc | Always | Keyboard path as in the key table | None can occur: the menus are built from the framework's tables at startup | `window: keyboard reaches every item` |
 | Tools adding menu items | A tool's code | Never | Impossible: the framework's interface for tools has no menu call | A tool that tries does not compile | `window: the tool interface exposes no menu` |
