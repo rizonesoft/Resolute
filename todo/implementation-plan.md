@@ -222,7 +222,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [x] | `D01 T03 §5`  | Update dialog and announcement                |  17   |
 | [ ] | `D01 T01 §5`  | Update check and consolidation announcement   |  10   |
 | [ ] | `D01 T01 §9`  | Standalone proof in an empty folder           |   7   |
-| [ ] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown           |  11   |
+| [ ] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown           |  14   |
 | [ ] | `D01 T01 §6`  | Elevation and its refusal path                |   9   |
 | [ ] | `D01 T01 §10` | Crash Handling and Single Instance            |  12   |
 | [ ] | `D01 T01 §11` | Command Line and Exit Codes                   |  11   |
