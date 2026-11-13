@@ -12,7 +12,8 @@ commit with --expect-commit and refuses, before the next command, when they diff
 passed it reads CMakePresets.json in the clone and fails naming any configure preset the quick start left unbuilt.
 
 The session runs inside a job object this script owns (scripts/lib/win_job.py): everything it starts is ended
-before `run` returns, whether the session finished, failed or timed out.
+before `run` returns, whether the session finished, failed or timed out. It runs no command until it is in that
+job (it waits for a go file the runner writes after taking it), so nothing it starts is ever outside the job.
 
 `facts` works out two things from the tree and fails by name when either stops being true: that no `.env` file
 applies to this repository, and what the first run takes from outside the clone.
@@ -80,8 +81,11 @@ def _quoted(text: str) -> str:
 def session_script(commands: list[str], expect: str, state: Path, after_clone: str = "") -> str:
     """The PowerShell the session runs: each command as written, a stop at the first that fails, and one check of
     the clone's commit the first time the session stands in a work tree."""
+    # The session starts nothing until the runner owns it: it waits here for the go file, which the runner writes
+    # only once the session is in its job object. Whatever it starts after that is born inside the job.
     out = ["$ErrorActionPreference = 'Continue'", "$quickstartConfirmed = $false", f"$quickstartExpect = {_quoted(expect)}",
-           f"$quickstartState = {_quoted(str(state))}"]
+           f"$quickstartState = {_quoted(str(state))}",
+           "while (-not (Test-Path -LiteralPath ($quickstartState + '.go'))) { Start-Sleep -Milliseconds 50 }"]
     for number, command in enumerate(commands, start=1):
         out += [
             f"Set-Content -LiteralPath $quickstartState -Value @('command', '{number}')",
@@ -119,7 +123,7 @@ def unbuilt_presets(clone: Path) -> list[str]:
 # ----- the run -----------------------------------------------------------------------------------------------------
 
 def run(readme: Path, work: Path, expect: str = "", timeout: float = DEFAULT_TIMEOUT, after_clone: str = "",
-        check_lanes: bool = True, say=print) -> int:
+        check_lanes: bool = True, say=print, before_owned=None, take=None) -> int:
     import win_job
 
     try:
@@ -141,7 +145,16 @@ def run(readme: Path, work: Path, expect: str = "", timeout: float = DEFAULT_TIM
     stuck = False
     try:
         child = subprocess.Popen([pwsh, "-NoLogo", "-NoProfile", "-NonInteractive", "-File", str(script)], cwd=work, creationflags=NO_WINDOW)
-        job.take(child)
+        if before_owned:
+            before_owned()   # the self-test's pause between starting the session and owning it
+        try:
+            (take or job.take)(child)
+        except BaseException:
+            child.kill()     # never owned, and still waiting for its go file: it has started nothing
+            child.wait(10)
+            shutil.rmtree(control, ignore_errors=True)
+            raise
+        Path(str(state) + ".go").write_text("go", encoding="utf-8")
         try:
             code = child.wait(timeout)
         except subprocess.TimeoutExpired:
@@ -361,7 +374,21 @@ def self_test() -> int:
         code = attempt("slow", (stray, "Start-Sleep 300"), timeout=6.0)
         check("a quick start that does not finish is refused at its timeout", code == EXIT_TIMEOUT and any("did not finish" in line for line in said), f"{code} {said}")
         check("a process it left running is ended at the timeout", _gone(child_of("slow")))
-        check("the three runs were bounded to seconds", time.monotonic() - started < 90, f"{time.monotonic() - started:.0f}s")
+        # Ownership comes first: a session that is slow to be put in the job has started nothing by then.
+        code = attempt("gap", (stray, "Set-Content ran.txt done"), before_owned=lambda: time.sleep(4))
+        check("a session held up before it is owned starts nothing outside the job", code == 0 and _gone(child_of("gap")), f"{code} {said}")
+
+        def refuses(child) -> None:
+            raise OSError("the job would not take the session")
+
+        try:
+            attempt("untaken", (stray, "Start-Sleep 300"), take=refuses)
+            untaken = "no refusal"
+        except OSError as error:
+            untaken = str(error)
+        check("a session the job will not take is ended, with what it started, and the refusal kept",
+              untaken == "the job would not take the session" and not (root / "untaken" / "child.pid").exists(), untaken)
+        check("the three runs were bounded to seconds", time.monotonic() - started < 120, f"{time.monotonic() - started:.0f}s")
         check("a folder that is not empty is refused", "must be an existing empty folder" in refusal(lambda: run(root / "finish.md", root / "finish", say=said.append)))
 
         # Two commits that carry the same quick start: the clone has to be the expected one, not only read the same.
