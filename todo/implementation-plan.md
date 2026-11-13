@@ -209,8 +209,8 @@ The framework every tool consumes, the repair contract the destructive half cons
 
 |  ✔  | Section       | Deliverable                                   | Items |
 | :-: | ------------- | --------------------------------------------- | :---: |
-| [ ] | `D01 T01 §1`  | Application shell and lifecycle               |  11   |
-| [ ] | `D01 T01 §2`  | Settings: one writer, one path                |  11   |
+| [ ] | `D01 T01 §1`  | Application shell and lifecycle               |   9   |
+| [ ] | `D01 T01 §2`  | Settings: one writer, one path                |  12   |
 | [ ] | `D01 T01 §4`  | Localization and the pack loader              |  11   |
 | [x] | `D01 T03 §1`  | Standard window, menus, message layer         |  23   |
 | [x] | `D01 T03 §2`  | Preferences shell, general, performance       |  27   |
@@ -224,7 +224,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T01 §9`  | Standalone proof in an empty folder           |   7   |
 | [x] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown           |  14   |
 | [ ] | `D01 T01 §6`  | Elevation and its refusal path                |   9   |
-| [ ] | `D01 T01 §10` | Crash Handling and Single Instance            |  12   |
+| [ ] | `D01 T01 §10` | Crash Handling and Single Instance            |  13   |
 | [ ] | `D01 T01 §11` | Command Line and Exit Codes                   |  11   |
 | [ ] | `D02 T01 §1`  | The repair item and the run loop              |   7   |
 | [ ] | `D02 T01 §2`  | Diagnose before repair                        |  10   |
