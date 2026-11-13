@@ -742,7 +742,7 @@ function Invoke-SelfTest {
         $ready = Get-RunRefusals $good @({ @() }, { $null })
         $held = Get-RunRefusals $good @({ @() }, { 'the task can be changed by another principal: S-1-5-11' })
         Check 'a run is refused on any reason the shared list gives, and only then' ($ready.Count -eq 0 -and $held.Count -eq 1 -and $held[0] -match 'another principal')
-        $runSource = (Get-Command Invoke-Run).ScriptBlock.ToString()
+        $runSource = (Get-Command Invoke-RunUnderLock).ScriptBlock.ToString()  # the launch path, which Invoke-Run calls under the lock
         $checkSource = (Get-Command Invoke-Check).ScriptBlock.ToString()
         Check 'the launch path and the readiness answer both read the shared list' ($runSource.Contains('Get-RunRefusals') -and $checkSource.Contains('Get-RunRefusals'))
         $defaults = (Get-Command Get-RunRefusals).ScriptBlock.ToString()
@@ -785,7 +785,7 @@ function Invoke-SelfTest {
         # The same function registers, fails where it is told to, and rolls back; nothing here is a stand-in for it.
         $saved = @{ TaskPath = $TaskPath; TaskName = $TaskName; HashDir = $HashDir; HashFile = $HashFile; SnapshotDir = $SnapshotDir
                     PythonDir = $PythonDir; EnvFile = $EnvFile; RegisterLog = $RegisterLog; JournalFile = $JournalFile; Registration = $script:Registration
-                    FailAfterStep = $script:FailAfterStep; AbandonAfterStep = $script:AbandonAfterStep; RegistrationLockName = $script:RegistrationLockName }
+                    FailAfterStep = $script:FailAfterStep; AbandonAfterStep = $script:AbandonAfterStep; RegistrationLockName = $script:RegistrationLockName; RunProbe = $script:RunProbe }
         $box = Join-Path $td 'registration'
         $source = Join-Path $td 'runtime-source'
         New-Item -ItemType Directory -Path $source | Out-Null
@@ -958,6 +958,77 @@ function Invoke-SelfTest {
             }
             Check 'a registration started while another holds the lock is refused before it touches anything' (
                 $journalBefore -eq $null -and (Compare-RegistrationState $registered (Get-RegistrationState)).Count -eq 0)
+            # The same lock keeps a run out while a registration holds it, and a run is refused before it starts anything.
+            $holder = [powershell]::Create()
+            $ready = New-Object Threading.ManualResetEventSlim($false)
+            $release = New-Object Threading.ManualResetEventSlim($false)
+            $null = $holder.AddScript({
+                param($name, $ready, $release)
+                $m = New-Object Threading.Mutex($false, $name)
+                $null = $m.WaitOne()
+                $ready.Set()
+                $null = $release.Wait(30000)
+                $m.ReleaseMutex(); $m.Dispose()
+            }).AddArgument($script:RegistrationLockName).AddArgument($ready).AddArgument($release)
+            $running = $holder.BeginInvoke()
+            try {
+                $null = $ready.Wait(10000)
+                $lastRun = (Get-ScheduledTaskInfo -TaskPath $script:TaskPath -TaskName $script:TaskName).LastRunTime
+                $runSaid = (Invoke-Run 6>&1 | Out-String)
+                $notStarted = (Get-ScheduledTaskInfo -TaskPath $script:TaskPath -TaskName $script:TaskName).LastRunTime -eq $lastRun
+            } finally {
+                $release.Set()
+                $null = $holder.EndInvoke($running)
+                $holder.Dispose()
+            }
+            Check 'a run started while a registration holds the lock is refused, naming it, and starts nothing' (
+                $runSaid -match 'a registration of the elevated smoke task is running' -and $notStarted)
+            # Inside an admitted run the lock is held; when the run has returned it is free again.
+            $seen = @{}
+            $peek = {
+                param($name)
+                $m = New-Object Threading.Mutex($false, $name)
+                try { $got = $m.WaitOne(0) } catch [Threading.AbandonedMutexException] { $got = $true }
+                if ($got) { $m.ReleaseMutex() }
+                $m.Dispose()
+                return $got
+            }
+            function Test-LockFree([string]$Name) {
+                $other = [powershell]::Create()
+                try { return [bool]($other.AddScript($peek).AddArgument($Name).Invoke() | Select-Object -Last 1) } finally { $other.Dispose() }
+            }
+            $script:RunProbe = { $seen.Inside = Test-LockFree $script:RegistrationLockName }
+            try { $null = Invoke-Run 6>$null } finally { $script:RunProbe = $null }
+            $seen.After = Test-LockFree $script:RegistrationLockName
+            Check 'inside an admitted run the lock is held, and when the run has returned it is free' ($seen.Inside -eq $false -and $seen.After -eq $true)
+
+            # -Remove takes the same lock: with it held elsewhere it refuses and leaves the task in place.
+            $holder = [powershell]::Create()
+            $ready = New-Object Threading.ManualResetEventSlim($false)
+            $release = New-Object Threading.ManualResetEventSlim($false)
+            $null = $holder.AddScript({
+                param($name, $ready, $release)
+                $m = New-Object Threading.Mutex($false, $name)
+                $null = $m.WaitOne()
+                $ready.Set()
+                $null = $release.Wait(30000)
+                $m.ReleaseMutex(); $m.Dispose()
+            }).AddArgument($script:RegistrationLockName).AddArgument($ready).AddArgument($release)
+            $running = $holder.BeginInvoke()
+            try {
+                $null = $ready.Wait(10000)
+                $removeSaid = (Invoke-Remove 6>&1 | Out-String)
+                $stillThere = [bool](Get-TaskOrNull)
+            } finally {
+                $release.Set()
+                $null = $holder.EndInvoke($running)
+                $holder.Dispose()
+            }
+            Check '-Remove with the lock held elsewhere refuses by name and leaves the task in place' (
+                $removeSaid -match 'a registration or a run of the elevated smoke task is under way' -and $stillThere)
+
+            Check 'a lock this process may not open counts as held' (
+                $null -eq (Enter-RegistrationLock $script:RegistrationLockName { param($n) throw [UnauthorizedAccessException]::new('Access to the path is denied.') }))
             $orphan = [powershell]::Create()
             $null = $orphan.AddScript({ param($name) $m = New-Object Threading.Mutex($false, $name); $null = $m.WaitOne() }).AddArgument($script:RegistrationLockName)
             $null = $orphan.Invoke()
@@ -1125,10 +1196,19 @@ function Invoke-ElevatedRegistration {
     }
 }
 
-function Enter-RegistrationLock([string]$Name) {
+function Enter-RegistrationLock([string]$Name, [scriptblock]$Open = { param($n) New-Object Threading.Mutex($false, $n) }) {
     # The lock, taken at once or not at all. A mutex whose holder died is
-    # taken too: that is the abandoned registration a journal records.
-    $mutex = New-Object Threading.Mutex($false, $Name)
+    # taken too: that is the abandoned registration a journal records. One
+    # this process may not even open is held by an elevated registration
+    # (a named mutex exists only while something holds it), so it is busy.
+    try {
+        $mutex = & $Open $Name
+    } catch [UnauthorizedAccessException] {
+        return $null
+    } catch {
+        if ($_.Exception.InnerException -is [UnauthorizedAccessException]) { return $null }
+        throw
+    }
     try {
         if ($mutex.WaitOne(0)) { return $mutex }
     } catch [Threading.AbandonedMutexException] {
@@ -1452,6 +1532,21 @@ function Invoke-Check {
 }
 
 function Invoke-Run {
+    # The whole run, from its readiness check to its end, under the lock a
+    # registration takes: neither can begin while the other is under way.
+    $lock = Enter-RegistrationLock $script:RegistrationLockName
+    if (-not $lock) { Write-Host 'refused: a registration of the elevated smoke task is running; run again when it has finished'; return 2 }
+    try {
+        return (Invoke-RunUnderLock)
+    } finally {
+        $lock.ReleaseMutex()
+        $lock.Dispose()
+    }
+}
+
+function Invoke-RunUnderLock {
+    # The self-test's look at the lock from inside a run; nothing else sets it.
+    if ($script:RunProbe) { & $script:RunProbe }
     $task = Get-TaskOrNull
     $refusals = Get-RunRefusals $task
     if ($refusals) { Write-Host ("refused: " + ($refusals -join '; ')); return 2 }
@@ -1532,6 +1627,19 @@ function Invoke-Run {
 }
 
 function Invoke-Remove {
+    # Under the same lock: a removal between a registration's readiness check
+    # and its commit would leave that registration reporting a task that is gone.
+    $lock = Enter-RegistrationLock $script:RegistrationLockName
+    if (-not $lock) { Write-Host 'refused: a registration or a run of the elevated smoke task is under way; remove it when that has finished'; return 2 }
+    try {
+        return (Invoke-RemoveUnderLock)
+    } finally {
+        $lock.ReleaseMutex()
+        $lock.Dispose()
+    }
+}
+
+function Invoke-RemoveUnderLock {
     $task = $null
     try {
         $task = Get-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -ErrorAction Stop
