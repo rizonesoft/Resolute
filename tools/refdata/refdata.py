@@ -688,18 +688,21 @@ def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, 
     with tempfile.TemporaryDirectory(prefix="refdata-upgrade-") as tmp:
         dump = Path(tmp) / "upgrade.sql"
         with contextlib.redirect_stdout(io.StringIO()):
-            cmd_backup(s, str(dump))
-            if before_restore:
-                before_restore()
             try:
+                cmd_backup(s, str(dump))
+                if before_restore:
+                    before_restore()
                 cmd_restore(new, str(dump), schema, restricted_override, before_cleanup)
             except RestoreLeftovers as refusal:
                 # Only a restore that says it loaded its own copy leaves one behind, never compared; any other refusal
                 # (a name another author took meanwhile among them) names no database of this upgrade's to drop.
                 if not refusal.loaded:
-                    raise
+                    raise Refused(f"{refusal}; {keep_old}") from None
                 raise Refused(f"{refusal}; the upgrade stopped before comparing, so '{to}' is loaded but unverified: do not use it. "
                               f"{keep_old}, and drop the copy with: DROP DATABASE IF EXISTS `{to}`;") from None
+            except Refused as refusal:
+                # The copy began and failed: its own refusal says what was left, and the next step is the same.
+                raise Refused(f"{refusal}; {keep_old}") from None
 
     def rolled_back(reason: str) -> Refused:
         # The reason first, then what became of the copy, as far as it is known.
@@ -1274,7 +1277,7 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
         except Refused as refusal:
             raced_said = str(refusal)
         checks.check("an upgrade whose new name another author took meanwhile is refused without advising a drop, that database left alone",
-                     raced_said is not None and "already exists" in raced_said and "DROP DATABASE" not in raced_said
+                     raced_said is not None and "already exists" in raced_said and "DROP DATABASE" not in raced_said and f"refdata.py upgrade --database {old.database} --to" in raced_said
                      and Session(options, taken).exists(), repr(raced_said))
         run_sql(f"DROP DATABASE IF EXISTS `{taken}`;", options=options)
 
@@ -1357,7 +1360,8 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
         checks.check("a restore and an upgrade whose restricted connection is given a CA that did not sign the server's certificate are refused "
                      "naming that connection, no database or restore user left and the source unchanged",
                      said_restore is not None and "restore user's connection" in said_restore and said_upgrade is not None
-                     and "restore user's connection" in said_upgrade and not Session(options, tls_refused).exists()
+                     and "restore user's connection" in said_upgrade and f"refdata.py upgrade --database {old.database} --to" in said_upgrade
+                     and not Session(options, tls_refused).exists()
                      and not Session(options, tls_refused_up).exists() and users == "0"
                      and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state,
                      f"restore said {said_restore!r}; upgrade said {said_upgrade!r}; restore users left {users}")
