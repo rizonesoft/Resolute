@@ -219,7 +219,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T01 §8`  | DPI awareness and system theme                |   7   |
 | [x] | `D01 T03 §4`  | Per-tool log surface                          |  15   |
 | [ ] | `D01 T01 §3`  | Logging and the log surface                   |   9   |
-| [ ] | `D01 T03 §5`  | Update dialog and announcement                |  13   |
+| [ ] | `D01 T03 §5`  | Update dialog and announcement                |  14   |
 | [ ] | `D01 T01 §5`  | Update check and consolidation announcement   |  10   |
 | [ ] | `D01 T01 §9`  | Standalone proof in an empty folder           |   7   |
 | [ ] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown           |   6   |
@@ -367,7 +367,7 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | [ ] | `D06 T01 §11` | Tag-Derived Version Scheme Record              |   5   |
 | [ ] | `D06 T01 §10` | Identity Registry and Version Agreement        |  10   |
 | [ ] | `D06 T01 §17` | About Dialog, From the Registry                |   8   |
-| [ ] | `D06 T01 §5`  | Update Files and Consolidation Announcements   |   8   |
+| [ ] | `D06 T01 §5`  | Update Files and Consolidation Announcements   |   9   |
 | [ ] | `D06 T01 §7`  | Focused Builds From One Codebase               |   7   |
 | [ ] | `D06 T01 §12` | Versioner Wiring and String Migration          |   4   |
 | [ ] | `D06 T01 §13` | Stamped-Surface Agreement Test                 |   5   |
