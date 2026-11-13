@@ -213,7 +213,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T01 §2`  | Settings: one writer, one path               |  11   |
 | [ ] | `D01 T01 §4`  | Localization and the pack loader             |   8   |
 | [x] | `D01 T03 §1`  | Standard window, menus, message layer        |  23   |
-| [ ] | `D01 T03 §2`  | Preferences shell, general, performance      |   7   |
+| [ ] | `D01 T03 §2`  | Preferences shell, general, performance      |  13   |
 | [ ] | `D01 T03 §3`  | Language page and tool-page contract         |   5   |
 | [ ] | `D01 T01 §7`  | Standard window, About, and preferences      |  12   |
 | [ ] | `D01 T01 §8`  | DPI awareness and system theme               |   7   |
