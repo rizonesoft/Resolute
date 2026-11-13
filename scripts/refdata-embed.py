@@ -300,15 +300,25 @@ def self_test() -> int:
             except OSError as error:
                 return f"UNHANDLED {type(error).__name__}: {error}"
 
+        def reason(action) -> str:
+            # The reason Windows gives for the same operation made directly: what a refusal has to carry.
+            try:
+                action()
+            except OSError as error:
+                return str(error.strerror or error)
+            return "the operation did not fail"
+
         (root / "afile").write_bytes(b"a file where a folder is needed")
+        why = reason(lambda: (root / "afile" / "out").mkdir(parents=True))
         said = outcome(lambda: cmd_pack(root / "sample.refdata", root / "afile" / "out" / "sample.rdz"))
         check("a destination folder that cannot be created is refused by name",
-              "UNHANDLED" not in said and "could not be created" in said and "nothing was embedded" in said, said)
+              "UNHANDLED" not in said and f"could not be created ({why})" in said and "nothing was embedded" in said, said)
         partial = target.with_name(target.name + ".partial")
         partial.mkdir()   # the staging path is taken by a folder: the write fails, and so does removing it as a file
+        why = reason(lambda: partial.write_bytes(b""))
         said = outcome(lambda: cmd_pack(root / "sample.refdata", target))
         check("a staging file that cannot be written or removed is refused with the first reason kept and the staging path named",
-              "UNHANDLED" not in said and "could not be written" in said and "could not be removed" in said and str(partial) in said
+              "UNHANDLED" not in said and f"could not be written ({why})" in said and "could not be removed" in said and str(partial) in said
               and target.read_bytes() == earlier, said)
         partial.rmdir()
         kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -318,11 +328,13 @@ def self_test() -> int:
         held = kernel32.CreateFileW(str(target), 0x80000000, 1, None, 3, 0x80, None)   # readable; it cannot be replaced while held
         try:
             (root / "sample.refdata").write_bytes(fmt.emit(fmt.Export("sample", 5, fmt.digest_of("sample", 5, entries), entries)))
+            (root / "other").write_bytes(b"another file")
+            why = reason(lambda: os.replace(root / "other", target))
             said = outcome(lambda: cmd_pack(root / "sample.refdata", target))
         finally:
             kernel32.CloseHandle(held)
         check("a packed file that cannot be replaced is refused by name, left as it was, with no staging file behind",
-              "UNHANDLED" not in said and "could not be replaced" in said and "is as it was" in said
+              "UNHANDLED" not in said and f"could not be replaced ({why})" in said and "is as it was" in said
               and target.read_bytes() == earlier and not partial.exists(), said)
         said = outcome(lambda: cmd_pack(root / "sample.refdata", target))
         check("the pack completes once nothing is in its way", said == "no refusal" and target.read_bytes() != earlier, said)
