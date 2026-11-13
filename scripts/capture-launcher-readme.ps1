@@ -151,7 +151,8 @@ public class Idle {
 }
 public class Touch {
     [StructLayout(LayoutKind.Sequential)] public struct MOUSEINPUT { public int dx; public int dy; public uint mouseData; public uint dwFlags; public uint time; public IntPtr extra; }
-    [StructLayout(LayoutKind.Sequential)] public struct INPUT { public uint type; public MOUSEINPUT mi; public long pad; }
+    // type, then the union, whose widest member is MOUSEINPUT: 40 bytes on x64, the size SendInput checks.
+    [StructLayout(LayoutKind.Sequential)] public struct INPUT { public uint type; public MOUSEINPUT mi; }
     [DllImport("user32.dll", SetLastError = true)] public static extern uint SendInput(uint n, INPUT[] inputs, int size);
     // One-pixel move and back: the cursor ends where it was, and the
     // last-input tick moves exactly as an operator's touch moves it.
@@ -275,7 +276,13 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
         $describes = "the launcher $State view, $Mode, at 1600 px wide: visual proof for the README (D00 T05 section 1)"
         $fixture = "launcher built from a clean checkout (Bin/Release/Resolute.exe); host $HostName; appearance $Mode set by $Presses theme-command press(es) from System; view set by WM_COMMAND $ViewCmd"
         $context = Get-ReproductionCommand $DriverPath $Exe $CaptureScript $OutDir $Date
-        $cap = Start-Process pwsh -ArgumentList @('-NoProfile', '-File', $CaptureScript, '-ProcessId', $proc.Id, '-Appearance', $Mode, '-Out', $out, '-Describes', $describes, '-Fixture', $fixture, '-LaunchContext', $context, '-FixtureFiles', 'none beside Bin/Release (launcher only build)') -PassThru -NoNewWindow
+        # Each argument handed over as one argument, whatever spaces it holds:
+        # Start-Process joins an argument list with spaces and splits a path
+        # like "replay dir with spaces" into words.
+        $info = [System.Diagnostics.ProcessStartInfo]::new((Get-Process -Id $PID).Path)
+        foreach ($a in @('-NoProfile', '-File', $CaptureScript, '-ProcessId', "$($proc.Id)", '-Appearance', $Mode, '-Out', $out, '-Describes', $describes, '-Fixture', $fixture, '-LaunchContext', $context, '-FixtureFiles', 'none beside Bin/Release (launcher only build)')) { $info.ArgumentList.Add($a) }
+        $info.UseShellExecute = $false
+        $cap = [System.Diagnostics.Process]::Start($info)
         Invoke-Drill 'capture'
         $deadline = [DateTime]::UtcNow.AddSeconds($CaptureTimeoutSeconds)
         while (-not $cap.WaitForExit(200)) {
