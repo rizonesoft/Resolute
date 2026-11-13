@@ -181,7 +181,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T02 §12` | Port-vs-port visual comparison                    |   8   |
 | [x] | `D00 T02 §13` | Capture pairs are replaced atomically             |   4   |
 | [ ] | `D00 T02 §14` | A capture refuses a covered window                |   7   |
-| [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance              |  15   |
+| [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance              |  16   |
 | [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files               |  18   |
 | [ ] | `D00 T05 §3`  | Setup-Path CI Plus Reproducibility                |   5   |
 | [ ] | `D00 T05 §4`  | Sidecar Reproduction Command Carries -Visible     |   3   |
