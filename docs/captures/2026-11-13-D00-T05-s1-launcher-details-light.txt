@@ -1,7 +1,8 @@
 capture       : 2026-11-13-D00-T05-s1-launcher-details-light.png
+image sha256  : 79B86C056D9D89F3682524192758435A125CFD22A1F3FB9A4546FFEFC8A399A4
 describes     : the launcher details view, light, at 1600 px wide: visual proof for the README (D00 T05 section 1)
 window title  : Resolute
-target process: 46004 D:\Resolute\Bin\Release\Resolute.exe
+target process: 40984 D:\Resolute\Bin\Release\Resolute.exe
 attached      : attached to a process the caller started and owns
 source binary : D:\Resolute\Bin\Release\Resolute.exe
 file version  : 0.1.0.0
@@ -18,7 +19,7 @@ working dir   : (default)
 locale        : en-ZA / UI en-US
 geometry      : 49,40 1582x991
 exe sha256    : 946A36572CFE36FD2E8013412522453159133B099920A3B2636149361668E4E2
-source revision: ecf692064c67576404c095bd7e84cd5e9b10a235
+source revision: 14cfde5c9f5b82fc3be5a6870f5a5ba7a0c55185
 windows build : 10.0.26300.0
 captured      : 2026-11-13
 

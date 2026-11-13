@@ -1,7 +1,8 @@
 capture       : 2026-11-13-D00-T05-s1-launcher-large-icons-light.png
+image sha256  : 19EBF82E27A1E86ABF06392A5C1C8869DC249BC5A606F41ECD8A6CB94E0011D4
 describes     : the launcher large-icons view, light, at 1600 px wide: visual proof for the README (D00 T05 section 1)
 window title  : Resolute
-target process: 48148 D:\Resolute\Bin\Release\Resolute.exe
+target process: 52240 D:\Resolute\Bin\Release\Resolute.exe
 attached      : attached to a process the caller started and owns
 source binary : D:\Resolute\Bin\Release\Resolute.exe
 file version  : 0.1.0.0
@@ -18,7 +19,7 @@ working dir   : (default)
 locale        : en-ZA / UI en-US
 geometry      : 49,40 1582x991
 exe sha256    : 946A36572CFE36FD2E8013412522453159133B099920A3B2636149361668E4E2
-source revision: ecf692064c67576404c095bd7e84cd5e9b10a235
+source revision: 14cfde5c9f5b82fc3be5a6870f5a5ba7a0c55185
 windows build : 10.0.26300.0
 captured      : 2026-11-13
 
