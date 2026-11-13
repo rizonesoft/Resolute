@@ -179,7 +179,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T02 §10` | Focus-free UI suite conversion                    |  11   |
 | [x] | `D00 T02 §11` | Nightly full-suite regression run                 |   9   |
 | [x] | `D00 T02 §12` | Port-vs-port visual comparison                    |   8   |
-| [ ] | `D00 T02 §13` | Capture pairs are replaced atomically             |   2   |
+| [ ] | `D00 T02 §13` | Capture pairs are replaced atomically             |   4   |
 | [ ] | `D00 T02 §14` | A capture refuses a covered window                |   2   |
 | [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance              |  15   |
 | [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files               |  18   |

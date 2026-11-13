@@ -286,6 +286,19 @@ def status(name: str, wait: float, gh=run_gh, paths=None, filtered=None, say=pri
             return expired()
 
 
+def make_say(stream):
+    """A writer for what this script says, in the stream's own encoding: a character the stream cannot hold (a
+    byte-order mark in a failed log's tail, on a console in cp1252) is replaced rather than ending the run, which
+    otherwise turned a red CI into "could not be read"."""
+    encoding = getattr(stream, "encoding", None) or "utf-8"
+
+    def say(text: str) -> None:
+        stream.write(str(text).encode(encoding, errors="replace").decode(encoding) + "\n")
+        stream.flush()
+
+    return say
+
+
 def answer(name: str, wait: float, say=print, **readers) -> int:
     """status(), with the one promise its exit code makes kept: 1 means a red run and nothing else.
 
@@ -556,6 +569,26 @@ def self_test() -> int:
 
     for failure in failures:
         print("FAIL " + failure)
+    class Strict:
+        """A console that holds cp1252 and nothing else, as Windows' default console does."""
+        encoding = "cp1252"
+
+        def __init__(self) -> None:
+            self.text = ""
+
+        def write(self, text: str) -> None:
+            text.encode("cp1252")
+            self.text += text
+
+        def flush(self) -> None:
+            pass
+
+    console = Strict()
+    try:
+        make_say(console)("\ufeff2026-11-13T04:32:47Z ##[error]Process completed with exit code 1.")
+        check("a failed log's byte-order mark is written to a cp1252 console, replaced", console.text.startswith("?2026-11-13"), True)
+    except UnicodeEncodeError as e:
+        check("a failed log's byte-order mark is written to a cp1252 console, replaced", f"raised {e}", True)
     print(f"{cases} cases, {len(failures)} failed")
     return 1 if failures else 0
 
@@ -568,7 +601,7 @@ def main() -> int:
     args = parser.parse_args()
     if args.self_test:
         return self_test()
-    return answer(args.commit, args.wait)
+    return answer(args.commit, args.wait, say=make_say(sys.stdout))
 
 
 if __name__ == "__main__":
