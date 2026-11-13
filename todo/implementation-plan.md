@@ -159,7 +159,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D07 T01 §7`  | Unattended elevated smoke via scheduled task      |  32   |
 | [x] | `D07 T01 §8`  | Smoke forwarding-test assertion                   |   2   |
 | [x] | `D07 T01 §9`  | Smoke fixture release in finally                  |   2   |
-| [ ] | `D07 T01 §10` | Elevated smoke ends with the run that started it  |   7   |
+| [ ] | `D07 T01 §10` | Elevated smoke ends with the run that started it  |   8   |
 | [ ] | `D07 T01 §11` | An interrupted registration is recovered          |   5   |
 | [x] | `D09 T01 §1`  | Make the AutoIt suite buildable again             |   6   |
 | [x] | `D09 T01 §2`  | Clear the housekeeping defects                    |   5   |
