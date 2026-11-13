@@ -509,12 +509,31 @@ def self_test() -> int:
 
     # Local git is inside the same rules: a failed read is exit 3 and never an empty answer, and a slow one
     # spends the wait like any other read.
-    def cannot_list(commit, base, timeout):
-        raise CannotAsk("git could not list what c0ffee changed (fatal: bad object)")
+    # Through changed_paths() itself, with only git replaced: what it asks git for, what it makes of a failure,
+    # and what it makes of an answer (D00 T01 section 11).
+    asked_git: list = []
+    real_git = globals()["run_git"]
 
-    said_lines = []
-    code = named("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), filtered=filtered, say=said_lines.append, changed=cannot_list)
-    check("a failed listing of the commit's paths is exit 3, never green", (code, "git could not list" in " ".join(said_lines)), (3, True))
+    def git_says(returncode, stdout="", stderr=""):
+        def fake(args, timeout):
+            asked_git.append(args)
+            return subprocess.CompletedProcess(args, returncode, stdout, stderr)
+        return fake
+
+    try:
+        globals()["run_git"] = git_says(128, stderr="fatal: bad object ba5e\n")
+        said_lines = []
+        code = named("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), filtered=filtered, say=said_lines.append)
+        check("a failed listing of the push's paths is exit 3, never green",
+              (code, "git could not list what the push ba5e..c0ffee changed (fatal: bad object ba5e)" in " ".join(said_lines)), (3, True))
+        del asked_git[:]
+        globals()["run_git"] = git_says(0, stdout="src/a.cpp\nscripts/x.py\n")
+        said_lines = []
+        code = named("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), filtered=filtered, say=said_lines.append)
+        check("the push's paths are listed base to head, and a path under the filter owes plan-gates",
+              (code, asked_git, "plan-gates: no run yet" in " ".join(said_lines)), (2, [["diff", "--name-only", "ba5e", "c0ffee"]], True))
+    finally:
+        globals()["run_git"] = real_git
     code = status("nope", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["src/a.cpp"], filtered=filtered, say=said_lines.append,
                   resolve=lambda name, timeout: (_ for _ in ()).throw(CannotAsk(f"{name} is not a commit here")))
     check("a name that is not a commit is exit 3", (code, "nope is not a commit here" in " ".join(said_lines)), (3, True))
