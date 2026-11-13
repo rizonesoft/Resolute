@@ -22,6 +22,7 @@ The AutoIt window is built by `_StartCoreGui` (`resolute_au3/SDK/Concrete/ReBar/
 | Update animation over the icon | `ReBar.au3:569-571` | Cut from the heading. A running update check shows in the status bar's task slot. |
 | Name and version label, 12 pt | `ReBar.au3:573-574` | The heading block's title line. |
 | Subheading, `Label_Status_Welcome` formatted, rewritten with status during an update check | `ReBar.au3:575-577`, `:905`, `:914` | The heading block's subheading, which is the tool's purpose and never a status. Status goes to the status bar. |
+| Open log file, which handed the log to its associated program (`_Logging_OpenFile`) | `SDK/Includes/Logging.au3:265-275`, `:269` | Kept in two places: File, Open log file opens the log in the tool's own log surface, and that surface's "Open in default app" (`D01 T03 §4`) hands the file to its associated program as the AutoIt item did. |
 | Status list, a 125 px report list view docked at the bottom, written by `_Logging_EditWrite` | `ReBar.au3:579-594`, `SDK/Includes/Logging.au3:76-104` | The per-tool log surface, `D01 T03 §4`. The status bar shows its latest line. |
 | Donate icon and label | `ReBar.au3:596-599` | Not in the window. The verdict on Donate is `D01 T03 §7`'s. |
 | `HotKeySet("{ESC}", "_MinimizeProgram")` | `ReBar.au3:506` | File, Minimize, with Esc as its accelerator. |
@@ -34,13 +35,14 @@ From top to bottom, five regions. Only the content region is the tool's.
 
 | Region | Contents | Height | Resize |
 | --- | --- | --- | --- |
-| Caption | The tool's application icon (16 px), the title (the descriptor's display name), and minimize, maximize and close, drawn with Direct2D in the theme (`DESIGN.md` §8; built by `D01 T02 §4`). The rest of the bar is the drag region. | 32 | Fixed height. The title truncates with an ellipsis and carries a tooltip with the full title when it does. |
-| Menu bar | File and Help, text buttons left-aligned at `SpacingSM` from the edge. | 32 | Fixed height. Never wraps: two short labels always fit at the minimum width. |
-| Heading block | The tool icon (48 px) at `SpacingLG` from the left and top; beside it, at `SpacingMD` from the icon, the title line (Title, 20 px, SemiBold): the descriptor's display name and its version; under it the subheading (Body, 13 px, secondary text colour). | 80 | Fixed height. The title line truncates with an ellipsis and a tooltip. The subheading wraps to two lines, then truncates with an ellipsis and a tooltip. |
+| Caption | The tool's application icon (16 px), the title (the descriptor's display name), and minimize, maximize and close, drawn with Direct2D in the theme (`DESIGN.md` §8; built by `D01 T02 §4`). The rest of the bar is the drag region. | 32 at every density | Fixed height, matching the Windows caption whatever the density. The title truncates with an ellipsis and carries a tooltip with the full title when it does. |
+| Menu bar | File and Help, text buttons left-aligned at `SpacingSM` from the edge. | 28, 32, 36 (Compact, Normal, Spacious) | Fixed height per density. Never wraps: two short labels always fit at the minimum width. |
+| Heading block | The tool icon (48 px) at `SpacingLG` from the left and top; beside it, at `SpacingMD` from the icon, the title line (Title, 20 px, SemiBold): the descriptor's display name and its version; under it the subheading (Body, 13 px, secondary text colour). | 72, 80, 96 (its outer padding `SpacingMD`, `SpacingLG`, `SpacingXL`) | Fixed height. The title line truncates with an ellipsis and a tooltip. The subheading wraps to two lines, then truncates with an ellipsis and a tooltip. |
 | Content region | The tool's own view. The framework draws nothing in it and lays nothing over it. | the rest | Takes all the height and width left. The tool lays out its own content inside it. |
-| Status bar | The shared `StatusBar` control (`shared/resolute-ui/include/resolute/controls/statusbar.h`): state text, background-task slot, elevation indicator. | 26 (`StatusBar::BASE_HEIGHT`) | Fixed height. Segments as below. |
+| Status bar | The shared `StatusBar` control (`shared/resolute-ui/include/resolute/controls/statusbar.h`): state text, background-task slot, elevation indicator. | 22, 26, 30 (26 is `StatusBar::BASE_HEIGHT`) | Fixed height. Segments as below. |
 
 - **The heading strings come from the descriptor and the tool's pack:** the title line is the descriptor's display name, a space, and its version as `major.minor.patch` (tag-derived, `D06 T01 §11`); the subheading is the key `Program_Purpose`, the one-line job of the tool (for BiosCodes, "Look up what your computer's beep codes mean."), resolved like every key (`D01 T01 §4`): the tool's pack in the chosen language, then the common pack, then the built-in English, so an incomplete translation shows the English purpose rather than nothing. Only when no level holds the key does the block show no subheading, keeping its height, and the key is then reported missing as `D01 T01 §4` reports every missing key.
+- **Density** is the user's choice (`DESIGN.md` §5) and comes from `D01 T02 §2`'s density scale, which the menu bar, heading block and status bar read for the heights above; text sizes and icon sizes do not change with density, and the caption stays the Windows caption's height. At the minimum window size every region fits at every density with nothing clipped: 640 x 480 leaves the content region at least 280 tall at Spacious.
 - **The window's size:** default 960 x 640, minimum 640 x 480, both base values; the framework enforces the minimum (`DESIGN.md` §5), remembers size, position and maximized state per monitor through the settings writer (`D01 T01 §2`), and restores onto a monitor that still exists or centres on the primary one. Windows 11 snap layouts work because the caption reports its maximize button to `WM_NCHITTEST` as `HTMAXBUTTON`.
 - **Keyboard order** (`DESIGN.md` §9), top to bottom as the window reads: the menu bar is outside the Tab order, reached with Alt or F10 and left with Esc. Tab goes heading icon (a button labelled "About <display name>"), the content region (the tool's own order inside it), the status bar's state segment, its task segment while a task runs, its elevation segment, then back to the heading icon; Shift+Tab goes the same way backwards. Focus starts in the content region when the window opens.
 
@@ -52,15 +54,15 @@ Exactly these items, in this order. The framework builds the menu from this tabl
 | --- | --- | --- | --- | --- | --- |
 | Preferences | `File_Preferences` (`&Preferences`) | Ctrl+, | Always | Opens the Preferences dialog, `D01 T03 §2`, for this tool. | A Preferences dialog already open is brought forward rather than opened twice. |
 | Logging, a submenu | `File_Logging` (`&Logging`) | | Always | Opens the two items below. | |
-| Open log file | `File_Logging_Open_File` (`Open &log file`) | | When this tool's log file exists; otherwise disabled with the tooltip `File_Logging_Unavailable` | Opens the log file in the per-tool log surface, `D01 T03 §4`. | The file vanished or cannot be read (access denied, locked): the message layer's Error `Log_Open_Failed` ("The log file could not be opened."), naming the path, selectable, and the Windows reason, with "Open log folder" as its action. |
+| Open log file | `File_Logging_Open_File` (`Open &log file`) | | When this tool's log file exists; otherwise disabled with the tooltip `File_Logging_Unavailable` | Opens the log file in the per-tool log surface, `D01 T03 §4`. | The surface opens anyway and states the failure inside itself (missing, unreadable or malformed, per `D01 T03 §4`), never a dialog. |
 | Open log folder | `File_Logging_Open_Directory` (`Open log &folder`) | | When the log folder exists; otherwise disabled with the same tooltip | Opens the log folder in File Explorer, with the log file selected. | Explorer cannot be started or the folder is gone: Error `Log_Folder_Failed` ("The log folder could not be opened."), naming the path, selectable, so it can be pasted into Explorer. |
 | (separator) | | | | | |
 | Minimize | `File_Minimize` (`Mi&nimize`), new: `[Menus]` has no key for it today | Esc, when no menu or message is open | Always | Minimizes the window, as Esc did in the AutoIt suite (`ReBar.au3:506`). | |
 | Close | `File_Close` (`&Close`) | Alt+F4 | Always | Closes the tool through the framework's shutdown (`D01 T01 §1`), which persists settings first. | Settings that cannot be written are shutdown's own message (`D01 T03 §6`); the window still closes. |
 
 - **Accelerator text is the framework's, not the pack's.** The AutoIt value `&Close\tAlt+F4` (`resolute_au3/Resolute/Language/ReBar/en.lng:106`) carries its accelerator inside the string, so a translation could change or drop it. The pack value is the label alone; the framework draws the accelerator right-aligned from this table.
-- **Disabled items stay visible** and say why in their tooltip: `File_Logging_Unavailable` ("No log has been written yet."), new.
-- **Every failure is a message, never silence.** The AutoIt handlers wrote a `ShellExecute` failure to the status list and nowhere else (`SDK/Includes/Logging.au3:245-275`); here each failure is the message layer's Error with the path and the reason, and the same line goes to the log. `Log_Open_Failed` and `Log_Folder_Failed` are new keys in `[Messages]`.
+- **Disabled items stay visible and say why**, to every user: the arrow keys land on a disabled item (it cannot be chosen) and its reason shows as its tooltip on keyboard focus exactly as on hover, and the same reason is the item's UI Automation help text (`D01 T02 §8`). The log items' reason is `File_Logging_Unavailable` ("There is no log file yet, or it was moved or deleted."), true on first run and after a deletion.
+- **Every failure is said, never silent.** The AutoIt handlers wrote a `ShellExecute` failure to the status list and nowhere else (`SDK/Includes/Logging.au3:245-275`). Here a log file that cannot be opened is stated inside the log surface (`D01 T03 §4`), which is where the user asked to look, and only Open log folder, which leaves the tool for File Explorer, fails through the message layer with `Log_Folder_Failed`; each failure also writes a log line.
 - Two value corrections, each for `D01 T03 §7`'s string audit: `File_Logging_Open_File` loses its stray capital ("Open log File" to "Open log file"), and `File_Logging_Open_Directory` says "folder", the Windows word.
 
 ## What is on the Help menu?
@@ -119,7 +121,7 @@ The menus' own keys are the popup menu's (`D01 T02 §8`); the choices here are t
 | Alt, F10 | Anywhere in the window | Focuses the menu bar on File, with access keys underlined. |
 | Alt+F, Alt+H | Anywhere | Opens File or Help. |
 | Left, Right | Menu bar, or an open menu | Moves to the neighbouring title, opening its menu when one was open. |
-| Up, Down, Home, End | Open menu | Moves between enabled items; disabled items are skipped by the keys and still read out on hover. |
+| Up, Down, Home, End | Open menu | Moves between items. A disabled item can be landed on, shows its reason as a tooltip and in its help text, and cannot be chosen. |
 | Right, Left | On Logging, or in its submenu | Opens or closes the submenu. |
 | Enter, an item's access key | Open menu | Chooses the item. |
 | Esc | Open submenu, open menu, menu bar | Closes one level: the submenu, then the menu, then leaves the bar for the control that was focused before. |
@@ -160,9 +162,36 @@ The shared `StatusBar`, three segments, all written by the framework. A tool set
 | Elevation | Administrator or Standard user | As above | The window opens | Never; elevation does not change while a process runs |
 
 - **More than one task:** a tool's action and an update check can run together (Check for updates stays enabled while a tool's action runs). The task segment shows one of them: the one that started first and is still running. A task that starts while another is shown runs without the segment and is named in its tooltip ("Also running: Checking for updates"). When the shown task ends, the segment shows the next running task, oldest first, or empties when none runs. A task that ends while not shown never clears or changes the segment: its result line still goes to the state segment and its announcement is still raised.
+- **The taskbar shows it too** (`DESIGN.md` §8): the task the segment shows drives the window's taskbar button through `ITaskbarList3`, owned by the framework's status layer (`D01 T01 §7`): normal progress at its fraction while it runs, indeterminate when it has no total; on success or cancellation the button clears at once; on failure it turns to the error state, and on partial completion to the paused state, each held at the task's last fraction until the window is next activated, then cleared. When the shown task ends and another runs, the button shows the next task's progress at once and drops the ended task's state.
 - **Announced:** a task's start, its result line and a change of elevation each raise a UI Automation notification; progress is not announced at every step, only at its end.
 - **Keyboard:** the state segment is focusable and opens the log surface with Enter; the task segment is focusable while a task runs and its Enter offers to cancel the task it is showing, by name, when that task can be cancelled (`Status_Cancel_Task`, new), never one it is not showing; the elevation segment is focusable for its tooltip and acts on nothing.
 - **What the shared control offers and this window does not use:** the clickable segments are used as above, through `SetSegmentCommand`; the notification icons (`AddNotifyIcon`: spinner, success, warning) are not used, because the task segment's progress bar and the result line already say the same thing, and two signals for one state disagree when one lags; the slide-in notice (`ShowNotification`) is not used, because a message that disappears on a timer can be missed, and anything worth saying belongs in the state segment or the message layer.
+
+## Which strings does the window add?
+
+Every string this page introduces, with its pack section and English text; nothing on the page is drawn from a literal. `%{Program.Name}` is the descriptor's display name, substituted by the loader (`D01 T01 §4`).
+
+| Key | Section | English | Used by |
+| --- | --- | --- | --- |
+| `File_Minimize` | `[Menus]` | `Mi&nimize` | File, Minimize |
+| `File_Logging_Unavailable` | `[Menus]` | There is no log file yet, or it was moved or deleted. | The disabled log items' reason |
+| `Help_Update_Running` | `[Menus]` | Checking for updates... | Check for updates, disabled while it runs |
+| `Heading_About` | `[Menus]` | About %{Program.Name} | The heading icon's accessible name and tooltip |
+| `Status_Ready` | `[Status]`, new section | Ready | The state segment when idle |
+| `Status_Cancelled` | `[Status]` | Cancelled: %1 | The state segment after a cancel; %1 is the task's name |
+| `Status_Also_Running` | `[Status]` | Also running: %1 | The task segment's tooltip when a second task runs; %1 is that task's name |
+| `Status_Cancel_Task` | `[Status]` | Cancel %1? | The task segment's Enter, for the task it shows |
+| `Status_Cannot_Cancel` | `[Status]` | %1 cannot be stopped part way; it will finish on its own. | The task segment's tooltip for a task that cannot be cancelled |
+| `Status_Elevated` | `[Status]` | Administrator | The elevation segment |
+| `Status_Standard` | `[Status]` | Standard user | The elevation segment |
+| `Status_Elevated_Tip` | `[Status]` | This tool is running with administrator rights. | The elevation segment's tooltip |
+| `Status_Standard_Tip` | `[Status]` | Actions that change your system will ask for administrator rights. | The elevation segment's tooltip |
+| `Button_OK`, `Button_Close`, `Button_Cancel` | `[Messages]` | OK, Close, Cancel | The message layer's ways out |
+| `Message_Copy` | `[Messages]` | Copy message | The message's copy button |
+| `Message_Copy_Failed` | `[Messages]` | Could not copy | The copy button when the clipboard is held |
+| `Log_Folder_Failed` | `[Messages]` | The log folder could not be opened. | Open log folder's failure |
+| `Link_Open_Failed` | `[Messages]` | The page could not be opened. | A Help link's failure |
+| `Link_Copy` | `[Messages]` | Copy link | A Help link's failure, its action |
 
 ## What must the build prove, row by row?
 
@@ -171,19 +200,26 @@ Every row is one behavioural check in `D01 T01 §7`, named in the last column, d
 | Element | Trigger | States | Result | Failure | Check in `D01 T01 §7` |
 | --- | --- | --- | --- | --- | --- |
 | File, Preferences | Click; Alt+F, P; Ctrl+, | Always enabled | Preferences opens for this tool, focused | A second open brings the first forward | `window: preferences opens once` |
-| File, Logging, Open log file | Click; Alt+F, L, L | Enabled when the log file exists, else disabled with its reason | The log surface opens on the file | Unreadable file: Error `Log_Open_Failed` with the path | `window: open log file and its refusal` |
+| File, Logging, Open log file | Click; Alt+F, L, L | Enabled when the log file exists, else disabled with its reason | The log surface opens on the file | Missing, unreadable or malformed: the surface opens and states it inside itself, no dialog | `window: open log file and its refusal` |
+| A disabled menu item | Hover; arrow keys onto it | Disabled with a reason | The reason shows as a tooltip on hover and on keyboard focus, and is the item's help text; it cannot be chosen by click, Enter or access key | None can occur: the reason is the framework's table, present for every disabled item | `window: a disabled item says why, by mouse and by keyboard` |
 | File, Logging, Open log folder | Click; Alt+F, L, F | Enabled when the folder exists, else disabled with its reason | Explorer opens on the folder | Error `Log_Folder_Failed` with the path | `window: open log folder and its refusal` |
 | File, Minimize | Click; Alt+F, N; Esc with nothing open | Always | The window minimizes | None can occur: minimizing a window the process owns does not fail | `window: minimize, and Esc closes a menu first` |
 | File, Close | Click; Alt+F, C; Alt+F4; caption close | Always | Shutdown runs and the window closes | A failed settings write is shutdown's message, then the close | `window: close persists settings` |
 | Help, Check for updates | Click; Alt+H, U | Disabled while a check runs, with its reason | The check runs; its result is the update dialog | The update dialog's failure state | `window: update check is single-flight` |
 | Help, Home, Downloads, Support, Report a problem | Click; Alt+H and the access key | Always | The default browser opens the item's framework constant URL | Error `Link_Open_Failed`, URL selectable, "Copy link" | `window: help links open, and refuse without a browser` |
 | Help, About | Click; Alt+H, A | Always | The About dialog for this tool's descriptor | None can occur: the descriptor is compiled into the tool; an About already open is brought forward | `window: about shows this tool's descriptor` |
-| Heading icon | Click; Enter or Space when focused | Always | The About dialog | As Help, About | `window: heading icon opens about` |
+| Heading icon | Click; Enter or Space when focused | Always | The About dialog; its accessible name and tooltip are `Heading_About` | As Help, About | `window: heading icon opens about` |
 | Status, state segment | Click; Enter when focused | Always | The log surface opens | No log yet: the surface's empty state (`D01 T03 §4`) | `window: status opens the log` |
 | Status, task segment | Enter when focused | Focusable only while a task runs | Offers to cancel the task it shows, by name | A task that cannot be cancelled says so in its tooltip | `window: task segment cancels` |
 | Status, task segment with two tasks | Start a tool's action, then Check for updates, and let the check end first | Shows the tool's action throughout | The check's result line reaches the state segment; the segment keeps showing the action and its progress, then empties when the action ends | The check's failure is its update dialog's; the action's display is untouched | `window: overlapping tasks keep the shown one` |
+| Message copy | Ctrl+C; "Copy message" | Always | The clipboard holds the title, severity, summary and body as text | The clipboard held by another program: the button says "Could not copy" (`Message_Copy_Failed`) for two seconds and the message stays | `window: a message copies whole` |
 | Message buttons | Click; Enter; Esc; caption close; Alt+F4 | Default per the rules above | The button's action; focus returns; Alt+F4 acts as the caption close and the tool stays open | The action's own failure is its notice's (`D01 T03 §5`, `§6`); if the opener is gone, focus goes to the content region | `window: message keys, default and focus return` |
 | Menu bar | Alt; F10; arrows; Esc | Always | Keyboard path as in the key table | None can occur: the menus are built from the framework's tables at startup | `window: keyboard reaches every item` |
+| Maximize and restore | Caption button; double-click on the caption; Win+Up and Win+Down | Normal or maximized | The window maximizes to the monitor's work area and restores to its last normal bounds | Restored bounds now off every monitor: restored centred on the window's current monitor | `window: maximize and restore by every route` |
+| Snap layouts | Hover the maximize button on Windows 11; Win+Z | Windows 11 | The snap layout flyout opens and a chosen layout places the window | Windows 10: no flyout, the button maximizes | `window: the maximize button reports itself for snap` |
+| Remembered geometry | Close and reopen; reopen with that monitor disconnected | Per monitor | The window reopens at its size, position and maximized state; with its monitor gone, centred on the primary monitor at its size | A stored position off every monitor is not used | `window: geometry reads back, and recovers from a missing monitor` |
+| Density | Change the density in Preferences, at the minimum window size | Compact, Normal, Spacious | Menu bar, heading block and status bar take their density heights; nothing is clipped | A density the settings file names but the scale lacks: Normal, with the value logged | `window: every density fits at the minimum size` |
+| Taskbar progress | A task running, then succeeding, failing, ending part done, cancelled, or ending while another runs | As the status bar rules | Normal or indeterminate while running; cleared on success or cancel; error or paused held until the window is activated, then cleared; the next task's progress at once on a handoff | No taskbar button (Explorer not running): the status bar alone shows progress, and nothing fails | `window: the taskbar follows the shown task` |
 | Window's Tab order | Tab and Shift+Tab from the window's first focus | With and without a running task | Heading icon, content, state, task (only while one runs), elevation, and back; Shift+Tab the reverse | None can occur: the order is fixed by the framework | `window: tab order follows the page` |
 | Heading subheading | Open a tool whose chosen-language pack lacks `Program_Purpose` | Key in the common or English level, or in none | The English purpose shows; with no level holding it, no subheading and the key reported missing | Never a blank subheading while any level holds the key | `window: subheading falls back` |
 | Tools adding menu items | A tool's code | Never | Impossible: the framework's interface for tools has no menu call | A tool that tries does not compile | `window: the tool interface exposes no menu` |
