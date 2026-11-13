@@ -218,7 +218,7 @@ def cmd_propose(s: Session, path: str, version: int | None) -> int:
     return 0
 
 
-def cmd_step(s: Session, step: str, dataset: str, number: int, actor: str, reason: str) -> int:
+def cmd_step(s: Session, step: str, dataset: str, number: int, actor: str | None, reason: str) -> int:
     procedure = {"review": "rd_review", "reopen": "rd_reopen", "stamp": "rd_stamp"}[step]
     # One transaction: the check, the status change and the changelog row land together or not at all.
     s.sql(f"SET autocommit = 0;\nSTART TRANSACTION;\nCALL {procedure}({sql_str(dataset)}, {int(number)}, {sql_str(actor)}, {sql_str(reason)});\nCOMMIT;\n")
@@ -323,7 +323,10 @@ def cmd_backup(s: Session, path: str) -> int:
     with open(partial, "wb") as out:
         proc = subprocess.Popen(
             [str(exe), f"--defaults-extra-file={s.options}", "--default-character-set=utf8mb4",
-             "--routines", "--single-transaction", "--skip-dump-date", s.database],
+             # The data only: a restore builds the schema from data/refdata/schema.sql, the repository's own, and loads
+             # these rows as a user that can do nothing else (cmd_restore).
+             "--no-create-info", "--skip-triggers", "--skip-disable-keys", "--complete-insert", "--single-transaction",
+             "--skip-dump-date", s.database],
             stdout=out, stderr=subprocess.PIPE)
         try:
             _, err = proc.communicate(timeout=TIMEOUT_SECONDS)
@@ -351,7 +354,19 @@ def dump_reaches_out(text: str) -> str | None:
     return None
 
 
-def cmd_restore(s: Session, path: str) -> int:
+def option_value(options: Path, key: str) -> str | None:
+    for line in options.read_text(encoding="ascii", errors="replace").splitlines():
+        if line.strip().startswith(f"{key}="):
+            return line.split("=", 1)[1].strip()
+    return None
+
+
+def cmd_restore(s: Session, path: str, schema: Path = SCHEMA) -> int:
+    """Loads a backup into a new database, and nowhere else. The schema comes from the repository's own schema.sql;
+    the backup's rows are then run as a MySQL user created for this restore alone, whose only privileges are SELECT,
+    INSERT and LOCK TABLES on the new database, so a statement that reaches any other database is refused by the
+    server whatever it says. The user is dropped however the restore ends, and a failed restore drops the new
+    database."""
     dump = Path(path)
     if not dump.is_file():
         raise Refused(f"refused: no backup at {dump}")
@@ -361,13 +376,27 @@ def cmd_restore(s: Session, path: str) -> int:
     reaches = dump_reaches_out(text)
     if reaches:
         raise Refused(f"refused: the dump {reaches}, so it would write outside '{s.database}'; take the backup with refdata.py backup, which names no database")
+    user = f"refdata_restore_{secrets.token_hex(4)}"
+    password = secrets.token_urlsafe(24)
     run_sql(f"CREATE DATABASE `{s.database}` CHARACTER SET utf8mb4;", options=s.options)
-    try:
-        # --one-database as well: the client skips any statement for another database the check above did not see.
-        run_sql(text, options=s.options, database=s.database, extra=("--one-database",))
-    except Refused:
-        run_sql(f"DROP DATABASE `{s.database}`;", options=s.options)
-        raise
+    restored = False
+    with tempfile.TemporaryDirectory(prefix="refdata-restore-") as tmp:
+        restricted = Path(tmp) / "restore.cnf"
+        try:
+            run_sql(schema.read_text(encoding="utf-8"), options=s.options, database=s.database)
+            run_sql(f"CREATE USER '{user}'@'localhost' IDENTIFIED BY {sql_str(password)};\n"
+                    f"GRANT SELECT, INSERT, LOCK TABLES ON `{s.database}`.* TO '{user}'@'localhost';", options=s.options)
+            restricted.write_text(f"[client]\nuser={user}\npassword={password}\nhost={option_value(s.options, 'host') or '127.0.0.1'}\n"
+                                  f"port={option_value(s.options, 'port') or '3306'}\n", encoding="ascii")
+            try:
+                run_sql(text, options=restricted, database=s.database)
+            except Refused as refusal:
+                raise Refused(f"refused: the backup could not be loaded as rows into '{s.database}' alone ({refusal}); nothing outside it was changed") from None
+            restored = True
+        finally:
+            run_sql(f"DROP USER IF EXISTS '{user}'@'localhost';", options=s.options)
+            if not restored:
+                run_sql(f"DROP DATABASE IF EXISTS `{s.database}`;", options=s.options)
     print(f"restored {dump} into '{s.database}'")
     return 0
 
@@ -543,6 +572,36 @@ def self_test(schema: Path) -> int:
             refused("a reviewer who changed the version", ["review", "fixture", "4", "--as", "author-two", "--reason", "my contribution looks right"], "the reviewer changed this version")
             code, _ = call(["review", "fixture", "4", "--as", "author-three", "--reason", "neither of us wrote it"] + base)
             checks.check("a reviewer who changed nothing reviews it", code == 0)
+
+            # A backup round trip: the rows come back in a database of their own, with the schema's rules.
+            dump_file = Path(tmp) / "roundtrip.sql"
+            code, out = call(["backup", str(dump_file)] + base)
+            copy = f"{database}_copy"
+            code2, out2 = call(["restore", str(dump_file), "--options", str(options), "--database", copy])
+            copied = Session(options, copy)
+            same = code == 0 and code2 == 0 and copied.exists() and history_rows(copied, "fixture") == history_rows(session, "fixture")
+            refused_copy = None
+            if copied.exists():
+                try:
+                    copied.sql("CALL rd_review('fixture', 4, 'author-one', 'the restored rules still hold');")
+                except Refused as refusal:
+                    refused_copy = str(refusal)
+                run_sql(f"DROP DATABASE `{copy}`;", options=options)
+            checks.check("a backup restores into a new database with the same changelog and the same rules",
+                         same and refused_copy is not None and "only a proposed version can be reviewed" in refused_copy,
+                         f"backup {out.strip()!r}; restore {out2.strip()!r}; same changelog {same}; the copy's rules said {refused_copy!r}")
+
+            # A backup that reaches into another database is refused by the server, and that database is untouched.
+            hostile = Path(tmp) / "hostile.sql"
+            # A harmless first line, so the client reaches the DROP and only the server's privileges can stop it.
+            hostile.write_text(f"SELECT 1;\nDROP TABLE `{database}`.`changelog`;\n", encoding="utf-8")
+            before_rows = len(history_rows(session, "fixture"))
+            target = f"{database}_hostile"
+            code, out = call(["restore", str(hostile), "--options", str(options), "--database", target])
+            users = run_sql("SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options)[0][0]
+            checks.check("a backup that reaches into another database is refused, that database untouched, no target or user left",
+                         code == 1 and "could not be loaded as rows" in out and len(history_rows(session, "fixture")) == before_rows
+                         and not Session(options, target).exists() and users == "0", out.strip())
 
             # A dump that names a database is refused before anything is restored.
             named = Path(tmp) / "named.sql"
