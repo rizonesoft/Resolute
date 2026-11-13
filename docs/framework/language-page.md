@@ -49,7 +49,7 @@ One group, `Group_Language` ("Language"), holding four things from top to bottom
 The rows, in this order:
 
 1. **Use the Windows language.** `Row_Windows` ("Use the Windows language (%1)"), where %1 is the name of the language it resolves to now. When no pack matches any Windows display language it reads `Row_Windows_Fallback` ("Use the Windows language (English: there is no pack for %1)"), naming the first Windows display language. Its Code cell is empty and its Translated cell is that of the language it resolves to. This is the default.
-2. **One row per language**, sorted by code, compared character by character without regard to case, so the order is the same in every language. English is always among them: from `en.lng` when the tool has one, from the built-in text when it does not, and never twice.
+2. **One row per language**, sorted by code, compared character by character without regard to case, so the order is the same in every language. English is always among them and can always be chosen: from `en.lng` when the tool has one that can be used, and from the built-in text when that file is missing or cannot be used. There is never a second English row. A damaged `en.lng` is still reported: the English row's detail line reads `Pack_English_Builtin` ("%1 cannot be used: %2. English is shown from the built-in text."), %1 the file name and %2 its reason, so the way back to English never depends on a file a translator can break.
 
 A pack is found when its file is in the tool's language folder (`D01 T01 §4`) and ends in `.lng`. The folder is scanned each time the dialog opens, never while it is open: a translator who edits a pack closes and reopens Preferences to see it.
 
@@ -80,7 +80,7 @@ The page follows the three values [`preferences.md`](preferences.md) defines, wi
 
 - **The dialog previews at once.** Choosing a row loads that language and redraws the Preferences dialog in it: the page list, every page, the buttons, the notes, and any message the dialog raises. It is announced as `Label_Preview` ("Previewing %1. Save to keep it."), the shell's own key. The tool's main window does not change. A pack is read whole before anything is redrawn, so the dialog is never half in one language.
 - **Save stores it.** `Language` is written when the row was changed and differs from the file, by the shell's Save and its read-back, like every other key. Nothing on this page can fail validation: a pack that cannot be used cannot be chosen.
-- **A restart applies it.** The language is the one setting the running tool cannot take on: after a confirmed save, where the stored language differs from the one the tool is showing, the reconcile rule's action is the restart note, not a change. [`preferences.md`](preferences.md) says so in its reconcile rule, and names the preview as an action that is not a save.
+- **A restart applies it.** The language is the one setting the running tool cannot take on: after a confirmed save, where the stored language differs from the one the tool is showing and its pack can be used, the reconcile rule's action is the restart note, not a change. [`preferences.md`](preferences.md) says so in its reconcile rule, and names the preview as an action that is not a save.
 - **Cancel and Discard undo the preview.** The dialog returns to the language it had at the baseline, as the shell rules for every preview.
 - **The dialog opens in the stored language.** After a save, and at every later opening before the restart, the dialog shows the stored language while the main window shows the one it started with. The showing-now line and the restart note say which is which.
 - **The dirty rule is the shell's.** The page is dirty when the chosen row's value differs from the persisted one. Choosing the German row while "Use the Windows language" is stored and resolves to German is a change (it pins the language), although nothing on screen moves.
@@ -89,7 +89,7 @@ A file the AutoIt tool wrote reads back the same: it holds `Language` only when 
 
 ## What happens after a language is saved?
 
-When the stored language resolves to another language than the one the tool is showing, the page carries the restart note. It appears after the confirmed save that caused it, and at every later opening of the dialog until the tool restarts or the stored language is changed back.
+When the stored language resolves to another language than the one the tool is showing, and that language's pack can be used, the page carries the restart note. It appears after the confirmed save that caused it, and at every later opening of the dialog until the tool restarts or the stored language is changed back.
 
 | Part | Rule |
 | --- | --- |
@@ -132,9 +132,10 @@ Every text below is resolved in the language the dialog is showing, through the 
 | Case | In the list | Text |
 | --- | --- | --- |
 | A pack that cannot be read | Listed by its file name in the Language cell, with its code; Translated reads `Pack_Unusable`; the row cannot be chosen | Detail line: `Pack_Unusable_Detail` ("%1 cannot be used: %2."), %1 the file name in monospace, %2 one of the reasons below |
+| An `en.lng` that cannot be read | The English row stays, at 100%, and can be chosen: it shows the built-in text | Detail line: `Pack_English_Builtin` ("%1 cannot be used: %2. English is shown from the built-in text.") |
 | A pack missing strings | Listed normally with its percentage; can be chosen | Detail line: `Pack_Partial_Detail` ("%1 of %2 strings are translated. The rest show in English."). A missing string resolves through the language's common pack, then the built-in English (`D01 T01 §4`), so "the rest" are those neither pack holds |
 | A pack whose `Code` disagrees with its file name | Listed under its file name; can be chosen; stored and loaded by its file name | Detail line: `Pack_Code_Mismatch` ("This pack calls itself %1, but its file is %2. It is used as %2.") |
-| A stored language whose pack is gone or cannot be read | The tool is showing English. No row is chosen; focus starts on English. An unreadable pack is listed as in the first row of this table; a missing one is not listed | Note under the showing-now line: `Label_Language_Missing` ("%{Program.Name} is set to %1, but %2 cannot be used: %3. It is showing English."), %1 the stored code, %2 the file name, %3 a reason below or `Pack_Reason_Missing` |
+| A stored language whose pack is gone or cannot be read | No row is chosen; focus starts on English. An unreadable pack is listed as in the first row of this table; a missing one is not listed. The dialog opens in the language the tool is showing | Note under the showing-now line: `Label_Language_Missing` ("%{Program.Name} is set to %1, but %2 cannot be used: %3."), %1 the stored code, %2 the file name, %3 a reason below or `Pack_Reason_Missing`. The note says nothing about which language is showing: the showing-now line above it does, and it is right in both cases below |
 | A language folder that is empty, missing or unreadable | The list holds "Use the Windows language" and English | Note: `Label_Language_No_Packs` ("No language packs were found in %1."), or `Label_Language_Folder_Unreadable` ("The language folder %1 could not be read: %2."), %1 the folder's path in monospace, %2 the Windows reason |
 
 The reasons a pack cannot be used, each named by the loader (`D01 T01 §4`):
@@ -149,6 +150,13 @@ The reasons a pack cannot be used, each named by the loader (`D01 T01 §4`):
 | The file is not there | `Pack_Reason_Missing` ("the file is missing") |
 
 ### What if the stored language cannot be used?
+
+There are two ways to get here, and they differ in what the tool is showing:
+
+- **The pack was unusable when the tool started.** The tool started in English (`D01 T01 §4`), and the showing-now line says English.
+- **The pack was lost while the tool was running** (its file deleted, its folder disconnected). The tool keeps the language it loaded at the start, because the effective language never changes while it runs, and the showing-now line names that language. It will start in English next time unless the pack is back.
+
+In both, the dialog cannot open in the stored language, so it opens in the one the tool is showing, and no restart note appears: there is nothing a restart could load.
 
 The stored value is left exactly as it is: an unedited control never rewrites its key (`preferences.md`), so a pack that comes back (a network folder reconnected, a file restored) works again at the next start with nothing lost. The page is not dirty. Choosing any row is an edit, and Save then stores that row's value.
 
@@ -204,9 +212,10 @@ All in `[Preferences]` unless marked. Every text above has a key here.
 | `Pack_Unusable` | Cannot be used | New |
 | `Pack_Unusable_Detail` | %1 cannot be used: %2. | New |
 | `Pack_Partial_Detail` | %1 of %2 strings are translated. The rest show in English. | New |
+| `Pack_English_Builtin` | %1 cannot be used: %2. English is shown from the built-in text. | New |
 | `Pack_Code_Mismatch` | This pack calls itself %1, but its file is %2. It is used as %2. | New |
 | `Pack_Reason_Encoding`, `Pack_Reason_Truncated`, `Pack_Reason_No_Language`, `Pack_Reason_Duplicate`, `Pack_Reason_Unreadable`, `Pack_Reason_Missing` | As the reasons table gives them | New |
-| `Label_Language_Missing` | %{Program.Name} is set to %1, but %2 cannot be used: %3. It is showing English. | New |
+| `Label_Language_Missing` | %{Program.Name} is set to %1, but %2 cannot be used: %3. | New |
 | `Label_Language_No_Packs` | No language packs were found in %1. | New |
 | `Label_Language_Folder_Unreadable` | The language folder %1 could not be read: %2. | New |
 | `Label_Language_Restart` | %{Program.Name} is still showing %1. It will show %2 after it restarts. | New; replaces `MsgBox_Language_Message` |
@@ -233,7 +242,7 @@ Every row is one behavioural check in `D01 T01 §7`, driven against the built di
 | Pinning the Windows language | With `Language` empty and resolving to German, choose the German row; Save | | The page is dirty before Save; `Language` reads back `de`; no restart note | Save's failures | `language: pinning the resolved language is a change` |
 | Back to the Windows language | With `Language` holding `de`, choose "Use the Windows language"; Save | | `Language` reads back empty | Save's failures | `language: the windows row stores an empty value` |
 | Cancel and Discard | Choose a language; Cancel, then Discard | Previewing | The dialog returns to the baseline language; `Language` unchanged | None can occur: the baseline pack is already loaded | `language: discard undoes the preview` |
-| Reopening before a restart | Save a new language; close; reopen Preferences | Stored differs from effective | The dialog opens in the stored language with the note; the showing-now line names the main window's language | A stored pack gone since: the stored-language row below | `language: the dialog opens in the stored language` |
+| Reopening before a restart | Save a new language; close; reopen Preferences | Stored differs from effective | The dialog opens in the stored language with the note; the showing-now line names the main window's language | A stored pack gone since: the dialog opens in the running language with `Label_Language_Missing` and no restart note | `language: the dialog opens in the stored language` |
 | An unrelated save | With the note showing, change only Reduce memory; Save | | The main window's language is unchanged; the note is still there; `Language` unchanged | Save's failures | `language: an unrelated save keeps the pending restart` |
 | Changing back | With the note showing, choose the effective language; Save | | The note goes, announced as `Announce_Restart_Cleared` | Save's failures | `language: saving the running language clears the note` |
 | Restart now | Press it; Alt+R | Not dirty, no task | One instance running afterwards, started before the first exited, with the same arguments, showing the stored language in its main window | Windows refusing the start: the first stays open with `Restart_Failed_Body` naming the path and reason, no second process | `language: restart shows the stored language` |
@@ -242,9 +251,11 @@ Every row is one behavioural check in `D01 T01 §7`, driven against the built di
 | Restart with nothing to restart for | With the note showing, choose the effective language without saving; press Restart now; answer Save | Dirty | The save is read back, the note goes and the tool stays open | Save's failures | `language: no restart when the stored language is running` |
 | Restart while a task runs | Start the tool's action; open the page with the note showing | A task running; then finished | The button is disabled with `Label_Restart_Busy`; it is enabled, announced, when the task ends | None can occur: the state follows the task | `language: restart waits for a running task` |
 | A pack that cannot be read | Fixture packs: wrong encoding, cut short, no `[Language]`, a duplicate key, access denied | Each reason | Each is listed by file name as "Cannot be used"; the detail line names the file and that reason; clicking or reaching it does not choose it | The stated results are the failure presentations | `language: an unreadable pack is named and cannot be chosen` |
+| A damaged English pack | A corrupt `en.lng` beside a usable German pack, Windows set to German; choose English; Save; restart | | One English row, at 100%, whose detail line names `en.lng` and its reason; choosing it previews English from the built-in text; `Language` reads back `en`; the restarted tool shows English | None can occur: the built-in text is compiled in | `language: english survives a damaged english pack` |
 | A part-translated pack | A pack missing keys, one of which its common pack holds | 82 percent | The percentage counts the common pack's key as translated; the detail line gives the counts; the missing strings show in English and the common pack's in the language | None can occur: every key resolves to built-in English at worst | `language: missing strings fall back in order` |
 | A code that disagrees | A pack `xx.lng` whose `Code` is `yy` | | Listed and stored as `xx`; the detail line states both | Save's failures | `language: the file name is the pack's identity` |
-| A stored language that cannot be used | `Language` holding a code whose pack is missing; then unreadable | Missing; unreadable | The tool shows English; `Label_Language_Missing` names the code, file and reason; no row chosen; the page not dirty; after an unrelated save `Language` reads back unchanged | The stated results are the failure presentations | `language: a lost pack is reported and its setting kept` |
+| A stored language that cannot be used at the start | Start with `Language` holding a code whose pack is missing; then unreadable | Missing; unreadable | The tool and the showing-now line show English; `Label_Language_Missing` names the code, file and reason; no row chosen; no restart note; the page not dirty; after an unrelated save `Language` reads back unchanged | The stated results are the failure presentations | `language: a lost pack is reported and its setting kept` |
+| A pack lost while the tool runs | Start in German; delete `de.lng`; open Preferences | | The main window and the showing-now line are still German; the dialog opens in German; `Label_Language_Missing` names `de`, the file and `Pack_Reason_Missing`; no restart note; `Language` unchanged | The stated results are the failure presentations | `language: a pack lost mid-session keeps the running language` |
 | No packs | An empty language folder; a missing one; an unreadable one | Each | The list holds the Windows row and English; the note names the folder, and the Windows reason when unreadable | The stated results are the failure presentations | `language: a missing folder still offers english` |
 | A pack that turns bad while the dialog is open | Corrupt a listed pack after opening, then choose it | | The row turns to "Cannot be used" with its reason; the chosen row and the dialog's language stay | The stated result is the failure presentation | `language: a pack is checked again when chosen` |
 | Copying a note | Tab to the detail line of an unreadable pack; Ctrl+C | A note showing | The clipboard holds the whole line, file name and reason included | The clipboard held by another program: `Message_Copy_Failed`, as the shell rules | `language: a pack's reason copies whole` |
