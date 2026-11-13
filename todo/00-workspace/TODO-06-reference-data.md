@@ -43,7 +43,7 @@ track: N0
 
 | Order | Section | Deliverable | Depends On | Status |
 | :---: | :-----: | ----------- | ---------- | :----: |
-|   1   |   §1    | MySQL schema and authoring workflow | -- |  [ ]   |
+|   1   |   §1    | MySQL schema and authoring workflow | -- |  [x]   |
 |   2   |   §2    | Build-time export, embedding, versioning | §1 |  [ ]   |
 |   3   |   §3    | Beep database migration off packs | §2 |  [ ]   |
 |   4   |   §4    | Data extension: vendors, blink, more codes | §3 |  [ ]   |
@@ -101,6 +101,14 @@ The database that owns reference data: datasets (one per data family), entries w
 - [x] Commit: `"data: MySQL schema and authoring workflow"`
 
 **Test checkpoint:** `tools/refdata/server.ps1 -Install`, `-Start` and `-Status` on this machine, and the start refused on an occupied port, quoted; `python tools/refdata/refdata.py --self-test` passes against the private server (a fresh database from the schema, the fixture versioned and stamped with its changelog, every refusal shown), quoted, and fails by name with one refusal removed; the dependency decision names its reason and reversal. Nothing here runs on CI or ships to users. Cheaper substitute that fails the checkpoint: a schema without the workflow, which stores data nobody can change safely.
+
+> **Verified:** 2026-11-13 | §1 | the reference-data authoring server, schema and workflow, with every repair: `tools/refdata/server.ps1 -Install` `already pinned: ... mysqld.exe  Ver 8.4.13 for Win64 on x86_64 (MySQL Community Server - GPL)`; `-Start` `already running: pid 75108 on 127.0.0.1:33061, root needs its password`; `-Status` `running: pid 75108 on 127.0.0.1:33061, answering`; a start on a port another listener holds, `refused: port 33079 on 127.0.0.1 is held by another listener; it was left alone. Choose another with -Port`, exit 2. `python tools/refdata/refdata.py --self-test` on the final candidate: 80 PASS, `self-test: all pass` (a fresh database from the schema, the fixture versioned, reviewed by digest and stamped with its changelog, every refusal shown, backup and restricted restore, the revision 1 upgrade, TLS carried, the server stopped and started, every other database unchanged); with the author refusal removed through `--schema`, `FAIL refused: a reviewer who is the author`, `self-test: 1 failed`. The dependency decision, its reason and reversal are in `docs/reference-data.md` and `AGENTS.md`. Each repair's cases fail with their fix removed (quoted in the items). pyright on `tools/refdata/refdata.py`: `0 errors, 0 warnings, 0 informations`. `python scripts/ci-status.py 821a7e65` `gates: success`, `plan-gates: success`. `todo-graph.py validate` `30 todos, 256 sections -- 0 fatal`.
+> **Review:** astra (gpt-6-astra via codex). `docs/reviews/00-workspace/D00-T06-s1.md`: plan gaps (8, folded), rounds 1 to 8 (P1 to round 6, P2, then `none`), completion gaps (6, Repair 1). `-repair.md`: plan gaps (4, folded), rounds 1 (P2, fixed) and 2 (`none`), completion gaps (3, Repair 2). `-repair2.md`: plan gaps (P1, folded), rounds 1 to 5 (P1, P1, P1, P2 fixed, then `none`; round 4's re-think replaced the settings allowlist with an include), completion gaps (1, Repair 3). `-repair3.md`: plan approve, round 1 (P3, carried), completion gaps (3, Repair 4). `-repair4.md`: plan gaps (2, folded), rounds 1 (P1) and 2 (P2) fixed, round 3 `none`, completion gaps (2, Repair 5). `-repair5.md`: plan gaps (P2, folded), round 1 (P2, fixed), round 2 (P3, carried), completion gaps (2, Repair 6). `-repair6.md`: plan approve, round 1 (P3, carried), completion gaps (2, Repair 7). `-repair7.md`: plan gaps (P3, folded), round 1 (P2 and P3, fixed), round 2 `none`, completion gaps (1, Repair 8). `-repair8.md`: plan approve, round 1 (medium, adversarial) `HIGHEST: none` · Raw findings: docs/reviews/00-workspace/D00-T06-s1*.md
+> **Completion:** astra (medium), candidate 9a801d56 -- COMPLETION: complete, gap list empty · Repair records: -repair (0a294e37), -repair2 (2e4aed5d), -repair3 (9b920e03), -repair4 (06f166ee), -repair5 (d4928203), -repair6 (5a476ae5), -repair7 (ff1d75f6), -repair8 (9a801d56)
+> **Plan review:** astra -- gaps on the first record (8, folded), then each repair record's own plan pass
+> **CRUD:** applicable: create (`propose` opens a version, `add`), read (`list`, `show`, `changes`, `history`), update (`reword`, `review`, `reopen`, `stamp`), delete not offered by design (keys are never reused or renamed; history is kept), each refused by name where the workflow forbids it
+> **Duration:** 2026-11-13T02:40:20Z to 2026-11-13T12:57:48Z
+> **Implementer:** claude (claude-opus-5-5)
 
 
 ## 2. Build-Time Export, Embedding, Versioning
