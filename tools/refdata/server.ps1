@@ -174,7 +174,8 @@ function Test-Answers([int]$OnPort) {
     $prev = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
     # The port is given here, ahead of the option file's, so a start on a new port is checked before the file changes.
-    & $Admin "--defaults-extra-file=$LocalCnf" "--port=$OnPort" --connect-timeout=2 ping 2>&1 | Out-Null
+    Push-Location -LiteralPath (Split-Path $LocalCnf)
+    try { & $Admin "--defaults-extra-file=$(Split-Path $LocalCnf -Leaf)" "--port=$OnPort" --connect-timeout=2 ping 2>&1 | Out-Null } finally { Pop-Location }
     $ok = ($LASTEXITCODE -eq 0)
     $ErrorActionPreference = $prev
     return $ok
@@ -207,13 +208,31 @@ function Write-Ini([int]$OnPort) {
 
 $script:BeforeReplace = $null   # the self-test's stand-in for a write cut short before the replace
 
+function Get-OptionEncoding {
+    # The system ANSI code page (GetACP), strict: an unmappable character throws instead of becoming '?'.
+    if (-not ('AnsiCodePage' -as [type])) {
+        Add-Type -TypeDefinition 'using System.Runtime.InteropServices; public static class AnsiCodePage { [DllImport("kernel32.dll")] public static extern uint GetACP(); }'
+    }
+    [System.Text.Encoding]::RegisterProvider([System.Text.CodePagesEncodingProvider]::Instance)
+    return [System.Text.Encoding]::GetEncoding([int][AnsiCodePage]::GetACP(), [System.Text.EncoderFallback]::ExceptionFallback, [System.Text.DecoderFallback]::ExceptionFallback)
+}
+
 function Write-OptionFile([string]$Path, [string[]]$Lines) {
     # A file that may hold the only copy of root's password is never
     # truncated in place: the new text goes to a sibling file, is read back,
     # and replaces the old one in one step. Cut short anywhere, the old file
     # is whole.
     $temp = "$Path.writing"
-    $bytes = [System.Text.Encoding]::ASCII.GetBytes((($Lines -join "`r`n") + "`r`n"))
+    # In the system's ANSI code page, which is how mysqld and mysql read an option file on Windows (measured
+    # 2026-11-13: ASCII turned R:\...\Référence into R?f?rence, and UTF-8 bytes were read as RÃ©fÃ©rence; either way
+    # initialization failed). A line the code page cannot hold is refused by name rather than written wrong.
+    $text = ($Lines -join "`r`n") + "`r`n"
+    $encoding = Get-OptionEncoding
+    try {
+        $bytes = $encoding.GetBytes($text)
+    } catch [System.Text.EncoderFallbackException] {
+        throw "$Path would hold characters the system code page ($($encoding.CodePage)) cannot, and MySQL reads its option files in that code page; choose a -HomeDir whose path it can hold"
+    }
     try {
         [System.IO.File]::WriteAllBytes($temp, $bytes)
         if (-not [System.Linq.Enumerable]::SequenceEqual([System.IO.File]::ReadAllBytes($temp), $bytes)) { throw "$temp read back differently from what was written" }
@@ -257,7 +276,10 @@ function Invoke-Sql([string]$Options, [string]$Sql, [string[]]$Extra = @()) {
     # Exit code of the client running $Sql; nothing it prints is shown, so no secret can be.
     $prev = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
-    $Sql | & $Client "--defaults-extra-file=$Options" --connect-timeout=5 --batch @Extra 2>&1 | Out-Null
+    # The option file by its name from its own folder: the mysql client could not open a --defaults-extra-file path
+    # holding a character such as é (measured 2026-11-13), and a Windows profile folder may hold one.
+    Push-Location -LiteralPath (Split-Path $Options)
+    try { $Sql | & $Client "--defaults-extra-file=$(Split-Path $Options -Leaf)" --connect-timeout=5 --batch @Extra 2>&1 | Out-Null } finally { Pop-Location }
     $code = $LASTEXITCODE
     $ErrorActionPreference = $prev
     return $code
@@ -303,6 +325,11 @@ function Stop-Started([System.Diagnostics.Process]$Proc) {
 
 function Invoke-Start {
     if (-not (Test-Path -LiteralPath $Mysqld)) { Say 'refused: the server is not installed (run tools/refdata/server.ps1 -Install)'; return 2 }
+    # Before anything is made: every path the option files will hold must survive the code page MySQL reads them in.
+    try { $null = (Get-OptionEncoding).GetBytes("$Home_|$InstallDir") } catch [System.Text.EncoderFallbackException] {
+        Say "refused: $Home_ holds characters the system code page ($((Get-OptionEncoding).CodePage)) cannot, and MySQL reads its option files in that code page; choose a -HomeDir whose path it can hold. Nothing was created"
+        return 2
+    }
     $owned = Get-OwnedProcess
     $proc = $null
     if ($owned) {
@@ -378,7 +405,8 @@ function Invoke-Stop {
         Say 'was not running'
         return 0
     }
-    & $Admin "--defaults-extra-file=$LocalCnf" shutdown 2>&1 | Out-Null
+    Push-Location -LiteralPath (Split-Path $LocalCnf)
+    try { & $Admin "--defaults-extra-file=$(Split-Path $LocalCnf -Leaf)" shutdown 2>&1 | Out-Null } finally { Pop-Location }
     $proc = Get-Process -Id $owned.ProcessId -ErrorAction SilentlyContinue  # gone already is the outcome wanted
     if ($proc -and -not $proc.WaitForExit(30000)) { $proc.Kill($true); $null = $proc.WaitForExit(10000) }
     Remove-Item -LiteralPath $StateFile -Force

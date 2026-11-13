@@ -134,13 +134,15 @@ def run_sql(sql: str, *, options: Path, database: str | None = None, tool: str =
     exe = client_path(tool)
     if not exe.is_file():
         raise Refused(f"refused: no {tool} client at {exe} (run tools/refdata/server.ps1 -Install, or set RESOLUTE_REFDATA_CLIENT)")
-    args = [str(exe), f"--defaults-extra-file={options}", "--connect-timeout=5", "--default-character-set=utf8mb4"]
+    # The option file by its name, from its own folder: the mysql client could not open a --defaults-extra-file path
+    # holding a character such as é (measured 2026-11-13), and a Windows profile folder may hold one.
+    args = [str(exe), f"--defaults-extra-file={options.name}", "--connect-timeout=5", "--default-character-set=utf8mb4"]
     if tool == "mysql":
         args += ["--batch", "--skip-column-names"]
     args += list(extra)
     if database:
         args.append(database)
-    proc = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=str(options.parent))
     try:
         out, err = proc.communicate(input=sql.encode("utf-8"), timeout=TIMEOUT_SECONDS)
     except subprocess.TimeoutExpired:
@@ -322,12 +324,12 @@ def cmd_backup(s: Session, path: str) -> int:
     partial = target.with_name(target.name + ".partial")
     with open(partial, "wb") as out:
         proc = subprocess.Popen(
-            [str(exe), f"--defaults-extra-file={s.options}", "--default-character-set=utf8mb4",
+            [str(exe), f"--defaults-extra-file={s.options.name}", "--default-character-set=utf8mb4",
              # The data only: a restore builds the schema from data/refdata/schema.sql, the repository's own, and loads
              # these rows as a user that can do nothing else (cmd_restore).
              "--no-create-info", "--skip-triggers", "--skip-disable-keys", "--complete-insert", "--single-transaction",
              "--skip-dump-date", s.database],
-            stdout=out, stderr=subprocess.PIPE)
+            stdout=out, stderr=subprocess.PIPE, cwd=str(s.options.parent))
         try:
             _, err = proc.communicate(timeout=TIMEOUT_SECONDS)
         except subprocess.TimeoutExpired:
@@ -384,14 +386,17 @@ def cmd_restore(s: Session, path: str, schema: Path = SCHEMA) -> int:
         raise Refused(f"refused: the dump {reaches}, so it would write outside '{s.database}'; take the backup with refdata.py backup, which names no database")
     user = f"refdata_restore_{secrets.token_hex(4)}"
     password = secrets.token_urlsafe(24)
+    # The account is for the host the server sees this connection come from: 'localhost' for the private server,
+    # the workstation's address for a shared one, where an account for 'localhost' could not log in.
+    account_host = run_sql("SELECT SUBSTRING_INDEX(USER(), '@', -1);", options=s.options)[0][0]
     run_sql(f"CREATE DATABASE `{s.database}` CHARACTER SET utf8mb4;", options=s.options)
     restored = False
     with tempfile.TemporaryDirectory(prefix="refdata-restore-") as tmp:
         restricted = Path(tmp) / "restore.cnf"
         try:
             run_sql(schema.read_text(encoding="utf-8"), options=s.options, database=s.database)
-            run_sql(f"CREATE USER '{user}'@'localhost' IDENTIFIED BY {sql_str(password)};\n"
-                    f"GRANT SELECT, INSERT, LOCK TABLES ON `{grant_pattern(s.database)}`.* TO '{user}'@'localhost';", options=s.options)
+            run_sql(f"CREATE USER '{user}'@{sql_str(account_host)} IDENTIFIED BY {sql_str(password)};\n"
+                    f"GRANT SELECT, INSERT, LOCK TABLES ON `{grant_pattern(s.database)}`.* TO '{user}'@{sql_str(account_host)};", options=s.options)
             restricted.write_text(f"[client]\nuser={user}\npassword={password}\nhost={option_value(s.options, 'host') or '127.0.0.1'}\n"
                                   f"port={option_value(s.options, 'port') or '3306'}\n", encoding="ascii")
             try:
@@ -403,7 +408,7 @@ def cmd_restore(s: Session, path: str, schema: Path = SCHEMA) -> int:
                 raise Refused(f"refused: the backup could not be loaded as rows into '{s.database}' alone ({refusal}); nothing outside it was changed") from None
             restored = True
         finally:
-            run_sql(f"DROP USER IF EXISTS '{user}'@'localhost';", options=s.options)
+            run_sql(f"DROP USER IF EXISTS '{user}'@{sql_str(account_host)};", options=s.options)
             if not restored:
                 run_sql(f"DROP DATABASE IF EXISTS `{s.database}`;", options=s.options)
     print(f"restored {dump} into '{s.database}'")
