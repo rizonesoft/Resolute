@@ -1,8 +1,8 @@
 capture       : 2026-11-13-D00-T05-s2-readme-diagram-light.png
-image sha256  : 31F52555A30719429783C4A07F407207E964168E03FA2F32CF52C49BCEDEB119
+image sha256  : 6457333EC7E1FA4262A41B0CE3EA972B95266F45E813CF2974919DC6BD2FC0F8
 describes     : GitHub's rendering of the README architecture diagram, rendered by GitHub from Mermaid, light theme (D00 T05 section 2)
-window title  : Resolute/README.md at d4361805e8234326ed62e05c1ac4973a1a0e13ff · rizonesoft/Resolute · GitHub
-target process: 42704 C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
+window title  : Resolute/README.md at 64776f820df17a02222ab74a987f2b69cbec0283 · rizonesoft/Resolute · GitHub
+target process: 49400 C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
 attached      : attached to a process the caller started and owns
 source binary : C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
 file version  : 157.0.4341.46
@@ -11,15 +11,15 @@ monitor dpi   : 144  (150% scaling) -- what the image was rendered at
 window dpi    : 144  (logical dpi the process sees)
 dpi aware     : True
 appearance    : light  (stated by the caller)
-fixture       : github.com/rizonesoft/Resolute README.md at d4361805e8234326ed62e05c1ac4973a1a0e13ff, Microsoft Edge on a profile of its own, preferredColorScheme=1
-launch context: msedge --user-data-dir=R:\scratch\claude\008068c098901162\e637b220-98f9-427b-afb3-3937332d533d\scratchpad\edge-profile --no-first-run --no-default-browser-check --blink-settings=preferredColorScheme=1 --window-size=1400,1050 --window-position=60,60 --app=https://github.com/rizonesoft/Resolute/blob/d4361805e8234326ed62e05c1ac4973a1a0e13ff/README.md#how-is-it-built
+fixture       : github.com/rizonesoft/Resolute README.md at 64776f820df17a02222ab74a987f2b69cbec0283, Microsoft Edge on a profile of its own, preferredColorScheme=1
+launch context: msedge --user-data-dir=R:\scratch\claude\008068c098901162\e637b220-98f9-427b-afb3-3937332d533d\scratchpad\edge-profile --no-first-run --no-default-browser-check --blink-settings=preferredColorScheme=1 --window-size=1400,1050 --window-position=60,60 --app=https://github.com/rizonesoft/Resolute/blob/64776f820df17a02222ab74a987f2b69cbec0283/README.md#how-is-it-built
 fixture files : none (a public web page)
 launch args   : attached to a running process
 working dir   : (default)
 locale        : en-ZA / UI en-US
 geometry      : 99,90 2082x1566
 exe sha256    : 3E2C8557B5CA4D78868D3089346146CEAB94F198CE3D58526CE8F6C8D4B4167C
-source revision: d4361805e8234326ed62e05c1ac4973a1a0e13ff
+source revision: 96d79f2eac7bc3e888fbaa48ac2d6e76b2d1c79a
 windows build : 10.0.26300.0
 captured      : 2026-11-13
 
