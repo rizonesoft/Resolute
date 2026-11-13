@@ -69,6 +69,9 @@ param(
     [string]$WindowTitle,
     [int]$ProcessId = 0,
     [string]$Out,
+
+    # Read a pair and say whether its sidecar is the one for its image (D00 T02 section 13).
+    [string]$Verify = '',
     [string]$Describes = '',
 
     # The appearance the captured window shows. An application can override
@@ -106,6 +109,30 @@ Set-StrictMode -Version Latest
 # sidecar's switch fails, the image's is undone, so the live pair is either the
 # old one or the new one, never one of each. Whatever fails, the *.new and *.old
 # files this call made are removed and the failure is named.
+
+function Test-OutPath([string]$Image) {
+    # $null when the image and its sidecar are two files, the refusal otherwise.
+    $sidecar = [System.IO.Path]::ChangeExtension($Image, '.txt')
+    if ([string]::Equals([System.IO.Path]::GetFullPath($sidecar), [System.IO.Path]::GetFullPath($Image), [System.StringComparison]::OrdinalIgnoreCase)) {
+        return "-Out $Image would be its own sidecar ($sidecar): give the image a .png name"
+    }
+    return $null
+}
+
+function Test-PairBinding([string]$Image) {
+    # $null when the sidecar beside the image records the image's own SHA-256;
+    # the reason otherwise. Two files cannot be replaced at once, so a reader
+    # trusts a pair only when this holds.
+    $sidecar = [System.IO.Path]::ChangeExtension($Image, '.txt')
+    if (-not (Test-Path -LiteralPath $Image -PathType Leaf)) { return "no image at $Image" }
+    if (-not (Test-Path -LiteralPath $sidecar -PathType Leaf)) { return "no sidecar at $sidecar" }
+    $line = @(Get-Content -LiteralPath $sidecar | Where-Object { $_ -match '^image sha256\s*:' }) | Select-Object -First 1
+    if (-not $line) { return "the sidecar $sidecar records no image sha256 (it was written before pairs were bound), so the pair cannot be verified" }
+    $recorded = ($line -replace '^image sha256\s*:\s*', '').Trim().ToUpperInvariant()
+    $actual = (Get-FileHash -LiteralPath $Image -Algorithm SHA256).Hash.ToUpperInvariant()
+    if ($recorded -ne $actual) { return "the image's sha256 is $actual, its sidecar records ${recorded}: they are not one capture" }
+    return $null
+}
 
 $script:AfterWrite = $null   # the self-test's way to make a write land other bytes
 $script:SwitchHook = $null   # the self-test's stand-in for the writer ending between the two switches
@@ -293,6 +320,32 @@ function Invoke-SelfTest {
         Check 'a writer that ended while holding the pair does not block the next' ($null -ne $lock)
         $lock.ReleaseMutex(); $lock.Dispose()
 
+        # A pair proves itself: the sidecar records its image's hash, and a mixed pair is refused.
+        $bound = { param($bytes, $label) $enc.GetBytes("capture : $label`nimage sha256  : $([System.Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData([byte[]]$bytes)))`n") }
+        Write-CapturePair $png $oldPng $txt (& $bound $oldPng 'old')
+        Check 'a written pair verifies' ($null -eq (Test-PairBinding $png))
+        $script:SwitchHook = { 'stop' }
+        try { Write-CapturePair $png $newPng $txt (& $bound $newPng 'new') } finally { $script:SwitchHook = $null }
+        $mixed = Test-PairBinding $png
+        Check 'a new image beside the earlier sidecar is refused, naming both hashes' ($mixed -like '*they are not one capture*' -and $mixed -like "*$([System.Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData([byte[]]$newPng)))*")
+        $null = Restore-Pair $png $txt
+        $before = "$(Hash $png) $(Hash $txt)"
+        Check 'an output that is its own sidecar is refused, a .png is not' ((Test-OutPath (Join-Path $dir 'shot.txt')) -like '*would be its own sidecar*' -and $null -eq (Test-OutPath (Join-Path $dir 'shot.png')))
+        Set-Content -LiteralPath $txt -Value 'capture : legacy' -NoNewline
+        Check 'a sidecar written before pairs were bound is refused as unverifiable' ((Test-PairBinding $png) -like '*records no image sha256*cannot be verified*')
+        Write-CapturePair $png $oldPng $txt $oldTxt
+        $before = "$(Hash $png) $(Hash $txt)"
+
+        # Through the script itself: -Out shot.txt beside a pair and a recovery leftover touches nothing.
+        $clashDir = Join-Path $dir 'clash'
+        New-Item -ItemType Directory -Path $clashDir | Out-Null
+        foreach ($f in 'shot.png', 'shot.txt', 'shot.txt.new', 'shot.txt.old') { [System.IO.File]::WriteAllBytes((Join-Path $clashDir $f), $enc.GetBytes("kept $f")) }
+        $clashState = { @(Get-ChildItem -LiteralPath $clashDir -File | Sort-Object Name | ForEach-Object { "$($_.Name) $(Hash $_.FullName)" }) -join ';' }
+        $clashBefore = & $clashState
+        $said = & (Get-Process -Id $PID).Path -NoProfile -File $PSCommandPath -ProcessId 999999 -Out (Join-Path $clashDir 'shot.txt') 2>&1 | Out-String
+        $clashCode = $LASTEXITCODE
+        Check 'the script refuses -Out shot.txt with exit 2 and touches no file, leftovers included' ($clashCode -eq 2 -and $said -like '*would be its own sidecar*' -and (& $clashState) -eq $clashBefore)
+
         Write-CapturePair $png $newPng $txt $newTxt
         Check 'a replacing write leaves the new pair and no *.new or *.old' ((Leftovers) -eq 0 -and [System.Linq.Enumerable]::SequenceEqual([System.IO.File]::ReadAllBytes($png), $newPng) -and [System.Linq.Enumerable]::SequenceEqual([System.IO.File]::ReadAllBytes($txt), $newTxt))
     } finally {
@@ -305,8 +358,20 @@ function Invoke-SelfTest {
 
 if ($SelfTest) { exit (Invoke-SelfTest) }
 
+if ($Verify) {
+    $why = Test-PairBinding ([System.IO.Path]::GetFullPath($Verify))
+    if ($why) { Write-Host "capture-window: $Verify is not a verified pair: $why" -ForegroundColor Red; exit 1 }
+    Write-Host "capture-window: $Verify and its sidecar are one capture" -ForegroundColor Green
+    exit 0
+}
+
 if (-not $Out) {
     Write-Host "capture-window: give -Out, the PNG to write." -ForegroundColor Red
+    exit 2
+}
+$clash = Test-OutPath $Out
+if ($clash) {
+    Write-Host "capture-window: refused: $clash" -ForegroundColor Red
     exit 2
 }
 try {
@@ -491,6 +556,7 @@ $appearanceLine = if ($Appearance) {
 }
 $sidecarLines = @(
     "capture       : $(Split-Path $Out -Leaf)"
+    "image sha256  : $([System.Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData($imageBytes)))"
     "describes     : $Describes"
     "window title  : $($target.MainWindowTitle)"
     "target process: $($target.Id) $(if ($target.Path) { $target.Path } else { '(path unavailable)' })"
