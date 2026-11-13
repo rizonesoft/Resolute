@@ -219,7 +219,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T01 §8`  | DPI awareness and system theme                |   7   |
 | [x] | `D01 T03 §4`  | Per-tool log surface                          |  15   |
 | [ ] | `D01 T01 §3`  | Logging and the log surface                   |   9   |
-| [ ] | `D01 T03 §5`  | Update dialog and announcement                |  14   |
+| [ ] | `D01 T03 §5`  | Update dialog and announcement                |  17   |
 | [ ] | `D01 T01 §5`  | Update check and consolidation announcement   |  10   |
 | [ ] | `D01 T01 §9`  | Standalone proof in an empty folder           |   7   |
 | [ ] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown           |   6   |
