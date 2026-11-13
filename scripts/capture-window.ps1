@@ -141,20 +141,32 @@ public class ZOrder {
     // What the walk needs of one window. When a step fails, Error names it
     // and Gone says whether the window no longer exists, so a refusal can say
     // which; whatever was read before the failure (title, process) is kept.
+    // Whether a window exists and is shown: the two questions the self-test
+    // answers for a window that closes part way through being read.
+    public static Func<IntPtr, bool> Exists = h => IsWindow(h);
+    public static Func<IntPtr, bool> Shown = h => IsWindowVisible(h) && !IsIconic(h);
     public static Info Inspect(IntPtr h) {
         var info = new Info();
-        if (!IsWindow(h)) { info.Error = "it no longer exists"; info.Gone = true; return info; }
-        info.Visible = IsWindowVisible(h) && !IsIconic(h);
+        if (!Exists(h)) { info.Error = "it no longer exists"; info.Gone = true; return info; }
+        info.Visible = Shown(h);
         GetWindowThreadProcessId(h, out info.Pid);
         var t = new StringBuilder(256); GetWindowTextW(h, t, 256); info.Title = t.ToString();
         if (!info.Visible) return info;
         int cloaked;
         int hr = DwmGetWindowAttribute(h, 14, out cloaked, 4);   // DWMWA_CLOAKED
-        if (hr != 0) { info.Error = string.Format("its compositor state could not be read (DWMWA_CLOAKED, 0x{0:X8})", hr); return info; }
+        if (hr != 0) return Failed(h, info, string.Format("its compositor state could not be read (DWMWA_CLOAKED, 0x{0:X8})", hr));
         info.Cloaked = cloaked != 0;
         hr = DwmGetWindowAttribute(h, 9, out info.Frame, 16);   // DWMWA_EXTENDED_FRAME_BOUNDS, then the window rectangle
-        if (hr != 0 && !GetWindowRect(h, out info.Frame)) { info.Error = string.Format("its frame could not be read (DWMWA_EXTENDED_FRAME_BOUNDS 0x{0:X8}, then GetWindowRect)", hr); return info; }
-        if (!IsWindow(h)) { info.Error = "it disappeared while it was read"; info.Gone = true; return info; }
+        if (hr != 0 && !GetWindowRect(h, out info.Frame)) return Failed(h, info, string.Format("its frame could not be read (DWMWA_EXTENDED_FRAME_BOUNDS 0x{0:X8}, then GetWindowRect)", hr));
+        if (!Exists(h)) { info.Error = "it disappeared while it was read"; info.Gone = true; return info; }
+        return info;
+    }
+    // A read that failed on a window that has since closed failed because it
+    // closed: that is gone, with the step it was at, and not unreadable.
+    static Info Failed(IntPtr h, Info info, string step) {
+        if (Exists(h)) { info.Error = step; return info; }
+        info.Error = "it disappeared while it was read: " + step;
+        info.Gone = true;
         return info;
     }
 }
@@ -510,6 +522,20 @@ function Invoke-SelfTest {
     $firstBlind = Resolve-TargetFrame $blind ([IntPtr]77)
     $firstHere = Resolve-TargetFrame $here ([IntPtr]77)
     Check 'the first frame read refuses a gone or unreadable target naming it and the step, and yields a readable one''s frame' ($firstGone.Refusal -like "*target window 77 ('Launcher', pid 7) is gone (it no longer exists)*" -and $firstBlind.Refusal -like "*target window 77 ('Launcher', pid 7) could not be read: its compositor state*" -and ($firstHere.Frame -join ',') -eq '100,100,900,700' -and -not $firstHere.ContainsKey('Refusal'))
+    # The real inspection, of a handle no window has: it is told the window existed and was shown when it was first
+    # asked, so its compositor read fails as it does on a window that closes part way through being read.
+    $bogus = [IntPtr]0x7FFF0FF0
+    $script:asked = 0
+    $savedExists = [ZOrder]::Exists; $savedShown = [ZOrder]::Shown
+    try {
+        [ZOrder]::Shown = [Func[IntPtr, bool]] { param($h) $true }
+        [ZOrder]::Exists = [Func[IntPtr, bool]] { param($h) $script:asked++; $script:asked -eq 1 }
+        $closed = [ZOrder]::Inspect($bogus)
+        [ZOrder]::Exists = [Func[IntPtr, bool]] { param($h) $true }
+        $stuck = [ZOrder]::Inspect($bogus)
+    } finally { [ZOrder]::Exists = $savedExists; [ZOrder]::Shown = $savedShown }
+    $closedFirst = Resolve-TargetFrame $closed $bogus
+    Check 'a window that closes while it is read is gone with the step it was at, and one still there is unreadable' ($closed.Gone -and $closed.Error -like 'it disappeared while it was read: its compositor state could not be read*' -and $closedFirst.Refusal -like "*target window $bogus* is gone (it disappeared while it was read: its compositor state*" -and -not $stuck.Gone -and $stuck.Error -like 'its compositor state could not be read*' -and (Resolve-TargetFrame $stuck $bogus).Refusal -like '*could not be read: its compositor state*')
     Check 'a target that is gone, hidden or moved is refused naming it, and one where it was is not' ((Test-Target $null $frame ([IntPtr]77)) -like '*target window 77 is gone*' -and (Test-Target $hidden $frame ([IntPtr]77)) -like "*target window 77 ('w100', pid 7) is no longer visible*" -and (Test-Target $moved $frame ([IntPtr]77)) -like "*target window 77 ('w140', pid 7) moved*" -and $null -eq (Test-Target $here $frame ([IntPtr]77)))
 
     # The pair lock is released however the script ends, even run in this process, where exit does not end the thread.
