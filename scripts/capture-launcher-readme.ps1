@@ -267,6 +267,10 @@ function Publish-Set([string]$Staging, [string]$OutDir, [string[]]$Files) {
     Write-Journal $Staging $entries $false
     $movedAside = [System.Collections.Generic.List[string]]::new()
     $movedIn = [System.Collections.Generic.List[string]]::new()
+    # From the first move until publication or its undo has finished, the
+    # staging folder holds the only copy of an earlier file, so the caller
+    # keeps it whatever happens next.
+    $script:KeepStaging = $true
     try {
         foreach ($f in $Files) {
             $live = Join-Path $OutDir $f
@@ -283,18 +287,27 @@ function Publish-Set([string]$Staging, [string]$OutDir, [string[]]$Files) {
         Write-Journal $Staging $entries $true
     } catch {
         $why = $_.Exception.Message
-        foreach ($f in $movedIn) { Remove-Item -LiteralPath (Join-Path $OutDir $f) -Force }
+        # Each step of the undo reports instead of throwing, so one that
+        # fails cannot skip the rest or the decision to keep the staging folder.
+        $stuck = @()
+        foreach ($f in $movedIn) {
+            try { [System.IO.File]::Delete((Join-Path $OutDir $f)) } catch { $stuck += $f }
+        }
         $lost = @()
         foreach ($f in $movedAside) {
             try { [System.IO.File]::Move((Join-Path $aside $f), (Join-Path $OutDir $f)) } catch { $lost += $f }
         }
-        if ($lost) {
-            $script:KeepStaging = $true
-            throw "publication failed ($why) and $($lost -join ', ') could not be put back; the earlier files are in $aside"
+        if ($stuck -or $lost) {
+            $parts = @()
+            if ($stuck) { $parts += "the new $($stuck -join ', ') could not be removed" }
+            if ($lost) { $parts += "the earlier $($lost -join ', ') could not be put back and are in $aside" }
+            throw "publication failed ($why), and $($parts -join '; '); the staging folder is kept, and the next run puts the earlier files back"
         }
+        $script:KeepStaging = $false
         throw "publication failed, nothing was published, and the earlier files are as they were: $why"
     }
     Remove-Item -LiteralPath $aside -Recurse -Force
+    $script:KeepStaging = $false
 }
 
 function Restore-Interrupted([string]$OutDir) {
@@ -409,6 +422,22 @@ function Invoke-SelfTest {
         $cut = & $state
         $recovered = Restore-Interrupted $out
         Check 'a publication cut short is recovered at the next start: the earlier set byte for byte, no staging, aside or journal left' ($cut -ne $earlier -and (& $state) -eq $earlier -and -not (Test-Path -LiteralPath $dead) -and $recovered.Count -eq 1)
+
+        # (d) after installing, another handle holds a new file with no sharing: the readback fails, and so does removing it.
+        $held = Join-Path $out '.capture-staging-999998-selftest'
+        New-Item -ItemType Directory -Path $held | Out-Null
+        foreach ($f in $files) { Copy-Item -LiteralPath (Join-Path $stage $f) -Destination $held }
+        $script:Holder = $null
+        $script:PublishHook = { param($dir, $count) if ($count -eq $files.Count) { $script:Holder = [System.IO.File]::Open((Join-Path $dir 'a.png'), 'Open', 'Read', 'None') } }
+        $said = $null
+        $script:KeepStaging = $false
+        try { Publish-Set $held $out $files } catch { $said = $_.Exception.Message } finally { $script:PublishHook = $null }
+        $asideKept = @(Get-ChildItem -LiteralPath (Join-Path $held 'aside') -File | Sort-Object Name | ForEach-Object { "$($_.Name)=$((Get-Content -LiteralPath $_.FullName -Raw).Trim())" }) -join ';'
+        Check 'an undo that cannot remove a held file names it and keeps the staging folder with the earlier file' ($said -like '*the new a.png could not be removed*' -and $script:KeepStaging -and $asideKept -like '*a.png=earlier a.png*')
+        $script:Holder.Dispose()
+        $null = Restore-Interrupted $out
+        Check 'the next start then puts the whole earlier set back' ((& $state) -eq $earlier -and -not (Test-Path -LiteralPath $held))
+        $script:KeepStaging = $false
 
         Publish-Set $stage $out $files
         $now = @(Get-ChildItem -LiteralPath $out -File | Sort-Object Name | ForEach-Object { "$($_.Name)=$((Get-Content -LiteralPath $_.FullName -Raw).Trim())" }) -join ';'

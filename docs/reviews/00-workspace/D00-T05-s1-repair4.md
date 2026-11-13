@@ -27,3 +27,31 @@ OVERALL: needs-attention
 - Planned: finding 1 (P1), a journal written before anything moves, kept staging when a put-back fails, and recovery at the next start of a staging folder whose run is gone, proven by a case stopped after two files moved in, in the section-correction commit that follows this record
 - Planned: finding 2 (P2), a case that fails after new files were moved in (a readback that differs), restoring the whole earlier set, in the same commit
 - Planned: finding 3 (P2), the kill drill waits until the launcher and the capture child are both running, ends only the driver, and checks both are gone while a launcher started beforehand survives, in the same commit
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T03:36:31Z
+- Effort: medium
+- Writer model: claude-opus-5-5
+- Policy: a2ac53cb4840935e2f4ac6c56de7842f07dae193
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 10
+- Digest: c550c636bcd56bc1
+
+### adversarial: needs-attention
+
+1. **P1, `scripts/capture-launcher-readme.ps1:286` (cleanup at `:629`): Failed rollback deletion destroys the earlier set.** With `$ErrorActionPreference = 'Stop'`, a failure removing any newly installed file escapes the rollback before `$script:KeepStaging` is set. The caller then recursively deletes staging, including `aside` and its original files.
+
+   **Reproduction:** Publish over an existing capture set in `docs/captures`. After installation, hold a newly published PNG open with `FileShare.None`, representing a concurrent file consumer. The existing `PublishHook` can reproduce this deterministically without changing file contents. Hash readback fails, rollback deletion hits the same lock, and the caller deletes the unlocked originals in `aside`. The earlier set is lost and next-start recovery has no journal.
+
+   Preserve staging from the moment originals move aside until publication or rollback is conclusively complete. Handle rollback deletion failures without bypassing preservation.
+
+HIGHEST: P1
+OVERALL: needs-attention
+
+- Fixed: finding 1 (a failed undo let the caller delete the earlier set). The staging folder is marked kept from the moment the first earlier file moves aside, and the mark clears only when publication or its undo has finished; each undo step reports instead of throwing, so a new file another handle holds is named, the earlier file stays in the kept staging folder, and the next start puts the whole set back. Self-test: `PASS an undo that cannot remove a held file names it and keeps the staging folder with the earlier file`, `PASS the next start then puts the whole earlier set back`, 15 PASS in all; with the early mark removed, that first case fails by name.
