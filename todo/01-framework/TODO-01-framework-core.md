@@ -88,10 +88,12 @@ Everything else in this file hangs off the shell. It decides what a tool is stru
 - [ ] Draw the seam explicitly: the framework owns lifecycle and shared surface, the tool owns its own logic and its own window contents. Done when: the seam is documented and nothing tool-specific exists on the framework side.
 - [ ] Add assertions for the lifecycle order and the shutdown persist. Done when: both run under Catch2.
 - [ ] Apply the saved process priority and the memory-trim behaviour at startup (groom 2026-09-23 gap scan) : `D01 T03 §2` specifies the priority combo and the reduce-memory checkbox and `§2` persists them, but nothing applies either, so both are settings with no consumer, and `AGENTS.md` names process priority as framework-owned. Done when: a saved priority reads back as the process's priority class after startup, the save-above-high guard refuses silently raising past High, and the reduce-memory setting drives one trim path, each quoted from a drive.
+- [ ] Prove the incompatibility and shutdown notices row by row against `docs/framework/notices.md`'s matrix (`D01 T03 §6`): the tool started on a Windows below the one it declares, and a shutdown whose settings cannot be written, including Windows ending the session. Done when: every matrix row naming this section names a check here that passes. **Filed 2026-11-13** from `D01 T03 §6`.
 - [ ] Commit: `"framework: application shell and lifecycle"`
 
 - [ ] Extend `scripts/conformance-check.py` with evaluators for `C01` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C01` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A minimal tool built on the shell starts and exits cleanly for both architectures. The documented startup order matches the asserted order. A forced close persists configuration, proven by readback. All three quoted.
+-> XREF: D01 T03 §6 -- the incompatibility and shutdown notices this section raises
 
 ## 2. Settings: One Writer, One Path
 
@@ -198,10 +200,12 @@ Every AutoIt tool requests elevation at startup and then assumes it holds for th
 - [ ] Support the case where a tool can still do something useful unelevated. Done when: the framework exposes the distinction and this section records that each tool declares its own answer.
 - [ ] Add assertions for the guard, the refusal message, and the single log line. Done when: three assertions run unelevated.
 - [ ] Decide the manifest execution level and add the elevated relaunch (groom 2026-09-23 gap scan) : this section only refuses, `D01 T03 §6` requires the refusal to offer a next step, and `D03 T01` assumes tools prompt for UAC at launch, but no item decides `asInvoker` against `requireAdministrator`; with the latter the guard never fires in the window and its checkpoint is unreachable. Done when: the decision is dated with its reason, the refusal offers "restart as administrator" that relaunches with the same command line and writes one log line, and both the unelevated refusal and the elevated relaunch are driven, quoted.
+- [ ] Prove the elevation refusal row by row against `docs/framework/notices.md`'s matrix (`D01 T03 §6`): the refusal's text and buttons, and its three outcomes (agreed, declined as a non-error, refused or failed). Done when: every matrix row naming this section names a check here that passes. **Filed 2026-11-13** from `D01 T03 §6`.
 - [ ] Commit: `"framework: gate privileged actions at the call site"`
 
 - [ ] Extend `scripts/conformance-check.py` with evaluators for `C31` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C31` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** Three elevation assertions run green in an unelevated session, each proving the action was refused by name, nothing changed, and exactly one log line was written. The refusal message is quoted.
+-> XREF: D01 T03 §6 -- the refusal notice this section shows
 
 ## 7. Adopt the UI Library and Its Surfaces
 
@@ -306,11 +310,13 @@ Two lifecycle guarantees the plan assumed and never assigned. Both matter more h
 - [ ] Prove the guard holds where it matters. Done when: two copies of a repair tool cannot run a repair simultaneously against the same target, asserted.
 - [ ] Build the crash notice's restart offer (groom 2026-09-23 gap scan) : `D01 T03 §6` specifies the restart offer and its buttons, and this section writes the report without it. Done when: after a seeded crash the notice offers restart, restart relaunches the tool with its command line, and dismiss exits with one log line, driven, quoted.
 - [ ] Build restart on request (`D01 T03 §3`, the Language page's "Restart now"): the running instance starts the same executable with the same working directory and the same command line, less any argument `§11`'s grammar marks as a one-time action, plus a handoff the new instance recognises, at the level the first is running at; the new instance answers that it has started, is not refused by the single-instance guard, and waits for the first to exit before it reads the settings; the first instance runs the framework's shutdown and exits only after that answer. A start that fails, or is not answered within 10 seconds, leaves the first instance open and running, ends any half-started second instance, and reports why; the wait never blocks the UI thread and can be cancelled, which ends the second instance and leaves the first as it was. Done when: a driven restart ends with one instance running with the same arguments, having read the settings the first one wrote at shutdown; a seeded start failure and a seeded missing answer each leave the first instance open with its message and no second process, quoted. **Filed 2026-11-13** from `D01 T03 §3`.
+- [ ] Prove the crash and single-instance notices row by row against `docs/framework/notices.md`'s matrix (`D01 T03 §6`): the three cases of what the computer holds, the report's fields and place, the notice at the next start when none could be shown, and a first instance that cannot be brought forward. Done when: every matrix row naming this section names a check here that passes. **Filed 2026-11-13** from `D01 T03 §6`.
 - [ ] Commit: `"framework: crash handling and single instance"`
 
 - [ ] Extend `scripts/conformance-check.py` with evaluators for `C19` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C19` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A deliberately faulted fixture tool produces a report, not the Windows crash dialog, and no tool installs its own handler, proven by search. A tool faulted mid-repair leaves a usable restore record, proven by undoing it from `Repair History`. The notice names the tool and whether the machine changed, captured. A second launch focuses the first. Two copies cannot repair the same target simultaneously, asserted.
 -> XREF: D01 T03 §3 -- the Language page whose restart this section builds
+-> XREF: D01 T03 §6 -- the crash and single-instance notices this section shows
 
 ## 11. Command Line and Exit Codes
 

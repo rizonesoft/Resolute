@@ -190,10 +190,12 @@ The audit trail. The AutoIt suite has six tools that write nothing at all, so th
 - [ ] Make the log line and the surface result agree. Done when: a driven run's lines and rendered rows are compared and match, quoted.
 - [ ] Log the undo as its own action, not as a repair. Done when: a run followed by undo produces distinguishable lines, asserted.
 - [ ] Prove no action can bypass the log. Done when: this section names the enforcement and an assertion covers it.
+- [ ] Write a registry failure as `docs/framework/notices.md` specifies (`D01 T03 §6`): one error line naming the action, the key's full path and the value's name, and the Windows reason in words, with no second line. Done when: every matrix row naming this section names a check here that passes, each driven against a fixture key that refuses the action. **Filed 2026-11-13** from `D01 T03 §6`.
 - [ ] Commit: `"repair: one log line per action and per refusal"`
 
 - [ ] Extend `scripts/conformance-check.py` with evaluators for `C30` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C30` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A mixed fixture run produces exactly one line per item, each naming item and target. Lines and rendered rows are compared and agree. Undo lines are distinguishable from repair lines. All quoted.
+-> XREF: D01 T03 §6 -- the registry failure lines this section writes
 
 ## Verification
 

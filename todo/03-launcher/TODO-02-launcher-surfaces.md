@@ -188,6 +188,8 @@ Everything the launcher owns around its content: its Preferences page in the fra
 -> XREF: D03 T01 §3 -- the build that consumes this chrome spec
 -> XREF: D00 T02 §12 -- the region comparison harness the deferred pair runs on
 
+-> XREF: D01 T03 §6 -- the launch log lines whose failure this surface shows
+
 ## Verification
 
 - [ ] Every AutoIt launcher control carries keep, cut with reason, or remapped to a named home

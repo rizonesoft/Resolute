@@ -102,9 +102,11 @@ The launcher starts tools that need administrator rights. What it does when that
 - [ ] Handle declined elevation as a first-class outcome, not an error. Done when: declining the prompt returns the user to the launcher with a stated message and one log line, and nothing is left running.
 - [ ] Log every launch and every launch failure. Done when: each produces exactly one line naming the tool.
 - [ ] Do not block the launcher while a tool runs. Done when: launching two tools in succession works and the launcher stays responsive, captured.
+- [ ] Write the launch lines as `docs/framework/notices.md` specifies (`D01 T03 §6`): one line per launch naming the tool, with the process id on success, the Windows reason on a refused start, and the path for a missing executable. Done when: every matrix row naming this section names a check here that passes. **Filed 2026-11-13** from `D01 T03 §6`.
 - [ ] Commit: `"launcher: launch tools and report failure honestly"`
 
 **Test checkpoint:** Corrupted executable, missing file, and declined elevation each produce their own named message and exactly one log line. Declining elevation leaves nothing running. Two tools launch in succession with the launcher responsive, captured.
+-> XREF: D01 T03 §6 -- the launch log lines this section writes
 
 ## 4. Windows System Locations
 
