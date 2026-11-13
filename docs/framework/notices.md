@@ -75,7 +75,7 @@ A tool that faults does not vanish. The framework's handler (`D01 T01 §10`) flu
 | Changed, and the record could not be written | `Crash_Changed_Unrecorded` ("%1 was part way through, and what it had changed could not be recorded. Run the repair again to finish it; the report lists the last steps it logged.") | The flush failed. Said plainly: this is the case that matters most |
 
 - **Restart** starts the tool as it is normally started: with its command line less any argument that asks for a one-time action (`D01 T01 §11`), as the Language page's restart does. It never repeats what the tool was doing when it stopped. A repair that was started from the command line is not run again; the tool opens, and the user decides. After a repair that changed something, the restarted tool opens on that run's record (`D02 T01 §4`), so Undo is one press away.
-- **Open report folder** opens the folder in File Explorer with the report selected, at the user's level ([`update-notices.md`](update-notices.md#which-page-does-the-button-open)). The notice stays open.
+- **Open report folder** opens the folder in File Explorer with the report selected, at the user's level ([`update-notices.md`](update-notices.md#which-page-does-the-button-open)). The notice stays open. A folder that cannot be opened is `Crash_Folder_Failed`, below.
 - **Close** ends the notice. Nothing restarts by itself.
 
 ### What is in the report?
@@ -100,7 +100,8 @@ A text file in the tool's log folder (`D01 T01 §3`), named `<short name>-crash-
 | --- | --- |
 | The report cannot be written (a full disk, a folder that refuses) | The notice is still shown, from what the hand-over carries. Its third line is `Crash_Report_Failed` ("A report could not be saved: %1"), and Open report folder is not offered |
 | The second instance cannot be started | Nothing can be shown then. At its next ordinary start the tool finds a report newer than `CrashNoticeShown` in its settings and shows the notice once the main window is up, with the summary `Crash_Title_Last` ("%{Program.Name} stopped working the last time it ran") and without Restart, since it is running |
-| Restart fails | Error `Restart_Failed_Title` with its body, as [`language-page.md`](language-page.md#what-happens-after-a-language-is-saved) specifies; the crash notice stays open |
+| Restart fails | Error, with the summary `Restart_Failed_Title` ("%{Program.Name} could not restart"), the Language page's, and a body of its own, `Crash_Restart_Failed_Body` ("Windows could not start %1: %2."), %1 the executable's path in monospace and %2 the Windows reason, with Close. It says nothing about a language, which the Language page's body does. The crash notice stays open |
+| The report folder cannot be opened | Error `Crash_Folder_Failed` ("The report folder could not be opened."), naming the folder's path, selectable, as File, Open log folder's failure does ([`standard-window.md`](standard-window.md#what-is-on-the-file-menu)). The crash notice stays open |
 | `CrashNoticeShown` cannot be written | Logged. The notice is shown again at the next start, which errs towards telling |
 
 ## What happens when the tool is started twice?
@@ -234,6 +235,8 @@ In `[Messages]` unless marked.
 | `Crash_Changed_None`, `Crash_Changed_Undo`, `Crash_Changed_Partial`, `Crash_Changed_Partial_Next`, `Crash_Changed_More`, `Crash_Changed_Unrecorded` | As the four cases give them | New |
 | `Button_Crash_Restart` | `&Restart %{Program.Name}` | New |
 | `Button_Crash_Folder` | `&Open report folder` | New |
+| `Crash_Restart_Failed_Body` | Windows could not start %1: %2. | New |
+| `Crash_Folder_Failed` | The report folder could not be opened. | New |
 | `Shutdown_Save_Title`, `Shutdown_Save_Body`, `Shutdown_Save_Unconfirmed_Body` | As the shutdown notice gives them | New |
 | `Button_Try_Again` | `&Try again` | New |
 | `Button_Close_Anyway` | `Close &anyway` | New |
@@ -260,8 +263,8 @@ Every row is one behavioural check in the section named in its last column, whic
 | A crash mid-repair with an irreversible item | Fault a fixture repair after one reversible and one irreversible item | | `Crash_Changed_Partial` counting 1, the irreversible item listed by name, then what to do next; Undo after restart restores the reversible item only, and says so | The stated result is the honest presentation | `D01 T01 §10`: `crash: a change that cannot be undone is named` |
 | A crash whose record could not be written | Fault a fixture repair with the record's folder refusing writes | | `Crash_Changed_Unrecorded`; the report lists the last logged steps | The stated result is the failure presentation | `D01 T01 §10`: `crash: an unrecorded change is said plainly` |
 | The report | Read the file a crash wrote | | Its name follows the rule; every field in the table is present; no file, registry or environment contents; an eleventh report deletes the oldest | The report cannot be written: `Crash_Report_Failed` in the notice, no Open report folder | `D01 T01 §10`: `crash: the report holds its fields and nothing else` |
-| Restart after a crash | Start the tool with a command line that runs a repair; fault it; press Restart | | The tool opens with its window and the repair is not run again, checked against the fixture | Restart failing: `Restart_Failed_Title`, the notice still open | `D01 T01 §10`: `crash: restart never repeats the action` |
-| Open report folder | Press it from an elevated crash | | Explorer opens the folder with the report selected, not elevated; the notice stays | `Link_Open_Failed` with the path, copyable | `D01 T01 §10`: `crash: the report folder opens at the user's level` |
+| Restart after a crash | Start the tool with a command line that runs a repair; fault it; press Restart | | The tool opens with its window and the repair is not run again, checked against the fixture | Restart failing: `Restart_Failed_Title` with `Crash_Restart_Failed_Body`, which names the path and reason and no language; the notice still open | `D01 T01 §10`: `crash: restart never repeats the action` |
+| Open report folder | Press it from an elevated crash | | Explorer opens the folder with the report selected, not elevated; the notice stays | Explorer cannot be started (seeded): `Crash_Folder_Failed` with the folder's path, selectable; the notice still open | `D01 T01 §10`: `crash: the report folder opens at the user's level` |
 | No notice could be shown | Seed the second instance failing to start; then start the tool normally; then again | | The first start shows the notice with `Crash_Title_Last` and no Restart, after the main window; `CrashNoticeShown` reads back; the second start shows nothing | The key cannot be written (seeded): shown again at the next start | `D01 T01 §10`: `crash: an unshown crash is told at the next start` |
 | A second start | Start the tool twice; with the first minimized | | The first is restored and in front; the second ends with no notice | The rows below | `D01 T01 §10`: `singleton: a second start brings the first forward` |
 | A first instance that does not answer | Start again with the first made to hang | | After 2 seconds `Singleton` with `Singleton_Busy`; no offer to end it; the first is untouched | The stated result is the failure presentation | `D01 T01 §10`: `singleton: a hung first instance is left alone` |
