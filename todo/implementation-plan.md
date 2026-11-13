@@ -209,13 +209,13 @@ The framework every tool consumes, the repair contract the destructive half cons
 
 |  ✔  | Section       | Deliverable                                   | Items |
 | :-: | ------------- | --------------------------------------------- | :---: |
-| [ ] | `D01 T01 §1`  | Application shell and lifecycle               |  10   |
+| [ ] | `D01 T01 §1`  | Application shell and lifecycle               |  11   |
 | [ ] | `D01 T01 §2`  | Settings: one writer, one path                |  11   |
 | [ ] | `D01 T01 §4`  | Localization and the pack loader              |  11   |
 | [x] | `D01 T03 §1`  | Standard window, menus, message layer         |  23   |
 | [x] | `D01 T03 §2`  | Preferences shell, general, performance       |  27   |
 | [x] | `D01 T03 §3`  | Language page and tool-page contract          |  15   |
-| [ ] | `D01 T01 §7`  | Standard window, About, and preferences       |  19   |
+| [ ] | `D01 T01 §7`  | Standard window, About, and preferences       |  20   |
 | [ ] | `D01 T01 §8`  | DPI awareness and system theme                |   7   |
 | [x] | `D01 T03 §4`  | Per-tool log surface                          |  15   |
 | [ ] | `D01 T01 §3`  | Logging and the log surface                   |   9   |
@@ -241,7 +241,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T02 §7`  | Text presentation and machine values          |   6   |
 | [ ] | `D01 T02 §8`  | Menu bar and the complete popup menu          |   6   |
 | [ ] | `D01 T02 §9`  | Form controls: button, checkbox, input, combo |   7   |
-| [ ] | `D01 T03 §7`  | Splash, donate, string audit                  |   4   |
+| [ ] | `D01 T03 §7`  | Splash, donate, string audit                  |   8   |
 
 
 ### Phase 2 -- The launcher and the ports
@@ -379,7 +379,7 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | [ ] | `D06 T01 §15` | Web Publishing and Link Switch                 |   4   |
 | [ ] | `D06 T01 §16` | Final Acceptance: The Suite As Shipped         |   6   |
 | [ ] | `D08 T01 §1`  | Documentation set for every tool               |  10   |
-| [ ] | `D08 T01 §2`  | Shared string pool and build-time composition  |   6   |
+| [ ] | `D08 T01 §2`  | Shared string pool and build-time composition  |   7   |
 | [ ] | `D08 T01 §3`  | Coverage matrix and pack hygiene               |   8   |
 | [ ] | `D08 T01 §4`  | Rewrite the shipped documentation              |   7   |
 | [ ] | `D08 T01 §5`  | Repository and developer documentation         |   5   |

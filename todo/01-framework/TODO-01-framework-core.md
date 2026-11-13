@@ -89,11 +89,13 @@ Everything else in this file hangs off the shell. It decides what a tool is stru
 - [ ] Add assertions for the lifecycle order and the shutdown persist. Done when: both run under Catch2.
 - [ ] Apply the saved process priority and the memory-trim behaviour at startup (groom 2026-09-23 gap scan) : `D01 T03 §2` specifies the priority combo and the reduce-memory checkbox and `§2` persists them, but nothing applies either, so both are settings with no consumer, and `AGENTS.md` names process priority as framework-owned. Done when: a saved priority reads back as the process's priority class after startup, the save-above-high guard refuses silently raising past High, and the reduce-memory setting drives one trim path, each quoted from a drive.
 - [ ] Prove the incompatibility and shutdown notices row by row against `docs/framework/notices.md`'s matrix (`D01 T03 §6`): the tool started on a Windows below the one it declares, and a shutdown whose settings cannot be written, including Windows ending the session. Done when: every matrix row naming this section names a check here that passes. **Filed 2026-11-13** from `D01 T03 §6`.
+- [ ] Start with no splash and close with no Donate dialog (`docs/framework/string-audit.md`, `D01 T03 §7`): the tool's window is its first surface, no delay is added to startup to show a message, closing raises nothing but shutdown's own notice, and nothing writes a `[Donate]` section or the computer's name to the settings file, an existing section being left as it is. Done when: the audit's rows naming this section each name a check here that passes, the settings file compared before and after a first run and close. **Filed 2026-11-13** from `D01 T03 §7`.
 - [ ] Commit: `"framework: application shell and lifecycle"`
 
 - [ ] Extend `scripts/conformance-check.py` with evaluators for `C01` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C01` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A minimal tool built on the shell starts and exits cleanly for both architectures. The documented startup order matches the asserted order. A forced close persists configuration, proven by readback. All three quoted.
 -> XREF: D01 T03 §6 -- the incompatibility and shutdown notices this section raises
+-> XREF: D01 T03 §7 -- the verdicts that remove the splash and the Donate dialog from startup and shutdown
 
 ## 2. Settings: One Writer, One Path
 
@@ -236,6 +238,7 @@ This section connects the two, and it is adoption rather than construction. DPI 
 - [ ] Prove the log surface row by row against `docs/framework/log-surface.md`'s matrix (`D01 T03 §4`): one behavioural check per row, driving the trigger and reading back the list, the clipboard, the log file and, for the window's place, the settings file across a restart, with fixture logs for each failure and one above 100 MB, and the writer made to stop and recover while the surface is open. Done when: every matrix row names a check here that passes. **Filed 2026-11-13** from `D01 T03 §4`.
 - [ ] Prove the update notices row by row against `docs/framework/update-notices.md`'s matrix (`D01 T03 §5`): one behavioural check per row, against a fixture update server, reading back the notice, the settings file and the log. Done when: every matrix row names a check here that passes. **Filed 2026-11-13** from `D01 T03 §5`.
 - [ ] Open every link at the user's own level (`D01 T03 §5`): a link the framework opens (the Help menu's, the update notices', About's) starts the browser as the signed-in user, not with the tool's administrator rights, when the tool is elevated. Done when: an elevated fixture tool opens a link and the started process is shown running without elevation, quoted, and a failure to start it that way reports `Link_Open_Failed` and does not fall back to starting it elevated. **Filed 2026-11-13** from `D01 T03 §5`.
+- [ ] Build no Donate surface (`docs/framework/string-audit.md`, `D01 T03 §7`): no strip in the window, no Help menu item, no tip in About. Done when: the audit's row naming this section names a check here that passes, a UI Automation walk of the window, both menus and About finding no element whose name holds "Donate". **Filed 2026-11-13** from `D01 T03 §7`.
 - [ ] Commit: `"framework: standard window, about, and preferences"`
 
 - [ ] Extend `scripts/conformance-check.py` with evaluators for `C11`, `C12`, `C13` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C11`, `C12`, `C13` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
@@ -248,6 +251,7 @@ This section connects the two, and it is adoption rather than construction. DPI 
 -> XREF: D07 T01 §4 -- the smoke run whose preferences step this section activates
 -> XREF: D01 T03 §4 -- the log surface this section builds and proves
 -> XREF: D01 T03 §5 -- the update notices this section proves, and whose links it opens
+-> XREF: D01 T03 §7 -- the verdict that removes every Donate surface
 
 ## 8. Extend the UI Library for the Tools
 

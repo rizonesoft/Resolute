@@ -90,9 +90,11 @@ The change that turns an impossible translation job into a tractable one. Most s
 - [ ] Compose each tool's shipped pack at build time by merging shared and tool-specific keys. Done when: a shipped pack is a single self-contained file per language per tool, and nothing resolves a shared file at runtime. Cheaper substitute that breaks standalone distribution: a shared language directory the tool reads at runtime, which makes a tool depend on a suite install.
 - [ ] Prove the composition. Done when: a composed pack is diffed against a hand-built expected pack and matches.
 - [ ] Leave tool-specific strings untranslated rather than guessing. Done when: what was ported and what was left is listed per language.
+- [ ] Compose the framework's packs from `docs/framework/string-audit.md` and the six framework pages' strings tables (`D01 T03 §7`): a key the audit cuts is in no composed pack, a key it fixes carries the fixed text, and a key a page adds is present with that page's English. Done when: a check over every composed pack fails on a cut key or an unfixed text, shown failing on a fixture pack that carries `Compatible_Bit`, and passes on the composed set. **Filed 2026-11-13** from `D01 T03 §7`.
 - [ ] Commit: `"localization: one shared string pool, composed at build time"`
 
 **Test checkpoint:** A composed pack is a single self-contained file matching a hand-built expected pack, diffed. No tool resolves a shared language file at runtime, proven by the standalone check. The ported and left-untranslated sets are listed per language.
+-> XREF: D01 T03 §7 -- the string audit these packs are composed from
 
 ## 3. Coverage Matrix and Pack Hygiene
 

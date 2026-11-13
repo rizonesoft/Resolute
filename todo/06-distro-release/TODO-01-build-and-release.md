@@ -437,6 +437,7 @@ The suite gets one traditional modal About dialog, Help menu > About, owned by t
 -> XREF: D06 T01 §10 -- the identity registry this dialog renders
 -> XREF: D01 T01 §12 -- where this section was written; its Moved marker points here
 -> XREF: D01 T01 §7 -- the UI surfaces this dialog builds on
+-> XREF: D01 T03 §7 -- the string audit that keeps or cuts each About key and leaves its final text here
 
 ## 18. F1 Context Help
 
