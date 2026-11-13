@@ -354,6 +354,12 @@ def dump_reaches_out(text: str) -> str | None:
     return None
 
 
+def grant_pattern(database: str) -> str:
+    """A database name as a GRANT reads it exactly: in a database-level grant `_` and `%` are wildcards, so a grant on
+    `refdat_` would also cover `refdata`; each is escaped with a backslash."""
+    return database.replace("\\", "\\\\").replace("_", "\\_").replace("%", "\\%")
+
+
 def option_value(options: Path, key: str) -> str | None:
     for line in options.read_text(encoding="ascii", errors="replace").splitlines():
         if line.strip().startswith(f"{key}="):
@@ -385,7 +391,7 @@ def cmd_restore(s: Session, path: str, schema: Path = SCHEMA) -> int:
         try:
             run_sql(schema.read_text(encoding="utf-8"), options=s.options, database=s.database)
             run_sql(f"CREATE USER '{user}'@'localhost' IDENTIFIED BY {sql_str(password)};\n"
-                    f"GRANT SELECT, INSERT, LOCK TABLES ON `{s.database}`.* TO '{user}'@'localhost';", options=s.options)
+                    f"GRANT SELECT, INSERT, LOCK TABLES ON `{grant_pattern(s.database)}`.* TO '{user}'@'localhost';", options=s.options)
             restricted.write_text(f"[client]\nuser={user}\npassword={password}\nhost={option_value(s.options, 'host') or '127.0.0.1'}\n"
                                   f"port={option_value(s.options, 'port') or '3306'}\n", encoding="ascii")
             try:
@@ -605,6 +611,16 @@ def self_test(schema: Path) -> int:
             checks.check("a backup that reaches into another database is refused, that database untouched, no target or user left",
                          code == 1 and "could not be loaded as rows" in out and len(history_rows(session, "fixture")) == before_rows
                          and not Session(options, target).exists() and users == "0", out.strip())
+
+            # A restore into a name one underscore away from another database cannot reach it: the grant names it exactly.
+            near = database[:-1] + "_"
+            reach = Path(tmp) / "reach.sql"
+            reach.write_text(f"SELECT 1;\nINSERT INTO `{database}`.`sources` (citation) VALUES ('written from a restore into {near}');\n", encoding="utf-8")
+            sources_before = session.sql("SELECT COUNT(*) FROM sources;")[0][0]
+            code, out = call(["restore", str(reach), "--options", str(options), "--database", near])
+            checks.check("a restore into a name that differs by an underscore cannot write the other database",
+                         code == 1 and session.sql("SELECT COUNT(*) FROM sources;")[0][0] == sources_before and not Session(options, near).exists(),
+                         f"exit {code}, sources {sources_before} -> {session.sql('SELECT COUNT(*) FROM sources;')[0][0]}, said {out.strip()!r}")
 
             # A backup that asks the client to run a shell command is refused, and the command never runs.
             marker = Path(tmp) / "shell-ran.txt"
