@@ -2,7 +2,7 @@
 schema_version: 1
 id: framework-surfaces
 domain: 01-framework
-status: draft
+status: done
 title: "TODO-03 -- Framework Surface Specification"
 depends_on: []
 track: F1
@@ -433,8 +433,8 @@ Two verdicts and an audit. The splash screen (`Splash.au3`: message label plus p
 
 ## Verification
 
-- [ ] Every AutoIt framework control and message carries keep, cut with reason, or remapped to a named home
-- [ ] Every specified surface names its controls, strings with pack sources, states, and empty and failure presentations
-- [ ] The string audit names every finding with keep, fix quoted, or cut, and no cut key ships
-- [ ] Every `D01 T01` build section can be built from its spec section with no invented control or string
-- [ ] `python scripts/todo-graph.py validate` clean
+- [x] Every AutoIt framework control and message carries keep, cut with reason, or remapped to a named home **Verified 2026-11-13:** the six pages' inventories hold 86 AutoIt parts (standard-window 14, preferences 17, language-page 13, log-surface 18, update-notices 13, notices 11), none without a verdict, and `docs/framework/string-audit.md` adds the splash and Donate; counted by script over `docs/framework/*.md`.
+- [x] Every specified surface names its controls, strings with pack sources, states, and empty and failure presentations **Verified 2026-11-13:** the eight pages' matrices hold 221 rows (standard-window 25, preferences 37, language-page 30, tool-pages 22, log-surface 34, update-notices 32, notices 34, string-audit 7), none with an empty failure or check cell; a scan for keys used on a page but given English text nowhere finds only the six cut `ExecuteTool_*` keys and `Program_Purpose`, which each tool's own pack supplies by design.
+- [x] The string audit names every finding with keep, fix quoted, or cut, and no cut key ships **Verified 2026-11-13:** the audit script reports 172 pairs in the pack and 172 in the audit, none missing, none ruled twice; no C++ pack exists in the tree yet (no `.lng` file outside `resolute_au3/`), and the check that keeps a cut key out of a composed pack is `D08 T01 §2`'s, filed with its three failing fixtures.
+- [x] Every `D01 T01` build section can be built from its spec section with no invented control or string **Verified 2026-11-13:** each section's completion review ended with no gap in scope, and the build sections carry what the pages need: 19 items filed from this file into `D01 T01`, 4 into `D01 T02`, 4 into `D02 T01`, 1 into `D03 T01`, 1 into `D06 T01` and 1 into `D08 T01` (counted by `grep -c` of the filing mark), with a row-by-row proof item for every matrix. Proof by building is those sections' own.
+- [x] `python scripts/todo-graph.py validate` clean **Verified 2026-11-13:** `30 todos, 258 sections -- 0 fatal`.
