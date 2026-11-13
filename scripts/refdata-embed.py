@@ -231,6 +231,10 @@ def self_test() -> int:
     check("a truncated blob is refused", "compressed bytes" in refusal(lambda: unpack_bytes(blob[:-7], "the blob")))
     check("corrupted compressed bytes are refused, never read as data",
           refusal(lambda: unpack_bytes(blob[:-40] + bytes(40), "the blob")) != "")
+    bad_name = bytearray(blob)
+    bad_name[26] = 0xFF
+    check("a name that is not text is refused by name, not a crash", "name is not UTF-8" in refusal(lambda: unpack_bytes(bytes(bad_name), "the blob")),
+          refusal(lambda: unpack_bytes(bytes(bad_name), "the blob")))
     check("bytes that are not an embedded dataset are refused", "not an embedded dataset" in refusal(lambda: unpack_bytes(b"MZ" + bytes(60), "the blob")))
     # A machine where the compression call fails: the build stops naming the dataset, with nothing embedded.
     real = globals()["_cabinet"]

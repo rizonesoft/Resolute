@@ -85,6 +85,9 @@ def self_test() -> int:
         check("a reordered file fails naming the dataset", "dataset sample, version 3" in (verdict(reordered) or ""), repr(verdict(reordered)))
         miscounted = data.replace(b"entries 4", b"entries 5")
         check("a wrong count fails naming the dataset", "says 5 entries and the file holds 4" in (verdict(miscounted) or ""), repr(verdict(miscounted)))
+        superscript = data.replace(b"version 3", "version ³".encode("utf-8"))
+        check("a version that is a digit only to Unicode is refused by name, not a crash",
+              "must be whole numbers" in (verdict(superscript) or ""), repr(verdict(superscript)))
         check("CR LF line ends fail", "LF" in (verdict(data.replace(b"\n", b"\r\n")) or ""))
         check("a file named for another dataset fails", "must be named sample.refdata" in (verdict(data, "other.refdata") or ""), repr(verdict(data, "other.refdata")))
         bad_name = fmt.emit(fmt.Export("Con", 1, fmt.digest_of("Con", 1, ()), ()))

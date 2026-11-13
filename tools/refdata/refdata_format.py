@@ -117,7 +117,8 @@ def parse(data: bytes, where: str = "the export") -> Export:
             raise FormatError(f"{where}: header line '{line}' should be '{label} ...'")
         header[label] = line[len(label) + 1:]
     name = header["dataset"]
-    if not header["version"].isdigit() or not header["entries"].isdigit():
+    # ASCII digits only: str.isdigit() also accepts characters such as a superscript two, which int() then refuses.
+    if not re.fullmatch(r"[0-9]{1,9}", header["version"]) or not re.fullmatch(r"[0-9]{1,9}", header["entries"]):
         raise FormatError(f"{where} (dataset {name}): the version and the entry count must be whole numbers")
     version, count = int(header["version"]), int(header["entries"])
     named = f"{where} (dataset {name}, version {version})"
@@ -174,5 +175,8 @@ def read_blob(data: bytes, where: str = "the embedded dataset") -> Blob:
     start = _BLOB_FIXED.size + name_length + 32
     if len(data) != start + packed_size:
         raise FormatError(f"{where}: its header promises {packed_size} compressed bytes and {len(data) - start} follow")
-    name = data[_BLOB_FIXED.size:_BLOB_FIXED.size + name_length].decode("utf-8")
+    try:
+        name = data[_BLOB_FIXED.size:_BLOB_FIXED.size + name_length].decode("utf-8")
+    except UnicodeDecodeError:
+        raise FormatError(f"{where}: its dataset name is not UTF-8 text") from None
     return Blob(name, version, data[_BLOB_FIXED.size + name_length:start].hex(), raw_size, data[start:])
