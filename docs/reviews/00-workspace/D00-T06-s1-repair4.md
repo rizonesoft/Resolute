@@ -48,3 +48,25 @@ OVERALL: needs-attention
 
 HIGHEST: P1
 OVERALL: needs-attention
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T11:45:48Z
+- Effort: low
+- Writer model: claude-opus-5-5
+- Policy: 938d3b0ec43659bb07f0e094520cfb5bdf258a42
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 6
+- Digest: bbd9f08d4b67acb6
+
+### consistency: needs-attention
+
+1. **P2**: `tools/refdata/refdata.py:1178` deletes every account matching `refdata_restore_%`, rather than only the account created by this self-test. This contradicts the documented isolation of the self-test and `cmd_restore`’s per-restore ownership. Reproduction: run the documented `--self-test` against a private server containing a restore account left by an earlier interrupted restore; the outage case deletes that unrelated account too. Concurrent restores can also lose their accounts. Capture this case’s exact account and host and remove only that account. This finding is from code inspection; no destructive reproduction was run.
+
+HIGHEST: P2
+OVERALL: needs-attention

@@ -775,6 +775,18 @@ class SelfTestRun:
         self.read_back = lambda label: None
         self.dump_file = tmp
         self.hostile = tmp
+        # The restore accounts there before this run: an interrupted earlier restore may have left one, and the run's
+        # checks look only at accounts it made, never deleting or counting one it did not.
+        self.accounts_before = self.restore_accounts()
+
+    def restore_accounts(self) -> set[tuple[str, str]]:
+        # The underscores escaped, so the pattern matches restore accounts and nothing like them.
+        return {(name, host) for name, host in run_sql(r"SELECT user, host FROM mysql.user WHERE user LIKE 'refdata\_restore\_%';", options=self.options)}
+
+    def accounts_left(self) -> str:
+        """'0' when every restore account this run made is gone, otherwise the ones left."""
+        left = self.restore_accounts() - self.accounts_before
+        return "0" if not left else f"left {sorted(left)}"
 
     def proposal(self, name: str, body: object) -> str:
         path = self.tmp / f"{name}.json"
@@ -964,7 +976,7 @@ def _phase_restores(t: SelfTestRun) -> None:
     before_rows = len(history_rows(session, "fixture"))
     target = f"{database}_hostile"
     code, out = call(["restore", str(hostile), "--options", str(options), "--database", target])
-    users = run_sql("SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options)[0][0]
+    users = t.accounts_left()
     checks.check("a backup that reaches into another database is refused, that database untouched, no target or user left",
                  code == 1 and "could not be loaded as rows" in out and len(history_rows(session, "fixture")) == before_rows
                  and not Session(options, target).exists() and users == "0", out.strip())
@@ -1144,7 +1156,7 @@ def _phase_file_errors_and_cleanup(t: SelfTestRun) -> None:
         for path, handle in handles:
             kernel32.CloseHandle(handle)
             path.unlink(missing_ok=True)
-        users = run_sql("SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options)[0][0]
+        users = t.accounts_left()
         outcomes[label] = (said, users, Session(options, target).exists())
         run_sql(f"DROP DATABASE IF EXISTS `{target}`;", options=options)
     ok_said, ok_users, ok_kept = outcomes["a successful restore"]
@@ -1175,8 +1187,9 @@ def _phase_file_errors_and_cleanup(t: SelfTestRun) -> None:
             kernel32.CloseHandle(handle)
             path.unlink(missing_ok=True)
         started = server("-Start")
-    for name, host in run_sql("SELECT user, host FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options):
-        run_sql(f"DROP USER '{name}'@'{host}';", options=options)
+    # Only the account this case's restore made, by the command its refusal gave, run as given.
+    for command in re.findall(r"DROP USER IF EXISTS 'refdata_restore_[0-9a-f]+'@'[^']*';", outage_said or ""):
+        run_sql(command, options=options)
     run_sql(f"DROP DATABASE IF EXISTS `{target}`;", options=options)
     checks.check("a restore whose cleanup meets an outage says the user's removal could not be confirmed, never that it was dropped",
                  outage_said is not None and "the user it names could not be confirmed removed" in outage_said
@@ -1327,7 +1340,7 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
                     said_restore = str(refusal)
                 else:
                     said_upgrade = str(refusal)
-        users = run_sql("SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options)[0][0]
+        users = t.accounts_left()
         checks.check("a restore and an upgrade whose restricted connection is given a CA that did not sign the server's certificate are refused "
                      "naming that connection, no database or restore user left and the source unchanged",
                      said_restore is not None and "restore user's connection" in said_restore and said_upgrade is not None
