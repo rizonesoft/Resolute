@@ -130,10 +130,12 @@ Six of fourteen AutoIt tools write no log at all, including every browser optimi
 - [ ] Guarantee a log line cannot be lost for an action already performed. Done when: an action followed by forced termination still leaves its line, proven by a driven run.
 - [ ] Add assertions for format, rotation, and the disable switch. Done when: three assertions run.
 - [ ] Resolve the log directory per mode, mirroring `§2`'s settings path (groom 2026-09-23 gap scan) : the crash report (`§10`), the restore record (`D02 T01 §4`), the launcher's suite log viewer (`D03 T01 §5`), and Repair History (`D05 T04 §2`) all need the log location, and no item provides one while the Verification forbids tool-side paths. Done when: one resolver returns the portable and installed log directories, every consumer calls it, and a fixture proves both modes, quoted.
+- [ ] Give the log surface what it shows (`D01 T03 §4`, `docs/framework/log-surface.md`): every line is written with its level as an argument, never inferred from its text; the writer tells a listener when it has added a line (with that level), rotated the file, or cleared it, without the listener rereading the file; and the count of lines written at the error level since an action started comes from those levels. Done when: a listener fixture receives each of the three notifications with the right level, a plain line containing the word "error" is counted as plain, and nothing in the writer inspects a message's text. **Filed 2026-11-13** from `D01 T03 §4`.
 - [ ] Commit: `"framework: one log format, one log writer"`
 
 - [ ] Extend `scripts/conformance-check.py` with evaluators for `C04`, `C05` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C04`, `C05` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** Three logging assertions run green. A line from the new writer matches the AutoIt shape on a fixture. Disabling produces no writes; a small cap rotates. An action followed by forced termination still leaves its line. All quoted.
+-> XREF: D01 T03 §4 -- the log surface this writer feeds
 
 ## 4. Localization and the Pack Loader
 
@@ -226,6 +228,7 @@ This section connects the two, and it is adoption rather than construction. DPI 
 - [ ] Activate the smoke run's preferences step per tool: `scripts/smoke-run.py` (`D07 T01 §4`) opens Preferences in each tool once this dialog exists, changes one setting, saves, and reads it back. Done when: the smoke report shows the preferences step run, not skipped, for every tool built on the framework. **Arrived 2026-11-13** from `D07 T01 §4`'s deferral, which named the specification `D01 T03 §2` where the build is here.
 - [ ] Prove the Language page row by row against `docs/framework/language-page.md`'s matrix (`D01 T03 §3`): one behavioural check per row, driving the trigger and reading back the control, the settings file and the language the dialog and the restarted tool show, with fixture packs for each faulty state. Done when: every matrix row names a check here that passes. **Filed 2026-11-13** from `D01 T03 §3`.
 - [ ] Prove the tool-page contract row by row against `docs/framework/tool-pages.md`'s matrix (`D01 T03 §3`): a fixture tool declares a page using every control kind, with an action whose effect and whose failure are both driven and read back, and a second fixture declares each refused form; one behavioural check per row. Done when: every matrix row names a check here that passes, and the declaration check a tool's own suite runs is shown failing on a refused page. **Filed 2026-11-13** from `D01 T03 §3`.
+- [ ] Prove the log surface row by row against `docs/framework/log-surface.md`'s matrix (`D01 T03 §4`): one behavioural check per row, driving the trigger and reading back the list, the clipboard and the log file, with fixture logs for each failure and one at the size limit. Done when: every matrix row names a check here that passes. **Filed 2026-11-13** from `D01 T03 §4`.
 - [ ] Commit: `"framework: standard window, about, and preferences"`
 
 - [ ] Extend `scripts/conformance-check.py` with evaluators for `C11`, `C12`, `C13` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C11`, `C12`, `C13` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
@@ -236,6 +239,8 @@ This section connects the two, and it is adoption rather than construction. DPI 
 -> XREF: D01 T02 §8 -- the menu bar and popup menu the standard window's menus are built with
 -> XREF: D01 T02 §9 -- the form controls the Preferences dialog is built with
 -> XREF: D07 T01 §4 -- the smoke run whose preferences step this section activates
+-> XREF: D01 T03 §4 -- the log surface this section builds and proves
+
 ## 8. Extend the UI Library for the Tools
 
 The library has six controls, built for a launcher that browses and launches things. The repair tools need surfaces it does not have: a per-item result list that reconciles, a progress surface, and the standard message and confirmation dialogs every destructive action goes through.
