@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **80 of 245 sections complete (33%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **81 of 245 sections complete (33%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -156,7 +156,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D07 T01 §4`  | Standing smoke run over the suite                 |  13   |
 | [x] | `D07 T01 §5`  | Elevated smoke pass for RegStudio                 |   3   |
 | [x] | `D07 T01 §6`  | Smoke capture-timeout test                        |   3   |
-| [ ] | `D07 T01 §7`  | Unattended elevated smoke via scheduled task      |  32   |
+| [x] | `D07 T01 §7`  | Unattended elevated smoke via scheduled task      |  32   |
 | [x] | `D07 T01 §8`  | Smoke forwarding-test assertion                   |   2   |
 | [x] | `D07 T01 §9`  | Smoke fixture release in finally                  |   2   |
 | [ ] | `D07 T01 §10` | Elevated smoke ends with the run that started it  |   8   |

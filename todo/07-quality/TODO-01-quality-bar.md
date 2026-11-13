@@ -44,7 +44,7 @@ track: Q1
 |   4   |   §4    | Standing smoke run over the suite      | §3           |  [x]   |
 |   5   |   §5    | Elevated smoke pass for RegStudio             | §4            |  [x]   |
 |   6   |   §6    | Smoke capture-timeout test                    | §4            |  [x]   |
-|   7   |   §7    | Unattended elevated smoke via scheduled task  | §5            |  [ ]   |
+|   7   |   §7    | Unattended elevated smoke via scheduled task  | §5            |  [x]   |
 |   8   |   §8    | Smoke forwarding-test assertion               | §5            |  [x]   |
 |   9   |   §9    | Smoke fixture release in finally              | §6            |  [x]   |
 |  10   |   §10   | Elevated smoke ends with the run that started it | §7          |  [ ]   |
@@ -253,7 +253,7 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 > **Completion:** astra (medium), candidate `1973447c` COMPLETION gaps (5 in-scope, implemented in `aae9f55` on D07-T01-s5-repair.md: repair plan P2 taken, round 1 HIGHEST none, completion gaps again on the superseded candidate named in its prompt); repair2 `cb55fcb`/`6be8a109` closed both repeated gaps in fact; repair3 on D07-T01-s5-repair3.md, plan complete with no findings, round 1 HIGHEST none, candidate `6be8a109` COMPLETION: complete · Repair records: docs/reviews/07-quality/D07-T01-s5-repair.md, D07-T01-s5-repair2.md, D07-T01-s5-repair3.md
 > **Plan review:** astra (medium) on `578b2c08`, 4 P2 gaps folded into the section build order before building (`25701516`); repair-cycle plans likewise returned gaps folded in before their rounds
 > **CRUD:** not applicable (developer gate tooling; writes only `build/smoke/` artifacts, launches the shipped tool read-only by window messages, terminates only processes it launched, and a declined consent launches nothing)
-> **Deferred:** unattended elevated smoke without a prompt per run -> XREF: D07 T01 §7; forwarding-test assertion strength -> XREF: D07 T01 §8
+> **Resolved:** 2026-11-13 | unattended elevated smoke without a prompt per run -> XREF: D07 T01 §7; forwarding-test assertion strength -> XREF: D07 T01 §8 | closed by `450d3777` (D07 T01 §7) and `5a9a3c23` (D07 T01 §8)
 > **Duration:** 2026-11-09T21:57:01Z to 2026-11-09T22:41:11Z
 > **Implementer:** Muse Code (muse-wonder-1.0)
 
@@ -349,8 +349,6 @@ No surface of its own: a scheduled task, one script, and the existing smoke repo
 
 **Corrected 2026-11-13 (plan review on the fifth repair record):** the fence this section consumes admits a collecting run after 120 seconds without input, and neither it nor the task's wrapper asks whether the desktop is locked. A locked session is exactly what a long idle period becomes, and a capture taken there proves no visible window, which is why `tools/nightly.ps1` skips captures in a locked session. The runs quoted in this section were started 132 to 203 seconds after the operator's last input, on an unlocked desktop. The refusal belongs in what the task executes (the wrapper or the pinned driver), so it changes the registered task or its pinned bytes and needs a consent prompt: it is an item of `D07 T01 §10`, the section that already owes the next registration, and until it ships the limit is this sentence: an elevated smoke run that starts on a locked desktop is not refused, and its captures there are not evidence.
 
-> **Deferred:** a named refusal before any tool is launched when the desktop is locked or its state cannot be established -> XREF: §10 (item: "Refuse a locked desktop")
-
 - [x] Repair 5, the refused rename is tested again: `Switch-Path` in `tools/elevated-smoke.ps1` takes its move as a parameter, and `-SelfTest` refuses the second rename, after the live copy has been moved aside, and reads the previous copy back in the live path with no `*.old` left. Done when: the case passes, and a copy with the put-back removed from `Switch-Path` fails it and exits 1, quoted.
 - [x] Commit: `"quality: unattended elevated smoke via scheduled task"`
 
@@ -378,6 +376,20 @@ No surface of its own: a scheduled task, one script, and the existing smoke repo
 -> SOURCE: operator-2026-11-10-elevated-smoke-task
 
 **Test checkpoint:** From a non-elevated shell after 120s without input, `tools/elevated-smoke.ps1 -Run` completes with no UAC prompt, the fresh `build/smoke/smoke-report.md` shows RegStudio start, main, About, and exit `pass` with preferences `absent`, the environment verdict reads clean, `LastTaskResult` is 0, and the registration readback shows `RunLevel Highest` with an interactive logon type. `tools/elevated-smoke.ps1 -SelfTest` passes, and its failure paths are quoted. All from real runs.
+
+> **Verified:** 2026-11-13 | §7 | `D07 T01 §7` at `450d3777`: from a non-elevated shell after 132 s without input, `tools/elevated-smoke.ps1 -Run` completed with no prompt, "Suite verdict: **pass**" (RegStudio start, main, About and exit `pass`, preferences `absent`), `LastTaskResult: 0`, "environment verdict: clean", the staged executables' hashes equal to the manifest's, and again at 23:47:43Z on the last registration; registration readback `Highest Interactive`, Windows PowerShell by full path from `C:\ProgramData\Resolute\ElevatedSmoke`, the directory written only by SYSTEM and Administrators and every entry owned by Administrators; `-Readback` "trusted", the task changeable only by Administrators and SYSTEM; a fenced refusal with the operator at the keyboard; cleanup driven with `RegStudio.exe` alive, then no tool process, `LastTaskResult 0x41306`; `tools/elevated-smoke.ps1 -SelfTest` 51 PASS, "self-test: all pass", process exit 0, including the registration transaction run in a sandbox (a failure after each step and a readiness refusal each read back as the previous registration), and exit 1 on copies with a rule broken, `-XmlText` restored, the runtime's or the hashes' rollback removed, the readiness refusal ignored, and the switch's put-back removed; `python scripts/smoke-run.py --self-test` "self-test: all pass"; `python -m unittest scripts.tests.test_smoke_staging` OK, failing with the refusal branch bypassed; `python scripts/ci-status.py` on `450d3777`: `gates` success (run 43335468399), `plan-gates` success (run 43335468572); `validate` 0 fatal
+> **Review:** first record round 1 astra (medium), writer `muse`, candidate at `2b385f03`(round 1) -- `adversarial` needs-attention (5, fixed in `ec8e77be` `8d497fa8` `b014fa68`), the record ending there because a second writer cannot continue it; repair record round 2 astra (low), writer `claude`, candidates `f0bbd38b`(round 1) `43740dde`(round 2) -- `adversarial` needs-attention (2, P1 and P2, fixed in `43740dde`) then `consistency` approve; repair2 round 2 astra (low), candidates `81cce229`(round 1) `feb5c64c`(round 2) -- `adversarial` needs-attention (2, P1 and P2, fixed in `feb5c64c`) then `consistency` approve; repair3 round 1 astra (medium), candidate `6fecddb2`(round 1) -- `adversarial` approve; repair4 round 1 astra (medium), candidate `35e99029`(round 1) -- `adversarial` approve; repair5 round 1 astra (medium), candidate `450d3777`(round 1) -- `adversarial` approve. Raw findings: docs/reviews/07-quality/D07-T01-s7.md and D07-T01-s7-repair.md to D07-T01-s7-repair5.md
+> **Completion:** astra (medium), repair record candidate `43740dde` -- COMPLETION: gaps (3 in-scope, implemented in `81cce229` and `feb5c64c`). Repair records: repair2 final candidate `feb5c64c`, gaps (3 in-scope, implemented in `6fecddb2`); repair3 final candidate `6fecddb2`, gaps (2 in-scope, implemented in `35e99029`); repair4 final candidate `35e99029`, gaps (1 in-scope, implemented in `450d3777`; 1 out-of-scope filed as `D07 T01 §11`); repair5 final candidate `450d3777`, COMPLETION: complete
+> **Plan review:** astra (medium) on `2b385f03` for writer `muse`, 6 gaps planned; repair on `f1a2479e`, 4 gaps planned in `7febb596`; repair2 on `6531f5ef`, 2 gaps planned in `81cce229`; repair3 on `3e31e73f`, no findings; repair4 on `948648b9`, no findings; repair5 on `90bc5732`, 1 gap filed as an item of `D07 T01 §10` with the limit stated in this section
+> **Deferred:** the elevated run ends when its caller ends -> XREF: §10 (item: "Couple the task to its caller")
+> **Deferred:** no console window from the task or its registration -> XREF: §10 (item: "No console window from the task or its registration")
+> **Deferred:** the rollback of a real, elevated registration failed on purpose -> XREF: §10 (item: "Prove the rollback at this registration")
+> **Deferred:** a named refusal when the desktop is locked -> XREF: §10 (item: "Refuse a locked desktop")
+> **Deferred:** recovery of a registration interrupted between its renames -> XREF: §11 (item: "Recover before registering")
+> **CRUD:** applicable | the task registered three times and read back, the pinned hashes and runtime written, replaced and restored in the sandboxed transaction, the run manifest written to `HKCU` and read back against the staged copies, and `-Remove`'s stop path driven with a tool alive
+> **Duration:** 2026-11-09T22:56:17Z to 2026-11-13T00:23:05Z
+> **Implementer:** Muse Code (muse-wonder-1.0) to round 1; Claude Fable 5.2 (claude-fable-5-2) from 2026-11-13
+
 ## 8. Smoke Forwarding-Test Assertion
 
 > **Started:** 2026-11-12T22:14:18Z
