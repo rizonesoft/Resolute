@@ -319,10 +319,11 @@ if ($Runner -eq 'claude') {
 # A new session, named to the guard before it starts, so the Stop hook holds a Claude Code session from its first
 # turn. Antigravity takes no session id, so its run is held under a name of the launcher's own.
 $session = if ($Runner -eq 'claude') { [guid]::NewGuid().ToString() } else { "agy-$([guid]::NewGuid())" }
+# --name keeps the window's title: Claude Code replaces the host title with its own session topic otherwise.
 # --disallowedTools takes a list, so options follow it and the goal stays the last, positional argument. -i runs
 # the opening prompt and keeps the conversation open, as Claude Code does with its prompt argument.
 $command = if ($Runner -eq 'claude') {
-    @($cli, '--dangerously-skip-permissions', '--disallowedTools', 'AskUserQuestion', '--session-id', $session, '--model', $model, '--effort', $effort, $goal)
+    @($cli, '--dangerously-skip-permissions', '--disallowedTools', 'AskUserQuestion', '--session-id', $session, '--name', $windowTitle, '--model', $model, '--effort', $effort, $goal)
 } else {
     @($cli, '--model', $carbon, '--dangerously-skip-permissions', '-i', $goal)
 }

@@ -227,6 +227,10 @@ class LauncherWriterModel(unittest.TestCase):
         line = next(l for l in self.text.splitlines() if "'--session-id', $session" in l)
         self.assertIn("'--model', $model, '--effort', $effort, $goal)", line)
 
+    def test_the_session_is_named_for_the_window_title(self):
+        line = next(l for l in self.text.splitlines() if "'--session-id', $session" in l)
+        self.assertIn("'--name', $windowTitle", line)
+
 
 if __name__ == "__main__":
     unittest.main()
