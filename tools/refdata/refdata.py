@@ -548,7 +548,7 @@ def restricted_option_bytes(author: Path, user: str, password: str, override: di
     return ("\r\n".join(lines) + "\r\n").encode(OPTION_CODE_PAGE)
 
 
-def cmd_restore(s: Session, path: str, schema: Path = SCHEMA, restricted_override: dict | None = None) -> int:
+def cmd_restore(s: Session, path: str, schema: Path = SCHEMA, restricted_override: dict | None = None, before_cleanup=None) -> int:
     """Loads a backup into a new database, and nowhere else. The schema comes from the repository's own schema.sql;
     the backup's rows are then run as a MySQL user created for this restore alone, whose only privileges are SELECT,
     INSERT and LOCK TABLES on the new database, so a statement that reaches any other database is refused by the
@@ -599,10 +599,29 @@ def cmd_restore(s: Session, path: str, schema: Path = SCHEMA, restricted_overrid
                           f"which uses your option file's settings ({refusal}); nothing outside it was changed") from None
         restored = True
     finally:
-        restricted.unlink(missing_ok=True)
-        run_sql(f"DROP USER IF EXISTS '{user}'@{sql_str(account_host)};", options=s.options)
+        # Each step is attempted whatever the others did, and whatever is left is named: a credential file that cannot
+        # be removed never keeps the restore user alive, nor a half-made database.
+        failure = sys.exc_info()[1]   # the refusal that ended the restore, if one did: kept in what is reported
+        if before_cleanup:
+            before_cleanup(restricted)
+        left = []
+        try:
+            restricted.unlink(missing_ok=True)
+        except OSError as exc:
+            left.append(f"the restore user's option file {restricted} could not be removed ({exc.strerror or exc}); delete it, "
+                        "though the user it names no longer exists")
+        try:
+            run_sql(f"DROP USER IF EXISTS '{user}'@{sql_str(account_host)};", options=s.options)
+        except Refused as refusal:
+            left.append(f"the restore user '{user}'@'{account_host}' could not be dropped ({refusal}); drop it with: DROP USER '{user}'@'{account_host}';")
         if not restored:
-            run_sql(f"DROP DATABASE IF EXISTS `{s.database}`;", options=s.options)
+            try:
+                run_sql(f"DROP DATABASE IF EXISTS `{s.database}`;", options=s.options)
+            except Refused as refusal:
+                left.append(f"the half-made database '{s.database}' could not be dropped ({refusal}); drop it with: DROP DATABASE `{s.database}`;")
+        if left:
+            ended = f"refused: the backup was restored into '{s.database}', but " if restored else f"{failure or 'refused: the restore failed'}; and "
+            raise Refused(ended + "; ".join(left)) from None
     print(f"restored {dump} into '{s.database}'")
     return 0
 
@@ -1043,6 +1062,31 @@ def self_test(schema: Path) -> int:
             checks.check("a backup that cannot be read is refused by name, no database created",
                          code == 1 and "restore could not read" in out and str(unreadable) in out and not Session(options, target).exists(),
                          f"exit {code}, said {out.strip()!r}")
+
+            # A restore user's option file that cannot be removed stops none of the other cleanup steps.
+            outcomes = {}
+            for label, dump, target in (("a successful restore", dump_file, f"{database}_heldok"), ("a failed restore", hostile, f"{database}_heldbad")):
+                handles = []
+                said = None
+                try:
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        cmd_restore(Session(options, target), str(dump), before_cleanup=lambda path: handles.append((path, held(path, 1))))
+                except Refused as refusal:
+                    said = str(refusal)
+                except Exception as exc:  # noqa: BLE001 -- an unhandled error is the failure this case exists to catch
+                    said = f"unhandled {type(exc).__name__}: {exc}"
+                for path, handle in handles:
+                    kernel32.CloseHandle(handle)
+                    path.unlink(missing_ok=True)
+                users = run_sql("SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options)[0][0]
+                outcomes[label] = (said, users, Session(options, target).exists())
+                run_sql(f"DROP DATABASE IF EXISTS `{target}`;", options=options)
+            ok_said, ok_users, ok_kept = outcomes["a successful restore"]
+            bad_said, bad_users, bad_kept = outcomes["a failed restore"]
+            checks.check("a restore whose option file cannot be removed still drops its user, names the file, keeps a restored database and drops a failed one",
+                         ok_said is not None and "was restored into" in ok_said and "could not be removed" in ok_said and ok_users == "0" and ok_kept
+                         and bad_said is not None and "could not be loaded as rows" in bad_said and "could not be removed" in bad_said
+                         and bad_users == "0" and not bad_kept, repr(outcomes))
 
             # A database at schema revision 1 is upgraded with nothing lost; until then, commands on it are refused.
             old_schema = Path(tmp) / "schema-revision-1.sql"
