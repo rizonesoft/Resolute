@@ -32,3 +32,27 @@ OVERALL: needs-attention
 - Planned: a disabled control is reset to its persisted value and never validated or written, with the empty-size sequence checked (P2).
 - Planned: logging that cannot start after a save or restart after a clear: persisted on, writer stopped, `Label_Logging_Not_Running` with the reason, and a check (P2).
 - Planned: the dialog's size keys `PreferencesWidth` and `PreferencesHeight`, written at every way out, outside Save and the dirty rule, with its write failure and a resize, close, reopen check (P2).
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T14:21:28Z
+- Effort: medium
+- Writer model: claude-fable-5-2
+- Policy: 164e2012ebe8c2d8bccd2c45652918958703312b
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 8
+- Digest: 7242f9edd6d7239e
+
+### adversarial: needs-attention
+
+1. **P2: An unrelated Save cancels session-only Realtime.** `docs/framework/preferences.md:122` applies priority at Save, while line 123 resets the combo to persisted High after granting session-only Realtime. Reproduce: run elevated, save Realtime without Keep Realtime, then change only Reduce memory and save again. Applying the displayed priority now sets High, despite the promise that Realtime lasts until the tool closes. Specify preservation of the session override across unrelated saves, and check this sequence.
+
+2. **P2: Successful persistence followed by an unreadable verification has no defined recovery.** `docs/framework/preferences.md:60` covers a different read-back value but assumes the file can be read. Reproduce through the settings writer: let atomic replacement succeed, then make the verification read return a sharing violation. The file contains the edit, but the runtime has not applied it. Once reading succeeds, line 46's edited-versus-persisted comparison declares the dialog clean, potentially disabling the retry needed to apply it. Define an unverified transaction state, its retry and exit behavior, and check that recovery applies the committed values before reporting success.
+
+HIGHEST: P2
+OVERALL: needs-attention

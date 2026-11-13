@@ -50,14 +50,16 @@ The AutoIt dialog is `_ShowPreferencesDlg` (`resolute_au3/SDK/Concrete/ReBar/ReB
 
 1. It validates every page, in page order. The first control whose value is not allowed stops the save: nothing is written, the dialog moves to that page, focus goes to the control, and its error shows beneath it.
 2. It writes every changed key through the settings writer in one atomic write (`D01 T01 §2`), then reads the file back.
-3. Only when the file reads back as written does it apply the values to the running tool (below, per setting), show the saved notice and disable Save. The edited values become the new baseline.
+3. Only when the file reads back as written does it apply to the running tool the settings this save changed, and only those (below, per setting), show the saved notice and disable Save. A setting whose value this save did not change is not applied again, so saving one thing never disturbs another: an unrelated save leaves a session-only Realtime running. The edited values become the new baseline.
+
+A save whose write went through but whose read-back failed or differed leaves the save unconfirmed: the file may already hold the new values while the tool has not applied them. Until a save completes all three steps, the dialog counts as having unsaved changes whatever the file now holds: Save stays enabled, the way out asks, and the next Save writes every value of the unconfirmed save again, reads back, and then applies them all before it reports success. Discard leaves the file as it is and applies nothing; the tool takes the file's values at its next start.
 
 | Outcome | Persisted | Effective | Edited | The user sees |
 | --- | --- | --- | --- | --- |
 | Save succeeds | The edited values | The edited values | Unchanged; the new baseline | The saved notice; Save disabled |
 | A value is not allowed | Unchanged | Unchanged, except a preview already showing | Unchanged | The control's error (`Error_Value_Range`), focus on it; no notice |
 | The file cannot be written | Unchanged | Unchanged, except a preview already showing | Unchanged | The message layer's Error `Save_Failed` with the path and the Windows reason; Save stays enabled |
-| The file reads back differently | What the file now holds | Unchanged, except a preview already showing | Unchanged | Error `Save_Unverified` with the path; no saved notice; Save stays enabled |
+| The file reads back differently, or cannot be read back | What the file now holds, which may be the new values | Unchanged, except a preview already showing: nothing is applied | Unchanged | Error `Save_Unverified` with the path and, for a read that failed, the Windows reason; no saved notice; the save is unconfirmed, so Save stays enabled and the way out asks, even if the file is later found to match |
 | Discard | Unchanged | The baseline, every preview undone | Dropped | The dialog closes |
 | Cancel in the prompt | Unchanged | Unchanged, previews still showing | Unchanged | The prompt closes; the dialog stays |
 
@@ -273,7 +275,8 @@ Every row is one behavioural check in `D01 T01 §7`, driven against the built di
 | Save | Click; Alt+S; Enter | Disabled until an edit differs | One atomic write, read back, values applied, the saved notice announced, Save disabled | The three save failures below | `prefs: save writes, reads back and applies` |
 | A value that is not allowed | Save with the size input empty, 0, 2.5 or 101 | | Nothing written; the page shown; focus on the input; `Error_Value_Range` beneath it, announced | The stated result is the failure presentation | `prefs: a bad value stops the save` |
 | A file that cannot be written | Save with the settings file read-only | | `Save_Failed` with the path; edits kept; file unchanged; Save enabled | The stated result is the failure presentation | `prefs: a refused write keeps the edits` |
-| A write that reads back differently | Save with the read-back made to differ | | `Save_Unverified`; no saved notice; Save enabled | The stated result is the failure presentation | `prefs: an unconfirmed write is not a success` |
+| A write that cannot be confirmed | Save with the read-back made to differ, and with the read-back made to fail after the write went through; then Save again with reads working | | `Save_Unverified`; no saved notice; nothing applied to the running tool; Save enabled and the way out asks; the second Save writes again, reads back, applies every value, then shows the saved notice | The stated result is the failure presentation | `prefs: an unconfirmed write is not a success, and the retry applies it` |
+| An unrelated save | Elevated: save Realtime without Keep Realtime, then change only Reduce memory and Save | | Windows still reports Realtime after the second save; only the trim timer changed | None can occur: only changed settings are applied | `prefs: a save applies only what it changed` |
 | The way out with no change | Cancel; Esc; Alt+F4; caption close | Clean | Closes at once | None can occur | `prefs: a clean dialog closes at once` |
 | The way out with a change | The same four | Dirty | The prompt; Save saves and closes, Discard drops and closes, Cancel returns | A failed Save from the prompt leaves the dialog open with its failure | `prefs: the unsaved prompt's three answers` |
 | Enable logging | Click; Space; Alt+E | Checked, unchecked | The size input enables or disables; at Save `LoggingEnabled` is written and the log writer starts or stops | Save's failures; logging that cannot start, below | `prefs: logging turns off and on in the running tool` |
