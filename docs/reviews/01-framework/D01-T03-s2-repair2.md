@@ -29,3 +29,25 @@ OVERALL: needs-attention
 - Planned: "Return to High now" clears the session override on a confirmed change, keeps it with the reason on a refusal, and is checked across an unrelated save and a reopen (P2).
 - Planned: only an edited control is validated; an unedited limit's exact bytes are kept apart from the rounded display, checked for a fractional and an out-of-range stored limit (P2).
 - Planned: a completed check is a valid, parsed update response; HTTP errors and malformed files leave `UpdateLastCheck` unchanged, read back (P2).
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T14:32:54Z
+- Effort: medium
+- Writer model: claude-fable-5-2
+- Policy: e09b2ef204151cbaf69d3ed594f5c4b99f8257d6
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 6
+- Digest: 68f686f2b226aeea
+
+### adversarial: needs-attention
+
+1. **P2: Restoring on the same monitor bypasses work-area clamping.** `docs/framework/preferences.md:44` places clamping only in the fallback branch. Reproduce by saving a large Preferences window on a high-resolution monitor, reducing that monitor’s resolution, then reopening Preferences with the tool still on it. If the saved rectangle still overlaps the monitor, none of the fallback conditions applies: the dialog restores at its old bounds, potentially leaving Save and Cancel off-screen. The previous contract clamped oversized geometry on every open. Require size and position clamping against the current work area on every restore, including a matching monitor.
+
+HIGHEST: P2
+OVERALL: needs-attention
