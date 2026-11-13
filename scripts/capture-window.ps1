@@ -100,7 +100,8 @@ param(
     # A drill (D00 T02 section 14): an always-on-top window of another
     # process laid over the target before the first check, or between the
     # first check and the copy, so each check is proven as it runs.
-    [ValidateSet('', 'before', 'between')][string]$DrillCoverAt = ''
+    # 'close' ends the target between the checks instead, as a user closing it mid-capture would.
+    [ValidateSet('', 'before', 'between', 'close')][string]$DrillCoverAt = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -178,7 +179,20 @@ function Get-Covering([IntPtr[]]$Above, [int[]]$Frame, [uint32]$TargetPid, [scri
     return $found
 }
 
+function Test-Target($Info, [int[]]$Frame) {
+    # $null when the target is still there, visible, and where it was
+    # measured; the refusal otherwise. A target that closed has nothing
+    # above it, so the walk alone would call it uncovered.
+    if ($null -eq $Info) { return 'the target window is gone' }
+    if (-not $Info.Visible -or $Info.Cloaked) { return 'the target window is no longer visible' }
+    $now = @($Info.Frame.Left, $Info.Frame.Top, $Info.Frame.Right, $Info.Frame.Bottom)
+    if (($now -join ',') -ne ($Frame -join ',')) { return "the target window moved (it was at $($Frame -join ','), it is at $($now -join ','))" }
+    return $null
+}
+
 function Assert-Uncovered([IntPtr]$Hwnd, [int[]]$Frame, [uint32]$TargetPid, [string]$When) {
+    $gone = Test-Target ([ZOrder]::Inspect($Hwnd)) $Frame
+    if ($gone) { return "capture-window: refused $When the copy: $gone" }
     try {
         $covering = @(Get-Covering ([ZOrder]::Above($Hwnd)) $Frame $TargetPid { param($h) [ZOrder]::Inspect($h) })
     } catch {
@@ -453,6 +467,29 @@ function Invoke-SelfTest {
     $said = $null
     try { $null = Get-Covering @([IntPtr]2, [IntPtr]9) $frame 7 { param($h) $table[[int]$h] } } catch { $said = $_.Exception.Message }
     Check 'a window that cannot be read refuses the capture, named' ($said -like '*window 9 could not be read*')
+    $here = & $record 100 100 900 700 7
+    $hidden = & $record 100 100 900 700 7; $hidden.Visible = $false
+    $moved = & $record 140 100 940 700 7
+    Check 'a target that is gone, hidden or moved is refused, and one where it was is not' ((Test-Target $null $frame) -like '*gone*' -and (Test-Target $hidden $frame) -like '*no longer visible*' -and (Test-Target $moved $frame) -like '*moved*' -and $null -eq (Test-Target $here $frame))
+
+    # The pair lock is released however the script ends, even run in this process, where exit does not end the thread.
+    $lockDir = Join-Path ([System.IO.Path]::GetTempPath()) ("capture-lock-selftest-" + [Guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Path $lockDir | Out-Null
+    try {
+        $lockPng = Join-Path $lockDir 'lock.png'
+        $null = & $PSCommandPath -ProcessId 2147483647 -Out $lockPng *>&1
+        $key = [System.BitConverter]::ToString([System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes($lockPng.ToLowerInvariant()))).Replace('-', '').Substring(0, 32)
+        $probe = [System.Diagnostics.ProcessStartInfo]::new((Get-Process -Id $PID).Path)
+        foreach ($a in '-NoProfile', '-Command', "`$m = [System.Threading.Mutex]::new(`$false, 'Local\ResoluteCapturePair-$key'); if (`$m.WaitOne(1000)) { 'free' } else { 'held' }") { $probe.ArgumentList.Add($a) }
+        $probe.RedirectStandardOutput = $true
+        $probe.CreateNoWindow = $true
+        $child = [System.Diagnostics.Process]::Start($probe)
+        $answer = $child.StandardOutput.ReadToEnd().Trim()
+        $null = $child.WaitForExit(15000)
+        Check 'a capture that ended, run in this process, leaves the pair free for another' ($answer -eq 'free')
+    } finally {
+        Remove-Item -LiteralPath $lockDir -Recurse -Force
+    }
 
     if ($failed.Count) { Write-Host ("self-test: FAIL " + ($failed -join '; ')); return 1 }
     Write-Host 'self-test: all pass'
@@ -483,6 +520,16 @@ try {
     Write-Host "capture-window: refused: $($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }
+function Exit-Capture([int]$Code) {
+    # Every way out from here releases the pair: run with & in a shell that
+    # stays open, exit does not end the thread that owns the mutex.
+    if ($script:PairLock) { $script:PairLock.ReleaseMutex(); $script:PairLock.Dispose(); $script:PairLock = $null }
+    exit $Code
+}
+trap {
+    Write-Host "capture-window: $($_.Exception.Message)" -ForegroundColor Red
+    Exit-Capture 1
+}
 $recovered = Restore-Pair ([System.IO.Path]::GetFullPath($Out)) ([System.IO.Path]::ChangeExtension([System.IO.Path]::GetFullPath($Out), '.txt'))
 if ($recovered) { Write-Host "capture-window: $recovered ($Out)" -ForegroundColor Yellow }
 
@@ -492,7 +539,7 @@ if ($recovered) { Write-Host "capture-window: $recovered ($Out)" -ForegroundColo
 if (-not $Path -and -not $WindowTitle -and -not $ProcessId) {
     Write-Host "capture-window: give -Path, -WindowTitle, -ProcessId, or a combination." -ForegroundColor Red
     Write-Host "  Without a target this would capture whichever window came first." -ForegroundColor Red
-    exit 2
+    Exit-Capture 2
 }
 
 Add-Type -AssemblyName System.Drawing
@@ -566,7 +613,7 @@ if ($Path) {
                 Write-Host "  An instance was already running and is deliberately left alone." -ForegroundColor Yellow
                 Write-Host "  Close it, or attach with -WindowTitle and no -Path." -ForegroundColor Yellow
             }
-            exit 1
+            Exit-Capture 1
         }
     }
 }
@@ -577,7 +624,7 @@ else {
 if (-not $target) {
     Write-Host "capture-window: no window found" -ForegroundColor Red
     if ($WindowTitle) { Write-Host "  title filter: '$WindowTitle'" -ForegroundColor Red }
-    exit 1
+    Exit-Capture 1
 }
 
 function Stop-Ours {
@@ -597,7 +644,7 @@ if ($foreground -ne $hwnd) {
     Write-Host "  Capturing now would save whatever is on top of it." -ForegroundColor Red
     Write-Host "  Bring the window to the front and re-run, or use -KeepOpen and attach." -ForegroundColor Yellow
     Stop-Ours
-    exit 3
+    Exit-Capture 3
 }
 
 $rect = New-Object Win32Capture+RECT
@@ -609,14 +656,14 @@ $framed = [Win32Capture]::DwmGetWindowAttribute($hwnd, 9, [ref]$rect, [System.Ru
 if (-not $framed -and -not [Win32Capture]::GetWindowRect($hwnd, [ref]$rect)) {
     Write-Host "capture-window: could not read the window rect" -ForegroundColor Red
     Stop-Ours
-    exit 1
+    Exit-Capture 1
 }
 $width = $rect.Right - $rect.Left
 $height = $rect.Bottom - $rect.Top
 if ($width -le 0 -or $height -le 0) {
     Write-Host "capture-window: the window has no area ($width x $height)" -ForegroundColor Red
     Stop-Ours
-    exit 1
+    Exit-Capture 1
 }
 
 $targetFrame = @($rect.Left, $rect.Top, $rect.Right, $rect.Bottom)
@@ -642,15 +689,16 @@ function Stop-Cover { if ($script:cover -and -not $script:cover.HasExited) { & t
 if ($DrillCoverAt -eq 'before') { $script:cover = Start-Cover }
 try {
     $refusal = Assert-Uncovered $hwnd $targetFrame $targetPid 'before'
-    if ($refusal) { Write-Host $refusal -ForegroundColor Red; Stop-Ours; exit 3 }
+    if ($refusal) { Write-Host $refusal -ForegroundColor Red; Stop-Ours; Exit-Capture 3 }
     if ($DrillCoverAt -eq 'between') { $script:cover = Start-Cover }
+    if ($DrillCoverAt -eq 'close') { Stop-Process -Id $target.Id -Force; Start-Sleep -Milliseconds 700; Write-Host "drill: the target, process $($target.Id), was closed between the checks" }
     $bitmap = New-Object System.Drawing.Bitmap $width, $height
     $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
     $graphics.CopyFromScreen($rect.Left, $rect.Top, 0, 0, $bitmap.Size)
     $graphics.Dispose()
     # A window that arrived while the copy was made is in the copy: checked again before anything is written.
     $refusal = Assert-Uncovered $hwnd $targetFrame $targetPid 'after'
-    if ($refusal) { $bitmap.Dispose(); Write-Host $refusal -ForegroundColor Red; Stop-Ours; exit 3 }
+    if ($refusal) { $bitmap.Dispose(); Write-Host $refusal -ForegroundColor Red; Stop-Ours; Exit-Capture 3 }
 } finally {
     Stop-Cover
 }
@@ -724,11 +772,11 @@ try {
 } catch {
     Write-Host "capture-window: $($_.Exception.Message)" -ForegroundColor Red
     Stop-Ours
-    exit 1
+    Exit-Capture 1
 }
 
 Write-Host ("captured {0}  {1}x{2}  monitor {3} dpi, window {4} dpi, aware={5}" -f `
     (Split-Path $Out -Leaf), $width, $height, $monX, $windowDpi, $dpiAware) -ForegroundColor Green
 
 Stop-Ours
-exit 0
+Exit-Capture 0
