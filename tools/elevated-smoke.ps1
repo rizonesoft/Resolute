@@ -58,6 +58,9 @@ $ManifestName = 'HKCU\Software\Resolute\ElevatedSmoke\Manifest'   # as the drive
 $KnownEntries = @('trusted-hashes.txt', 'trusted-hashes.txt.new', 'trusted-hashes.txt.old', 'python', 'python.new', 'python.old', 'run', 'register-log.txt', 'registration.journal')
 $RegisterLog = Join-Path $HashDir 'register-log.txt'
 $JournalFile = Join-Path $HashDir 'registration.journal'
+# One registration or recovery at a time, machine-wide. A mutex and not a file: the system releases it when its
+# holder dies, which is exactly when the journal it leaves is abandoned and may be recovered.
+$RegistrationLockName = 'Global\Resolute-ElevatedSmoke-Registration'
 $AdminsSid = 'S-1-5-32-544'
 $SystemSid = 'S-1-5-18'
 $DriverFiles = @('scripts\smoke-run.py', 'scripts\conformance-check.py')
@@ -782,7 +785,7 @@ function Invoke-SelfTest {
         # The same function registers, fails where it is told to, and rolls back; nothing here is a stand-in for it.
         $saved = @{ TaskPath = $TaskPath; TaskName = $TaskName; HashDir = $HashDir; HashFile = $HashFile; SnapshotDir = $SnapshotDir
                     PythonDir = $PythonDir; EnvFile = $EnvFile; RegisterLog = $RegisterLog; JournalFile = $JournalFile; Registration = $script:Registration
-                    FailAfterStep = $script:FailAfterStep; AbandonAfterStep = $script:AbandonAfterStep }
+                    FailAfterStep = $script:FailAfterStep; AbandonAfterStep = $script:AbandonAfterStep; RegistrationLockName = $script:RegistrationLockName }
         $box = Join-Path $td 'registration'
         $source = Join-Path $td 'runtime-source'
         New-Item -ItemType Directory -Path $source | Out-Null
@@ -812,6 +815,7 @@ function Invoke-SelfTest {
             $script:EnvFile = Join-Path $box 'run\elevated-smoke-env.txt'
             $script:RegisterLog = Join-Path $box 'register-log.txt'
             $script:JournalFile = Join-Path $box 'registration.journal'
+            $script:RegistrationLockName = 'Local\ResoluteSelfTest-' + [Guid]::NewGuid().ToString('N')
             $script:Registration = [pscustomobject]@{
                 RequireElevation = $false; RunLevel = 'Limited'; Protect = $false
                 Source = { $source }
@@ -929,6 +933,39 @@ function Invoke-SelfTest {
                 $said -match 'does not pass its readiness checks: an interrupted registration was found' -and $differs.Count -eq 0 -and
                 -not (Test-Path -LiteralPath $script:JournalFile))
 
+            # A second registration while one holds the lock is refused and touches nothing; a lock whose holder
+            # died is taken, since that is the abandoned registration a journal records.
+            $holder = [powershell]::Create()
+            $ready = New-Object Threading.ManualResetEventSlim($false)
+            $release = New-Object Threading.ManualResetEventSlim($false)
+            $null = $holder.AddScript({
+                param($name, $ready, $release)
+                $m = New-Object Threading.Mutex($false, $name)
+                $null = $m.WaitOne()
+                $ready.Set()
+                $null = $release.Wait(30000)
+                $m.ReleaseMutex(); $m.Dispose()
+            }).AddArgument($script:RegistrationLockName).AddArgument($ready).AddArgument($release)
+            $running = $holder.BeginInvoke()
+            try {
+                $null = $ready.Wait(10000)
+                $null = Register-InSandbox -AbandonAfter 'task'
+                $journalBefore = Get-Content -LiteralPath $script:JournalFile -Raw -ErrorAction SilentlyContinue
+            } finally {
+                $release.Set()
+                $null = $holder.EndInvoke($running)
+                $holder.Dispose()
+            }
+            Check 'a registration started while another holds the lock is refused before it touches anything' (
+                $journalBefore -eq $null -and (Compare-RegistrationState $registered (Get-RegistrationState)).Count -eq 0)
+            $orphan = [powershell]::Create()
+            $null = $orphan.AddScript({ param($name) $m = New-Object Threading.Mutex($false, $name); $null = $m.WaitOne() }).AddArgument($script:RegistrationLockName)
+            $null = $orphan.Invoke()
+            $orphan.Dispose()
+            $taken = Enter-RegistrationLock $script:RegistrationLockName
+            Check 'a lock whose holder ended without releasing it is taken' ($null -ne $taken)
+            if ($taken) { $taken.ReleaseMutex(); $taken.Dispose() }
+
             # A committed registration's leftover does not stop the next one.
             New-Item -ItemType Directory -Path "$($script:PythonDir).old" | Out-Null
             Set-Content (Join-Path "$($script:PythonDir).old" 'python.exe') 'left behind'
@@ -942,6 +979,11 @@ function Invoke-SelfTest {
         }
         Check 'the sandbox task is gone and the real task was never touched' (
             -not (Get-ScheduledTask -TaskName 'ResoluteSelfTest-*' -ErrorAction SilentlyContinue) -and $TaskName -eq 'ElevatedSmoke' -and $HashDir -eq 'C:\ProgramData\Resolute\ElevatedSmoke')
+
+        # -Register answers from an existing task only when no interrupted registration is waiting for it.
+        Check '-Register goes on to recover an interrupted registration even when a task is there and -Replace is not given' (
+            (Test-KeepsExistingTask $true $false $false) -and -not (Test-KeepsExistingTask $true $false $true) -and
+            -not (Test-KeepsExistingTask $true $true $false) -and -not (Test-KeepsExistingTask $false $false $false))
 
         # A journal is trusted only in a directory that passes its checks and owned by Administrators or SYSTEM.
         Check 'a journal is trusted only in a protected directory and owned by Administrators or SYSTEM' (
@@ -1083,7 +1125,34 @@ function Invoke-ElevatedRegistration {
     }
 }
 
+function Enter-RegistrationLock([string]$Name) {
+    # The lock, taken at once or not at all. A mutex whose holder died is
+    # taken too: that is the abandoned registration a journal records.
+    $mutex = New-Object Threading.Mutex($false, $Name)
+    try {
+        if ($mutex.WaitOne(0)) { return $mutex }
+    } catch [Threading.AbandonedMutexException] {
+        return $mutex
+    }
+    $mutex.Dispose()
+    return $null
+}
+
 function Invoke-RegisterElevated {
+    # The registration transaction, run under the machine-wide lock: a
+    # second registration started meanwhile is refused instead of taking
+    # the first one's journal for an abandoned one and undoing it.
+    $lock = Enter-RegistrationLock $script:RegistrationLockName
+    if (-not $lock) { Write-Host 'refused: another registration of the elevated smoke task is running; wait for it to finish'; return 2 }
+    try {
+        return (Invoke-RegistrationTransaction)
+    } finally {
+        $lock.ReleaseMutex()
+        $lock.Dispose()
+    }
+}
+
+function Invoke-RegistrationTransaction {
     # One transaction. It prepares everything beside what is live (the new
     # Python, the new pinned hashes), registers the task, switches the new
     # files in while keeping the previous ones, and then asks the same
@@ -1301,9 +1370,16 @@ function Confirm-Registration([string[]]$Refusals) {
     return 0
 }
 
+function Test-KeepsExistingTask([bool]$TaskExists, [bool]$Replace, [bool]$Interrupted) {
+    # Whether -Register may answer from the task that is there. Not when an
+    # interrupted registration is waiting: only a registration recovers it,
+    # and the refusal -Check and -Run give says to run -Register.
+    return ($TaskExists -and -not $Replace -and -not $Interrupted)
+}
+
 function Invoke-Register {
     $existing = Get-TaskOrNull
-    if ($existing -and -not $Replace) {
+    if (Test-KeepsExistingTask ([bool]$existing) ([bool]$Replace) (Test-Path -LiteralPath $JournalFile)) {
         $refusals = Get-RunRefusals $existing
         if (-not $refusals) { return (Confirm-Registration @()) }
         Write-Host ("refused: an existing task differs and is preserved: " + ($refusals -join '; '))
