@@ -861,9 +861,45 @@ function Invoke-SelfTest {
             }
             $answer = @($shown | Where-Object { $_ -is [int] })
             $text = ($shown | Where-Object { $_ -isnot [int] } | ForEach-Object { "$_" }) -join "`n"
+            # The same with a log that cannot be read: the exit code's refusal is still shown.
+            $savedLog = $script:RegisterLog
+            $script:Replace = $true
+            try {
+                New-Item -ItemType Directory -Path $box -Force | Out-Null
+                $script:RegisterLog = $box   # a directory: reading it fails, as a denied or locked file would
+                $unreadable = @(Invoke-Register 6>&1)
+            } catch {
+                $unreadable = @("threw: $($_.Exception.Message)")
+            } finally {
+                $script:Replace = $savedReplace
+                $script:RegisterLog = $savedLog
+                if (Test-Path -LiteralPath $box) { Remove-Item -LiteralPath $box -Recurse -Force }
+            }
+            $uAnswer = @($unreadable | Where-Object { $_ -is [int] })
+            $uText = ($unreadable | Where-Object { $_ -isnot [int] } | ForEach-Object { "$_" }) -join "`n"
+            Check '-Register with a log it cannot read still shows the refusal the exit code names, and fails' (
+                $uText.Contains("elevated: $(Get-RefusalForExitCode 12)") -and $uAnswer.Count -eq 1 -and $uAnswer[0] -ne 0)
             Check '-Register shows a refusal the consented copy gave only in its exit code, fails, and confirms nothing' (
                 $text.Contains("elevated: $(Get-RefusalForExitCode 12)") -and $answer.Count -eq 1 -and $answer[0] -ne 0 -and
                 -not $text.Contains('readiness checks') -and -not $text.Contains('registered:'))
+
+            # A log that cannot be written does not change a refusal's exit code, or what the operator is shown.
+            $savedLog = $script:RegisterLog
+            $missing = $script:Registration.Source
+            try {
+                New-Item -ItemType Directory -Path $box -Force | Out-Null
+                $script:RegisterLog = $box   # a directory: appending to it fails, as a full disk or a denied file would
+                $script:Registration.Source = { Join-Path $td 'no-runtime-here' }
+                try { $code = Invoke-RegisterElevated 6>$null } catch { $code = "threw: $($_.Exception.Message)" }
+                $script:RegisterLog = Join-Path $td 'no-log-at-all.txt'
+                $text = if ($code -is [int]) { ((Write-ElevatedOutcome $code 0 6>&1) | Where-Object { $_ -isnot [int] } | ForEach-Object { "$_" }) -join "`n" } else { '' }
+            } finally {
+                $script:RegisterLog = $savedLog
+                $script:Registration.Source = $missing
+                if (Test-Path -LiteralPath $box) { Remove-Item -LiteralPath $box -Recurse -Force }
+            }
+            Check 'a refusal whose log cannot be written still returns its code, and the operator is still shown why' (
+                $code -eq 12 -and $text.Contains("elevated: $(Get-RefusalForExitCode 12)"))
 
             # A first registration abandoned after its switch is recovered to nothing: no task, no directory.
             $said = Register-InSandbox -AbandonAfter 'commit'
@@ -1218,15 +1254,30 @@ function Write-ElevatedOutcome([int]$ExitCode, [int]$LogFrom) {
 function Read-RegistrationLog([int]$From) {
     # What the elevated copy said since line $From, for -Register to print:
     # that copy runs in a console of its own, which closes when it exits.
+    # A log that cannot be read is said, and read as empty, so the exit
+    # code's refusal is what the operator sees: the log never decides.
     if (-not (Test-Path -LiteralPath $RegisterLog)) { return @() }
-    return @(@(Get-Content -LiteralPath $RegisterLog) | Select-Object -Skip $From)
+    try {
+        return @(@(Get-Content -LiteralPath $RegisterLog -ErrorAction Stop) | Select-Object -Skip $From)
+    } catch {
+        Write-Host "the registration log could not be read ($($_.Exception.Message)); the exit code still says the outcome"
+        return @()
+    }
 }
 
 function Write-Registration([string]$Line) {
     # The elevated copy runs in a window of its own, so what it says is
     # also kept in the protected directory for -Register to print.
     Write-Host $Line
-    if (Test-Path -LiteralPath $HashDir) { Add-Content -LiteralPath $RegisterLog -Value $Line }
+    if (-not (Test-Path -LiteralPath $HashDir)) { return }
+    try {
+        Add-Content -LiteralPath $RegisterLog -Value $Line
+    } catch {
+        # The log is a second copy for -Register to read; the exit code is the
+        # answer. A log that cannot be written is said here, and the caller
+        # returns what it was going to return.
+        Write-Host "the registration log could not be written ($($_.Exception.Message)); the exit code still says the outcome"
+    }
 }
 
 function Get-RegistrationState {
@@ -1584,7 +1635,7 @@ function Invoke-Register {
         Write-Host 'registration needs one consent prompt; approving it registers the task and pins the driver hashes'
         $args = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -RegisterElevated -OperatorSid $(Get-CurrentSid) -Root `"$Root`""
         if ($ProveRollback) { $args += ' -ProveRollback' }
-        $logFrom = if (Test-Path -LiteralPath $RegisterLog) { @(Get-Content -LiteralPath $RegisterLog).Count } else { 0 }
+        $logFrom = @(Read-RegistrationLog 0).Count
         try {
             $proc = & $script:Registration.Launch $args
         } catch {
