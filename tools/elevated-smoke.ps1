@@ -40,6 +40,7 @@ param(
     [string]$OperatorSid = '',   # internal: the account that asked for the registration
     [switch]$ProveRollback,      # with -Register: first fail a registration on purpose and read the previous state back
     [string]$FailAfterStep = '', # internal: the step after which the elevated copy fails on purpose (it can only make a registration fail)
+    [string]$AbandonAfterStep = '', # internal, self-test only: leave after this step without the rollback, as a killed process would
     [int]$RunTimeoutSec = 900,   # how long -Run waits for the task before it stops it and cleans up
     [string]$Root = (Split-Path -Parent $PSScriptRoot)
 )
@@ -54,8 +55,9 @@ $PythonDir = Join-Path $HashDir 'python'
 $EnvFile = Join-Path $HashDir 'run\elevated-smoke-env.txt'
 $ManifestKey = 'HKCU:\Software\Resolute\ElevatedSmoke\Manifest'
 $ManifestName = 'HKCU\Software\Resolute\ElevatedSmoke\Manifest'   # as the driver's winreg reads it
-$KnownEntries = @('trusted-hashes.txt', 'trusted-hashes.txt.new', 'trusted-hashes.txt.old', 'python', 'python.new', 'python.old', 'run', 'register-log.txt')
+$KnownEntries = @('trusted-hashes.txt', 'trusted-hashes.txt.new', 'trusted-hashes.txt.old', 'python', 'python.new', 'python.old', 'run', 'register-log.txt', 'registration.journal')
 $RegisterLog = Join-Path $HashDir 'register-log.txt'
+$JournalFile = Join-Path $HashDir 'registration.journal'
 $AdminsSid = 'S-1-5-32-544'
 $SystemSid = 'S-1-5-18'
 $DriverFiles = @('scripts\smoke-run.py', 'scripts\conformance-check.py')
@@ -71,7 +73,8 @@ $Registration = [pscustomobject]@{
     Protect = $true
     Source = { Join-Path $Root 'reskit\python' }
     Action = $null
-    Readiness = { Get-RunRefusals (Get-TaskOrNull) }
+    Readiness = { Get-TransactionRefusals }
+    JournalTrusted = { Test-JournalTrusted @(Get-DirectoryRefusals) (Get-JournalOwner) }
 }
 $StopTimeoutSec = 30
 
@@ -371,14 +374,28 @@ function Restore-Task([string]$Path, [string]$Name, [string]$Xml) {
     Register-ScheduledTask -TaskPath $Path -TaskName $Name -Xml $Xml -Force -ErrorAction Stop | Out-Null
 }
 
-function Switch-Path([string]$New, [string]$Live, [scriptblock]$Move = { param($from, $to) Move-Item -LiteralPath $from -Destination $to }) {
+function Invoke-StepPoint([string]$Name) {
+    # A named point in a registration. Only ever makes one end early: with a
+    # failure (the rollback proof's fault) or, in the self-test, by leaving
+    # without the rollback, which is what a killed process or a reboot does.
+    if (-not $Name) { return }
+    if ($script:FailAfterStep -eq $Name) { throw "injected failure after step '$Name'" }
+    if ($script:AbandonAfterStep -eq $Name) { throw "abandoned after step '$Name'" }
+}
+
+function Switch-Path([string]$New, [string]$Live, [scriptblock]$Move = { param($from, $to) Move-Item -LiteralPath $from -Destination $to }, [string]$Label = '') {
     # Puts $New in place of $Live, a file or a directory, and keeps what was
     # there beside it as "$Live.old". Both moves are renames inside one
     # directory. The kept copy is what a rollback puts back, so it stays
     # until the registration has passed its readiness checks.
+    # A kept copy already there is never removed here: it is either the
+    # previous registration a journal still points at, or a committed
+    # registration's leftover, which the next registration removes when it
+    # starts and has no journal (D07 T01 section 11).
     $old = "$Live.old"
-    if (Test-Path -LiteralPath $old) { Remove-Item -LiteralPath $old -Recurse -Force }
+    if (Test-Path -LiteralPath $old) { throw "a kept copy is already at ${old}: it was not cleared before the switch" }
     if (Test-Path -LiteralPath $Live) { & $Move $Live $old }
+    if ($Label) { Invoke-StepPoint "$Label aside" }
     try {
         & $Move $New $Live
     } catch {
@@ -386,6 +403,110 @@ function Switch-Path([string]$New, [string]$Live, [scriptblock]$Move = { param($
         # aside: it goes straight back, so the live path is never left empty.
         if (Test-Path -LiteralPath $old) { & $Move $old $Live }
         throw
+    }
+    if ($Label) { Invoke-StepPoint "$Label in" }
+}
+
+function Test-JournalTrusted([string[]]$DirectoryRefusals, [string]$OwnerSid) {
+    # A journal tells an elevated process which task definition to register,
+    # so it is read only where nobody but Administrators and SYSTEM could
+    # have written it: in a directory that passes its own checks, and owned
+    # by one of the two. Registration protects the directory before it
+    # writes a journal, so one that fails this was not written by it.
+    return ((@($DirectoryRefusals | Where-Object { $_ })).Count -eq 0 -and (Test-TrustedOwner $OwnerSid))
+}
+
+function Get-JournalOwner {
+    try { return (Get-Acl -LiteralPath $JournalFile).GetOwner([Security.Principal.SecurityIdentifier]).Value } catch { return '' }
+}
+
+function Read-Journal {
+    return (Get-Content -LiteralPath $JournalFile -Raw | ConvertFrom-Json)
+}
+
+function Write-Journal($State, [bool]$Protect) {
+    # Written once, before the first change it covers, and never updated:
+    # it says only what was there before. A temporary file renamed into
+    # place, so a journal is either whole or absent.
+    $tmp = "$JournalFile.tmp"
+    if (Test-Path -LiteralPath $tmp) { Remove-Item -LiteralPath $tmp -Force }
+    Set-Content -LiteralPath $tmp -Value ($State | ConvertTo-Json -Depth 3) -Encoding utf8
+    if ($Protect) {
+        $acl = Get-Acl -LiteralPath $tmp
+        $acl.SetOwner((New-Object Security.Principal.SecurityIdentifier($AdminsSid)))
+        Set-Acl -LiteralPath $tmp -AclObject $acl
+    }
+    $back = Get-Content -LiteralPath $tmp -Raw | ConvertFrom-Json
+    if ($back.HashesText -ne $State.HashesText -or $back.TaskXml -ne $State.TaskXml) { throw "the journal written to $tmp did not read back as written" }
+    Move-Item -LiteralPath $tmp -Destination $JournalFile
+}
+
+function Get-StateOnDisk {
+    # The same fields a journal records, read from the disk and the scheduler.
+    $task = Get-TaskOrNull
+    return [pscustomobject]@{
+        HadTask = [bool]$task
+        TaskXml = if ($task) { (Export-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName) -replace '\s+', ' ' } else { '' }
+        HadHashes = Test-Path -LiteralPath $HashFile
+        HashesText = if (Test-Path -LiteralPath $HashFile) { (Get-Content -LiteralPath $HashFile -Raw).Trim() } else { '' }
+        HadRuntime = Test-Path -LiteralPath $PythonDir
+        RuntimeHash = if (Test-Path -LiteralPath (Join-Path $PythonDir 'python.exe')) { (Get-FileHash -LiteralPath (Join-Path $PythonDir 'python.exe')).Hash } else { '' }
+    }
+}
+
+function Restore-Kept([string]$Live, [bool]$HadLive) {
+    # One live path back to what a journal says was there, from the disk:
+    # a kept copy means the live path was switched or emptied, so the copy
+    # goes back; no kept copy and nothing there before means what is live
+    # is new and goes. Safe to repeat: each call starts from what it finds.
+    $old = "$Live.old"
+    if (Test-Path -LiteralPath $old) {
+        if (Test-Path -LiteralPath $Live) { Remove-Item -LiteralPath $Live -Recurse -Force }
+        Move-Item -LiteralPath $old -Destination $Live
+    } elseif (-not $HadLive -and (Test-Path -LiteralPath $Live)) {
+        Remove-Item -LiteralPath $Live -Recurse -Force
+    }
+    if (Test-Path -LiteralPath "$Live.new") { Remove-Item -LiteralPath "$Live.new" -Recurse -Force }
+}
+
+function Invoke-RegistrationRecovery {
+    # Returns a registration that never reached its commit, by a kill or a
+    # reboot, to what its journal says was there before, and reads that
+    # back before the journal goes. A recovery that cannot finish throws,
+    # naming what it could not do, and leaves the journal and the kept
+    # copies for the next attempt; each step starts from what is on disk.
+    $journal = Read-Journal
+    Restore-Kept $HashFile ([bool]$journal.HadHashes)
+    Restore-Kept $PythonDir ([bool]$journal.HadRuntime)
+    if ($journal.HadTask) {
+        Restore-Task $TaskPath $TaskName $journal.TaskXmlRaw
+    } elseif (Get-TaskOrNull) {
+        Unregister-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Confirm:$false -ErrorAction Stop
+    }
+    $now = Get-StateOnDisk
+    $differs = @(foreach ($name in 'HadTask', 'TaskXml', 'HadHashes', 'HashesText', 'HadRuntime', 'RuntimeHash') {
+        if ("$($now.$name)" -ne "$($journal.$name)") { $name }
+    })
+    if ($differs) { throw ("the interrupted registration was not fully recovered (" + ($differs -join ', ') + " differ); the journal and the kept copies are left for another attempt") }
+    if ($journal.HadDir) {
+        Remove-Item -LiteralPath $JournalFile -Force
+    } else {
+        Remove-Item -LiteralPath $HashDir -Recurse -Force
+    }
+}
+
+function Resolve-Journal {
+    # Before a registration: a journal it can trust is recovered; one it
+    # cannot is removed unread, since what it would have it register cannot
+    # be told apart from what someone else wrote.
+    if (-not (Test-Path -LiteralPath $JournalFile)) { return }
+    if (& $script:Registration.JournalTrusted) {
+        Write-Registration "an interrupted registration was found: recovering it before this one"
+        Invoke-RegistrationRecovery
+        Write-Registration "the interrupted registration was recovered"
+    } else {
+        Write-Host "removed an untrusted journal, unread: $JournalFile"
+        Remove-Item -LiteralPath $JournalFile -Force
     }
 }
 
@@ -660,18 +781,25 @@ function Invoke-SelfTest {
         # limited privilege whose action only exits, and a temporary directory in place of the protected one.
         # The same function registers, fails where it is told to, and rolls back; nothing here is a stand-in for it.
         $saved = @{ TaskPath = $TaskPath; TaskName = $TaskName; HashDir = $HashDir; HashFile = $HashFile; SnapshotDir = $SnapshotDir
-                    PythonDir = $PythonDir; EnvFile = $EnvFile; RegisterLog = $RegisterLog; Registration = $script:Registration; FailAfterStep = $script:FailAfterStep }
+                    PythonDir = $PythonDir; EnvFile = $EnvFile; RegisterLog = $RegisterLog; JournalFile = $JournalFile; Registration = $script:Registration
+                    FailAfterStep = $script:FailAfterStep; AbandonAfterStep = $script:AbandonAfterStep }
         $box = Join-Path $td 'registration'
         $source = Join-Path $td 'runtime-source'
         New-Item -ItemType Directory -Path $source | Out-Null
         Set-Content (Join-Path $source 'python.exe') 'runtime one'
         $verdict = @{ Refusals = @() }
-        function Register-InSandbox([string]$FailAfter = '') {
+        $trust = @{ Value = $true }
+        function Register-InSandbox([string]$FailAfter = '', [string]$AbandonAfter = '') {
             # 'ok', or the failure's message. What the registration prints is not part of the self-test's output.
             $script:FailAfterStep = $FailAfter
+            $script:AbandonAfterStep = $AbandonAfter
             try { $code = Invoke-RegisterElevated 6>$null; if ($code -eq 0) { return 'ok' }; return "exit $code" }
             catch { return $_.Exception.Message }
-            finally { $script:FailAfterStep = '' }
+            finally { $script:FailAfterStep = ''; $script:AbandonAfterStep = '' }
+        }
+        function Recover-InSandbox {
+            # 'ok', or the refusal's message.
+            try { Invoke-RegistrationRecovery 6>$null; return 'ok' } catch { return $_.Exception.Message }
         }
         function Get-Leftovers { @(Get-ChildItem -LiteralPath $box -Force -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '\.(new|old)$' } | ForEach-Object Name) }
         try {
@@ -683,12 +811,21 @@ function Invoke-SelfTest {
             $script:PythonDir = Join-Path $box 'python'
             $script:EnvFile = Join-Path $box 'run\elevated-smoke-env.txt'
             $script:RegisterLog = Join-Path $box 'register-log.txt'
+            $script:JournalFile = Join-Path $box 'registration.journal'
             $script:Registration = [pscustomobject]@{
                 RequireElevation = $false; RunLevel = 'Limited'; Protect = $false
                 Source = { $source }
                 Action = (New-ScheduledTaskAction -Execute (Join-Path $env:SystemRoot 'System32\cmd.exe') -Argument '/c exit 0')
-                Readiness = { $verdict.Refusals }
+                Readiness = { Get-TransactionRefusals @({ $verdict.Refusals }) }
+                JournalTrusted = { $trust.Value }
             }
+
+            # A first registration abandoned after its switch is recovered to nothing: no task, no directory.
+            $said = Register-InSandbox -AbandonAfter 'commit'
+            $abandoned = (Test-Path -LiteralPath $script:JournalFile) -and [bool](Get-TaskOrNull)
+            $said2 = Recover-InSandbox
+            Check 'a first registration abandoned after its switch is recovered to no task and no directory' (
+                $said -match "abandoned after step 'commit'" -and $abandoned -and $said2 -eq 'ok' -and -not (Get-TaskOrNull) -and -not (Test-Path -LiteralPath $box))
 
             # A first registration that fails after the switch leaves nothing: no task, no directory.
             $said = Register-InSandbox 'commit'
@@ -715,15 +852,101 @@ function Invoke-SelfTest {
             Check 'a replacement its readiness checks refuse is rolled back like any other failure' (
                 $said -match 'does not pass its readiness checks: the task can be changed by another principal' -and $differs.Count -eq 0 -and (Get-Leftovers).Count -eq 0)
             $verdict.Refusals = @()
+
+            # A replacement abandoned at any point, as a killed process leaves it, is recovered from the disk to
+            # exactly the registration before it, with no journal and no spare copy left.
+            foreach ($step in 'hashes', 'task', 'hashes aside', 'hashes in', 'runtime aside', 'runtime in', 'commit', 'report') {
+                $said = Register-InSandbox -AbandonAfter $step
+                $journalThere = Test-Path -LiteralPath $script:JournalFile
+                $said2 = Recover-InSandbox
+                $differs = Compare-RegistrationState $registered (Get-RegistrationState)
+                Check "a replacement abandoned after '$step' is recovered to the registration before it" (
+                    $said -match "abandoned after step '$step'" -and $journalThere -and $said2 -eq 'ok' -and $differs.Count -eq 0 -and
+                    -not (Test-Path -LiteralPath $script:JournalFile) -and (Get-Leftovers).Count -eq 0)
+            }
+
+            # A registration started on an abandoned state recovers it first and ends as a complete new registration.
+            $null = Register-InSandbox -AbandonAfter 'runtime aside'
+            $emptied = -not (Test-Path -LiteralPath $script:PythonDir)
             $said = Register-InSandbox
-            Check 'a replacement that passes takes the new runtime and keeps no spare copy' (
-                $said -eq 'ok' -and (Get-Content (Join-Path $script:PythonDir 'python.exe')) -eq 'runtime two' -and (Get-Leftovers).Count -eq 0)
+            Check 'a registration started where the live runtime was left moved aside recovers first and ends complete' (
+                $emptied -and $said -eq 'ok' -and (Get-Content (Join-Path $script:PythonDir 'python.exe')) -eq 'runtime two' -and
+                -not (Test-Path -LiteralPath $script:JournalFile) -and (Get-Leftovers).Count -eq 0)
+            Set-Content (Join-Path $source 'python.exe') 'runtime one'
+            $null = Register-InSandbox
+            $registered = Get-RegistrationState
+            Set-Content (Join-Path $source 'python.exe') 'runtime two'
+
+            # A recovery that cannot finish says so, keeps what it needs, and finishes when run again.
+            $null = Register-InSandbox -AbandonAfter 'runtime in'
+            $held = [IO.File]::Open((Join-Path $script:PythonDir 'python.exe'), 'Open', 'Read', 'None')
+            try { $first = Recover-InSandbox } finally { $held.Dispose() }
+            $kept = (Test-Path -LiteralPath $script:JournalFile) -and (Test-Path -LiteralPath "$($script:PythonDir).old")
+            $second = Recover-InSandbox
+            $differs = Compare-RegistrationState $registered (Get-RegistrationState)
+            Check 'a recovery stopped by a held file refuses, keeps the journal and the kept copy, and finishes on the next attempt' (
+                $first -ne 'ok' -and $kept -and $second -eq 'ok' -and $differs.Count -eq 0 -and (Get-Leftovers).Count -eq 0)
+
+            # An untrusted journal is never read; the same journal trusted is (so the case can tell the two apart).
+            function Set-AlteredJournal {
+                $null = Register-InSandbox -AbandonAfter 'task'
+                $j = Read-Journal
+                $j.TaskXmlRaw = $j.TaskXmlRaw -replace '/c exit 0', '/c exit 7'
+                $j.TaskXml = $j.TaskXml -replace '/c exit 0', '/c exit 7'
+                Set-Content -LiteralPath $script:JournalFile -Value ($j | ConvertTo-Json -Depth 3) -Encoding utf8
+            }
+            $actionOf = { @((Get-ScheduledTask -TaskPath $script:TaskPath -TaskName $script:TaskName).Actions)[0].Arguments }
+            Set-AlteredJournal
+            $trust.Value = $false
+            Resolve-Journal 6>$null
+            $untrustedAction = & $actionOf
+            $journalGone = -not (Test-Path -LiteralPath $script:JournalFile)
+            Restore-Kept $script:HashFile $true; Restore-Kept $script:PythonDir $true
+            $trust.Value = $true
+            Set-AlteredJournal
+            Resolve-Journal 6>$null
+            $trustedAction = & $actionOf
+            Check 'an untrusted journal is removed unread, and the same journal trusted is the one that is restored' (
+                $journalGone -and $untrustedAction -eq '/c exit 0' -and $trustedAction -eq '/c exit 7')
+            $null = Register-InSandbox
+            $registered = Get-RegistrationState
+
+            # While a journal is there, the outside callers refuse and start nothing; the transaction does not refuse itself.
+            $null = Register-InSandbox -AbandonAfter 'task'
+            $lastRun = (Get-ScheduledTaskInfo -TaskPath $script:TaskPath -TaskName $script:TaskName).LastRunTime
+            $checkSaid = (Invoke-Check 6>&1 | Out-String)
+            $runSaid = (Invoke-Run 6>&1 | Out-String)
+            $notStarted = (Get-ScheduledTaskInfo -TaskPath $script:TaskPath -TaskName $script:TaskName).LastRunTime -eq $lastRun
+            Check '-Check and -Run refuse while an interrupted registration is there, naming it, and start nothing' (
+                $checkSaid -match 'an interrupted registration was found' -and $runSaid -match 'an interrupted registration was found' -and $notStarted)
+            $null = Recover-InSandbox
+            $plain = $script:Registration.Readiness
+            $script:Registration.Readiness = { Get-RunRefusals $null @({ $verdict.Refusals }) }
+            $said = Register-InSandbox
+            $differs = Compare-RegistrationState $registered (Get-RegistrationState)
+            $script:Registration.Readiness = $plain
+            Check 'a registration whose readiness counts its own journal refuses itself and rolls back' (
+                $said -match 'does not pass its readiness checks: an interrupted registration was found' -and $differs.Count -eq 0 -and
+                -not (Test-Path -LiteralPath $script:JournalFile))
+
+            # A committed registration's leftover does not stop the next one.
+            New-Item -ItemType Directory -Path "$($script:PythonDir).old" | Out-Null
+            Set-Content (Join-Path "$($script:PythonDir).old" 'python.exe') 'left behind'
+            $said = Register-InSandbox
+            Check 'a replacement that passes takes the new runtime and keeps no spare copy, a committed leftover included' (
+                $said -eq 'ok' -and (Get-Content (Join-Path $script:PythonDir 'python.exe')) -eq 'runtime two' -and (Get-Leftovers).Count -eq 0 -and
+                -not (Test-Path -LiteralPath $script:JournalFile))
         } finally {
             if (Get-TaskOrNull) { Unregister-ScheduledTask -TaskPath $script:TaskPath -TaskName $script:TaskName -Confirm:$false }
             foreach ($name in $saved.Keys) { Set-Variable -Scope Script -Name $name -Value $saved[$name] }
         }
         Check 'the sandbox task is gone and the real task was never touched' (
             -not (Get-ScheduledTask -TaskName 'ResoluteSelfTest-*' -ErrorAction SilentlyContinue) -and $TaskName -eq 'ElevatedSmoke' -and $HashDir -eq 'C:\ProgramData\Resolute\ElevatedSmoke')
+
+        # A journal is trusted only in a directory that passes its checks and owned by Administrators or SYSTEM.
+        Check 'a journal is trusted only in a protected directory and owned by Administrators or SYSTEM' (
+            (Test-JournalTrusted @() $AdminsSid) -and (Test-JournalTrusted @() $SystemSid) -and
+            -not (Test-JournalTrusted @() 'S-1-5-21-1-2-3-1001') -and -not (Test-JournalTrusted @('C:\x is owned by someone') $AdminsSid))
 
         # The task restoration the rollback relies on, run for real on a throwaway task of this account
         # (limited privilege, an action that only exits, no trigger), which is removed before the case ends.
@@ -870,10 +1093,7 @@ function Invoke-RegisterElevated {
     # permissions. Exit code says the outcome.
     $mode = $script:Registration
     if ($mode.RequireElevation -and -not (Test-IsElevated)) { Write-Host 'refused: the registration copy is not elevated'; return 2 }
-    function Step([string]$Name) {
-        # Only ever makes a registration fail: the rollback proof's fault.
-        if ($script:FailAfterStep -eq $Name) { throw "injected failure after step '$Name'" }
-    }
+    function Step([string]$Name) { Invoke-StepPoint $Name }
     if ($OperatorSid -and $OperatorSid -ne (Get-CurrentSid)) {
         # Consent given with another administrator's credentials: this copy
         # runs as that administrator, so the task and the HKCU it reads would
@@ -891,6 +1111,16 @@ function Invoke-RegisterElevated {
         Write-Host 'refused: the elevated smoke task is running or queued; let it finish or run -Remove first'
         return 2
     }
+    # An earlier registration that never reached its commit comes first.
+    Resolve-Journal
+    # With no journal, kept copies are a committed registration's leftovers.
+    foreach ($leftover in "$HashFile.old", "$PythonDir.old") {
+        if (Test-Path -LiteralPath $leftover) {
+            Remove-Item -LiteralPath $leftover -Recurse -Force
+            Write-Registration "removed a committed registration's leftover: $leftover"
+        }
+    }
+    $prior = Get-TaskOrNull
     $priorXml = $null
     if ($prior) { $priorXml = Export-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName }
     $hadHashDir = Test-Path -LiteralPath $HashDir
@@ -954,6 +1184,17 @@ function Invoke-RegisterElevated {
         if (Test-Path $runDir) { Remove-Item -LiteralPath $runDir -Recurse -Force }
         New-Item -ItemType Directory -Force -Path $SnapshotDir | Out-Null
         Step 'directory'
+        # What was here before, written before anything it describes changes.
+        Write-Journal ([pscustomobject]@{
+            HadDir = $hadHashDir
+            HadTask = [bool]$priorXml
+            TaskXml = if ($priorXml) { $priorXml -replace '\s+', ' ' } else { '' }
+            TaskXmlRaw = if ($priorXml) { $priorXml } else { '' }
+            HadHashes = $hadHashes
+            HashesText = if ($hadHashes) { (Get-Content -LiteralPath $HashFile -Raw).Trim() } else { '' }
+            HadRuntime = $hadRuntime
+            RuntimeHash = if (Test-Path -LiteralPath (Join-Path $PythonDir 'python.exe')) { (Get-FileHash -LiteralPath (Join-Path $PythonDir 'python.exe')).Hash } else { '' }
+        }) $mode.Protect
         # The new runtime and the new pinned hashes are written beside the
         # live ones, which are not touched until the switch below. The
         # hashes are read back before anything depends on them.
@@ -970,20 +1211,28 @@ function Invoke-RegisterElevated {
         Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Action $action -Principal $principal `
             -Description 'Resolute unattended elevated smoke (D07 T01 S7). Fixed action, hash-pinned driver; remove with tools/elevated-smoke.ps1 -Remove.' -Force | Out-Null
         Step 'task'
-        # The switch. The previous hashes and runtime are kept as *.old.
-        Switch-Path $newHashes $HashFile
+        # The switch. The previous hashes and runtime are kept as *.old. Each
+        # flag is set before its switch, because Undo-Switch is right from
+        # any point inside one.
         $switchedHashes = $true
-        Switch-Path $newPython $PythonDir
+        Switch-Path $newHashes $HashFile -Label 'hashes'
         $switchedRuntime = $true
+        Switch-Path $newPython $PythonDir -Label 'runtime'
         Step 'commit'
         # The same list a run is refused on. A registration that would not
         # be allowed to run is not a registration: it is rolled back.
-        $refusals = @(& $mode.Readiness)
+        # Flattened: a readiness check may hand back its list as one array.
+        $refusals = @(& $mode.Readiness | ForEach-Object { $_ } | Where-Object { $_ })
         if ($refusals) { throw ("the registration does not pass its readiness checks: " + ($refusals -join '; ')) }
         Write-Registration "python: $((Get-FileHash -Algorithm SHA256 -Path (Join-Path $PythonDir 'python.exe')).Hash) $(Join-Path $PythonDir 'python.exe')"
         foreach ($line in $lines) { Write-Registration "pinned: $line" }
         Step 'report'
+        # The commit: with the journal gone, what is live is the registration.
+        Remove-Item -LiteralPath $JournalFile -Force
     } catch {
+        # The self-test's stand-in for a killed process leaves as one would:
+        # without the rollback, so the next registration has to recover.
+        if ($_.Exception.Message -like "abandoned after step '*'") { throw }
         # Roll back. Every step runs whatever the others do, and a step that
         # fails is said beside the original error.
         $cause = $_
@@ -1021,7 +1270,9 @@ function Invoke-RegisterElevated {
             }
         )
         if ($notRestored.Count) {
-            Write-Host ("rollback incomplete, restore by hand: " + ($notRestored -join '; '))
+            Write-Host ("rollback incomplete: " + ($notRestored -join '; ') + "; the journal is left, so the next registration recovers what this one could not")
+        } elseif (Test-Path -LiteralPath $JournalFile) {
+            Remove-Item -LiteralPath $JournalFile -Force
         }
         # What a rollback does not undo, said so nobody has to find it.
         if ($hadHashDir) {
@@ -1087,7 +1338,13 @@ function Invoke-Register {
     return (Confirm-Registration (Get-RunRefusals (Get-TaskOrNull)))
 }
 
-function Get-RunRefusals($Task, [scriptblock[]]$Checks = $null) {
+function Get-TransactionRefusals([scriptblock[]]$Checks = $null) {
+    # The readiness a registration asks itself, while its own journal is
+    # still there: every reason a run may not start, but that one.
+    return (Get-RunRefusals (Get-TaskOrNull) $Checks -InTransaction)
+}
+
+function Get-RunRefusals($Task, [scriptblock[]]$Checks = $null, [switch]$InTransaction) {
     # Every reason the task may not be started, in one place. -Check reports
     # this list and -Run refuses on it, so the launch path cannot be missing
     # a check the readiness answer has.
@@ -1103,6 +1360,9 @@ function Get-RunRefusals($Task, [scriptblock[]]$Checks = $null) {
     }
     $refusals = @()
     foreach ($check in $Checks) { $refusals += @(& $check) }
+    if (-not $InTransaction -and (Test-Path -LiteralPath $JournalFile)) {
+        $refusals += "an interrupted registration was found ($JournalFile): run tools/elevated-smoke.ps1 -Register to recover it"
+    }
     return ,@($refusals | Where-Object { $_ })
 }
 
