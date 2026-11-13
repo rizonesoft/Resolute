@@ -607,18 +607,24 @@ def cmd_restore(s: Session, path: str, schema: Path = SCHEMA, restricted_overrid
         left = []
         try:
             restricted.unlink(missing_ok=True)
+            file_left = None
         except OSError as exc:
-            left.append(f"the restore user's option file {restricted} could not be removed ({exc.strerror or exc}); delete it, "
-                        "though the user it names no longer exists")
+            file_left = f"{exc.strerror or exc}"
         try:
             run_sql(f"DROP USER IF EXISTS '{user}'@{sql_str(account_host)};", options=s.options)
+            user_dropped = True
         except Refused as refusal:
-            left.append(f"the restore user '{user}'@'{account_host}' could not be dropped ({refusal}); drop it with: DROP USER '{user}'@'{account_host}';")
+            user_dropped = False
+            left.append(f"the restore user '{user}'@'{account_host}' could not be confirmed removed ({refusal}); drop it with: DROP USER IF EXISTS '{user}'@'{account_host}';")
+        if file_left is not None:
+            # What the file's password still opens is said only as far as it is known.
+            state = "the user it names was dropped" if user_dropped else "the user it names could not be confirmed removed"
+            left.insert(0, f"the restore user's option file {restricted} could not be removed ({file_left}); delete it ({state})")
         if not restored:
             try:
                 run_sql(f"DROP DATABASE IF EXISTS `{s.database}`;", options=s.options)
             except Refused as refusal:
-                left.append(f"the half-made database '{s.database}' could not be dropped ({refusal}); drop it with: DROP DATABASE `{s.database}`;")
+                left.append(f"the half-made database '{s.database}' could not be confirmed removed ({refusal}); drop it with: DROP DATABASE IF EXISTS `{s.database}`;")
         if left:
             ended = f"refused: the backup was restored into '{s.database}', but " if restored else f"{failure or 'refused: the restore failed'}; and "
             raise Refused(ended + "; ".join(left)) from None
@@ -651,7 +657,16 @@ def upgrade_difference(old: Session, new: Session) -> str | None:
     return None
 
 
-def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, restricted_override: dict | None = None) -> int:
+def _exists_quietly(s: Session) -> bool:
+    """Whether a database exists, read without letting a failed read hide the refusal being reported."""
+    try:
+        return s.exists()
+    except Refused:
+        return True   # unknown: reported as possibly there, which is the safe side for an author deciding what to drop
+
+
+def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, restricted_override: dict | None = None,
+                before_cleanup=None) -> int:
     """Copies a database at an older schema revision into a new one at this revision: a backup of the old, restored into
     the new name from the current schema, then every version's text and every changelog row read back from both and
     compared. The old database is never changed; a difference drops the new one. after_restore is the self-test's
@@ -664,21 +679,36 @@ def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, 
     new = Session(s.options, to)
     if new.exists():
         raise Refused(f"refused: the database '{to}' already exists; upgrade into a new name; nothing was changed")
+    keep_old = f"'{s.database}' is unchanged: keep working in it"
     with tempfile.TemporaryDirectory(prefix="refdata-upgrade-") as tmp:
         dump = Path(tmp) / "upgrade.sql"
         with contextlib.redirect_stdout(io.StringIO()):
             cmd_backup(s, str(dump))
-            cmd_restore(new, str(dump), schema, restricted_override)
+            try:
+                cmd_restore(new, str(dump), schema, restricted_override, before_cleanup)
+            except Refused as refusal:
+                # A restore that loaded and then could not clean up leaves the copy behind, never compared.
+                if not _exists_quietly(new):
+                    raise
+                raise Refused(f"{refusal}; the upgrade stopped before comparing, so '{to}' is loaded but unverified: do not use it. "
+                              f"{keep_old}, and drop the copy with: DROP DATABASE IF EXISTS `{to}`;") from None
+
+    def rolled_back(reason: str) -> Refused:
+        # The reason first, then what became of the copy, as far as it is known.
+        try:
+            run_sql(f"DROP DATABASE IF EXISTS `{to}`;", options=s.options)
+            return Refused(f"{reason}; '{to}' was dropped and {keep_old}")
+        except Refused as refusal:
+            return Refused(f"{reason}; '{to}' could not be confirmed removed ({refusal}): drop it with: DROP DATABASE IF EXISTS `{to}`; and {keep_old}")
+
     try:
         if after_restore:
             after_restore(new)
         difference = upgrade_difference(s, new)
-    except Refused:
-        run_sql(f"DROP DATABASE IF EXISTS `{to}`;", options=s.options)
-        raise
+    except Refused as refusal:
+        raise rolled_back(f"refused: the upgraded copy could not be compared with '{s.database}' ({refusal})") from None
     if difference:
-        run_sql(f"DROP DATABASE IF EXISTS `{to}`;", options=s.options)
-        raise Refused(f"refused: the upgraded copy differs from '{s.database}': {difference}; '{to}' was dropped and '{s.database}' is unchanged")
+        raise rolled_back(f"refused: the upgraded copy differs from '{s.database}': {difference}") from None
     print(f"upgraded '{s.database}' (schema revision {revision}) into '{to}' (revision {SCHEMA_REVISION}); every version and changelog row reads back the same.")
     print(f"'{s.database}' is unchanged. Work in '{to}' from now on (--database {to}, or RESOLUTE_REFDATA_DATABASE={to}); "
           f"once it is checked, drop '{s.database}' with: DROP DATABASE `{s.database}`;")
@@ -721,6 +751,721 @@ def other_databases(options: Path, own: str) -> dict:
     return state
 
 
+class SelfTestRun:
+    """What every phase of the self-test shares: its checks, the database it made, and the helpers its cases use."""
+
+    def __init__(self, checks: Checks, options: Path, database: str, session: Session, tmp: Path):
+        self.checks, self.options, self.database, self.session, self.tmp = checks, options, database, session, tmp
+        self.base = ["--options", str(options), "--database", database]
+        self.kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        self.kernel32.CreateFileW.restype = ctypes.c_void_p
+        self.kernel32.CreateFileW.argtypes = [ctypes.c_wchar_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p]
+        self.kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
+        # Produced by one phase and read by a later one.
+        self.v1 = ""
+        self.expected_v1: list[tuple] = []
+        self.expected_v2: list[tuple] = []
+        self.expected_log: list[tuple] = []
+        self.read_back = lambda label: None
+        self.dump_file = tmp
+        self.hostile = tmp
+
+    def proposal(self, name: str, body: object) -> str:
+        path = self.tmp / f"{name}.json"
+        path.write_text(json.dumps(body), encoding="utf-8")
+        return str(path)
+
+    def refused(self, label: str, argv: list[str], expected: str) -> None:
+        code, out = call(argv + self.base)
+        self.checks.check(f"refused: {label}", code == 1 and expected in out, f"exit {code}, said {out.strip()!r}")
+
+    @staticmethod
+    def safe_call(argv: list[str]) -> tuple[int | None, str]:
+        # A refusal that is not handled ends in a traceback; that is reported as a failure, not raised.
+        try:
+            return call(argv)
+        except Exception as exc:  # noqa: BLE001 -- the self-test reports any unhandled error as the failure it is
+            return None, f"unhandled {type(exc).__name__}: {exc}"
+
+    def digest_of(self, number: int) -> str:
+        _, out = call(["changes", "fixture", str(number)] + self.base)
+        found = re.search(r"digest: ([0-9a-f]{64})", out)
+        return found.group(1) if found else "no digest printed"
+
+    def review(self, number: int, who: str, reason: str, digest: str | None = None) -> tuple[int, str]:
+        return call(["review", "fixture", str(number), "--as", who, "--reason", reason, "--inspected", digest or self.digest_of(number)] + self.base)
+
+    def held(self, path: Path, share: int):
+        # GENERIC_READ, OPEN_EXISTING; share 1 lets others read but not replace or delete it, share 0 lets nobody open it.
+        handle = self.kernel32.CreateFileW(str(path), 0x80000000, share, None, 3, 0x80, None)
+        if handle in (None, ctypes.c_void_p(-1).value):
+            raise Refused(f"refused: the self-test could not hold {path} (error {ctypes.get_last_error()})")
+        return handle
+
+    @staticmethod
+    def server(flag: str) -> str:
+        proc = subprocess.Popen(["pwsh", "-NoProfile", "-File", str(SERVER_SCRIPT), flag], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        try:
+            said, _ = proc.communicate(timeout=180)
+        except subprocess.TimeoutExpired:
+            _end_tree(proc)
+            said = b"did not finish within 180s and was ended with its children"
+        return f"exit {proc.returncode}: " + said.decode("utf-8", "replace").strip()[-200:]
+
+
+def _phase_workflow(t: SelfTestRun) -> None:
+    checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
+    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
+        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
+    # Version 1: proposed, refused review by its author, reviewed, stamped.
+    v1 = str(FIXTURES / "fixture-v1.json")
+    code, out = call(["propose", v1] + base)
+    checks.check("version 1 is proposed from the fixture", code == 0 and "version 1" in out, out.strip())
+    refused("a reviewer who is the author", ["review", "fixture", "1", "--as", "author-one", "--reason", "self", "--inspected", digest_of(1)], "the reviewer is the author")
+    refused("stamping an unreviewed version", ["stamp", "fixture", "1", "--as", "author-one", "--reason", "early"], "the version is not reviewed")
+    code, _ = review(1, "author-two", "checked against both manuals")
+    code2, _ = call(["stamp", "fixture", "1", "--as", "author-one", "--reason", "release the first version"] + base)
+    checks.check("version 1 is reviewed by another author and stamped", code == 0 and code2 == 0)
+    refused("editing a stamped version", ["propose", proposal("stamped", {"dataset": "fixture", "author": "author-one", "changes": [
+        {"reword": "beep-3-short", "text": "x", "reason": "late edit"}]}), "--version", "1"], "the version is stamped and cannot change")
+
+    # Version 2: one entry reworded, one unchanged.
+    code, out = call(["propose", str(FIXTURES / "fixture-v2.json")] + base)
+    checks.check("version 2 is proposed", code == 0 and "version 2" in out, out.strip())
+    refused("a change without a reason", ["propose", proposal("noreason", {"dataset": "fixture", "author": "author-one", "changes": [
+        {"add": "beep-2-short", "text": "Two short beeps", "reason": ""}]}), "--version", "2"], "a change needs a reason")
+    refused("a key reused", ["propose", proposal("reuse", {"dataset": "fixture", "author": "author-one", "changes": [
+        {"add": "beep-1-long", "text": "again", "reason": "reuse"}]}), "--version", "2"], "keys are never reused")
+    refused("a key renamed", ["propose", proposal("rename", {"dataset": "fixture", "author": "author-one", "changes": [
+        {"rename": "beep-1-long", "to": "beep-long", "reason": "rename"}]}), "--version", "2"], "keys are never renamed")
+    code, _ = review(2, "author-two", "the rewording matches the revised manual")
+    code2, _ = call(["stamp", "fixture", "2", "--as", "author-one", "--reason", "release the second version"] + base)
+    checks.check("version 2 is reviewed and stamped", code == 0 and code2 == 0)
+
+    expected_v1 = [
+        ("beep-1-long", "One long beep: memory not detected", "Award BIOS 6.0 manual, appendix B", 1),
+        ("beep-3-short", "Three short beeps: base memory read or write error", "AMI BIOS 8 manual, table 4", 1),
+    ]
+    expected_v2 = [
+        ("beep-1-long", "One long beep: no memory detected in any slot", "Award BIOS 6.0 manual, appendix B, revised", 2),
+        expected_v1[1],
+    ]
+    expected_log = [
+        (1, "open", None, "author-one", "the first version of the fixture"),
+        (1, "add", "beep-1-long", "author-one", "first entry"),
+        (1, "add", "beep-3-short", "author-one", "second entry"),
+        (1, "review", None, "author-two", "checked against both manuals"),
+        (1, "stamp", None, "author-one", "release the first version"),
+        (2, "open", None, "author-one", "the second version of the fixture: one entry reworded, one left as it was"),
+        (2, "reword", "beep-1-long", "author-one", "the manual's later printing names the slots"),
+        (2, "review", None, "author-two", "the rewording matches the revised manual"),
+        (2, "stamp", None, "author-one", "release the second version"),
+    ]
+
+    def read_back(label: str) -> None:
+        checks.check(f"version 1 reads back exactly ({label})", version_text(session, "fixture", 1) == expected_v1, repr(version_text(session, "fixture", 1)))
+        checks.check(f"version 2 reads back exactly ({label})", version_text(session, "fixture", 2) == expected_v2, repr(version_text(session, "fixture", 2)))
+        checks.check(f"the changelog reads back exactly ({label})", history_rows(session, "fixture")[:len(expected_log)] == expected_log, repr(history_rows(session, "fixture")))
+
+    read_back("after stamping")
+    _, lines, _ = changes_between(session, "fixture", 2)
+    checks.check("changes names the one rewording against version 1", len(lines) == 1 and lines[0].startswith("reworded beep-1-long"), repr(lines))
+
+    # A proposal of three changes whose third is refused leaves nothing behind.
+    log_before = len(history_rows(session, "fixture"))
+    refused("the third change of a proposal", ["propose", proposal("partial", {"dataset": "fixture", "author": "author-one", "reason": "three changes", "changes": [
+        {"add": "beep-a", "text": "A", "reason": "first"}, {"add": "beep-b", "text": "B", "reason": "second"},
+        {"add": "beep-3-short", "text": "C", "reason": "third, a reused key"}]})], "keys are never reused")
+    leftovers = session.sql("SELECT COUNT(*) FROM entries WHERE entry_key IN ('beep-a', 'beep-b');")[0][0]
+    versions = session.sql("SELECT COUNT(*) FROM versions;")[0][0]
+    checks.check("a refused proposal leaves no row and no changelog row", leftovers == "0" and versions == "2" and len(history_rows(session, "fixture")) == log_before,
+                 f"entries {leftovers}, versions {versions}, changelog {len(history_rows(session, 'fixture'))} against {log_before}")
+
+    # A step whose changelog row cannot be written leaves the version as it was: one transaction.
+    refused_step = None
+    try:
+        cmd_step(session, "review", "fixture", 2, None, "a reviewer the changelog cannot record")
+    except Refused as refusal:
+        refused_step = str(refusal)
+    checks.check("a step whose changelog row fails leaves the version unchanged",
+                 refused_step is not None and require_version(session, "fixture", 2) == "stamped",
+                 f"refused {refused_step!r}, status {require_version(session, 'fixture', 2)}")
+
+    # A reviewed version is frozen; reopen clears its review, so stamp is refused until it is reviewed again.
+    call(["propose", proposal("v3", {"dataset": "fixture", "author": "author-one", "reason": "a third version", "changes": [
+        {"add": "beep-a", "text": "A", "reason": "a new entry"}]})] + base)
+    review(3, "author-two", "looks right")
+    refused("changing a reviewed version", ["propose", proposal("frozen", {"dataset": "fixture", "author": "author-one", "changes": [
+        {"reword": "beep-a", "text": "A, reworded", "reason": "after review"}]}), "--version", "3"], "reviewed and frozen")
+    code, _ = call(["reopen", "fixture", "3", "--as", "author-one", "--reason", "one more change"] + base)
+    code2, _ = call(["propose", proposal("after-reopen", {"dataset": "fixture", "author": "author-one", "changes": [
+        {"reword": "beep-a", "text": "A, reworded", "reason": "after reopening"}]}), "--version", "3"] + base)
+    checks.check("reopen returns the version to proposed and it changes", code == 0 and code2 == 0)
+    refused("stamping a reopened version before it is reviewed again", ["stamp", "fixture", "3", "--as", "author-one", "--reason", "on the old approval"], "the version is not reviewed")
+    code, _ = review(3, "author-two", "the change after reopening is right")
+    code2, _ = call(["stamp", "fixture", "3", "--as", "author-one", "--reason", "release the third version"] + base)
+    checks.check("the reopened version is stamped after a second review", code == 0 and code2 == 0)
+
+    # Someone who changed a version is not its reviewer, whoever opened it (the cases follow the failed review below).
+    # A step whose changelog row cannot be written, on a proposed version: still proposed afterwards.
+    call(["propose", proposal("v4", {"dataset": "fixture", "author": "author-one", "reason": "a fourth version", "changes": [
+        {"add": "beep-d", "text": "D", "reason": "a new entry"}]})] + base)
+    refused_step = None
+    try:
+        cmd_step(session, "review", "fixture", 4, None, "a reviewer the changelog cannot record", digest_of(4))
+    except Refused as refusal:
+        refused_step = str(refusal)
+    log_rows = [r for r in history_rows(session, "fixture") if r[0] == 4]
+    checks.check("a review whose changelog row fails leaves the version proposed, with no row of it",
+                 refused_step is not None and require_version(session, "fixture", 4) == "proposed" and [r[1] for r in log_rows] == ["open", "add"],
+                 f"refused {refused_step!r}, status {require_version(session, 'fixture', 4)}, changelog {log_rows}")
+    code, _ = call(["propose", proposal("v4-contribution", {"dataset": "fixture", "author": "author-two", "changes": [
+        {"add": "beep-c", "text": "C", "reason": "a contribution to version 4"}]}), "--version", "4"] + base)
+    checks.check("a second author can add to a proposed version", code == 0)
+    refused("a reviewer who changed the version", ["review", "fixture", "4", "--as", "author-two", "--reason", "my contribution looks right", "--inspected", digest_of(4)], "the reviewer changed this version")
+    code, _ = review(4, "author-three", "neither of us wrote it")
+    checks.check("a reviewer who changed nothing reviews it", code == 0)
+    t.v1 = v1
+    t.expected_v1 = expected_v1
+    t.expected_v2 = expected_v2
+    t.expected_log = expected_log
+    t.read_back = read_back
+
+
+def _phase_restores(t: SelfTestRun) -> None:
+    checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
+    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
+        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
+    # A backup round trip: the rows come back in a database of their own, with the schema's rules.
+    dump_file = Path(tmp) / "roundtrip.sql"
+    code, out = call(["backup", str(dump_file)] + base)
+    copy = f"{database}_copy"
+    code2, out2 = call(["restore", str(dump_file), "--options", str(options), "--database", copy])
+    copied = Session(options, copy)
+    same = code == 0 and code2 == 0 and copied.exists() and history_rows(copied, "fixture") == history_rows(session, "fixture")
+    refused_copy = None
+    if copied.exists():
+        try:
+            copied.sql("CALL rd_review('fixture', 4, 'author-one', 'the restored rules still hold', NULL);")
+        except Refused as refusal:
+            refused_copy = str(refusal)
+        run_sql(f"DROP DATABASE `{copy}`;", options=options)
+    checks.check("a backup restores into a new database with the same changelog and the same rules",
+                 same and refused_copy is not None and "only a proposed version can be reviewed" in refused_copy,
+                 f"backup {out.strip()!r}; restore {out2.strip()!r}; same changelog {same}; the copy's rules said {refused_copy!r}")
+
+    # A backup that reaches into another database is refused by the server, and that database is untouched.
+    hostile = Path(tmp) / "hostile.sql"
+    # A harmless first line, so the client reaches the DROP and only the server's privileges can stop it.
+    hostile.write_text(f"SELECT 1;\nDROP TABLE `{database}`.`changelog`;\n", encoding="utf-8")
+    before_rows = len(history_rows(session, "fixture"))
+    target = f"{database}_hostile"
+    code, out = call(["restore", str(hostile), "--options", str(options), "--database", target])
+    users = run_sql("SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options)[0][0]
+    checks.check("a backup that reaches into another database is refused, that database untouched, no target or user left",
+                 code == 1 and "could not be loaded as rows" in out and len(history_rows(session, "fixture")) == before_rows
+                 and not Session(options, target).exists() and users == "0", out.strip())
+
+    # A restore into a name one underscore away from another database cannot reach it: the grant names it exactly.
+    near = database[:-1] + "_"
+    reach = Path(tmp) / "reach.sql"
+    reach.write_text(f"SELECT 1;\nINSERT INTO `{database}`.`sources` (citation) VALUES ('written from a restore into {near}');\n", encoding="utf-8")
+    sources_before = session.sql("SELECT COUNT(*) FROM sources;")[0][0]
+    code, out = call(["restore", str(reach), "--options", str(options), "--database", near])
+    checks.check("a restore into a name that differs by an underscore cannot write the other database",
+                 code == 1 and session.sql("SELECT COUNT(*) FROM sources;")[0][0] == sources_before and not Session(options, near).exists(),
+                 f"exit {code}, sources {sources_before} -> {session.sql('SELECT COUNT(*) FROM sources;')[0][0]}, said {out.strip()!r}")
+
+    # A backup that asks the client to run a shell command is refused, and the command never runs.
+    marker = Path(tmp) / "shell-ran.txt"
+    shell = Path(tmp) / "shell.sql"
+    shell.write_text(f"SELECT 1;\n\\! cmd /c echo ran> \"{marker}\"\nSELECT 2;\n", encoding="utf-8")
+    target = f"{database}_shell"
+    code, out = call(["restore", str(shell), "--options", str(options), "--database", target])
+    checks.check("a backup that asks the client to run a shell command is refused, and the command does not run",
+                 code == 1 and not marker.exists() and not Session(options, target).exists(), f"exit {code}, marker {marker.exists()}, said {out.strip()!r}")
+
+    # A dump that names a database is refused before anything is restored.
+    named = Path(tmp) / "named.sql"
+    named.write_text(f"-- a mysqldump --databases dump\nCREATE DATABASE /*!32312 IF NOT EXISTS*/ `{database}`;\nUSE `{database}`;\nDROP TABLE IF EXISTS `changelog`;\n", encoding="utf-8")
+    target = f"{database}_restored"
+    code, out = call(["restore", str(named), "--options", str(options), "--database", target])
+    changelog_after = len(history_rows(session, "fixture"))
+    checks.check("a dump that names a database is refused, restoring nothing and leaving that database as it was",
+                 code == 1 and "selects, creates or drops a database (line 2" in out and not Session(options, target).exists() and changelog_after == len(history_rows(session, "fixture")),
+                 out.strip())
+    t.dump_file = dump_file
+    t.hostile = hostile
+
+
+def _phase_review_and_history(t: SelfTestRun) -> None:
+    checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
+    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
+        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
+    # ---- Repair 1: an approval covers exactly what was inspected, and every edit stays in the history.
+    call(["stamp", "fixture", "4", "--as", "author-one", "--reason", "release the fourth version"] + base)
+    call(["propose", proposal("v5", {"dataset": "fixture", "author": "author-one", "reason": "a fifth version", "changes": [
+        {"add": "beep-e", "text": "E", "source": "Manual E, first printing", "reason": "a new entry"},
+        {"add": "NULL", "text": "NULL", "source": "NULL", "reason": "an entry whose key, text and source are the word NULL"}]})] + base)
+    seen = digest_of(5)
+    for printing in ("second", "third"):
+        call(["propose", proposal(f"v5-{printing}", {"dataset": "fixture", "author": "author-two", "changes": [
+            {"reword": "beep-e", "text": f"E, {printing}", "source": f"Manual E, {printing} printing", "reason": f"the {printing} printing"}]}), "--version", "5"] + base)
+    code, out = review(5, "author-three", "approved on what I saw", seen)
+    now = digest_of(5)
+    checks.check("a review naming the digest of contents another author has since changed is refused, the version staying proposed",
+                 code == 1 and "changed since it was inspected" in out and require_version(session, "fixture", 5) == "proposed" and now != seen, out.strip())
+
+    detail = [(r[1], r[4], r[6], r[7]) for r in history_detail(session, "fixture") if r[0] == 5 and r[2] == "beep-e"]
+    code, out = call(["history", "fixture"] + base)
+    checks.check("two rewordings of one entry in one version both stay in history, each with its text, source and reason",
+                 detail == [("add", "a new entry", "E", "Manual E, first printing"),
+                            ("reword", "the second printing", "E, second", "Manual E, second printing"),
+                            ("reword", "the third printing", "E, third", "Manual E, third printing")]
+                 and 'v5 reword beep-e by author-two: the second printing  -> "E, second" [source: Manual E, second printing]' in out
+                 and 'v5 reword beep-e by author-two: the third printing  -> "E, third" [source: Manual E, third printing]' in out,
+                 f"{detail!r}; history said {out[-500:]!r}")
+
+    texts = version_text(session, "fixture", 5)
+    _, lines, _ = changes_between(session, "fixture", 5)
+    _, shown = call(["show", "fixture", "5"] + base)
+    null_rows = [(r[2], r[6], r[7]) for r in history_detail(session, "fixture") if r[0] == 5 and r[1] == "add" and r[4].startswith("an entry whose")]
+    checks.check("an entry whose key, text and source are the word NULL reads back as that text in show, changes and history",
+                 ("NULL", "NULL", "NULL", 5) in texts and "added NULL: NULL  [source: NULL]" in lines
+                 and "  NULL: NULL  [source: NULL; meaning from v5]" in shown and null_rows == [("NULL", "NULL", "NULL")],
+                 f"text {texts!r}; changes {lines!r}; show {shown!r}; history {null_rows!r}")
+
+    code, out = review(5, "author-three", "approved on what is there now", now)
+    checks.check("a review naming the digest of the contents as they are passes", code == 0 and require_version(session, "fixture", 5) == "reviewed", out.strip())
+    call(["stamp", "fixture", "5", "--as", "author-one", "--reason", "release the fifth version"] + base)
+
+    # A second author's edit in flight when the review is called: the review waits for its lock and is refused.
+    call(["propose", proposal("v6", {"dataset": "fixture", "author": "author-one", "reason": "a sixth version", "changes": [
+        {"add": "beep-f", "text": "F", "reason": "a new entry"}]})] + base)
+    seen = digest_of(6)
+    hold = subprocess.Popen([str(client_path()), f"--defaults-extra-file={options.name}", "--batch", database],
+                            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=str(options.parent))
+    assert hold.stdin is not None   # stdin=PIPE above
+    hold.stdin.write(b"SET autocommit = 0;\nSTART TRANSACTION;\n"
+                     b"CALL rd_reword('fixture', 6, 'beep-f', 'F, changed while under review', NULL, 'a concurrent edit', 'author-two');\n"
+                     b"DO SLEEP(4);\nCOMMIT;\n")
+    hold.stdin.close()
+    holding, deadline = False, time.monotonic() + 15
+    while time.monotonic() < deadline and hold.poll() is None:
+        if run_sql("SELECT COUNT(*) FROM information_schema.innodb_trx WHERE trx_rows_locked > 0;", options=options)[0][0] != "0":
+            holding = True
+            break
+        time.sleep(0.1)
+    started = time.monotonic()
+    code, out = review(6, "author-three", "approved on what I saw", seen)
+    waited = time.monotonic() - started
+    try:
+        _, held_err = hold.communicate(timeout=60)
+    except subprocess.TimeoutExpired:
+        _end_tree(hold)
+        held_err = b"the editing session did not finish within 60s and was ended"
+    checks.check("a review called while a second author's edit holds the version waits for it and is refused, the version staying proposed",
+                 holding and hold.returncode == 0 and waited > 1 and code == 1 and "changed since it was inspected" in out
+                 and require_version(session, "fixture", 6) == "proposed",
+                 f"edit holding {holding}, edit exit {hold.returncode} {held_err.decode('utf-8', 'replace').strip()!r}, waited {waited:.1f}s, review said {out.strip()!r}")
+
+    # A malformed proposal is refused naming the change and the field, and no SQL is sent.
+    for label, body, expected in (
+            ("not an object", [1, 2], "the proposal is list, not an object"),
+            ("no changes", {"dataset": "fixture", "author": "author-one"}, "the proposal has no 'changes'"),
+            ("changes not a list", {"dataset": "fixture", "author": "author-one", "changes": {"add": "k"}}, "'changes' is dict, not a list"),
+            ("a change not an object", {"dataset": "fixture", "author": "author-one", "changes": ["add k"]}, "change 1 is str, not an object"),
+            ("a change naming no verb", {"dataset": "fixture", "author": "author-one", "changes": [{"text": "x", "reason": "r"}]}, "change 1 names none of add, reword, rename"),
+            ("a change naming two verbs", {"dataset": "fixture", "author": "author-one", "changes": [{"add": "k", "reword": "k", "text": "x", "reason": "r"}]},
+             "change 1 names more than one of add, reword, rename (add, reword)"),
+            ("an add without text", {"dataset": "fixture", "author": "author-one", "changes": [{"add": "beep-g", "reason": "r"}]}, "change 1 (add beep-g) has no 'text'"),
+            ("a rename without a new key", {"dataset": "fixture", "author": "author-one", "changes": [{"rename": "beep-f"}]},
+             "change 1 (rename beep-f) has no 'to'")):
+        sent = SENT[0]
+        code, out = safe_call(["propose", proposal(f"malformed-{label}", body), "--version", "6"] + base)
+        checks.check(f"refused before anything runs: {label}", code == 1 and expected in out and "nothing was sent" in out and SENT[0] == sent,
+                     f"exit {code}, sessions started {SENT[0] - sent}, said {out.strip()!r}")
+
+
+def _phase_file_errors_and_cleanup(t: SelfTestRun) -> None:
+    checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
+    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
+        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
+    dump_file = t.dump_file
+    hostile = t.hostile
+    # File errors in backup and restore are refused naming the action and the path; earlier files are kept.
+    folder = Path(tmp) / "unwritable"
+    folder.mkdir()
+    earlier = folder / "refdata.sql"
+    earlier.write_bytes(b"-- an earlier backup\n")
+    (folder / "refdata.sql.partial").mkdir()   # the dump's own file cannot be created there
+    code, out = safe_call(["backup", str(earlier)] + base)
+    checks.check("a backup whose destination cannot be written is refused by name, the earlier backup kept",
+                 code == 1 and "backup could not write" in out and str(earlier) in out and "was kept unchanged" in out
+                 and earlier.read_bytes() == b"-- an earlier backup\n", f"exit {code}, said {out.strip()!r}")
+
+    locked = Path(tmp) / "locked.sql"
+    locked.write_bytes(b"-- the backup an editor holds open\n")
+    handle = held(locked, 1)
+    try:
+        code, out = safe_call(["backup", str(locked)] + base)
+    finally:
+        kernel32.CloseHandle(handle)
+    checks.check("a backup over an earlier one held open is refused by name, the earlier one byte-identical and no partial dump left",
+                 code == 1 and "backup could not replace" in out and "the new dump was removed" in out
+                 and locked.read_bytes() == b"-- the backup an editor holds open\n" and not locked.with_name("locked.sql.partial").exists(),
+                 f"exit {code}, said {out.strip()!r}")
+
+    unreadable = Path(tmp) / "unreadable.sql"
+    unreadable.write_bytes(b"SELECT 1;\n")
+    target = f"{database}_unread"
+    handle = held(unreadable, 0)
+    try:
+        code, out = safe_call(["restore", str(unreadable), "--options", str(options), "--database", target])
+    finally:
+        kernel32.CloseHandle(handle)
+    checks.check("a backup that cannot be read is refused by name, no database created",
+                 code == 1 and "restore could not read" in out and str(unreadable) in out and not Session(options, target).exists(),
+                 f"exit {code}, said {out.strip()!r}")
+
+    # A restore user's option file that cannot be removed stops none of the other cleanup steps.
+    outcomes = {}
+    for label, dump, target in (("a successful restore", dump_file, f"{database}_heldok"), ("a failed restore", hostile, f"{database}_heldbad")):
+        handles = []
+        said = None
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                cmd_restore(Session(options, target), str(dump), before_cleanup=lambda path: handles.append((path, held(path, 1))))
+        except Refused as refusal:
+            said = str(refusal)
+        except Exception as exc:  # noqa: BLE001 -- an unhandled error is the failure this case exists to catch
+            said = f"unhandled {type(exc).__name__}: {exc}"
+        for path, handle in handles:
+            kernel32.CloseHandle(handle)
+            path.unlink(missing_ok=True)
+        users = run_sql("SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options)[0][0]
+        outcomes[label] = (said, users, Session(options, target).exists())
+        run_sql(f"DROP DATABASE IF EXISTS `{target}`;", options=options)
+    ok_said, ok_users, ok_kept = outcomes["a successful restore"]
+    bad_said, bad_users, bad_kept = outcomes["a failed restore"]
+    checks.check("a restore whose option file cannot be removed still drops its user, names the file, keeps a restored database and drops a failed one",
+                 ok_said is not None and "was restored into" in ok_said and "could not be removed" in ok_said and ok_users == "0" and ok_kept
+                 and bad_said is not None and "could not be loaded as rows" in bad_said and "could not be removed" in bad_said
+                 and bad_users == "0" and not bad_kept and "the user it names was dropped" in ok_said, repr(outcomes))
+
+    # One outage in the cleanup: the file is held and the server stopped, so the user's removal is unknown,
+    # and the report says so rather than that it was dropped.
+    target, handles = f"{database}_outage", []
+    outage_said, started = None, ""
+
+    def hold_and_stop(path: Path) -> None:
+        handles.append((path, held(path, 1)))
+        server("-Stop")
+
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            cmd_restore(Session(options, target), str(dump_file), before_cleanup=hold_and_stop)
+    except Refused as refusal:
+        outage_said = str(refusal)
+    except Exception as exc:  # noqa: BLE001 -- an unhandled error is the failure this case exists to catch
+        outage_said = f"unhandled {type(exc).__name__}: {exc}"
+    finally:
+        for path, handle in handles:
+            kernel32.CloseHandle(handle)
+            path.unlink(missing_ok=True)
+        started = server("-Start")
+    for name, host in run_sql("SELECT user, host FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options):
+        run_sql(f"DROP USER '{name}'@'{host}';", options=options)
+    run_sql(f"DROP DATABASE IF EXISTS `{target}`;", options=options)
+    checks.check("a restore whose cleanup meets an outage says the user's removal could not be confirmed, never that it was dropped",
+                 outage_said is not None and "the user it names could not be confirmed removed" in outage_said
+                 and "DROP USER IF EXISTS 'refdata_restore_" in outage_said and "was dropped" not in outage_said
+                 and started.startswith("exit 0"), f"said {outage_said!r}; restart {started!r}")
+
+
+def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
+    checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
+    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
+        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
+    expected_v1 = t.expected_v1
+    expected_v2 = t.expected_v2
+    # A database at schema revision 1 is upgraded with nothing lost; until then, commands on it are refused.
+    old_schema = Path(tmp) / "schema-revision-1.sql"
+    old_schema.write_text(subprocess.run(["git", "-C", str(REPO), "show", "61d88277:data/refdata/schema.sql"], capture_output=True,
+                                         check=True, encoding="utf-8").stdout, encoding="utf-8")
+    old = Session(options, f"{database}_r1")
+    upgraded, lossy = f"{database}_r2", f"{database}_r2lossy"
+    tls_restored, tls_upgraded, tls_refused, tls_refused_up = (f"{database}_tls", f"{database}_tlsup", f"{database}_tlsno", f"{database}_tlsupno")
+    rel_restored, rel_upgraded = f"{database}_rel", f"{database}_relup"
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            cmd_init(old, old_schema)
+        for fixture in ("fixture-v1.json", "fixture-v2.json"):
+            old.sql(proposal_sql(json.loads((FIXTURES / fixture).read_text(encoding="utf-8")), None))
+            if fixture == "fixture-v1.json":
+                old.sql("SET autocommit = 0;\nSTART TRANSACTION;\nCALL rd_review('fixture', 1, 'author-two', 'checked against both manuals');\nCOMMIT;\n")
+                old.sql("SET autocommit = 0;\nSTART TRANSACTION;\nCALL rd_stamp('fixture', 1, 'author-one', 'release the first version');\nCOMMIT;\n")
+        old_state = {name: old.sql(query) for name, query in UPGRADE_READBACK.items()}
+        code, out = call(["list", "--options", str(options), "--database", old.database])
+        refused_old = code == 1 and f"upgrade --database {old.database}" in out
+
+        lossy_said = None
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                cmd_upgrade(old, lossy, after_restore=lambda new: new.sql("DELETE FROM changelog ORDER BY id DESC LIMIT 1;"))
+        except Refused as refusal:
+            lossy_said = str(refusal)
+        checks.check("an upgrade whose copy lost a changelog row is refused naming it, the copy dropped and the old database unchanged",
+                     lossy_said is not None and "changelog has" in lossy_said and not Session(options, lossy).exists()
+                     and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state, repr(lossy_said))
+
+        # An upgrade whose restore could not clean up says its copy is loaded but unverified.
+        unverified, handles = f"{database}_unverified", []
+        unverified_said = None
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                cmd_upgrade(old, unverified, before_cleanup=lambda path: handles.append((path, held(path, 1))))
+        except Refused as refusal:
+            unverified_said = str(refusal)
+        except Exception as exc:  # noqa: BLE001 -- an unhandled error is the failure this case exists to catch
+            unverified_said = f"unhandled {type(exc).__name__}: {exc}"
+        for path, handle in handles:
+            kernel32.CloseHandle(handle)
+            path.unlink(missing_ok=True)
+        checks.check("an upgrade whose restore could not clean up names its copy as unverified, with how to drop it, the old database unchanged",
+                     unverified_said is not None and f"'{unverified}' is loaded but unverified" in unverified_said
+                     and f"DROP DATABASE IF EXISTS `{unverified}`;" in unverified_said
+                     and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state, repr(unverified_said))
+        run_sql(f"DROP DATABASE IF EXISTS `{unverified}`;", options=options)
+
+        # A comparison that fails keeps its reason; on one outage the drop fails too, and the copy is named.
+        def comparison_fails(new: Session) -> None:
+            raise Refused("refused: the drill's comparison read failed")
+
+        failed_said = None
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                cmd_upgrade(old, f"{database}_cmpfail", after_restore=comparison_fails)
+        except Refused as refusal:
+            failed_said = str(refusal)
+        outage_copy = f"{database}_cmpoutage"
+        outage_up_said, started = None, ""
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                cmd_upgrade(old, outage_copy, after_restore=lambda new: server("-Stop"))
+        except Refused as refusal:
+            outage_up_said = str(refusal)
+        except Exception as exc:  # noqa: BLE001 -- an unhandled error is the failure this case exists to catch
+            outage_up_said = f"unhandled {type(exc).__name__}: {exc}"
+        finally:
+            started = server("-Start")
+        left_after_outage = Session(options, outage_copy).exists()
+        command = f"DROP DATABASE IF EXISTS `{outage_copy}`;"
+        if outage_up_said and command in outage_up_said:
+            run_sql(command, options=options)   # the command the refusal gave, run as given
+        checks.check("an upgrade's rollback keeps the comparison's reason, and on an outage names the copy it could not remove with the command that removes it",
+                     failed_said is not None and "the drill's comparison read failed" in failed_said and "was dropped" in failed_said
+                     and not Session(options, f"{database}_cmpfail").exists()
+                     and outage_up_said is not None and "could not be compared" in outage_up_said and "could not be confirmed removed" in outage_up_said
+                     and command in outage_up_said and started.startswith("exit 0") and left_after_outage and not Session(options, outage_copy).exists(),
+                     f"failed {failed_said!r}; outage {outage_up_said!r}; restart {started!r}; copy left {left_after_outage}")
+
+        code, out = call(["upgrade", "--options", str(options), "--database", old.database, "--to", upgraded])
+        new = Session(options, upgraded)
+        code2, said = call(["history", "fixture", "--options", str(options), "--database", upgraded]) if new.exists() else (None, "")
+        checks.check("a revision 1 database with a stamped and a proposed version upgrades with every version and changelog row the same, "
+                     "earlier edits named as not recorded, and a command on the old one refused naming the upgrade",
+                     refused_old and code == 0 and new.exists() and version_text(new, "fixture", 1) == expected_v1
+                     and version_text(new, "fixture", 2) == expected_v2 and require_version(new, "fixture", 2) == "proposed"
+                     and code2 == 0 and "v1 add beep-1-long by author-one: first entry  (contents not recorded" in said
+                     and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state,
+                     f"old refused {refused_old}; upgrade exit {code} {out.strip()!r}; history {said.strip()[:400]!r}")
+
+        # A restore and an upgrade connect as the author's own connections do: an option file that verifies the
+        # server's certificate is obeyed by the restricted connection too. The private server's own CA verifies;
+        # a CA that did not sign its certificate, put into the restricted file alone, is refused there.
+        ca = HOME / "server" / "data" / "ca.pem"
+        secure = Path(tmp) / "secure.cnf"
+        secure.write_bytes(options.read_bytes().rstrip(b"\r\n") + f"\r\nssl-mode=VERIFY_CA\r\nssl-ca={ca.as_posix()}\r\n".encode("ascii"))
+        roots = ssl.create_default_context().get_ca_certs(binary_form=True)
+        other_ca = Path(tmp) / "other-ca.pem"
+        other_ca.write_text(ssl.DER_cert_to_PEM_cert(roots[0]) if roots else "", encoding="ascii")
+        cipher = run_sql("SHOW SESSION STATUS LIKE 'Ssl_cipher';", options=secure) if ca.is_file() else []
+        tls_dump = Path(tmp) / "tls.sql"
+        with contextlib.redirect_stdout(io.StringIO()):
+            cmd_backup(Session(secure, database), str(tls_dump))
+        code, out = call(["restore", str(tls_dump), "--options", str(secure), "--database", tls_restored])
+        code2, out2 = call(["upgrade", "--options", str(secure), "--database", old.database, "--to", tls_upgraded])
+        checks.check("a restore and an upgrade through an option file that verifies the server's CA succeed, over TLS",
+                     bool(roots) and ca.is_file() and bool(cipher) and bool(cipher[0][1]) and code == 0 and code2 == 0
+                     and Session(options, tls_restored).exists() and Session(options, tls_upgraded).exists(),
+                     f"CA {ca.is_file()}, roots {len(roots)}, cipher {cipher!r}; restore {code} {out.strip()!r}; upgrade {code2} {out2.strip()!r}")
+
+        wrong = {"ssl-ca": other_ca.as_posix()}
+        said_restore = said_upgrade = None
+        for target_name, action in ((tls_refused, lambda: cmd_restore(Session(secure, tls_refused), str(tls_dump), restricted_override=wrong)),
+                                    (tls_refused_up, lambda: cmd_upgrade(Session(secure, old.database), tls_refused_up, restricted_override=wrong))):
+            try:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    action()
+            except Refused as refusal:
+                if target_name == tls_refused:
+                    said_restore = str(refusal)
+                else:
+                    said_upgrade = str(refusal)
+        users = run_sql("SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options)[0][0]
+        checks.check("a restore and an upgrade whose restricted connection is given a CA that did not sign the server's certificate are refused "
+                     "naming that connection, no database or restore user left and the source unchanged",
+                     said_restore is not None and "restore user's connection" in said_restore and said_upgrade is not None
+                     and "restore user's connection" in said_upgrade and not Session(options, tls_refused).exists()
+                     and not Session(options, tls_refused_up).exists() and users == "0"
+                     and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state,
+                     f"restore said {said_restore!r}; upgrade said {said_upgrade!r}; restore users left {users}")
+
+        # A CA named relative to the author's option file names the same file for the restore's connection.
+        beside = Path(tmp) / "relative"
+        beside.mkdir()
+        (beside / "server-ca.pem").write_bytes(ca.read_bytes())
+        relative = beside / "relative.cnf"
+        relative.write_bytes(options.read_bytes().rstrip(b"\r\n") + b"\r\nssl-mode=VERIFY_CA\r\nssl-ca=server-ca.pem\r\n")
+        code, out = call(["restore", str(tls_dump), "--options", str(relative), "--database", rel_restored])
+        code2, out2 = call(["upgrade", "--options", str(relative), "--database", old.database, "--to", rel_upgraded])
+        checks.check("a CA named relative to the author's option file verifies the restore's and the upgrade's connection too",
+                     code == 0 and code2 == 0 and Session(options, rel_restored).exists() and Session(options, rel_upgraded).exists(),
+                     f"restore {code} {out.strip()!r}; upgrade {code2} {out2.strip()!r}")
+
+        # Settings the client reads are the ones the restore carries, however the file writes them: a group header
+        # with a comment after it, and settings in an included file. Each is shown carried by the restricted
+        # connection's refusal of the CA put into it alone.
+        commented = Path(tmp) / "commented.cnf"
+        commented.write_bytes(options.read_bytes().rstrip(b"\r\n") + f"\r\n[client] # a shared server\r\nssl-mode=VERIFY_CA\r\nssl-ca={ca.as_posix()}\r\n".encode("ascii"))
+        tls_only = Path(tmp) / "tls-only.cnf"
+        tls_only.write_bytes(f"[client]\r\nssl-mode=VERIFY_CA\r\nssl-ca={ca.as_posix()}\r\n".encode("ascii"))
+        including = Path(tmp) / "including.cnf"
+        including.write_bytes(options.read_bytes().rstrip(b"\r\n") + f"\r\n!include {tls_only.as_posix()}\r\n".encode("ascii"))
+        carried = {}
+        for label, author in (("a group header with a comment after it", commented), ("an included file", including)):
+            target_name = f"{database}_carry"
+            try:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    cmd_restore(Session(author, target_name), str(tls_dump), restricted_override=wrong)
+                carried[label] = "restored, so the CA was not carried"
+            except Refused as refusal:
+                carried[label] = str(refusal)
+            run_sql(f"DROP DATABASE IF EXISTS `{target_name}`;", options=options)
+        checks.check("TLS settings under a group header with a comment, or in an included file, are carried to the restore's connection",
+                     all("restore user's connection" in said for said in carried.values()), repr(carried))
+
+        # The restore's option file reads, through MySQL's own reader, as every option of the author's file in
+        # its order (modifiers, a bind address, settings in other groups) and then the restore user's own.
+        modified = Path(tmp) / "modified.cnf"
+        modified.write_bytes(options.read_bytes().rstrip(b"\r\n") + b"\r\n[client] # a shared server\r\nloose-ssl-mode=VERIFY_IDENTITY\r\nloose_ssl_ca=server-ca.pem\r\n"
+                             b"bind-address=127.0.0.1\r\nget-server-public-key\r\nskip-get-server-public-key\r\n[mysql]\r\nloose-compression-algorithms=zlib\r\n")
+        beside_it = modified.with_name("restore-check.cnf")
+        beside_it.write_bytes(restricted_option_bytes(modified, "restore-user", "restore-secret"))
+        author_reads, restore_reads = client_settings(modified), client_settings(beside_it)
+        checks.check("the restore's option file reads as every option of the author's, in order, then the restore user's alone",
+                     restore_reads[:len(author_reads)] == author_reads and "bind-address=127.0.0.1" in author_reads
+                     and [o.partition("=")[0] for o in restore_reads[len(author_reads):]] == ["user", "password", "user", "password"]
+                     and restore_reads[len(author_reads)] == "user=restore-user",
+                     f"author {author_reads!r}; restore {restore_reads!r}")
+    finally:
+        for name in (old.database, upgraded, lossy, tls_restored, tls_upgraded, tls_refused, tls_refused_up, rel_restored, rel_upgraded, f"{database}_carry"):
+            run_sql(f"DROP DATABASE IF EXISTS `{name}`;", options=options)
+
+
+def _phase_force_list_and_timeout(t: SelfTestRun) -> None:
+    checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
+    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
+        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
+    # An option file that tells the client to go on past errors cannot make a refused proposal commit.
+    forcing = Path(tmp) / "forcing.cnf"
+    forcing.write_bytes(options.read_bytes().rstrip(b"\r\n") + b"\r\n[mysql]\r\nforce\r\n")
+    versions_before = session.sql("SELECT COUNT(*) FROM versions;")[0][0]
+    code, out = call(["propose", proposal("forced", {"dataset": "fixture", "author": "author-one", "reason": "two changes, the second refused", "changes": [
+        {"add": "beep-forced", "text": "kept only if force wins", "reason": "first"}, {"add": "beep-1-long", "text": "a reused key", "reason": "second"}]}),
+        "--version", "6", "--options", str(forcing), "--database", database])
+    forced_left = session.sql("SELECT COUNT(*) FROM entries WHERE entry_key = 'beep-forced';")[0][0]
+    checks.check("an option file with force cannot make a refused proposal commit the changes before it",
+                 code == 1 and "keys are never reused" in out and forced_left == "0" and session.sql("SELECT COUNT(*) FROM versions;")[0][0] == versions_before,
+                 f"exit {code}, entry left {forced_left}, said {out.strip()!r}")
+
+    # A dataset and an author named NULL list as that text.
+    call(["propose", proposal("named-null", {"dataset": "NULL", "create": "a dataset named NULL", "author": "NULL",
+                                             "reason": "a dataset and author named NULL", "changes": [{"add": "k", "text": "t", "reason": "r"}]})] + base)
+    code, out = call(["list"] + base)
+    checks.check("list prints a dataset and an author named NULL as that text", code == 0 and "NULL v1: proposed, author NULL" in out, out.strip()[-300:])
+
+    # A backup whose dump outlasts its time is ended and refused by name, with nothing left behind.
+    slow = Path(tmp) / "slow.sql"
+    slow.write_bytes(b"-- an earlier backup\n")
+    locker = subprocess.Popen([str(client_path()), f"--defaults-extra-file={options.name}", "--batch", database],
+                              stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=str(options.parent))
+    assert locker.stdin is not None   # stdin=PIPE above
+    locker.stdin.write(b"LOCK TABLES changelog WRITE;\nDO SLEEP(8);\nUNLOCK TABLES;\n")
+    locker.stdin.close()
+    locked, deadline = False, time.monotonic() + 15
+    while time.monotonic() < deadline and locker.poll() is None:
+        if run_sql("SELECT COUNT(*) FROM information_schema.processlist WHERE info LIKE 'DO SLEEP(8)%';", options=options)[0][0] != "0":
+            locked = True
+            break
+        time.sleep(0.1)
+    try:
+        cmd_backup(session, str(slow), timeout=2)
+        said = "the backup finished"
+    except Refused as refusal:
+        said = str(refusal)
+    except Exception as exc:  # noqa: BLE001 -- an unhandled error is the failure this case exists to catch
+        said = f"unhandled {type(exc).__name__}: {exc}"
+    try:
+        locker.communicate(timeout=60)
+    except subprocess.TimeoutExpired:
+        _end_tree(locker)
+    checks.check("a backup whose dump outlasts its time is ended and refused by name, no partial dump left and the earlier backup kept",
+                 locked and "did not finish within 2s" in said and "the partial dump was removed" in said
+                 and not slow.with_name("slow.sql.partial").exists() and slow.read_bytes() == b"-- an earlier backup\n",
+                 f"lock held {locked}; said {said!r}")
+
+
+def _phase_inspection_connection_restart(t: SelfTestRun) -> None:
+    checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
+    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
+        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
+    v1 = t.v1
+    read_back = t.read_back
+    # The inspection commands read the persisted records.
+    for argv, want in ((["list"], "fixture v3: stamped"), (["show", "fixture", "2"], "beep-1-long: One long beep: no memory detected in any slot"),
+                       (["changes", "fixture", "3"], "added beep-a: A, reworded"), (["history", "fixture"], "v3 reopen by author-one: one more change")):
+        code, out = call(argv + base)
+        checks.check(f"{argv[0]} reads the persisted records", code == 0 and want in out, out.strip()[:300])
+
+    # Connection failures: named, non-zero, nothing written, no secret printed.
+    versions_before = session.sql("SELECT COUNT(*) FROM versions;")[0][0]
+    fake = "wrong-" + secrets.token_hex(6)
+    missing = Path(tmp) / "absent.cnf"
+    silent = Path(tmp) / "silent.cnf"
+    silent.write_text("[client]\nuser=root\nhost=127.0.0.1\nport=1\n", encoding="ascii")
+    badauth = Path(tmp) / "badauth.cnf"
+    port = [line.split("=", 1)[1] for line in options.read_text(encoding="ascii").splitlines() if line.startswith("port=")][0]
+    badauth.write_text(f"[client]\nuser=root\npassword={fake}\nhost=127.0.0.1\nport={port}\n", encoding="ascii")
+    for label, path, expected in (("a missing option file", missing, "no option file"), ("a server that does not answer", silent, "does not answer"),
+                                  ("failed authentication", badauth, "authentication failed")):
+        code, out = call(["propose", v1, "--options", str(path), "--database", database])
+        checks.check(f"refused: {label}", code == 1 and expected in out and fake not in out, out.strip())
+    checks.check("the connection failures wrote nothing", session.sql("SELECT COUNT(*) FROM versions;")[0][0] == versions_before)
+
+    # The stamped data survives a stop and start of the private server.
+    for flag in ("-Stop", "-Start"):
+        proc = subprocess.Popen(["pwsh", "-NoProfile", "-File", str(SERVER_SCRIPT), flag], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        try:
+            said, _ = proc.communicate(timeout=180)
+        except subprocess.TimeoutExpired:
+            _end_tree(proc)
+            said = f"did not finish within 180s and was ended with its children".encode()
+        checks.check(f"server {flag}", proc.returncode == 0, said.decode("utf-8", "replace").strip()[-300:])
+    read_back("after a server restart")
+
+
 def self_test(schema: Path) -> int:
     checks = Checks()
     options = option_file(str(LOCAL_CNF))
@@ -733,30 +1478,7 @@ def self_test(schema: Path) -> int:
     base = ["--options", str(options), "--database", database]
     created = False
     with tempfile.TemporaryDirectory(prefix="refdata-selftest-") as tmp:
-        def proposal(name: str, body: object) -> str:
-            path = Path(tmp) / f"{name}.json"
-            path.write_text(json.dumps(body), encoding="utf-8")
-            return str(path)
-
-        def refused(label: str, argv: list[str], expected: str) -> None:
-            code, out = call(argv + base)
-            checks.check(f"refused: {label}", code == 1 and expected in out, f"exit {code}, said {out.strip()!r}")
-
-        def safe_call(argv: list[str]) -> tuple[int | None, str]:
-            # A refusal that is not handled ends in a traceback; that is reported as a failure, not raised.
-            try:
-                return call(argv)
-            except Exception as exc:  # noqa: BLE001 -- the self-test reports any unhandled error as the failure it is
-                return None, f"unhandled {type(exc).__name__}: {exc}"
-
-        def digest_of(number: int) -> str:
-            _, out = call(["changes", "fixture", str(number)] + base)
-            found = re.search(r"digest: ([0-9a-f]{64})", out)
-            return found.group(1) if found else "no digest printed"
-
-        def review(number: int, who: str, reason: str, digest: str | None = None) -> tuple[int, str]:
-            return call(["review", "fixture", str(number), "--as", who, "--reason", reason, "--inspected", digest or digest_of(number)] + base)
-
+        run = SelfTestRun(checks, options, database, session, Path(tmp))
         try:
             code, out = call(["init", "--schema", str(schema)] + base)
             created = code == 0
@@ -764,542 +1486,8 @@ def self_test(schema: Path) -> int:
             if not created:
                 return 1
 
-            # Version 1: proposed, refused review by its author, reviewed, stamped.
-            v1 = str(FIXTURES / "fixture-v1.json")
-            code, out = call(["propose", v1] + base)
-            checks.check("version 1 is proposed from the fixture", code == 0 and "version 1" in out, out.strip())
-            refused("a reviewer who is the author", ["review", "fixture", "1", "--as", "author-one", "--reason", "self", "--inspected", digest_of(1)], "the reviewer is the author")
-            refused("stamping an unreviewed version", ["stamp", "fixture", "1", "--as", "author-one", "--reason", "early"], "the version is not reviewed")
-            code, _ = review(1, "author-two", "checked against both manuals")
-            code2, _ = call(["stamp", "fixture", "1", "--as", "author-one", "--reason", "release the first version"] + base)
-            checks.check("version 1 is reviewed by another author and stamped", code == 0 and code2 == 0)
-            refused("editing a stamped version", ["propose", proposal("stamped", {"dataset": "fixture", "author": "author-one", "changes": [
-                {"reword": "beep-3-short", "text": "x", "reason": "late edit"}]}), "--version", "1"], "the version is stamped and cannot change")
-
-            # Version 2: one entry reworded, one unchanged.
-            code, out = call(["propose", str(FIXTURES / "fixture-v2.json")] + base)
-            checks.check("version 2 is proposed", code == 0 and "version 2" in out, out.strip())
-            refused("a change without a reason", ["propose", proposal("noreason", {"dataset": "fixture", "author": "author-one", "changes": [
-                {"add": "beep-2-short", "text": "Two short beeps", "reason": ""}]}), "--version", "2"], "a change needs a reason")
-            refused("a key reused", ["propose", proposal("reuse", {"dataset": "fixture", "author": "author-one", "changes": [
-                {"add": "beep-1-long", "text": "again", "reason": "reuse"}]}), "--version", "2"], "keys are never reused")
-            refused("a key renamed", ["propose", proposal("rename", {"dataset": "fixture", "author": "author-one", "changes": [
-                {"rename": "beep-1-long", "to": "beep-long", "reason": "rename"}]}), "--version", "2"], "keys are never renamed")
-            code, _ = review(2, "author-two", "the rewording matches the revised manual")
-            code2, _ = call(["stamp", "fixture", "2", "--as", "author-one", "--reason", "release the second version"] + base)
-            checks.check("version 2 is reviewed and stamped", code == 0 and code2 == 0)
-
-            expected_v1 = [
-                ("beep-1-long", "One long beep: memory not detected", "Award BIOS 6.0 manual, appendix B", 1),
-                ("beep-3-short", "Three short beeps: base memory read or write error", "AMI BIOS 8 manual, table 4", 1),
-            ]
-            expected_v2 = [
-                ("beep-1-long", "One long beep: no memory detected in any slot", "Award BIOS 6.0 manual, appendix B, revised", 2),
-                expected_v1[1],
-            ]
-            expected_log = [
-                (1, "open", None, "author-one", "the first version of the fixture"),
-                (1, "add", "beep-1-long", "author-one", "first entry"),
-                (1, "add", "beep-3-short", "author-one", "second entry"),
-                (1, "review", None, "author-two", "checked against both manuals"),
-                (1, "stamp", None, "author-one", "release the first version"),
-                (2, "open", None, "author-one", "the second version of the fixture: one entry reworded, one left as it was"),
-                (2, "reword", "beep-1-long", "author-one", "the manual's later printing names the slots"),
-                (2, "review", None, "author-two", "the rewording matches the revised manual"),
-                (2, "stamp", None, "author-one", "release the second version"),
-            ]
-
-            def read_back(label: str) -> None:
-                checks.check(f"version 1 reads back exactly ({label})", version_text(session, "fixture", 1) == expected_v1, repr(version_text(session, "fixture", 1)))
-                checks.check(f"version 2 reads back exactly ({label})", version_text(session, "fixture", 2) == expected_v2, repr(version_text(session, "fixture", 2)))
-                checks.check(f"the changelog reads back exactly ({label})", history_rows(session, "fixture")[:len(expected_log)] == expected_log, repr(history_rows(session, "fixture")))
-
-            read_back("after stamping")
-            _, lines, _ = changes_between(session, "fixture", 2)
-            checks.check("changes names the one rewording against version 1", len(lines) == 1 and lines[0].startswith("reworded beep-1-long"), repr(lines))
-
-            # A proposal of three changes whose third is refused leaves nothing behind.
-            log_before = len(history_rows(session, "fixture"))
-            refused("the third change of a proposal", ["propose", proposal("partial", {"dataset": "fixture", "author": "author-one", "reason": "three changes", "changes": [
-                {"add": "beep-a", "text": "A", "reason": "first"}, {"add": "beep-b", "text": "B", "reason": "second"},
-                {"add": "beep-3-short", "text": "C", "reason": "third, a reused key"}]})], "keys are never reused")
-            leftovers = session.sql("SELECT COUNT(*) FROM entries WHERE entry_key IN ('beep-a', 'beep-b');")[0][0]
-            versions = session.sql("SELECT COUNT(*) FROM versions;")[0][0]
-            checks.check("a refused proposal leaves no row and no changelog row", leftovers == "0" and versions == "2" and len(history_rows(session, "fixture")) == log_before,
-                         f"entries {leftovers}, versions {versions}, changelog {len(history_rows(session, 'fixture'))} against {log_before}")
-
-            # A step whose changelog row cannot be written leaves the version as it was: one transaction.
-            refused_step = None
-            try:
-                cmd_step(session, "review", "fixture", 2, None, "a reviewer the changelog cannot record")
-            except Refused as refusal:
-                refused_step = str(refusal)
-            checks.check("a step whose changelog row fails leaves the version unchanged",
-                         refused_step is not None and require_version(session, "fixture", 2) == "stamped",
-                         f"refused {refused_step!r}, status {require_version(session, 'fixture', 2)}")
-
-            # A reviewed version is frozen; reopen clears its review, so stamp is refused until it is reviewed again.
-            call(["propose", proposal("v3", {"dataset": "fixture", "author": "author-one", "reason": "a third version", "changes": [
-                {"add": "beep-a", "text": "A", "reason": "a new entry"}]})] + base)
-            review(3, "author-two", "looks right")
-            refused("changing a reviewed version", ["propose", proposal("frozen", {"dataset": "fixture", "author": "author-one", "changes": [
-                {"reword": "beep-a", "text": "A, reworded", "reason": "after review"}]}), "--version", "3"], "reviewed and frozen")
-            code, _ = call(["reopen", "fixture", "3", "--as", "author-one", "--reason", "one more change"] + base)
-            code2, _ = call(["propose", proposal("after-reopen", {"dataset": "fixture", "author": "author-one", "changes": [
-                {"reword": "beep-a", "text": "A, reworded", "reason": "after reopening"}]}), "--version", "3"] + base)
-            checks.check("reopen returns the version to proposed and it changes", code == 0 and code2 == 0)
-            refused("stamping a reopened version before it is reviewed again", ["stamp", "fixture", "3", "--as", "author-one", "--reason", "on the old approval"], "the version is not reviewed")
-            code, _ = review(3, "author-two", "the change after reopening is right")
-            code2, _ = call(["stamp", "fixture", "3", "--as", "author-one", "--reason", "release the third version"] + base)
-            checks.check("the reopened version is stamped after a second review", code == 0 and code2 == 0)
-
-            # Someone who changed a version is not its reviewer, whoever opened it (the cases follow the failed review below).
-            # A step whose changelog row cannot be written, on a proposed version: still proposed afterwards.
-            call(["propose", proposal("v4", {"dataset": "fixture", "author": "author-one", "reason": "a fourth version", "changes": [
-                {"add": "beep-d", "text": "D", "reason": "a new entry"}]})] + base)
-            refused_step = None
-            try:
-                cmd_step(session, "review", "fixture", 4, None, "a reviewer the changelog cannot record", digest_of(4))
-            except Refused as refusal:
-                refused_step = str(refusal)
-            log_rows = [r for r in history_rows(session, "fixture") if r[0] == 4]
-            checks.check("a review whose changelog row fails leaves the version proposed, with no row of it",
-                         refused_step is not None and require_version(session, "fixture", 4) == "proposed" and [r[1] for r in log_rows] == ["open", "add"],
-                         f"refused {refused_step!r}, status {require_version(session, 'fixture', 4)}, changelog {log_rows}")
-            code, _ = call(["propose", proposal("v4-contribution", {"dataset": "fixture", "author": "author-two", "changes": [
-                {"add": "beep-c", "text": "C", "reason": "a contribution to version 4"}]}), "--version", "4"] + base)
-            checks.check("a second author can add to a proposed version", code == 0)
-            refused("a reviewer who changed the version", ["review", "fixture", "4", "--as", "author-two", "--reason", "my contribution looks right", "--inspected", digest_of(4)], "the reviewer changed this version")
-            code, _ = review(4, "author-three", "neither of us wrote it")
-            checks.check("a reviewer who changed nothing reviews it", code == 0)
-
-            # A backup round trip: the rows come back in a database of their own, with the schema's rules.
-            dump_file = Path(tmp) / "roundtrip.sql"
-            code, out = call(["backup", str(dump_file)] + base)
-            copy = f"{database}_copy"
-            code2, out2 = call(["restore", str(dump_file), "--options", str(options), "--database", copy])
-            copied = Session(options, copy)
-            same = code == 0 and code2 == 0 and copied.exists() and history_rows(copied, "fixture") == history_rows(session, "fixture")
-            refused_copy = None
-            if copied.exists():
-                try:
-                    copied.sql("CALL rd_review('fixture', 4, 'author-one', 'the restored rules still hold', NULL);")
-                except Refused as refusal:
-                    refused_copy = str(refusal)
-                run_sql(f"DROP DATABASE `{copy}`;", options=options)
-            checks.check("a backup restores into a new database with the same changelog and the same rules",
-                         same and refused_copy is not None and "only a proposed version can be reviewed" in refused_copy,
-                         f"backup {out.strip()!r}; restore {out2.strip()!r}; same changelog {same}; the copy's rules said {refused_copy!r}")
-
-            # A backup that reaches into another database is refused by the server, and that database is untouched.
-            hostile = Path(tmp) / "hostile.sql"
-            # A harmless first line, so the client reaches the DROP and only the server's privileges can stop it.
-            hostile.write_text(f"SELECT 1;\nDROP TABLE `{database}`.`changelog`;\n", encoding="utf-8")
-            before_rows = len(history_rows(session, "fixture"))
-            target = f"{database}_hostile"
-            code, out = call(["restore", str(hostile), "--options", str(options), "--database", target])
-            users = run_sql("SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options)[0][0]
-            checks.check("a backup that reaches into another database is refused, that database untouched, no target or user left",
-                         code == 1 and "could not be loaded as rows" in out and len(history_rows(session, "fixture")) == before_rows
-                         and not Session(options, target).exists() and users == "0", out.strip())
-
-            # A restore into a name one underscore away from another database cannot reach it: the grant names it exactly.
-            near = database[:-1] + "_"
-            reach = Path(tmp) / "reach.sql"
-            reach.write_text(f"SELECT 1;\nINSERT INTO `{database}`.`sources` (citation) VALUES ('written from a restore into {near}');\n", encoding="utf-8")
-            sources_before = session.sql("SELECT COUNT(*) FROM sources;")[0][0]
-            code, out = call(["restore", str(reach), "--options", str(options), "--database", near])
-            checks.check("a restore into a name that differs by an underscore cannot write the other database",
-                         code == 1 and session.sql("SELECT COUNT(*) FROM sources;")[0][0] == sources_before and not Session(options, near).exists(),
-                         f"exit {code}, sources {sources_before} -> {session.sql('SELECT COUNT(*) FROM sources;')[0][0]}, said {out.strip()!r}")
-
-            # A backup that asks the client to run a shell command is refused, and the command never runs.
-            marker = Path(tmp) / "shell-ran.txt"
-            shell = Path(tmp) / "shell.sql"
-            shell.write_text(f"SELECT 1;\n\\! cmd /c echo ran> \"{marker}\"\nSELECT 2;\n", encoding="utf-8")
-            target = f"{database}_shell"
-            code, out = call(["restore", str(shell), "--options", str(options), "--database", target])
-            checks.check("a backup that asks the client to run a shell command is refused, and the command does not run",
-                         code == 1 and not marker.exists() and not Session(options, target).exists(), f"exit {code}, marker {marker.exists()}, said {out.strip()!r}")
-
-            # A dump that names a database is refused before anything is restored.
-            named = Path(tmp) / "named.sql"
-            named.write_text(f"-- a mysqldump --databases dump\nCREATE DATABASE /*!32312 IF NOT EXISTS*/ `{database}`;\nUSE `{database}`;\nDROP TABLE IF EXISTS `changelog`;\n", encoding="utf-8")
-            target = f"{database}_restored"
-            code, out = call(["restore", str(named), "--options", str(options), "--database", target])
-            changelog_after = len(history_rows(session, "fixture"))
-            checks.check("a dump that names a database is refused, restoring nothing and leaving that database as it was",
-                         code == 1 and "selects, creates or drops a database (line 2" in out and not Session(options, target).exists() and changelog_after == len(history_rows(session, "fixture")),
-                         out.strip())
-
-            # ---- Repair 1: an approval covers exactly what was inspected, and every edit stays in the history.
-            call(["stamp", "fixture", "4", "--as", "author-one", "--reason", "release the fourth version"] + base)
-            call(["propose", proposal("v5", {"dataset": "fixture", "author": "author-one", "reason": "a fifth version", "changes": [
-                {"add": "beep-e", "text": "E", "source": "Manual E, first printing", "reason": "a new entry"},
-                {"add": "NULL", "text": "NULL", "source": "NULL", "reason": "an entry whose key, text and source are the word NULL"}]})] + base)
-            seen = digest_of(5)
-            for printing in ("second", "third"):
-                call(["propose", proposal(f"v5-{printing}", {"dataset": "fixture", "author": "author-two", "changes": [
-                    {"reword": "beep-e", "text": f"E, {printing}", "source": f"Manual E, {printing} printing", "reason": f"the {printing} printing"}]}), "--version", "5"] + base)
-            code, out = review(5, "author-three", "approved on what I saw", seen)
-            now = digest_of(5)
-            checks.check("a review naming the digest of contents another author has since changed is refused, the version staying proposed",
-                         code == 1 and "changed since it was inspected" in out and require_version(session, "fixture", 5) == "proposed" and now != seen, out.strip())
-
-            detail = [(r[1], r[4], r[6], r[7]) for r in history_detail(session, "fixture") if r[0] == 5 and r[2] == "beep-e"]
-            code, out = call(["history", "fixture"] + base)
-            checks.check("two rewordings of one entry in one version both stay in history, each with its text, source and reason",
-                         detail == [("add", "a new entry", "E", "Manual E, first printing"),
-                                    ("reword", "the second printing", "E, second", "Manual E, second printing"),
-                                    ("reword", "the third printing", "E, third", "Manual E, third printing")]
-                         and 'v5 reword beep-e by author-two: the second printing  -> "E, second" [source: Manual E, second printing]' in out
-                         and 'v5 reword beep-e by author-two: the third printing  -> "E, third" [source: Manual E, third printing]' in out,
-                         f"{detail!r}; history said {out[-500:]!r}")
-
-            texts = version_text(session, "fixture", 5)
-            _, lines, _ = changes_between(session, "fixture", 5)
-            _, shown = call(["show", "fixture", "5"] + base)
-            null_rows = [(r[2], r[6], r[7]) for r in history_detail(session, "fixture") if r[0] == 5 and r[1] == "add" and r[4].startswith("an entry whose")]
-            checks.check("an entry whose key, text and source are the word NULL reads back as that text in show, changes and history",
-                         ("NULL", "NULL", "NULL", 5) in texts and "added NULL: NULL  [source: NULL]" in lines
-                         and "  NULL: NULL  [source: NULL; meaning from v5]" in shown and null_rows == [("NULL", "NULL", "NULL")],
-                         f"text {texts!r}; changes {lines!r}; show {shown!r}; history {null_rows!r}")
-
-            code, out = review(5, "author-three", "approved on what is there now", now)
-            checks.check("a review naming the digest of the contents as they are passes", code == 0 and require_version(session, "fixture", 5) == "reviewed", out.strip())
-            call(["stamp", "fixture", "5", "--as", "author-one", "--reason", "release the fifth version"] + base)
-
-            # A second author's edit in flight when the review is called: the review waits for its lock and is refused.
-            call(["propose", proposal("v6", {"dataset": "fixture", "author": "author-one", "reason": "a sixth version", "changes": [
-                {"add": "beep-f", "text": "F", "reason": "a new entry"}]})] + base)
-            seen = digest_of(6)
-            hold = subprocess.Popen([str(client_path()), f"--defaults-extra-file={options.name}", "--batch", database],
-                                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=str(options.parent))
-            assert hold.stdin is not None   # stdin=PIPE above
-            hold.stdin.write(b"SET autocommit = 0;\nSTART TRANSACTION;\n"
-                             b"CALL rd_reword('fixture', 6, 'beep-f', 'F, changed while under review', NULL, 'a concurrent edit', 'author-two');\n"
-                             b"DO SLEEP(4);\nCOMMIT;\n")
-            hold.stdin.close()
-            holding, deadline = False, time.monotonic() + 15
-            while time.monotonic() < deadline and hold.poll() is None:
-                if run_sql("SELECT COUNT(*) FROM information_schema.innodb_trx WHERE trx_rows_locked > 0;", options=options)[0][0] != "0":
-                    holding = True
-                    break
-                time.sleep(0.1)
-            started = time.monotonic()
-            code, out = review(6, "author-three", "approved on what I saw", seen)
-            waited = time.monotonic() - started
-            try:
-                _, held_err = hold.communicate(timeout=60)
-            except subprocess.TimeoutExpired:
-                _end_tree(hold)
-                held_err = b"the editing session did not finish within 60s and was ended"
-            checks.check("a review called while a second author's edit holds the version waits for it and is refused, the version staying proposed",
-                         holding and hold.returncode == 0 and waited > 1 and code == 1 and "changed since it was inspected" in out
-                         and require_version(session, "fixture", 6) == "proposed",
-                         f"edit holding {holding}, edit exit {hold.returncode} {held_err.decode('utf-8', 'replace').strip()!r}, waited {waited:.1f}s, review said {out.strip()!r}")
-
-            # A malformed proposal is refused naming the change and the field, and no SQL is sent.
-            for label, body, expected in (
-                    ("not an object", [1, 2], "the proposal is list, not an object"),
-                    ("no changes", {"dataset": "fixture", "author": "author-one"}, "the proposal has no 'changes'"),
-                    ("changes not a list", {"dataset": "fixture", "author": "author-one", "changes": {"add": "k"}}, "'changes' is dict, not a list"),
-                    ("a change not an object", {"dataset": "fixture", "author": "author-one", "changes": ["add k"]}, "change 1 is str, not an object"),
-                    ("a change naming no verb", {"dataset": "fixture", "author": "author-one", "changes": [{"text": "x", "reason": "r"}]}, "change 1 names none of add, reword, rename"),
-                    ("a change naming two verbs", {"dataset": "fixture", "author": "author-one", "changes": [{"add": "k", "reword": "k", "text": "x", "reason": "r"}]},
-                     "change 1 names more than one of add, reword, rename (add, reword)"),
-                    ("an add without text", {"dataset": "fixture", "author": "author-one", "changes": [{"add": "beep-g", "reason": "r"}]}, "change 1 (add beep-g) has no 'text'"),
-                    ("a rename without a new key", {"dataset": "fixture", "author": "author-one", "changes": [{"rename": "beep-f"}]},
-                     "change 1 (rename beep-f) has no 'to'")):
-                sent = SENT[0]
-                code, out = safe_call(["propose", proposal(f"malformed-{label}", body), "--version", "6"] + base)
-                checks.check(f"refused before anything runs: {label}", code == 1 and expected in out and "nothing was sent" in out and SENT[0] == sent,
-                             f"exit {code}, sessions started {SENT[0] - sent}, said {out.strip()!r}")
-
-            # File errors in backup and restore are refused naming the action and the path; earlier files are kept.
-            kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-            kernel32.CreateFileW.restype = ctypes.c_void_p
-            kernel32.CreateFileW.argtypes = [ctypes.c_wchar_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p]
-            kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
-
-            def held(path: Path, share: int):
-                # GENERIC_READ, OPEN_EXISTING; share 1 lets others read but not replace or delete it, share 0 lets nobody open it.
-                handle = kernel32.CreateFileW(str(path), 0x80000000, share, None, 3, 0x80, None)
-                if handle in (None, ctypes.c_void_p(-1).value):
-                    raise Refused(f"refused: the self-test could not hold {path} (error {ctypes.get_last_error()})")
-                return handle
-
-            folder = Path(tmp) / "unwritable"
-            folder.mkdir()
-            earlier = folder / "refdata.sql"
-            earlier.write_bytes(b"-- an earlier backup\n")
-            (folder / "refdata.sql.partial").mkdir()   # the dump's own file cannot be created there
-            code, out = safe_call(["backup", str(earlier)] + base)
-            checks.check("a backup whose destination cannot be written is refused by name, the earlier backup kept",
-                         code == 1 and "backup could not write" in out and str(earlier) in out and "was kept unchanged" in out
-                         and earlier.read_bytes() == b"-- an earlier backup\n", f"exit {code}, said {out.strip()!r}")
-
-            locked = Path(tmp) / "locked.sql"
-            locked.write_bytes(b"-- the backup an editor holds open\n")
-            handle = held(locked, 1)
-            try:
-                code, out = safe_call(["backup", str(locked)] + base)
-            finally:
-                kernel32.CloseHandle(handle)
-            checks.check("a backup over an earlier one held open is refused by name, the earlier one byte-identical and no partial dump left",
-                         code == 1 and "backup could not replace" in out and "the new dump was removed" in out
-                         and locked.read_bytes() == b"-- the backup an editor holds open\n" and not locked.with_name("locked.sql.partial").exists(),
-                         f"exit {code}, said {out.strip()!r}")
-
-            unreadable = Path(tmp) / "unreadable.sql"
-            unreadable.write_bytes(b"SELECT 1;\n")
-            target = f"{database}_unread"
-            handle = held(unreadable, 0)
-            try:
-                code, out = safe_call(["restore", str(unreadable), "--options", str(options), "--database", target])
-            finally:
-                kernel32.CloseHandle(handle)
-            checks.check("a backup that cannot be read is refused by name, no database created",
-                         code == 1 and "restore could not read" in out and str(unreadable) in out and not Session(options, target).exists(),
-                         f"exit {code}, said {out.strip()!r}")
-
-            # A restore user's option file that cannot be removed stops none of the other cleanup steps.
-            outcomes = {}
-            for label, dump, target in (("a successful restore", dump_file, f"{database}_heldok"), ("a failed restore", hostile, f"{database}_heldbad")):
-                handles = []
-                said = None
-                try:
-                    with contextlib.redirect_stdout(io.StringIO()):
-                        cmd_restore(Session(options, target), str(dump), before_cleanup=lambda path: handles.append((path, held(path, 1))))
-                except Refused as refusal:
-                    said = str(refusal)
-                except Exception as exc:  # noqa: BLE001 -- an unhandled error is the failure this case exists to catch
-                    said = f"unhandled {type(exc).__name__}: {exc}"
-                for path, handle in handles:
-                    kernel32.CloseHandle(handle)
-                    path.unlink(missing_ok=True)
-                users = run_sql("SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options)[0][0]
-                outcomes[label] = (said, users, Session(options, target).exists())
-                run_sql(f"DROP DATABASE IF EXISTS `{target}`;", options=options)
-            ok_said, ok_users, ok_kept = outcomes["a successful restore"]
-            bad_said, bad_users, bad_kept = outcomes["a failed restore"]
-            checks.check("a restore whose option file cannot be removed still drops its user, names the file, keeps a restored database and drops a failed one",
-                         ok_said is not None and "was restored into" in ok_said and "could not be removed" in ok_said and ok_users == "0" and ok_kept
-                         and bad_said is not None and "could not be loaded as rows" in bad_said and "could not be removed" in bad_said
-                         and bad_users == "0" and not bad_kept, repr(outcomes))
-
-            # A database at schema revision 1 is upgraded with nothing lost; until then, commands on it are refused.
-            old_schema = Path(tmp) / "schema-revision-1.sql"
-            old_schema.write_text(subprocess.run(["git", "-C", str(REPO), "show", "61d88277:data/refdata/schema.sql"], capture_output=True,
-                                                 check=True, encoding="utf-8").stdout, encoding="utf-8")
-            old = Session(options, f"{database}_r1")
-            upgraded, lossy = f"{database}_r2", f"{database}_r2lossy"
-            tls_restored, tls_upgraded, tls_refused, tls_refused_up = (f"{database}_tls", f"{database}_tlsup", f"{database}_tlsno", f"{database}_tlsupno")
-            rel_restored, rel_upgraded = f"{database}_rel", f"{database}_relup"
-            try:
-                with contextlib.redirect_stdout(io.StringIO()):
-                    cmd_init(old, old_schema)
-                for fixture in ("fixture-v1.json", "fixture-v2.json"):
-                    old.sql(proposal_sql(json.loads((FIXTURES / fixture).read_text(encoding="utf-8")), None))
-                    if fixture == "fixture-v1.json":
-                        old.sql("SET autocommit = 0;\nSTART TRANSACTION;\nCALL rd_review('fixture', 1, 'author-two', 'checked against both manuals');\nCOMMIT;\n")
-                        old.sql("SET autocommit = 0;\nSTART TRANSACTION;\nCALL rd_stamp('fixture', 1, 'author-one', 'release the first version');\nCOMMIT;\n")
-                old_state = {name: old.sql(query) for name, query in UPGRADE_READBACK.items()}
-                code, out = call(["list", "--options", str(options), "--database", old.database])
-                refused_old = code == 1 and f"upgrade --database {old.database}" in out
-
-                lossy_said = None
-                try:
-                    with contextlib.redirect_stdout(io.StringIO()):
-                        cmd_upgrade(old, lossy, after_restore=lambda new: new.sql("DELETE FROM changelog ORDER BY id DESC LIMIT 1;"))
-                except Refused as refusal:
-                    lossy_said = str(refusal)
-                checks.check("an upgrade whose copy lost a changelog row is refused naming it, the copy dropped and the old database unchanged",
-                             lossy_said is not None and "changelog has" in lossy_said and not Session(options, lossy).exists()
-                             and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state, repr(lossy_said))
-
-                code, out = call(["upgrade", "--options", str(options), "--database", old.database, "--to", upgraded])
-                new = Session(options, upgraded)
-                code2, said = call(["history", "fixture", "--options", str(options), "--database", upgraded]) if new.exists() else (None, "")
-                checks.check("a revision 1 database with a stamped and a proposed version upgrades with every version and changelog row the same, "
-                             "earlier edits named as not recorded, and a command on the old one refused naming the upgrade",
-                             refused_old and code == 0 and new.exists() and version_text(new, "fixture", 1) == expected_v1
-                             and version_text(new, "fixture", 2) == expected_v2 and require_version(new, "fixture", 2) == "proposed"
-                             and code2 == 0 and "v1 add beep-1-long by author-one: first entry  (contents not recorded" in said
-                             and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state,
-                             f"old refused {refused_old}; upgrade exit {code} {out.strip()!r}; history {said.strip()[:400]!r}")
-
-                # A restore and an upgrade connect as the author's own connections do: an option file that verifies the
-                # server's certificate is obeyed by the restricted connection too. The private server's own CA verifies;
-                # a CA that did not sign its certificate, put into the restricted file alone, is refused there.
-                ca = HOME / "server" / "data" / "ca.pem"
-                secure = Path(tmp) / "secure.cnf"
-                secure.write_bytes(options.read_bytes().rstrip(b"\r\n") + f"\r\nssl-mode=VERIFY_CA\r\nssl-ca={ca.as_posix()}\r\n".encode("ascii"))
-                roots = ssl.create_default_context().get_ca_certs(binary_form=True)
-                other_ca = Path(tmp) / "other-ca.pem"
-                other_ca.write_text(ssl.DER_cert_to_PEM_cert(roots[0]) if roots else "", encoding="ascii")
-                cipher = run_sql("SHOW SESSION STATUS LIKE 'Ssl_cipher';", options=secure) if ca.is_file() else []
-                tls_dump = Path(tmp) / "tls.sql"
-                with contextlib.redirect_stdout(io.StringIO()):
-                    cmd_backup(Session(secure, database), str(tls_dump))
-                code, out = call(["restore", str(tls_dump), "--options", str(secure), "--database", tls_restored])
-                code2, out2 = call(["upgrade", "--options", str(secure), "--database", old.database, "--to", tls_upgraded])
-                checks.check("a restore and an upgrade through an option file that verifies the server's CA succeed, over TLS",
-                             bool(roots) and ca.is_file() and bool(cipher) and bool(cipher[0][1]) and code == 0 and code2 == 0
-                             and Session(options, tls_restored).exists() and Session(options, tls_upgraded).exists(),
-                             f"CA {ca.is_file()}, roots {len(roots)}, cipher {cipher!r}; restore {code} {out.strip()!r}; upgrade {code2} {out2.strip()!r}")
-
-                wrong = {"ssl-ca": other_ca.as_posix()}
-                said_restore = said_upgrade = None
-                for target_name, action in ((tls_refused, lambda: cmd_restore(Session(secure, tls_refused), str(tls_dump), restricted_override=wrong)),
-                                            (tls_refused_up, lambda: cmd_upgrade(Session(secure, old.database), tls_refused_up, restricted_override=wrong))):
-                    try:
-                        with contextlib.redirect_stdout(io.StringIO()):
-                            action()
-                    except Refused as refusal:
-                        if target_name == tls_refused:
-                            said_restore = str(refusal)
-                        else:
-                            said_upgrade = str(refusal)
-                users = run_sql("SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options)[0][0]
-                checks.check("a restore and an upgrade whose restricted connection is given a CA that did not sign the server's certificate are refused "
-                             "naming that connection, no database or restore user left and the source unchanged",
-                             said_restore is not None and "restore user's connection" in said_restore and said_upgrade is not None
-                             and "restore user's connection" in said_upgrade and not Session(options, tls_refused).exists()
-                             and not Session(options, tls_refused_up).exists() and users == "0"
-                             and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state,
-                             f"restore said {said_restore!r}; upgrade said {said_upgrade!r}; restore users left {users}")
-
-                # A CA named relative to the author's option file names the same file for the restore's connection.
-                beside = Path(tmp) / "relative"
-                beside.mkdir()
-                (beside / "server-ca.pem").write_bytes(ca.read_bytes())
-                relative = beside / "relative.cnf"
-                relative.write_bytes(options.read_bytes().rstrip(b"\r\n") + b"\r\nssl-mode=VERIFY_CA\r\nssl-ca=server-ca.pem\r\n")
-                code, out = call(["restore", str(tls_dump), "--options", str(relative), "--database", rel_restored])
-                code2, out2 = call(["upgrade", "--options", str(relative), "--database", old.database, "--to", rel_upgraded])
-                checks.check("a CA named relative to the author's option file verifies the restore's and the upgrade's connection too",
-                             code == 0 and code2 == 0 and Session(options, rel_restored).exists() and Session(options, rel_upgraded).exists(),
-                             f"restore {code} {out.strip()!r}; upgrade {code2} {out2.strip()!r}")
-
-                # Settings the client reads are the ones the restore carries, however the file writes them: a group header
-                # with a comment after it, and settings in an included file. Each is shown carried by the restricted
-                # connection's refusal of the CA put into it alone.
-                commented = Path(tmp) / "commented.cnf"
-                commented.write_bytes(options.read_bytes().rstrip(b"\r\n") + f"\r\n[client] # a shared server\r\nssl-mode=VERIFY_CA\r\nssl-ca={ca.as_posix()}\r\n".encode("ascii"))
-                tls_only = Path(tmp) / "tls-only.cnf"
-                tls_only.write_bytes(f"[client]\r\nssl-mode=VERIFY_CA\r\nssl-ca={ca.as_posix()}\r\n".encode("ascii"))
-                including = Path(tmp) / "including.cnf"
-                including.write_bytes(options.read_bytes().rstrip(b"\r\n") + f"\r\n!include {tls_only.as_posix()}\r\n".encode("ascii"))
-                carried = {}
-                for label, author in (("a group header with a comment after it", commented), ("an included file", including)):
-                    target_name = f"{database}_carry"
-                    try:
-                        with contextlib.redirect_stdout(io.StringIO()):
-                            cmd_restore(Session(author, target_name), str(tls_dump), restricted_override=wrong)
-                        carried[label] = "restored, so the CA was not carried"
-                    except Refused as refusal:
-                        carried[label] = str(refusal)
-                    run_sql(f"DROP DATABASE IF EXISTS `{target_name}`;", options=options)
-                checks.check("TLS settings under a group header with a comment, or in an included file, are carried to the restore's connection",
-                             all("restore user's connection" in said for said in carried.values()), repr(carried))
-
-                # The restore's option file reads, through MySQL's own reader, as every option of the author's file in
-                # its order (modifiers, a bind address, settings in other groups) and then the restore user's own.
-                modified = Path(tmp) / "modified.cnf"
-                modified.write_bytes(options.read_bytes().rstrip(b"\r\n") + b"\r\n[client] # a shared server\r\nloose-ssl-mode=VERIFY_IDENTITY\r\nloose_ssl_ca=server-ca.pem\r\n"
-                                     b"bind-address=127.0.0.1\r\nget-server-public-key\r\nskip-get-server-public-key\r\n[mysql]\r\nloose-compression-algorithms=zlib\r\n")
-                beside_it = modified.with_name("restore-check.cnf")
-                beside_it.write_bytes(restricted_option_bytes(modified, "restore-user", "restore-secret"))
-                author_reads, restore_reads = client_settings(modified), client_settings(beside_it)
-                checks.check("the restore's option file reads as every option of the author's, in order, then the restore user's alone",
-                             restore_reads[:len(author_reads)] == author_reads and "bind-address=127.0.0.1" in author_reads
-                             and [o.partition("=")[0] for o in restore_reads[len(author_reads):]] == ["user", "password", "user", "password"]
-                             and restore_reads[len(author_reads)] == "user=restore-user",
-                             f"author {author_reads!r}; restore {restore_reads!r}")
-            finally:
-                for name in (old.database, upgraded, lossy, tls_restored, tls_upgraded, tls_refused, tls_refused_up, rel_restored, rel_upgraded, f"{database}_carry"):
-                    run_sql(f"DROP DATABASE IF EXISTS `{name}`;", options=options)
-
-            # An option file that tells the client to go on past errors cannot make a refused proposal commit.
-            forcing = Path(tmp) / "forcing.cnf"
-            forcing.write_bytes(options.read_bytes().rstrip(b"\r\n") + b"\r\n[mysql]\r\nforce\r\n")
-            versions_before = session.sql("SELECT COUNT(*) FROM versions;")[0][0]
-            code, out = call(["propose", proposal("forced", {"dataset": "fixture", "author": "author-one", "reason": "two changes, the second refused", "changes": [
-                {"add": "beep-forced", "text": "kept only if force wins", "reason": "first"}, {"add": "beep-1-long", "text": "a reused key", "reason": "second"}]}),
-                "--version", "6", "--options", str(forcing), "--database", database])
-            forced_left = session.sql("SELECT COUNT(*) FROM entries WHERE entry_key = 'beep-forced';")[0][0]
-            checks.check("an option file with force cannot make a refused proposal commit the changes before it",
-                         code == 1 and "keys are never reused" in out and forced_left == "0" and session.sql("SELECT COUNT(*) FROM versions;")[0][0] == versions_before,
-                         f"exit {code}, entry left {forced_left}, said {out.strip()!r}")
-
-            # A dataset and an author named NULL list as that text.
-            call(["propose", proposal("named-null", {"dataset": "NULL", "create": "a dataset named NULL", "author": "NULL",
-                                                     "reason": "a dataset and author named NULL", "changes": [{"add": "k", "text": "t", "reason": "r"}]})] + base)
-            code, out = call(["list"] + base)
-            checks.check("list prints a dataset and an author named NULL as that text", code == 0 and "NULL v1: proposed, author NULL" in out, out.strip()[-300:])
-
-            # A backup whose dump outlasts its time is ended and refused by name, with nothing left behind.
-            slow = Path(tmp) / "slow.sql"
-            slow.write_bytes(b"-- an earlier backup\n")
-            locker = subprocess.Popen([str(client_path()), f"--defaults-extra-file={options.name}", "--batch", database],
-                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=str(options.parent))
-            assert locker.stdin is not None   # stdin=PIPE above
-            locker.stdin.write(b"LOCK TABLES changelog WRITE;\nDO SLEEP(8);\nUNLOCK TABLES;\n")
-            locker.stdin.close()
-            locked, deadline = False, time.monotonic() + 15
-            while time.monotonic() < deadline and locker.poll() is None:
-                if run_sql("SELECT COUNT(*) FROM information_schema.processlist WHERE info LIKE 'DO SLEEP(8)%';", options=options)[0][0] != "0":
-                    locked = True
-                    break
-                time.sleep(0.1)
-            try:
-                cmd_backup(session, str(slow), timeout=2)
-                said = "the backup finished"
-            except Refused as refusal:
-                said = str(refusal)
-            except Exception as exc:  # noqa: BLE001 -- an unhandled error is the failure this case exists to catch
-                said = f"unhandled {type(exc).__name__}: {exc}"
-            try:
-                locker.communicate(timeout=60)
-            except subprocess.TimeoutExpired:
-                _end_tree(locker)
-            checks.check("a backup whose dump outlasts its time is ended and refused by name, no partial dump left and the earlier backup kept",
-                         locked and "did not finish within 2s" in said and "the partial dump was removed" in said
-                         and not slow.with_name("slow.sql.partial").exists() and slow.read_bytes() == b"-- an earlier backup\n",
-                         f"lock held {locked}; said {said!r}")
-
-            # The inspection commands read the persisted records.
-            for argv, want in ((["list"], "fixture v3: stamped"), (["show", "fixture", "2"], "beep-1-long: One long beep: no memory detected in any slot"),
-                               (["changes", "fixture", "3"], "added beep-a: A, reworded"), (["history", "fixture"], "v3 reopen by author-one: one more change")):
-                code, out = call(argv + base)
-                checks.check(f"{argv[0]} reads the persisted records", code == 0 and want in out, out.strip()[:300])
-
-            # Connection failures: named, non-zero, nothing written, no secret printed.
-            versions_before = session.sql("SELECT COUNT(*) FROM versions;")[0][0]
-            fake = "wrong-" + secrets.token_hex(6)
-            missing = Path(tmp) / "absent.cnf"
-            silent = Path(tmp) / "silent.cnf"
-            silent.write_text("[client]\nuser=root\nhost=127.0.0.1\nport=1\n", encoding="ascii")
-            badauth = Path(tmp) / "badauth.cnf"
-            port = [line.split("=", 1)[1] for line in options.read_text(encoding="ascii").splitlines() if line.startswith("port=")][0]
-            badauth.write_text(f"[client]\nuser=root\npassword={fake}\nhost=127.0.0.1\nport={port}\n", encoding="ascii")
-            for label, path, expected in (("a missing option file", missing, "no option file"), ("a server that does not answer", silent, "does not answer"),
-                                          ("failed authentication", badauth, "authentication failed")):
-                code, out = call(["propose", v1, "--options", str(path), "--database", database])
-                checks.check(f"refused: {label}", code == 1 and expected in out and fake not in out, out.strip())
-            checks.check("the connection failures wrote nothing", session.sql("SELECT COUNT(*) FROM versions;")[0][0] == versions_before)
-
-            # The stamped data survives a stop and start of the private server.
-            for flag in ("-Stop", "-Start"):
-                proc = subprocess.Popen(["pwsh", "-NoProfile", "-File", str(SERVER_SCRIPT), flag], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                try:
-                    said, _ = proc.communicate(timeout=180)
-                except subprocess.TimeoutExpired:
-                    _end_tree(proc)
-                    said = f"did not finish within 180s and was ended with its children".encode()
-                checks.check(f"server {flag}", proc.returncode == 0, said.decode("utf-8", "replace").strip()[-300:])
-            read_back("after a server restart")
+            for phase in (_phase_workflow, _phase_restores, _phase_review_and_history, _phase_file_errors_and_cleanup, _phase_upgrade_and_tls, _phase_force_list_and_timeout, _phase_inspection_connection_restart):
+                phase(run)
         except Refused as refusal:
             checks.check("the self-test ran to its end", False, str(refusal))
         finally:
@@ -1317,6 +1505,7 @@ def self_test(schema: Path) -> int:
         return 1
     print("self-test: all pass")
     return 0
+
 
 
 # ----- entry ------------------------------------------------------------------------------------------------------
