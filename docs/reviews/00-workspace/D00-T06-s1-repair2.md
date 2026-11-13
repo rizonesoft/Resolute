@@ -47,3 +47,25 @@ OVERALL: needs-attention
 
 HIGHEST: P1
 OVERALL: needs-attention
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T10:49:18Z
+- Effort: low
+- Writer model: claude-opus-5-5
+- Policy: f2b50b8b7eb98c36012fef72c7708d340606ae06
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 6
+- Digest: e669fc79d76367ac
+
+## consistency: needs-attention
+
+1. **P1, `tools/refdata/refdata.py:539`: A valid trailing comment on a group header silently drops its connection settings.** MySQL accepts inline `#` comments, but this parser interprets `[client] # shared server` as an unrecognized group. Reproduce through the documented author-written `client.cnf` path: use that header followed by `ssl-mode=VERIFY_CA` and `ssl-ca=server-ca.pem`, then restore or upgrade. Ordinary connections retain verification; the restricted connection loses it. A read-only probe of `restricted_option_bytes` confirmed that this input produces only `[client]`, user and password. Parse comments consistently with [MySQL option-file syntax](https://dev.mysql.com/doc/refman/8.0/en/option-files.html) before interpreting groups, preserving quoted values.
+
+HIGHEST: P1
+OVERALL: needs-attention

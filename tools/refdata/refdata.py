@@ -520,37 +520,57 @@ CONNECTION_SETTINGS = {
 PATH_SETTINGS = {"ssl-ca", "ssl-capath", "ssl-cert", "ssl-key", "ssl-crl", "ssl-crlpath", "server-public-key-path"}
 
 
-def restricted_option_bytes(author: Path, user: str, password: str, override: dict | None = None) -> bytes:
-    """The restore user's option file: the connection settings the author's file gives the mysql client (its
-    [client] and [mysql] groups: host, port, TLS mode, CA, certificate, key and the rest of CONNECTION_SETTINGS), a
-    file path made absolute against the author's folder so it names the same file from another folder, then the
-    restore user's own user and password. override is the self-test's hook for changing a setting the copy carries,
-    in the restricted file alone; it adds nothing the author's file lacks."""
-    code_page = "mbcs"   # option files are read in the system's ANSI code page (tools/refdata/server.ps1, Write-OptionFile)
-    group, settings = None, {}
-    for raw in author.read_bytes().splitlines():
-        line = raw.decode(code_page).strip()
-        if not line or line[0] in "#;":
+OPTION_CODE_PAGE = "mbcs"   # option files are read in the system's ANSI code page (tools/refdata/server.ps1, Write-OptionFile)
+
+
+def client_settings(author: Path) -> dict[str, str]:
+    """The connection settings the mysql client reads from the author's option file, as MySQL's own reader gives them
+    (my_print_defaults over the [client] and [mysql] groups): comments, quoting, escapes and included files are read
+    the way the client reads them, because nothing else here parses an option file."""
+    exe = client_path("my_print_defaults")
+    if not exe.is_file():
+        raise Refused(f"refused: no my_print_defaults at {exe} (run tools/refdata/server.ps1 -Install, or set RESOLUTE_REFDATA_CLIENT)")
+    # From the option file's folder, as run_sql runs the client, so a relative path reads as the client reads it.
+    proc = subprocess.run([str(exe), f"--defaults-extra-file={author.name}", "client", "mysql"], capture_output=True,
+                          cwd=str(author.parent), timeout=TIMEOUT_SECONDS, check=False)
+    if proc.returncode != 0:
+        said = proc.stderr.decode(OPTION_CODE_PAGE, "replace").strip().splitlines()
+        raise Refused(f"refused: the option file {author} could not be read ({said[0] if said else f'my_print_defaults exit {proc.returncode}'}); nothing was restored")
+    settings = {}
+    for line in proc.stdout.decode(OPTION_CODE_PAGE, "replace").splitlines():
+        if not line.startswith("--"):
             continue
-        if line.startswith("!"):
-            raise Refused(f"refused: {author} uses {line.split()[0]}, whose files a restore cannot carry safely to its own connection; "
-                          "put the connection settings in the option file itself; nothing was restored")
-        if line.startswith("["):
-            group = line.strip("[]").strip().lower()
-            continue
-        key, _, value = line.partition("=")
-        key, value = key.strip().lower().replace("_", "-"), value.strip().strip("'\"")
-        if group in ("client", "mysql") and key in CONNECTION_SETTINGS:
+        key, _, value = line[2:].partition("=")
+        key = key.strip().lower().replace("_", "-")
+        if key in CONNECTION_SETTINGS:
             if key in PATH_SETTINGS and value and not Path(value).is_absolute():
                 value = str((author.parent / value).resolve())
             settings[key] = value
+    return settings
+
+
+def restricted_option_bytes(author: Path, user: str, password: str, override: dict | None = None) -> bytes:
+    """The restore user's option file: the connection settings the author's file gives the mysql client
+    (client_settings: host, port, TLS mode, CA, certificate, key and the rest of CONNECTION_SETTINGS), a file path made
+    absolute against the author's folder so it names the same file from another folder, then the restore user's own
+    user and password. override is the self-test's hook for changing a setting the copy carries, in the restricted
+    file alone; it adds nothing the author's file lacks."""
+    settings = client_settings(author)
     for key, value in (override or {}).items():
         if key in settings:
             settings[key] = value
-    lines = ["[client]"] + [key if value == "" else f"{key}={value.replace(chr(92), '/')}" if key in PATH_SETTINGS else f"{key}={value}"
+
+    def quoted(value: str) -> str:
+        # Double-quoted, so a # or a space in a value stays in it; a backslash is the option file's escape character.
+        # An option file has no escape for a double quote inside a quoted value, so such a value is refused, not guessed.
+        if '"' in value:
+            raise Refused(f"refused: a connection setting in {author} holds a double quote, which the restore's own option file cannot carry; nothing was restored")
+        return '"' + value.replace("\\", "\\\\") + '"'
+
+    lines = ["[client]"] + [key if value == "" else f"{key}={quoted(value.replace(chr(92), '/') if key in PATH_SETTINGS else value)}"
                             for key, value in settings.items()]
-    lines += [f"user={user}", f"password={password}"]
-    return ("\r\n".join(lines) + "\r\n").encode(code_page)
+    lines += [f"user={user}", f"password={quoted(password)}"]
+    return ("\r\n".join(lines) + "\r\n").encode(OPTION_CODE_PAGE)
 
 
 def cmd_restore(s: Session, path: str, schema: Path = SCHEMA, restricted_override: dict | None = None) -> int:
@@ -1137,14 +1157,29 @@ def self_test(schema: Path) -> int:
                              code == 0 and code2 == 0 and Session(options, rel_restored).exists() and Session(options, rel_upgraded).exists(),
                              f"restore {code} {out.strip()!r}; upgrade {code2} {out2.strip()!r}")
 
-                # An option file that includes others is refused: what they hold could not be carried safely.
+                # Settings the client reads are the ones the restore carries, however the file writes them: a group header
+                # with a comment after it, and settings in an included file. Each is shown carried by the restricted
+                # connection's refusal of the CA put into it alone.
+                commented = Path(tmp) / "commented.cnf"
+                commented.write_bytes(options.read_bytes().rstrip(b"\r\n") + f"\r\n[client] # a shared server\r\nssl-mode=VERIFY_CA\r\nssl-ca={ca.as_posix()}\r\n".encode("ascii"))
+                tls_only = Path(tmp) / "tls-only.cnf"
+                tls_only.write_bytes(f"[client]\r\nssl-mode=VERIFY_CA\r\nssl-ca={ca.as_posix()}\r\n".encode("ascii"))
                 including = Path(tmp) / "including.cnf"
-                including.write_bytes(options.read_bytes().rstrip(b"\r\n") + f"\r\n!include {secure.as_posix()}\r\n".encode("ascii"))
-                code, out = safe_call(["restore", str(tls_dump), "--options", str(including), "--database", f"{database}_inc"])
-                checks.check("a restore through an option file that includes others is refused by name, no database created",
-                             code == 1 and "uses !include" in out and not Session(options, f"{database}_inc").exists(), f"exit {code}, said {out.strip()!r}")
+                including.write_bytes(options.read_bytes().rstrip(b"\r\n") + f"\r\n!include {tls_only.as_posix()}\r\n".encode("ascii"))
+                carried = {}
+                for label, author in (("a group header with a comment after it", commented), ("an included file", including)):
+                    target_name = f"{database}_carry"
+                    try:
+                        with contextlib.redirect_stdout(io.StringIO()):
+                            cmd_restore(Session(author, target_name), str(tls_dump), restricted_override=wrong)
+                        carried[label] = "restored, so the CA was not carried"
+                    except Refused as refusal:
+                        carried[label] = str(refusal)
+                    run_sql(f"DROP DATABASE IF EXISTS `{target_name}`;", options=options)
+                checks.check("TLS settings under a group header with a comment, or in an included file, are carried to the restore's connection",
+                             all("restore user's connection" in said for said in carried.values()), repr(carried))
             finally:
-                for name in (old.database, upgraded, lossy, tls_restored, tls_upgraded, tls_refused, tls_refused_up, rel_restored, rel_upgraded, f"{database}_inc"):
+                for name in (old.database, upgraded, lossy, tls_restored, tls_upgraded, tls_refused, tls_refused_up, rel_restored, rel_upgraded, f"{database}_carry"):
                     run_sql(f"DROP DATABASE IF EXISTS `{name}`;", options=options)
 
             # An option file that tells the client to go on past errors cannot make a refused proposal commit.
