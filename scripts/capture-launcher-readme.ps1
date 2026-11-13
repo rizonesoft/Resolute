@@ -99,6 +99,8 @@ using System.Runtime.InteropServices;
 public class Shot {
     [DllImport("user32.dll")] public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr ctx);
     [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int cx, int cy, uint flags);
+    [StructLayout(LayoutKind.Sequential)] public struct RECT { public int Left, Top, Right, Bottom; }
+    [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr h, out RECT r);
     [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
     [DllImport("user32.dll", SetLastError = true)] public static extern IntPtr SendMessageTimeoutW(IntPtr h, uint msg, IntPtr w, IntPtr l, uint flags, uint timeoutMs, out UIntPtr result);
 }
@@ -249,6 +251,39 @@ function Write-Journal([string]$Staging, [object[]]$Entries, [bool]$Complete) {
     [System.IO.File]::Move("$journal.tmp", $journal, $true)
 }
 
+$script:QueryFails = $false
+function Get-OperatorEvents {
+    # The operator's events since admission, or $null when the watch cannot be read.
+    if ($script:QueryFails) { return $null }
+    return [Watch]::Operator
+}
+
+function Assert-NoInput([string]$What) {
+    # Any operator event since admission, or no way to tell, stands the run down.
+    try {
+        $resumed = Test-InputResumed 0 (Get-OperatorEvents)
+    } catch {
+        throw "stood down during ${What}: $($_.Exception.Message) (docs/testing.md stand-down rule)"
+    }
+    if ($resumed) { throw "stood down during ${What}: operator input resumed (docs/testing.md stand-down rule)" }
+}
+
+function Set-Position([IntPtr]$Hwnd, [int]$X, [int]$Y, [int]$Width, [int]$Height, [string]$What, [int]$TimeoutMs = 5000) {
+    # Asked, not waited on: SWP_ASYNCWINDOWPOS posts the request to the
+    # launcher's thread instead of blocking on it. The driver then waits, as
+    # every wait does, checking operator input, until the window reports the
+    # size it was asked for, and stands the run down when it has not by the deadline.
+    [void][Shot]::SetWindowPos($Hwnd, [IntPtr]::Zero, $X, $Y, $Width, $Height, 0x4040)   # SWP_ASYNCWINDOWPOS | SWP_SHOWWINDOW
+    $deadline = [DateTime]::UtcNow.AddMilliseconds($TimeoutMs)
+    while ($true) {
+        Assert-NoInput $What
+        $rect = New-Object Shot+RECT
+        if ([Shot]::GetWindowRect($Hwnd, [ref]$rect) -and ($rect.Right - $rect.Left) -eq $Width -and ($rect.Bottom - $rect.Top) -eq $Height) { return }
+        if ([DateTime]::UtcNow -gt $deadline) { throw "stood down during ${What}: the launcher did not take its position within $($TimeoutMs / 1000) s" }
+        Start-Sleep -Milliseconds 50
+    }
+}
+
 function Publish-Set([string]$Staging, [string]$OutDir, [string[]]$Files) {
     # All or nothing. A journal names every file of the set and whether an
     # earlier file of that name is live, before anything moves. Every earlier
@@ -384,6 +419,12 @@ function Invoke-SelfTest {
     try { Send-Command $hung 1030 'the theme change' 1000 } catch { $said = $_.Exception.Message }
     $clock.Stop()
     Check 'a command to a window that does not answer returns by its deadline, naming the command' ($clock.ElapsedMilliseconds -lt 3000 -and $said -like '*did not answer command 1030*')
+    $hung = [Hung]::Start(8000)
+    $clock = [System.Diagnostics.Stopwatch]::StartNew()
+    $said = $null
+    try { Set-Position $hung 40 40 300 200 'positioning' 1000 } catch { $said = $_.Exception.Message }
+    $clock.Stop()
+    Check 'positioning a window that does not answer returns by its deadline, naming the step' ($clock.ElapsedMilliseconds -lt 3000 -and $said -like '*during positioning*did not take its position*')
 
     # A set published over an earlier one while one destination sidecar is locked by another handle.
     $root = Join-Path ([System.IO.Path]::GetTempPath()) ("capture-publish-selftest-" + [Guid]::NewGuid().ToString('N'))
@@ -469,23 +510,6 @@ function Get-IdleSeconds {
     return ([Idle]::GetTickCount() - $info.dwTime) / 1000.0
 }
 
-$script:QueryFails = $false
-function Get-OperatorEvents {
-    # The operator's events since admission, or $null when the watch cannot be read.
-    if ($script:QueryFails) { return $null }
-    return [Watch]::Operator
-}
-
-function Assert-NoInput([string]$What) {
-    # Any operator event since admission, or no way to tell, stands the run down.
-    try {
-        $resumed = Test-InputResumed 0 (Get-OperatorEvents)
-    } catch {
-        throw "stood down during ${What}: $($_.Exception.Message) (docs/testing.md stand-down rule)"
-    }
-    if ($resumed) { throw "stood down during ${What}: operator input resumed (docs/testing.md stand-down rule)" }
-}
-
 function Wait-Checked([int]$Milliseconds, [string]$What) {
     # Checked before the wait and after every step of it, so the caller's
     # next desktop action never follows an unchecked interval.
@@ -563,7 +587,7 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
         }
         if ($hwnd -eq [IntPtr]::Zero) { throw "no main window for $name" }
         Assert-NoInput 'positioning'
-        [Shot]::SetWindowPos($hwnd, [IntPtr]::Zero, 40, 40, 1600, 1000, 0x0040) | Out-Null
+        Set-Position $hwnd 40 40 1600 1000 'positioning'
         Invoke-Drill 'positioning'
         Wait-Checked 500 'positioning'
         # The launcher starts in System appearance; its theme command
