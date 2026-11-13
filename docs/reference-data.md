@@ -1,6 +1,6 @@
 # Reference data
 
-Some tools need reference data: tables of facts they look up, such as BiosCodes' beep codes. This page is how that data is authored. It is built by `D00 T06` (`todo/00-workspace/TODO-06-reference-data.md`); section 1 built the database and the authoring workflow, and section 2 adds the export the build embeds.
+Some tools need reference data: tables of facts they look up, such as BiosCodes' beep codes. This page is how that data is authored. It is built by `D00 T06` (`todo/00-workspace/TODO-06-reference-data.md`); section 1 built the database and the authoring workflow, and section 2 built the export, its checks, and the embedding of a tool's datasets in its executable.
 
 ## Where does reference data live?
 
@@ -10,7 +10,7 @@ It is authored in a MySQL database, one dataset per family of data, and versione
 
 Reference data is shared work that has to be reviewed: two authors may edit one dataset, a change has to say why it was made, and an approved version must not change after approval. A database with the rules in stored procedures enforces all three for every client, keeps the whole history queryable, and lets several authors work against one shared server. Edited files would need a second tool to do the same checks and would leave the history in commit messages.
 
-**How it is reversed:** the committed export files (section 2) become the source, edited by hand and checked by the same rules in a script, and the server is dropped. Nothing at build time or runtime changes, because the build already reads only those files.
+**How it is reversed:** the committed export files (section 2) become the source, edited by hand and checked by the same rules in a script, and the server is dropped. The no-server gate then computes a file's digest instead of checking it against the one the database stamped. Nothing at build time or runtime changes, because the build already reads only those files.
 
 This is the one external dependency `AGENTS.md` allows outside the toolchain and the test framework, for the reason above and on authoring machines only.
 
@@ -92,7 +92,103 @@ python tools/refdata/refdata.py history fixture        # the changelog: every ch
 
 Read `changes` before you review: its digest is exactly what the approval covers. Values are read back as text even when they are the word `NULL`, which the client would otherwise print for an empty field.
 
+## How does data get from the database into a tool?
+
+In three steps, and only the first needs the database.
+
+1. **Export**, on an authoring machine: `python tools/refdata/refdata.py export` writes each dataset's latest stamped version to `data/refdata/export/<dataset>.refdata`. The files are committed.
+2. **Check**, everywhere: `python scripts/refdata-verify.py` proves each committed file is whole and unedited, with no database. It is a gate of `scripts/check-all.ps1`, so CI runs it on every push.
+3. **Embed**, at build: a target names its datasets with one CMake call, and the build compresses each named export and embeds it in that executable and no other.
+
+A builder never needs a server: the committed export files are the build's input.
+
+### What does export write?
+
+Only stamped versions leave the database: a version still proposed or reviewed is not exported, and a dataset with no stamped version is skipped by name and gets no file. A file whose dataset is no longer in the database is removed, and the command says so.
+
+```powershell
+python tools/refdata/refdata.py export            # write data/refdata/export/
+python tools/refdata/refdata.py export --check    # write nothing; exit 1 naming each file that differs
+```
+
+`export --check` is how drift is caught where the database is: it names every file that differs from a fresh export, is missing, or is left over, with its dataset and version. Run it before committing reference-data work.
+
+Every file is written whole beside its target and read back before any is moved into place. So an export that fails (the folder cannot be written, a file is held open, the server cannot be reached) ends non-zero naming the file and the reason, and leaves each earlier file as it was; one that fails after some files were moved names which were.
+
+### What is in an export file?
+
+UTF-8 text with LF line ends, the same bytes on every machine (`.gitattributes` pins the line ends):
+
+```text
+resolute-refdata 1
+dataset <name>
+version <number>
+entries <count>
+digest <64 hex digits>
+<key> TAB <text> TAB <source>
+```
+
+- **One line per entry**, in the order the database's own digest reads them. The exporter asks the database for that order and never sorts.
+- **A key and a text are escaped:** a backslash as `\\`, a tab as `\t`, a line feed as `\n`, a carriage return as `\r`. Every other character, any Unicode included, is written as it is.
+- **A source** is `-` when the entry has none, and `=` followed by the escaped source when it has one. So a source that is the text "-" (written `=-`) and an empty source (written `=`) are both told apart from no source.
+- **The digest** is the one the database computes for that version (`rd_version_digest`): a SHA-256 chain over the dataset's name, the version and every entry's key, text and source.
+
+A dataset's name is its file's name, so it is lower-case letters, digits, hyphens and underscores, starting with a letter or digit, at most 63 long, and not a device name Windows reserves (`con`, `nul`, `com1` and the like). The database refuses to create a dataset named otherwise (schema revision 3), and `export` refuses by name, before it touches any file, if a database from an older revision holds one.
+
+**A committed export is never edited by hand.** Change the data in the database, export, review the diff, commit.
+
+### How is a committed export checked without a database?
+
+`scripts/refdata-verify.py` reads every `*.refdata` under `data/refdata/export/` and `data/refdata/fixtures/` and fails, naming the file, the dataset and the version, when a file does not parse, is not in canonical form (written again it must give the same bytes), holds another number of entries than its header says, is not named for its dataset, or carries a digest that is not the digest of its own entries. The last is what catches a hand edit: the digest was stamped by the database, and an edited entry no longer gives it.
+
+What this gate cannot know is whether the database has moved on since the export. That is `export --check`'s job, on the machine that has the database.
+
+### How does a tool get its datasets?
+
+A target names them in its `CMakeLists.txt`, and that is the only place it does:
+
+```cmake
+resolute_embed_refdata(BiosCodes beep-codes)
+```
+
+`cmake/ResoluteRefdata.cmake` then packs each named export at build time (`scripts/refdata-embed.py pack`) and embeds it in that target as an `RCDATA` resource named `REFDATA_<NAME>`: the dataset's name in capitals, an underscore doubled and a hyphen written `_H`, so no two datasets share a name. A target that names no dataset carries none. A dataset with no export file stops the configure step by name, and an export that fails its check stops the build naming the dataset.
+
+The export file is a declared input of the packed resource, so changing an export rebuilds the resource and relinks the executable; nothing has to be cleaned. `python scripts/refdata-embed.py list <binary>` lists what a built executable carries, reading it as data without running it.
+
+### What is the embedded form?
+
+A header, then the export file's bytes compressed with the Windows Compression API (XPRESS with Huffman, `COMPRESS_ALGORITHM_XPRESS_HUFF`). The same API decompresses it at run time (`compressapi.h`, `cabinet.dll`), so no library is added to the tree. All numbers are little-endian.
+
+| Offset | Size | Holds |
+| --- | --- | --- |
+| 0 | 8 | The bytes `RSLRDAT1` |
+| 8 | 2 | Format, 1 |
+| 10 | 2 | Algorithm, 4 |
+| 12 | 4 | The dataset's version |
+| 16 | 4 | The export's size in bytes, uncompressed |
+| 20 | 4 | The compressed size in bytes |
+| 24 | 2 | The length of the dataset's name in bytes |
+| 26 | name length | The dataset's name, UTF-8 |
+| then | 32 | The digest, as raw bytes |
+| then | compressed size | The compressed export |
+
+A reader must refuse a dataset, naming it, when the first bytes are not the magic, the format or algorithm is one it does not know, the bytes after the header are not exactly the compressed size, the data does not decompress to exactly the uncompressed size, or the dataset, version and digest in the header are not the ones in the export it holds. It never uses part of a dataset. The framework's loader (`D01 T01 §14`) is written from this table; until it exists, `tests/helpers/refdata_blob.h` is the reader the tests use.
+
+Reference text compresses well: the 244-entry fixture `bulk` is 38,204 bytes exported and 3,499 embedded.
+
+### What do I do when a reference-data gate is red?
+
+| The gate says | What happened | What to do |
+| --- | --- | --- |
+| `refdata-verify: <file> (dataset X, version N): its entries do not give the digest in its header` | The file was edited after it was exported, or a merge changed it | Restore the file from the commit that exported it, or export again from the database |
+| `refdata-verify: ... not in canonical form` or `lines must end in LF` | The file's bytes were changed by a tool (an editor, a line-end conversion) | The same |
+| `export: X version N: X.refdata differs from the database` | The database has a newer stamped version than the committed file | Run `export`, review the diff, commit |
+| `resolute_embed_refdata(T): the dataset 'X' has no export` | A target names a dataset that was never exported, or its name is misspelled | Export it and commit the file, or correct the name |
+| `refdata-embed: refused: ...: Windows could not create a compressor` | The Compression API is not available on the build machine | The build needs Windows 8 or later; nothing was embedded |
+
 ## How do I move a database to a newer schema?
+
+The schema is at revision 3. Revision 2 recorded what each change set; revision 3 changes no table and makes the database refuse a dataset name that cannot be a file name, because export writes one file per dataset. A database at revision 1 or 2 is moved the same way.
 
 The schema records its revision (`schema_info`). Every command on a database at an older revision is refused, naming the upgrade:
 

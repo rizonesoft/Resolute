@@ -174,7 +174,7 @@ The repair contract is for the repair tools only. The UI library draws every con
 <details>
 <summary><b>What the gates check</b></summary>
 
-`scripts/check-all.ps1` runs them all, and the `gates` workflow runs it on every push: the Debug and Release builds with warnings as errors, a clang-tidy ratchet that only goes down, the Catch2 suites in both configurations, the plan's structure and the claims it makes about this tree, the review wiring, and this README's generated blocks and links.
+`scripts/check-all.ps1` runs them all, and the `gates` workflow runs it on every push: the Debug and Release builds with warnings as errors, a clang-tidy ratchet that only goes down, the Catch2 suites in both configurations, the plan's structure and the claims it makes about this tree, the review wiring, this README's generated blocks and links, and the committed reference-data exports ([`docs/reference-data.md`](docs/reference-data.md)).
 
 </details>
 

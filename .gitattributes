@@ -9,6 +9,9 @@
 *.ps1 text eol=lf
 *.sh text eol=lf
 *.md text eol=lf
+# A reference-data export is compared byte for byte and carries a digest of
+# its own lines: LF on every checkout (D00 T06 §2).
+*.refdata text eol=lf
 tools/githooks/** text eol=lf
 
 # Persisted decision inputs hash by blob bytes: LF in every blob, so the

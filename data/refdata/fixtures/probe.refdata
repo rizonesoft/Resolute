@@ -1,0 +1,7 @@
+resolute-refdata 1
+dataset probe
+version 2
+entries 2
+digest 8f6fce7bdf05c6d5e24d48026ca5df79777c30db7055fc9cd4848043620180b6
+alpha	second text	=book one, second edition
+beta	kept from version one	=book two

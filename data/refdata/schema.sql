@@ -22,7 +22,7 @@
 CREATE TABLE schema_info (
     revision INT UNSIGNED NOT NULL PRIMARY KEY
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-INSERT INTO schema_info (revision) VALUES (2);
+INSERT INTO schema_info (revision) VALUES (3);
 
 CREATE TABLE datasets (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -137,6 +137,14 @@ END //
 
 CREATE PROCEDURE rd_create_dataset (IN p_dataset VARCHAR(64), IN p_description VARCHAR(500))
 BEGIN
+    -- A dataset's name becomes its export file's name and a resource's name (D00 T06 section 2), so it is held to what
+    -- both accept: lower-case ASCII letters, digits, hyphens and underscores, starting with a letter or digit, and not
+    -- a device name Windows reserves. Matched case-sensitively: the column's collation would let 'CON' pass.
+    IF p_dataset IS NULL OR NOT REGEXP_LIKE(p_dataset, '^[a-z0-9][a-z0-9_-]{0,62}$', 'c')
+        OR p_dataset IN ('con', 'prn', 'aux', 'nul', 'com1', 'com2', 'com3', 'com4', 'com5', 'com6', 'com7', 'com8', 'com9',
+                         'lpt1', 'lpt2', 'lpt3', 'lpt4', 'lpt5', 'lpt6', 'lpt7', 'lpt8', 'lpt9') THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: a dataset name must be lower-case letters, digits, hyphens and underscores, and not a Windows device name';
+    END IF;
     IF EXISTS (SELECT 1 FROM datasets WHERE name = p_dataset) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: the dataset already exists';
     END IF;

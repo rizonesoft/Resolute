@@ -17,6 +17,8 @@ refusal by name. Stdlib only, like the rest of scripts/; no database driver is a
     refdata.py backup <file>                          dump the database (schema, routines, data) to a file
     refdata.py restore <file> --database NAME         load a dump into a new database of that name
     refdata.py upgrade --database OLD --to NEW        copy a database at an older schema revision into NEW at this one
+    refdata.py export [--out DIR]                     write each dataset's latest stamped version to DIR/<dataset>.refdata
+    refdata.py export --check                         write nothing; exit 1 naming each file that differs from the database
     refdata.py --self-test [--schema FILE]            prove the workflow on a database of its own
 
 Connection details come only from a MySQL option file outside the repository: client.cnf beside local.cnf in
@@ -42,9 +44,13 @@ import tempfile
 import time
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import refdata_format as fmt   # after the path line above; shared with scripts/refdata-verify.py and the packer
+
 REPO = Path(__file__).resolve().parents[2]
 SCHEMA = REPO / "data" / "refdata" / "schema.sql"
 FIXTURES = REPO / "data" / "refdata" / "fixtures"
+EXPORT_DIR = REPO / "data" / "refdata" / "export"
 SERVER_SCRIPT = REPO / "tools" / "refdata" / "server.ps1"
 HOME = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "Resolute" / "refdata"
 LOCAL_CNF = HOME / "local.cnf"
@@ -53,8 +59,9 @@ DEFAULT_DATABASE = "refdata"
 SYSTEM_DATABASES = ("mysql", "information_schema", "performance_schema", "sys")
 TIMEOUT_SECONDS = 120
 # The schema revision this tool and data/refdata/schema.sql are at (its schema_info row). A database without the
-# table is at revision 1, the schema before D00 T06 section 1's Repair 1.
-SCHEMA_REVISION = 2
+# table is at revision 1, the schema before D00 T06 section 1's Repair 1. Revision 3 (D00 T06 section 2) changes no
+# table: rd_create_dataset refuses a name that cannot be a file name, since export writes one file per dataset.
+SCHEMA_REVISION = 3
 
 
 class Refused(Exception):
@@ -444,6 +451,128 @@ def cmd_history(s: Session, dataset: str) -> int:
     return 0
 
 
+# ----- export (D00 T06 section 2) ---------------------------------------------------------------------------------
+
+def export_read(s: Session) -> tuple[dict[str, tuple[int, int, bytes]], list[str]]:
+    """Each dataset's latest stamped version as its export file's bytes: {dataset: (version, entries, bytes)}, and the
+    datasets skipped because none of their versions is stamped. Nothing is written. Every dataset's name is checked
+    first, so a name that cannot be a file name refuses the whole export before a single file is touched. The entries
+    come in the order the database's own digest reads them (ORDER BY entry_key under the column's collation): this tool
+    never sorts them, so the digest recomputed from the file is the database's."""
+    require_current(s)
+    rows = s.sql(f"SELECT {marked('d.name')}, IFNULL((SELECT MAX(v.number) FROM versions v WHERE v.dataset_id = d.id AND v.status = 'stamped'), 0) "
+                 "FROM datasets d ORDER BY d.id;")
+    datasets = [(unmark_text(name), int(number)) for name, number in rows]
+    unusable = [f"the dataset {name!r} cannot be exported: {fmt.name_problem(name)}" for name, _ in datasets if fmt.name_problem(name)]
+    if unusable:
+        raise Refused("refused: " + "; ".join(unusable) + "; nothing was written")
+    out: dict[str, tuple[int, int, bytes]] = {}
+    skipped = []
+    for name, number in datasets:
+        if not number:
+            skipped.append(name)
+            continue
+        ds = sql_str(name)
+        # One snapshot for the rows and the digest. A stamped version cannot change, so this guards only against a
+        # read that straddles some other transaction's commit.
+        read = s.sql(
+            "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;\nSTART TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY;\n"
+            f"SELECT 'row', {marked('entry_key')}, {marked('text')}, {marked('source')} FROM rd_version_text WHERE dataset = {ds} AND as_of = {number} ORDER BY entry_key;\n"
+            f"CALL rd_version_digest({ds}, {number}, @rd_digest);\nSELECT 'digest', @rd_digest;\nCOMMIT;\n")
+        entries = tuple((unmark_text(r[1]), unmark_text(r[2]), unmark(r[3])) for r in read if r[0] == "row")
+        digest = next((r[1] for r in read if r[0] == "digest"), None)
+        if not digest:
+            raise Refused(f"refused: the database gave no digest for {name} version {number}; nothing was written")
+        data = fmt.emit(fmt.Export(name, number, digest, entries))
+        try:
+            fmt.parse(data, f"the export of {name}")
+        except fmt.FormatError as error:
+            # The file would not carry what the database holds (an encoding this tool reads differently, say): never
+            # written, because the no-server gate would refuse it and nobody could tell which side was wrong.
+            raise Refused(f"refused: {error}; the export does not reproduce what the database holds; nothing was written") from None
+        out[name] = (number, len(entries), data)
+    return out, skipped
+
+
+def _reason(error: OSError) -> str:
+    return error.strerror or str(error)
+
+
+def cmd_export(s: Session, out_dir: Path = EXPORT_DIR, check: bool = False, replace=os.replace) -> int:
+    """Writes each dataset's latest stamped version to <out_dir>/<dataset>.refdata and removes a file whose dataset is
+    no longer there. With check, writes nothing and exits 1 naming each file that differs, is missing or is left over.
+    Every file is written whole beside its target and read back before any is moved into place, so a failure leaves
+    each earlier file as it was; a failure after some were moved names which were. replace is the self-test's hook."""
+    exports, skipped = export_read(s)
+    wanted = {out_dir / (name + fmt.SUFFIX): name for name in exports}
+    try:
+        existing = sorted(out_dir.glob("*" + fmt.SUFFIX)) if out_dir.is_dir() else []
+        changed = [path for path, name in wanted.items() if not path.is_file() or path.read_bytes() != exports[name][2]]
+    except OSError as error:
+        raise Refused(f"refused: {out_dir} could not be read ({_reason(error)}); nothing was written") from None
+    leftover = [path for path in existing if path not in wanted]
+
+    if check:
+        for path in changed:
+            name = wanted[path]
+            print(f"export: {name} version {exports[name][0]}: {path.name} " + ("differs from the database" if path.is_file() else "is missing"))
+        for path in leftover:
+            print(f"export: {path.name}: the database has no stamped dataset of that name (left over)")
+        for name in skipped:
+            print(f"export: {name}: no stamped version, so no file is owed")
+        if changed or leftover:
+            print(f"export: {len(changed) + len(leftover)} file(s) differ from the database; run python tools/refdata/refdata.py export, review the diff and commit it")
+            return 1
+        print(f"export: {len(wanted)} file(s) match the database")
+        return 0
+
+    try:
+        out_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as error:
+        raise Refused(f"refused: {out_dir} could not be created ({_reason(error)}); nothing was written") from None
+    staged: list[tuple[Path, Path]] = []
+    moved: list[str] = []
+    try:
+        for path in changed:
+            partial = path.with_name(path.name + ".partial")
+            staged.append((partial, path))
+            try:
+                partial.write_bytes(exports[wanted[path]][2])
+                if partial.read_bytes() != exports[wanted[path]][2]:
+                    raise OSError("it did not read back as written")
+            except OSError as error:
+                raise Refused(f"refused: {partial} could not be written ({_reason(error)}); every export file is as it was") from None
+        for partial, path in staged:
+            try:
+                replace(str(partial), str(path))
+            except OSError as error:
+                state = f"already replaced: {', '.join(moved)}; the rest are as they were" if moved else "every export file is as it was"
+                raise Refused(f"refused: {path} could not be replaced ({_reason(error)}); {state}") from None
+            moved.append(path.name)
+    finally:
+        for partial, _ in staged:
+            try:
+                if partial.exists():
+                    partial.unlink()
+            except OSError:
+                print(f"export: the staging file {partial} could not be removed; delete it by hand")
+    for path in leftover:
+        try:
+            path.unlink()
+        except OSError as error:
+            raise Refused(f"refused: the left-over {path} could not be deleted ({_reason(error)}); "
+                          f"the exports are written ({', '.join(moved) or 'none changed'}); delete it by hand and run export --check") from None
+    for path, name in wanted.items():
+        number, count, data = exports[name]
+        print(f"{'exported' if path in changed else 'unchanged'}: {name} version {number}, {count} entries, {len(data)} bytes -> {path}")
+    for path in leftover:
+        print(f"removed: {path.name}: the database has no stamped dataset of that name")
+    for name in skipped:
+        print(f"skipped: {name}: no stamped version")
+    return 0
+
+
+
 def cmd_backup(s: Session, path: str, timeout: int = TIMEOUT_SECONDS) -> int:
     if not s.exists():
         raise Refused(f"refused: the database '{s.database}' does not exist")
@@ -741,7 +870,8 @@ def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, 
     print(f"upgraded '{s.database}' (schema revision {revision}) into '{to}' (revision {SCHEMA_REVISION}); every version and changelog row reads back the same.")
     print(f"'{s.database}' is unchanged. Work in '{to}' from now on (--database {to}, or RESOLUTE_REFDATA_DATABASE={to}); "
           f"once it is checked, drop '{s.database}' with: DROP DATABASE `{s.database}`;")
-    print("changelog rows written before the upgrade show their contents as not recorded: revision 1 kept only the latest text.")
+    if revision < 2:
+        print("changelog rows written before the upgrade show their contents as not recorded: revision 1 kept only the latest text.")
     return 0
 
 
@@ -1503,11 +1633,12 @@ def _phase_force_list_and_timeout(t: SelfTestRun) -> None:
                  code == 1 and "keys are never reused" in out and forced_left == "0" and session.sql("SELECT COUNT(*) FROM versions;")[0][0] == versions_before,
                  f"exit {code}, entry left {forced_left}, said {out.strip()!r}")
 
-    # A dataset and an author named NULL list as that text.
-    call(["propose", proposal("named-null", {"dataset": "NULL", "create": "a dataset named NULL", "author": "NULL",
-                                             "reason": "a dataset and author named NULL", "changes": [{"add": "k", "text": "t", "reason": "r"}]})] + base)
+    # An author named NULL lists as that text. (A dataset cannot be named NULL since schema revision 3: names are
+    # lower-case, because each becomes a file name. The lower-case word is tried here.)
+    call(["propose", proposal("named-null", {"dataset": "null", "create": "a dataset named null", "author": "NULL",
+                                             "reason": "a dataset named null and an author named NULL", "changes": [{"add": "k", "text": "t", "reason": "r"}]})] + base)
     code, out = call(["list"] + base)
-    checks.check("list prints a dataset and an author named NULL as that text", code == 0 and "NULL v1: proposed, author NULL" in out, out.strip()[-300:])
+    checks.check("list prints a dataset named null and an author named NULL as that text", code == 0 and "null v1: proposed, author NULL" in out, out.strip()[-300:])
 
     # A backup whose dump outlasts its time is ended and refused by name, with nothing left behind.
     slow = Path(tmp) / "slow.sql"
@@ -1577,6 +1708,160 @@ def _phase_inspection_connection_restart(t: SelfTestRun) -> None:
     read_back("after a server restart")
 
 
+def _phase_export(t: SelfTestRun) -> None:
+    """D00 T06 section 2: the export picks the right version of the right datasets, writes it losslessly and the same
+    every time, says where it differs from the database, and fails by name without disturbing what was there."""
+    checks, session, base, tmp = t.checks, t.session, t.base, t.tmp
+    out = tmp / "export"
+
+    def publish(dataset: str, number: int, stamp: bool = True) -> str:
+        _, said = call(["changes", dataset, str(number)] + base)
+        found = re.search(r"digest: ([0-9a-f]{64})", said)
+        digest = found.group(1) if found else "no digest printed"
+        call(["review", dataset, str(number), "--as", "author-two", "--reason", "checked", "--inspected", digest] + base)
+        if stamp:
+            call(["stamp", dataset, str(number), "--as", "author-one", "--reason", "release"] + base)
+        return digest
+
+    def export(*extra: str) -> tuple[int, str]:
+        return call(["export", "--out", str(out)] + list(extra) + base)
+
+    # A dataset with two stamped versions and a third still open: the export is version 2, with the entry version 1
+    # set and version 2 left alone kept, and nothing of version 3.
+    call(["propose", t.proposal("probe1", {"dataset": "probe", "create": "export probe", "author": "author-one", "reason": "first", "changes": [
+        {"add": "alpha", "text": "first text", "source": "book one", "reason": "a"},
+        {"add": "beta", "text": "kept from version one", "source": "book two", "reason": "b"}]})] + base)
+    publish("probe", 1)
+    call(["propose", t.proposal("probe2", {"dataset": "probe", "author": "author-one", "reason": "second", "changes": [
+        {"reword": "alpha", "text": "second text", "source": "book one, second edition", "reason": "reworded"}]})] + base)
+    digest2 = publish("probe", 2)
+    call(["propose", t.proposal("probe3", {"dataset": "probe", "author": "author-one", "reason": "third", "changes": [
+        {"add": "gamma", "text": "not released", "reason": "c"}]})] + base)
+    # A dataset whose only version is not stamped owes no file.
+    call(["propose", t.proposal("pending1", {"dataset": "pending", "create": "never stamped", "author": "author-one", "reason": "first", "changes": [
+        {"add": "only", "text": "unreleased", "reason": "a"}]})] + base)
+
+    code, said = export()
+    # Written by hand from what the proposals say, not through the tool's own writer; only the digest is the database's.
+    expected = ("resolute-refdata 1\ndataset probe\nversion 2\nentries 2\ndigest " + digest2 + "\n"
+                "alpha\tsecond text\t=book one, second edition\nbeta\tkept from version one\t=book two\n").encode("utf-8")
+    probe = out / "probe.refdata"
+    got = probe.read_bytes() if probe.is_file() else b""
+    checks.check("the export is the latest stamped version, an inherited entry kept and an open version left out, byte for byte",
+                 code == 0 and got == expected, f"exit {code}; {said.strip()[-300:]}; got {got!r}")
+    checks.check("a dataset with no stamped version is skipped by name and gets no file",
+                 "skipped: pending: no stamped version" in said and not (out / "pending.refdata").exists(), said.strip()[-300:])
+    publish("probe", 3, stamp=False)
+    code, said = export()
+    checks.check("a reviewed version that is not stamped is still left out",
+                 code == 0 and probe.read_bytes() == expected and "unchanged: probe version 2" in said, said.strip()[-300:])
+    before = {path.name: path.read_bytes() for path in out.glob("*")}
+    export()
+    checks.check("two consecutive exports are byte-identical", before == {path.name: path.read_bytes() for path in out.glob("*")} and bool(before))
+
+    # Values that are awkward to carry: every one reads back from the file as the database holds it.
+    awkward = [("back\\slash", "a \\ backslash and \\t that is not a tab", "c:\\books\\one"), ("line-break", "first line\nsecond line", None),
+               ("tab", "left\tright", "-"), ("unicode-caf\u00e9-\u65e5\u672c", "na\u00efve \u65e5\u672c\u8a9e \U0001F600", "\u00e9dition"),
+               ("looks-null", "NULL", "NULL"), ("hyphen", "-", None)]
+    call(["propose", t.proposal("awkward1", {"dataset": "awkward", "create": "awkward values", "author": "author-one", "reason": "first", "changes": [
+        dict({"add": key, "text": text, "reason": "awkward"}, **({"source": source} if source is not None else {})) for key, text, source in awkward]})] + base)
+    publish("awkward", 1)
+    code, said = export()
+    try:
+        back = fmt.parse((out / "awkward.refdata").read_bytes(), "awkward.refdata")
+        problem = ""
+    except (fmt.FormatError, OSError) as error:
+        back, problem = None, str(error)
+    checks.check("backslashes, tabs, line breaks, Unicode, a missing source and a source that is a hyphen all read back as they were stored",
+                 code == 0 and back is not None and sorted(back.entries) == sorted(awkward), problem or said.strip()[-300:])
+    verify = subprocess.run([sys.executable, str(REPO / "scripts" / "refdata-verify.py"), str(out)], capture_output=True, encoding="utf-8", check=False)
+    checks.check("the no-server gate accepts a real export holding those values", verify.returncode == 0 and "3 export(s) sound" in verify.stdout, verify.stdout.strip())
+
+    # Drift, named: an edited file, a missing one, a left-over one. Then a plain export puts all three right.
+    probe.write_bytes(expected.replace(b"second text", b"edited text"))
+    (out / "awkward.refdata").unlink()
+    (out / "ghost.refdata").write_bytes(expected.replace(b"dataset probe", b"dataset ghost"))
+    code, said = export("--check")
+    checks.check("export --check names an edited file, a missing file and a left-over file, and writes nothing",
+                 code == 1 and "probe version 2: probe.refdata differs from the database" in said and "awkward version 1: awkward.refdata is missing" in said
+                 and "ghost.refdata: the database has no stamped dataset of that name" in said and not (out / "awkward.refdata").exists(), said.strip())
+    code, said = export()
+    code2, said2 = export("--check")
+    checks.check("a plain export repairs all three and says which file it removed",
+                 code == 0 and "removed: ghost.refdata" in said and probe.read_bytes() == expected and code2 == 0 and "match the database" in said2, said.strip()[-300:])
+
+    # A name that cannot be a file name: refused at creation, and an existing one refuses the export before any file.
+    t.refused("a dataset named with capitals and a space", ["propose", t.proposal("badname", {"dataset": "Bad Name", "create": "x", "author": "author-one",
+              "reason": "first", "changes": [{"add": "a", "text": "b", "reason": "c"}]})], "a dataset name must be lower-case")
+    t.refused("a dataset named for a Windows device", ["propose", t.proposal("device", {"dataset": "con", "create": "x", "author": "author-one",
+              "reason": "first", "changes": [{"add": "a", "text": "b", "reason": "c"}]})], "a dataset name must be lower-case")
+    session.sql("INSERT INTO datasets (name, description) VALUES ('up/../out', 'made before the rule'), ('aux', 'made before the rule');")
+    before = {path.name: path.read_bytes() for path in out.glob("*")}
+    probe.write_bytes(b"stale")   # so a write would be visible
+    code, said = export()
+    after = {path.name: path.read_bytes() for path in out.glob("*")}
+    checks.check("an existing dataset whose name cannot be a file name refuses the whole export by name, before any file is touched",
+                 code == 1 and "'up/../out' cannot be exported" in said and "'aux' cannot be exported" in said and "nothing was written" in said
+                 and after == dict(before, **{"probe.refdata": b"stale"}) and not (tmp / "out.refdata").exists(), said.strip())
+    session.sql("DELETE FROM datasets WHERE name IN ('up/../out', 'aux');")
+
+    # Failures of the file system, each named, each leaving the earlier files as they were.
+    silent = tmp / "export-silent.cnf"
+    silent.write_text("[client]\nuser=root\nhost=127.0.0.1\nport=1\n", encoding="ascii")
+    code, said = call(["export", "--out", str(out), "--options", str(silent), "--database", t.database])
+    checks.check("an export that cannot reach the database refuses with the reason and writes nothing",
+                 code == 1 and "does not answer" in said and probe.read_bytes() == b"stale", said.strip())
+    blocked = tmp / "not-a-directory"
+    blocked.write_text("a file where the directory should be", encoding="ascii")
+    code, said = call(["export", "--out", str(blocked / "export")] + base)
+    checks.check("a destination that cannot be created is refused by name", code == 1 and "could not be created" in said and "nothing was written" in said, said.strip())
+    handle = t.held(probe, 1)   # readable, but it cannot be replaced or deleted while held
+    try:
+        code, said = export()
+    finally:
+        t.kernel32.CloseHandle(handle)
+    checks.check("a file that cannot be replaced is refused by name, left as it was, with no staging file behind",
+                 code == 1 and "probe.refdata could not be replaced" in said and "every export file is as it was" in said
+                 and probe.read_bytes() == b"stale" and not list(out.glob("*.partial")), said.strip())
+    (out / "awkward.refdata").write_bytes(b"stale too")
+
+    def second_fails(src: str, dst: str) -> None:
+        if Path(dst).name == "awkward.refdata":
+            raise OSError(13, "seeded: the second move is refused")
+        os.replace(src, dst)
+
+    buffer = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(buffer):
+            cmd_export(session, out, False, second_fails)
+        interrupted = "no refusal"
+    except Refused as refusal:
+        interrupted = str(refusal)
+    checks.check("an export interrupted between two files says which were already replaced and leaves the other whole",
+                 "awkward.refdata could not be replaced" in interrupted and "already replaced: probe.refdata" in interrupted
+                 and probe.read_bytes() == expected and (out / "awkward.refdata").read_bytes() == b"stale too"
+                 and not list(out.glob("*.partial")), interrupted)
+    ghost = out / "ghost.refdata"
+    ghost.write_bytes(b"left over")
+    handle = t.held(ghost, 1)
+    try:
+        code, said = export()
+    finally:
+        t.kernel32.CloseHandle(handle)
+    checks.check("a left-over file that cannot be deleted is refused by name, the exports written",
+                 code == 1 and "ghost.refdata could not be deleted" in said and probe.read_bytes() == expected, said.strip())
+    code, said = export()
+    checks.check("the export completes once nothing is in its way", code == 0 and not ghost.exists() and probe.read_bytes() == expected, said.strip()[-200:])
+
+    # The committed fixture export, which the build's tests embed, is what the database gives for the probe dataset
+    # this phase made: a real export, not a file written to look like one.
+    committed = FIXTURES / "probe.refdata"
+    exported = probe.read_bytes() if probe.is_file() else b""
+    checks.check("the committed fixture export is byte for byte what the database exports for the probe dataset",
+                 committed.is_file() and committed.read_bytes() == exported,
+                 f"committed {committed.read_bytes()[:120]!r}" if committed.is_file() else f"{committed} is missing; the export gives {exported!r}")
+
+
 def self_test(schema: Path) -> int:
     checks = Checks()
     options = option_file(str(LOCAL_CNF))
@@ -1597,7 +1882,7 @@ def self_test(schema: Path) -> int:
             if not created:
                 return 1
 
-            for phase in (_phase_workflow, _phase_restores, _phase_review_and_history, _phase_file_errors_and_cleanup, _phase_upgrade_and_tls, _phase_force_list_and_timeout, _phase_inspection_connection_restart):
+            for phase in (_phase_workflow, _phase_restores, _phase_review_and_history, _phase_file_errors_and_cleanup, _phase_upgrade_and_tls, _phase_force_list_and_timeout, _phase_inspection_connection_restart, _phase_export):
                 phase(run)
         except Refused as refusal:
             checks.check("the self-test ran to its end", False, str(refusal))
@@ -1657,6 +1942,9 @@ def parser() -> argparse.ArgumentParser:
     rs.add_argument("file")
     up = sub.add_parser("upgrade", parents=[common])
     up.add_argument("--to", required=True)
+    ex = sub.add_parser("export", parents=[common])
+    ex.add_argument("--out", default=str(EXPORT_DIR), help="the directory the export files live in")
+    ex.add_argument("--check", action="store_true", help="write nothing; exit 1 naming each file that differs from the database")
     return p
 
 
@@ -1689,6 +1977,8 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_restore(session, args.file)
         if args.command == "upgrade":
             return cmd_upgrade(session, check_name(args.to))
+        if args.command == "export":
+            return cmd_export(session, Path(args.out), args.check)
     except Refused as refusal:
         print(refusal)
         return 1

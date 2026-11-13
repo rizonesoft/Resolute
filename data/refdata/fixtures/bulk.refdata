@@ -1,0 +1,249 @@
+resolute-refdata 1
+dataset bulk
+version 1
+entries 244
+digest 707afd7c9f0c34884306c00b7ddb4f609b555df4d0f720cd0668aa180b59277a
+ami-001	One long beep pattern 1: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 2
+ami-009	Two short beep pattern 9: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 1
+ami-017	Three short beep pattern 17: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 9
+ami-025	One long, two short beep pattern 25: reseat the memory modules, check the video card and test again with one module fitted	-
+ami-033	Continuous beep pattern 33: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 7
+ami-041	Repeating short beep pattern 41: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 6
+ami-049	One long, three short beep pattern 49: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 5
+ami-057	High-low siren beep pattern 57: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 4
+ami-065	One long beep pattern 65: reseat the memory modules, check the video card and test again with one module fitted	-
+ami-073	Two short beep pattern 73: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 2
+ami-081	Three short beep pattern 81: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 1
+ami-089	One long, two short beep pattern 89: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 9
+ami-097	Continuous beep pattern 97: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 8
+ami-105	Repeating short beep pattern 105: reseat the memory modules, check the video card and test again with one module fitted	-
+ami-113	One long, three short beep pattern 113: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 6
+ami-121	High-low siren beep pattern 121: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 5
+ami-129	One long beep pattern 129: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 4
+ami-137	Two short beep pattern 137: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 3
+ami-145	Three short beep pattern 145: reseat the memory modules, check the video card and test again with one module fitted	-
+ami-153	One long, two short beep pattern 153: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 1
+ami-161	Continuous beep pattern 161: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 9
+ami-169	Repeating short beep pattern 169: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 8
+ami-177	One long, three short beep pattern 177: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 7
+ami-185	High-low siren beep pattern 185: reseat the memory modules, check the video card and test again with one module fitted	-
+ami-193	One long beep pattern 193: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 5
+ami-201	Two short beep pattern 201: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 4
+ami-209	Three short beep pattern 209: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 3
+ami-217	One long, two short beep pattern 217: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 2
+ami-225	Continuous beep pattern 225: reseat the memory modules, check the video card and test again with one module fitted	-
+ami-233	Repeating short beep pattern 233: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 9
+ami-241	One long, three short beep pattern 241: reseat the memory modules, check the video card and test again with one module fitted	=AMI BIOS service manual, table 8
+award-000	One long beep pattern 0: reseat the memory modules, check the video card and test again with one module fitted	-
+award-008	Two short beep pattern 8: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 9
+award-016	Three short beep pattern 16: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 8
+award-024	One long, two short beep pattern 24: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 7
+award-032	Continuous beep pattern 32: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 6
+award-040	Repeating short beep pattern 40: reseat the memory modules, check the video card and test again with one module fitted	-
+award-048	One long, three short beep pattern 48: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 4
+award-056	High-low siren beep pattern 56: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 3
+award-064	One long beep pattern 64: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 2
+award-072	Two short beep pattern 72: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 1
+award-080	Three short beep pattern 80: reseat the memory modules, check the video card and test again with one module fitted	-
+award-088	One long, two short beep pattern 88: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 8
+award-096	Continuous beep pattern 96: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 7
+award-104	Repeating short beep pattern 104: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 6
+award-112	One long, three short beep pattern 112: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 5
+award-120	High-low siren beep pattern 120: reseat the memory modules, check the video card and test again with one module fitted	-
+award-128	One long beep pattern 128: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 3
+award-136	Two short beep pattern 136: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 2
+award-144	Three short beep pattern 144: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 1
+award-152	One long, two short beep pattern 152: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 9
+award-160	Continuous beep pattern 160: reseat the memory modules, check the video card and test again with one module fitted	-
+award-168	Repeating short beep pattern 168: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 7
+award-176	One long, three short beep pattern 176: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 6
+award-184	High-low siren beep pattern 184: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 5
+award-192	One long beep pattern 192: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 4
+award-200	Two short beep pattern 200: reseat the memory modules, check the video card and test again with one module fitted	-
+award-208	Three short beep pattern 208: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 2
+award-216	One long, two short beep pattern 216: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 1
+award-224	Continuous beep pattern 224: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 9
+award-232	Repeating short beep pattern 232: reseat the memory modules, check the video card and test again with one module fitted	=AWARD BIOS service manual, table 8
+award-240	One long, three short beep pattern 240: reseat the memory modules, check the video card and test again with one module fitted	-
+compaq-007	One long beep pattern 7: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 8
+compaq-015	Two short beep pattern 15: reseat the memory modules, check the video card and test again with one module fitted	-
+compaq-023	Three short beep pattern 23: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 6
+compaq-031	One long, two short beep pattern 31: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 5
+compaq-039	Continuous beep pattern 39: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 4
+compaq-047	Repeating short beep pattern 47: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 3
+compaq-055	One long, three short beep pattern 55: reseat the memory modules, check the video card and test again with one module fitted	-
+compaq-063	High-low siren beep pattern 63: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 1
+compaq-071	One long beep pattern 71: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 9
+compaq-079	Two short beep pattern 79: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 8
+compaq-087	Three short beep pattern 87: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 7
+compaq-095	One long, two short beep pattern 95: reseat the memory modules, check the video card and test again with one module fitted	-
+compaq-103	Continuous beep pattern 103: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 5
+compaq-111	Repeating short beep pattern 111: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 4
+compaq-119	One long, three short beep pattern 119: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 3
+compaq-127	High-low siren beep pattern 127: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 2
+compaq-135	One long beep pattern 135: reseat the memory modules, check the video card and test again with one module fitted	-
+compaq-143	Two short beep pattern 143: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 9
+compaq-151	Three short beep pattern 151: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 8
+compaq-159	One long, two short beep pattern 159: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 7
+compaq-167	Continuous beep pattern 167: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 6
+compaq-175	Repeating short beep pattern 175: reseat the memory modules, check the video card and test again with one module fitted	-
+compaq-183	One long, three short beep pattern 183: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 4
+compaq-191	High-low siren beep pattern 191: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 3
+compaq-199	One long beep pattern 199: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 2
+compaq-207	Two short beep pattern 207: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 1
+compaq-215	Three short beep pattern 215: reseat the memory modules, check the video card and test again with one module fitted	-
+compaq-223	One long, two short beep pattern 223: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 8
+compaq-231	Continuous beep pattern 231: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 7
+compaq-239	Repeating short beep pattern 239: reseat the memory modules, check the video card and test again with one module fitted	=COMPAQ BIOS service manual, table 6
+dell-003	One long beep pattern 3: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 4
+dell-011	Two short beep pattern 11: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 3
+dell-019	Three short beep pattern 19: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 2
+dell-027	One long, two short beep pattern 27: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 1
+dell-035	Continuous beep pattern 35: reseat the memory modules, check the video card and test again with one module fitted	-
+dell-043	Repeating short beep pattern 43: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 8
+dell-051	One long, three short beep pattern 51: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 7
+dell-059	High-low siren beep pattern 59: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 6
+dell-067	One long beep pattern 67: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 5
+dell-075	Two short beep pattern 75: reseat the memory modules, check the video card and test again with one module fitted	-
+dell-083	Three short beep pattern 83: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 3
+dell-091	One long, two short beep pattern 91: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 2
+dell-099	Continuous beep pattern 99: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 1
+dell-107	Repeating short beep pattern 107: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 9
+dell-115	One long, three short beep pattern 115: reseat the memory modules, check the video card and test again with one module fitted	-
+dell-123	High-low siren beep pattern 123: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 7
+dell-131	One long beep pattern 131: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 6
+dell-139	Two short beep pattern 139: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 5
+dell-147	Three short beep pattern 147: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 4
+dell-155	One long, two short beep pattern 155: reseat the memory modules, check the video card and test again with one module fitted	-
+dell-163	Continuous beep pattern 163: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 2
+dell-171	Repeating short beep pattern 171: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 1
+dell-179	One long, three short beep pattern 179: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 9
+dell-187	High-low siren beep pattern 187: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 8
+dell-195	One long beep pattern 195: reseat the memory modules, check the video card and test again with one module fitted	-
+dell-203	Two short beep pattern 203: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 6
+dell-211	Three short beep pattern 211: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 5
+dell-219	One long, two short beep pattern 219: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 4
+dell-227	Continuous beep pattern 227: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 3
+dell-235	Repeating short beep pattern 235: reseat the memory modules, check the video card and test again with one module fitted	-
+dell-243	One long, three short beep pattern 243: reseat the memory modules, check the video card and test again with one module fitted	=DELL BIOS service manual, table 1
+hp-004	One long beep pattern 4: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 5
+hp-012	Two short beep pattern 12: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 4
+hp-020	Three short beep pattern 20: reseat the memory modules, check the video card and test again with one module fitted	-
+hp-028	One long, two short beep pattern 28: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 2
+hp-036	Continuous beep pattern 36: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 1
+hp-044	Repeating short beep pattern 44: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 9
+hp-052	One long, three short beep pattern 52: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 8
+hp-060	High-low siren beep pattern 60: reseat the memory modules, check the video card and test again with one module fitted	-
+hp-068	One long beep pattern 68: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 6
+hp-076	Two short beep pattern 76: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 5
+hp-084	Three short beep pattern 84: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 4
+hp-092	One long, two short beep pattern 92: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 3
+hp-100	Continuous beep pattern 100: reseat the memory modules, check the video card and test again with one module fitted	-
+hp-108	Repeating short beep pattern 108: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 1
+hp-116	One long, three short beep pattern 116: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 9
+hp-124	High-low siren beep pattern 124: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 8
+hp-132	One long beep pattern 132: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 7
+hp-140	Two short beep pattern 140: reseat the memory modules, check the video card and test again with one module fitted	-
+hp-148	Three short beep pattern 148: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 5
+hp-156	One long, two short beep pattern 156: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 4
+hp-164	Continuous beep pattern 164: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 3
+hp-172	Repeating short beep pattern 172: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 2
+hp-180	One long, three short beep pattern 180: reseat the memory modules, check the video card and test again with one module fitted	-
+hp-188	High-low siren beep pattern 188: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 9
+hp-196	One long beep pattern 196: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 8
+hp-204	Two short beep pattern 204: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 7
+hp-212	Three short beep pattern 212: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 6
+hp-220	One long, two short beep pattern 220: reseat the memory modules, check the video card and test again with one module fitted	-
+hp-228	Continuous beep pattern 228: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 4
+hp-236	Repeating short beep pattern 236: reseat the memory modules, check the video card and test again with one module fitted	=HP BIOS service manual, table 3
+ibm-006	One long beep pattern 6: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 7
+ibm-014	Two short beep pattern 14: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 6
+ibm-022	Three short beep pattern 22: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 5
+ibm-030	One long, two short beep pattern 30: reseat the memory modules, check the video card and test again with one module fitted	-
+ibm-038	Continuous beep pattern 38: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 3
+ibm-046	Repeating short beep pattern 46: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 2
+ibm-054	One long, three short beep pattern 54: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 1
+ibm-062	High-low siren beep pattern 62: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 9
+ibm-070	One long beep pattern 70: reseat the memory modules, check the video card and test again with one module fitted	-
+ibm-078	Two short beep pattern 78: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 7
+ibm-086	Three short beep pattern 86: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 6
+ibm-094	One long, two short beep pattern 94: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 5
+ibm-102	Continuous beep pattern 102: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 4
+ibm-110	Repeating short beep pattern 110: reseat the memory modules, check the video card and test again with one module fitted	-
+ibm-118	One long, three short beep pattern 118: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 2
+ibm-126	High-low siren beep pattern 126: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 1
+ibm-134	One long beep pattern 134: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 9
+ibm-142	Two short beep pattern 142: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 8
+ibm-150	Three short beep pattern 150: reseat the memory modules, check the video card and test again with one module fitted	-
+ibm-158	One long, two short beep pattern 158: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 6
+ibm-166	Continuous beep pattern 166: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 5
+ibm-174	Repeating short beep pattern 174: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 4
+ibm-182	One long, three short beep pattern 182: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 3
+ibm-190	High-low siren beep pattern 190: reseat the memory modules, check the video card and test again with one module fitted	-
+ibm-198	One long beep pattern 198: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 1
+ibm-206	Two short beep pattern 206: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 9
+ibm-214	Three short beep pattern 214: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 8
+ibm-222	One long, two short beep pattern 222: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 7
+ibm-230	Continuous beep pattern 230: reseat the memory modules, check the video card and test again with one module fitted	-
+ibm-238	Repeating short beep pattern 238: reseat the memory modules, check the video card and test again with one module fitted	=IBM BIOS service manual, table 5
+lenovo-005	One long beep pattern 5: reseat the memory modules, check the video card and test again with one module fitted	-
+lenovo-013	Two short beep pattern 13: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 5
+lenovo-021	Three short beep pattern 21: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 4
+lenovo-029	One long, two short beep pattern 29: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 3
+lenovo-037	Continuous beep pattern 37: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 2
+lenovo-045	Repeating short beep pattern 45: reseat the memory modules, check the video card and test again with one module fitted	-
+lenovo-053	One long, three short beep pattern 53: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 9
+lenovo-061	High-low siren beep pattern 61: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 8
+lenovo-069	One long beep pattern 69: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 7
+lenovo-077	Two short beep pattern 77: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 6
+lenovo-085	Three short beep pattern 85: reseat the memory modules, check the video card and test again with one module fitted	-
+lenovo-093	One long, two short beep pattern 93: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 4
+lenovo-101	Continuous beep pattern 101: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 3
+lenovo-109	Repeating short beep pattern 109: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 2
+lenovo-117	One long, three short beep pattern 117: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 1
+lenovo-125	High-low siren beep pattern 125: reseat the memory modules, check the video card and test again with one module fitted	-
+lenovo-133	One long beep pattern 133: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 8
+lenovo-141	Two short beep pattern 141: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 7
+lenovo-149	Three short beep pattern 149: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 6
+lenovo-157	One long, two short beep pattern 157: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 5
+lenovo-165	Continuous beep pattern 165: reseat the memory modules, check the video card and test again with one module fitted	-
+lenovo-173	Repeating short beep pattern 173: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 3
+lenovo-181	One long, three short beep pattern 181: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 2
+lenovo-189	High-low siren beep pattern 189: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 1
+lenovo-197	One long beep pattern 197: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 9
+lenovo-205	Two short beep pattern 205: reseat the memory modules, check the video card and test again with one module fitted	-
+lenovo-213	Three short beep pattern 213: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 7
+lenovo-221	One long, two short beep pattern 221: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 6
+lenovo-229	Continuous beep pattern 229: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 5
+lenovo-237	Repeating short beep pattern 237: reseat the memory modules, check the video card and test again with one module fitted	=LENOVO BIOS service manual, table 4
+phoenix-002	One long beep pattern 2: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 3
+phoenix-010	Two short beep pattern 10: reseat the memory modules, check the video card and test again with one module fitted	-
+phoenix-018	Three short beep pattern 18: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 1
+phoenix-026	One long, two short beep pattern 26: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 9
+phoenix-034	Continuous beep pattern 34: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 8
+phoenix-042	Repeating short beep pattern 42: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 7
+phoenix-050	One long, three short beep pattern 50: reseat the memory modules, check the video card and test again with one module fitted	-
+phoenix-058	High-low siren beep pattern 58: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 5
+phoenix-066	One long beep pattern 66: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 4
+phoenix-074	Two short beep pattern 74: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 3
+phoenix-082	Three short beep pattern 82: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 2
+phoenix-090	One long, two short beep pattern 90: reseat the memory modules, check the video card and test again with one module fitted	-
+phoenix-098	Continuous beep pattern 98: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 9
+phoenix-106	Repeating short beep pattern 106: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 8
+phoenix-114	One long, three short beep pattern 114: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 7
+phoenix-122	High-low siren beep pattern 122: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 6
+phoenix-130	One long beep pattern 130: reseat the memory modules, check the video card and test again with one module fitted	-
+phoenix-138	Two short beep pattern 138: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 4
+phoenix-146	Three short beep pattern 146: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 3
+phoenix-154	One long, two short beep pattern 154: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 2
+phoenix-162	Continuous beep pattern 162: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 1
+phoenix-170	Repeating short beep pattern 170: reseat the memory modules, check the video card and test again with one module fitted	-
+phoenix-178	One long, three short beep pattern 178: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 8
+phoenix-186	High-low siren beep pattern 186: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 7
+phoenix-194	One long beep pattern 194: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 6
+phoenix-202	Two short beep pattern 202: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 5
+phoenix-210	Three short beep pattern 210: reseat the memory modules, check the video card and test again with one module fitted	-
+phoenix-218	One long, two short beep pattern 218: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 3
+phoenix-226	Continuous beep pattern 226: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 2
+phoenix-234	Repeating short beep pattern 234: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 1
+phoenix-242	One long, three short beep pattern 242: reseat the memory modules, check the video card and test again with one module fitted	=PHOENIX BIOS service manual, table 9

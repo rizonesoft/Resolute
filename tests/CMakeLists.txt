@@ -60,6 +60,9 @@ target_compile_definitions(resolute_tests PRIVATE
     RESOLUTE_CAPTURE_DIR="${CMAKE_BINARY_DIR}/captures"
     RESOLUTE_LAUNCHER="$<TARGET_FILE:Resolute>"
     RESOLUTE_FLASHER="$<TARGET_FILE:resolute_flasher>"
+    # The committed exports the embedded fixture datasets are compared with
+    # (D00 T06 §2).
+    RESOLUTE_REFDATA_FIXTURE_DIR="${CMAKE_SOURCE_DIR}/data/refdata/fixtures"
 )
 target_include_directories(resolute_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -78,9 +81,18 @@ target_link_libraries(resolute_tests PRIVATE
     ole32
     # GetDpiForMonitor, for the census's per-monitor DPI (D00 T02 §10).
     shcore
+    # The Windows Compression API the embedded datasets are read with (D00 T06 §2).
+    cabinet
 )
 # The headful captures start the launcher, so a test build carries it.
 add_dependencies(resolute_tests Resolute)
+
+# The test executable is the fixture tool of D00 T06 §2: it names two datasets
+# and must carry exactly those, which refdata_embed_test.cpp reads back. The
+# launcher names none and must carry none.
+resolute_embed_refdata(resolute_tests
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/data/refdata/fixtures"
+    probe bulk)
 
 # The focus guard's in-context hook for adopted processes, and the helper
 # that shows a window on one monitor and moves it at once (D00 T02 §11). The

@@ -1,7 +1,7 @@
 {
-  "include": ["scripts"],
+  "include": ["scripts", "tools/refdata"],
   "exclude": ["**/__pycache__", "build", "reskit", "resolute_au3", "samples"],
-  "extraPaths": ["scripts", "scripts/lib"],
+  "extraPaths": ["scripts", "scripts/lib", "tools/refdata"],
   "pythonPlatform": "Windows",
   "typeCheckingMode": "standard"
 }

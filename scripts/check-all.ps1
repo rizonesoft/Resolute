@@ -305,6 +305,24 @@ Invoke-Gate -Name 'readme check self-test' -LogName 'gate-readme-check-selftest'
     & $Python (Join-Path $RepoRoot 'scripts\readme-check.py') --self-test
 }
 
+# ── reference data (D00 T06 §2) ──────────────────────────────
+
+# The database stays on authoring machines, so this is what a build and CI can
+# prove: every committed export is whole and unedited (canonical form, entry
+# count, and the digest the database stamped into it, recomputed from its own
+# entries), and the packer that embeds them round-trips through the Windows
+# Compression API. Whether the files are what the database holds now is the
+# authoring machine's check: refdata.py export --check.
+Invoke-Gate -Name 'refdata verify' -LogName 'gate-refdata-verify' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\refdata-verify.py')
+}
+Invoke-Gate -Name 'refdata verify self-test' -LogName 'gate-refdata-verify-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\refdata-verify.py') --self-test
+}
+Invoke-Gate -Name 'refdata embed self-test' -LogName 'gate-refdata-embed-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\refdata-embed.py') --self-test
+}
+
 # ── toolchain currency, ADVISORY ─────────────────────────────
 #
 # A pin that has fallen behind is information, not a failure. The build is

@@ -57,6 +57,8 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake/ResoluteJobPools.cmake")
 # FetchContent dependency is a subdirectory of this build and would inherit
 # anything set at the root. D00 T01 §3.
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/ResoluteWarnings.cmake")
+# Reference data embedded per tool (D00 T06 §2).
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/ResoluteRefdata.cmake")
 
 # ── Subdirectories ───────────────────────────────────────────
 add_subdirectory(shared/resolute-ui)
