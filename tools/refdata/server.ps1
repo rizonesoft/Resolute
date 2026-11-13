@@ -32,7 +32,9 @@ param(
     [string]$HomeDir = (Join-Path $env:LOCALAPPDATA 'Resolute\refdata'),
     # A drill: a first start stops after the server answers and before root's password is set, as an
     # interrupted start would, so the next -Start is shown to finish the credentials.
-    [switch]$DrillStopAfterInit
+    [switch]$DrillStopAfterInit,
+    # Check the option-file writer without a server.
+    [switch]$SelfTest
 )
 
 $ErrorActionPreference = 'Stop'
@@ -198,14 +200,57 @@ function Write-Ini([int]$OnPort) {
     $base = $InstallDir.Replace('\', '/')
     $data = $DataDir.Replace('\', '/')
     $log = (Join-Path $ServerDir 'mysqld.log').Replace('\', '/')
-    Set-Content -LiteralPath $IniFile -Encoding ascii -Value @(
+    Write-OptionFile $IniFile @(
         '[mysqld]', "basedir=$base", "datadir=$data", "port=$OnPort", 'bind-address=127.0.0.1', 'mysqlx=OFF', "log-error=$log"
     )
 }
 
+$script:BeforeReplace = $null   # the self-test's stand-in for a write cut short before the replace
+
+function Write-OptionFile([string]$Path, [string[]]$Lines) {
+    # A file that may hold the only copy of root's password is never
+    # truncated in place: the new text goes to a sibling file, is read back,
+    # and replaces the old one in one step. Cut short anywhere, the old file
+    # is whole.
+    $temp = "$Path.writing"
+    $bytes = [System.Text.Encoding]::ASCII.GetBytes((($Lines -join "`r`n") + "`r`n"))
+    try {
+        [System.IO.File]::WriteAllBytes($temp, $bytes)
+        if (-not [System.Linq.Enumerable]::SequenceEqual([System.IO.File]::ReadAllBytes($temp), $bytes)) { throw "$temp read back differently from what was written" }
+        if ($script:BeforeReplace) { & $script:BeforeReplace }
+        [System.IO.File]::Move($temp, $Path, $true)
+    } finally {
+        if (Test-Path -LiteralPath $temp) { [System.IO.File]::Delete($temp) }
+    }
+}
+
+function Invoke-SelfTest {
+    $failed = @()
+    $dir = Join-Path ([System.IO.Path]::GetTempPath()) ("refdata-server-selftest-" + [Guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Path $dir | Out-Null
+    try {
+        $file = Join-Path $dir 'local.cnf'
+        Write-OptionFile $file @('[client]', 'password=first')
+        $ok = (Get-Content -LiteralPath $file) -contains 'password=first'
+        Write-Host "$(if ($ok) { 'PASS' } else { 'FAIL' }) an option file is written whole"; if (-not $ok) { $failed += 'written' }
+        $script:BeforeReplace = { throw 'cut short before the replace' }
+        try { Write-OptionFile $file @('[client]', 'password=second') } catch { $null = $_ } finally { $script:BeforeReplace = $null }
+        $ok = ((Get-Content -LiteralPath $file) -contains 'password=first') -and -not (Test-Path -LiteralPath "$file.writing")
+        Write-Host "$(if ($ok) { 'PASS' } else { 'FAIL' }) a write cut short leaves the old file whole, and no partial file"; if (-not $ok) { $failed += 'cut short' }
+        Write-OptionFile $file @('[client]', 'password=third')
+        $ok = ((Get-Content -LiteralPath $file) -contains 'password=third') -and -not (Test-Path -LiteralPath "$file.writing")
+        Write-Host "$(if ($ok) { 'PASS' } else { 'FAIL' }) a replacing write leaves only the new file"; if (-not $ok) { $failed += 'replace' }
+    } finally {
+        Remove-Item -LiteralPath $dir -Recurse -Force
+    }
+    if ($failed) { Write-Host "self-test: FAIL $($failed -join ', ')"; return 1 }
+    Write-Host 'self-test: all pass'
+    return 0
+}
+
 function Write-LocalCnf([int]$OnPort, [string]$Password) {
     # Written once, readable by this account alone (the folder's ACL), and never printed.
-    Set-Content -LiteralPath $LocalCnf -Encoding ascii -Value @('[client]', 'user=root', "password=$Password", 'host=127.0.0.1', "port=$OnPort")
+    Write-OptionFile $LocalCnf @('[client]', 'user=root', "password=$Password", 'host=127.0.0.1', "port=$OnPort")
 }
 
 function Invoke-Sql([string]$Options, [string]$Sql, [string[]]$Extra = @()) {
@@ -232,7 +277,7 @@ function Complete-Credentials([int]$OnPort) {
     # Finishes what the marker says is unfinished; returns $null or the refusal.
     if (-not (Test-Path -LiteralPath $Pending)) { return $null }
     if (-not (Test-Path -LiteralPath $PendingCnf)) {
-        Set-Content -LiteralPath $PendingCnf -Encoding ascii -Value @('[client]', 'user=root', "password=$(New-Password)", 'host=127.0.0.1', "port=$OnPort")
+        Write-OptionFile $PendingCnf @('[client]', 'user=root', "password=$(New-Password)", 'host=127.0.0.1', "port=$OnPort")
     }
     if ((Invoke-Sql $PendingCnf 'SELECT 1;' @("--port=$OnPort")) -ne 0) {
         # Not set yet: set it, as the passwordless root the marker says it still is.
@@ -271,7 +316,7 @@ function Invoke-Start {
             & $Mysqld "--defaults-file=$IniFile" --initialize-insecure 2>&1 | Out-Null
             if ($LASTEXITCODE -ne 0) { Say "refused: initialization failed (see $(Join-Path $ServerDir 'mysqld.log'))"; return 2 }
             # Until the generated password is set, root has none: a client file without one reaches it.
-            Set-Content -LiteralPath $LocalCnf -Encoding ascii -Value @('[client]', 'user=root', 'host=127.0.0.1', "port=$port")
+            Write-OptionFile $LocalCnf @('[client]', 'user=root', 'host=127.0.0.1', "port=$port")
         }
         $proc = Get-Process -Id ([Daemon]::Start($Mysqld, "`"$Mysqld`" `"--defaults-file=$IniFile`""))
         @{ pid = $proc.Id; path = $Mysqld; port = $port; started = (Get-Date).ToUniversalTime().ToString('o') } | ConvertTo-Json | Set-Content -LiteralPath $StateFile -Encoding utf8
@@ -295,7 +340,7 @@ function Invoke-Start {
     if (-not $owned) {
         # The server answers on this port, so clients are pointed at it now, not before.
         $lines = @(Get-Content -LiteralPath $LocalCnf) | ForEach-Object { if ($_ -match '^port=') { "port=$port" } else { $_ } }
-        Set-Content -LiteralPath $LocalCnf -Encoding ascii -Value $lines
+        Write-OptionFile $LocalCnf $lines
     }
     # Every start, already running or not, ends only on a server that refuses a passwordless root and accepts local.cnf.
     if (Test-RootOpen $port) {
@@ -337,6 +382,7 @@ function Invoke-Stop {
     return 0
 }
 
+if ($SelfTest) { exit (Invoke-SelfTest) }
 $modes = @($Install, $Start, $Stop, $Status) | Where-Object { $_ }
 if ($modes.Count -ne 1) { Write-Host 'usage: server.ps1 -Install | -Start | -Status | -Stop [-Port N]'; exit 2 }
 if ($Install) { exit (Invoke-Install) }
