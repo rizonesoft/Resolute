@@ -170,7 +170,9 @@ def run_sql(sql: str, *, options: Path, database: str | None = None, tool: str =
     # holding a character such as é (measured 2026-11-13), and a Windows profile folder may hold one.
     args = [str(exe), f"--defaults-extra-file={options.name}", "--connect-timeout=5", "--default-character-set=utf8mb4"]
     if tool == "mysql":
-        args += ["--batch", "--skip-column-names"]
+        # --skip-force on the command line outranks any option file: with force, the client goes on past a failed
+        # statement and exits 0, so a refused change would commit the ones before it and report success.
+        args += ["--batch", "--skip-column-names", "--skip-force"]
     args += list(extra)
     if database:
         args.append(database)
@@ -453,7 +455,9 @@ def cmd_backup(s: Session, path: str, timeout: int = TIMEOUT_SECONDS) -> int:
              # these rows as a user that can do nothing else (cmd_restore).
              "--no-create-info", "--skip-triggers", "--skip-disable-keys", "--complete-insert", "--single-transaction",
              # schema_info is the schema's own row, which a restore's schema.sql writes; a backup carries data alone.
-             "--skip-dump-date", f"--ignore-table={s.database}.schema_info", s.database],
+             "--skip-dump-date", f"--ignore-table={s.database}.schema_info",
+             # A dump that skipped a table on an error would still exit 0; an option file's force never applies here.
+             "--skip-force", s.database],
             stdout=out, stderr=subprocess.PIPE, cwd=str(s.options.parent))
         timed_out, err = False, b""
         try:
@@ -505,21 +509,48 @@ def grant_pattern(database: str) -> str:
     return database.replace("\\", "\\\\").replace("_", "\\_").replace("%", "\\%")
 
 
-CREDENTIAL_LINE = re.compile(rb"^\s*(user|password)\s*=", re.IGNORECASE)
+# What decides how and to where the client connects, which a restore's connection must share with the author's.
+# Anything else an option file can say (force, execute, init-command, a database) is not carried.
+CONNECTION_SETTINGS = {
+    "host", "port", "socket", "protocol", "connect-timeout", "ssl-mode", "ssl-ca", "ssl-capath", "ssl-cert", "ssl-key",
+    "ssl-cipher", "ssl-crl", "ssl-crlpath", "ssl-fips-mode", "tls-version", "tls-ciphersuites", "get-server-public-key",
+    "server-public-key-path", "compression-algorithms", "zstd-compression-level",
+}
+# Settings naming a file, which the client resolves against its working directory, the option file's own folder.
+PATH_SETTINGS = {"ssl-ca", "ssl-capath", "ssl-cert", "ssl-key", "ssl-crl", "ssl-crlpath", "server-public-key-path"}
 
 
 def restricted_option_bytes(author: Path, user: str, password: str, override: dict | None = None) -> bytes:
-    """The restore user's option file: the author's own, every setting kept (host, port, TLS mode, CA, certificate,
-    key and any other), with only the user and password replaced, so the restore connects as the author's own
-    connections do. Kept as bytes, in whatever code page the author's file is in. override is the self-test's hook
-    for changing a setting the copy carries, in the restricted file alone; it adds nothing the author's file lacks."""
-    kept = [line for line in author.read_bytes().splitlines() if not CREDENTIAL_LINE.match(line)]
+    """The restore user's option file: the connection settings the author's file gives the mysql client (its
+    [client] and [mysql] groups: host, port, TLS mode, CA, certificate, key and the rest of CONNECTION_SETTINGS), a
+    file path made absolute against the author's folder so it names the same file from another folder, then the
+    restore user's own user and password. override is the self-test's hook for changing a setting the copy carries,
+    in the restricted file alone; it adds nothing the author's file lacks."""
+    code_page = "mbcs"   # option files are read in the system's ANSI code page (tools/refdata/server.ps1, Write-OptionFile)
+    group, settings = None, {}
+    for raw in author.read_bytes().splitlines():
+        line = raw.decode(code_page).strip()
+        if not line or line[0] in "#;":
+            continue
+        if line.startswith("!"):
+            raise Refused(f"refused: {author} uses {line.split()[0]}, whose files a restore cannot carry safely to its own connection; "
+                          "put the connection settings in the option file itself; nothing was restored")
+        if line.startswith("["):
+            group = line.strip("[]").strip().lower()
+            continue
+        key, _, value = line.partition("=")
+        key, value = key.strip().lower().replace("_", "-"), value.strip().strip("'\"")
+        if group in ("client", "mysql") and key in CONNECTION_SETTINGS:
+            if key in PATH_SETTINGS and value and not Path(value).is_absolute():
+                value = str((author.parent / value).resolve())
+            settings[key] = value
     for key, value in (override or {}).items():
-        setting = re.compile(rb"^\s*" + re.escape(key.encode("ascii")) + rb"\s*=")
-        kept = [key.encode("ascii") + b"=" + value.encode("ascii") if setting.match(line) else line for line in kept]
-    extra = [f"user={user}", f"password={password}"]
-    # A [client] group last, so its user and password are the ones read, whatever groups the author's file has.
-    return b"\r\n".join(kept + [b"", b"[client]"] + [line.encode("ascii") for line in extra]) + b"\r\n"
+        if key in settings:
+            settings[key] = value
+    lines = ["[client]"] + [key if value == "" else f"{key}={value.replace(chr(92), '/')}" if key in PATH_SETTINGS else f"{key}={value}"
+                            for key, value in settings.items()]
+    lines += [f"user={user}", f"password={password}"]
+    return ("\r\n".join(lines) + "\r\n").encode(code_page)
 
 
 def cmd_restore(s: Session, path: str, schema: Path = SCHEMA, restricted_override: dict | None = None) -> int:
@@ -1019,6 +1050,7 @@ def self_test(schema: Path) -> int:
             old = Session(options, f"{database}_r1")
             upgraded, lossy = f"{database}_r2", f"{database}_r2lossy"
             tls_restored, tls_upgraded, tls_refused, tls_refused_up = (f"{database}_tls", f"{database}_tlsup", f"{database}_tlsno", f"{database}_tlsupno")
+            rel_restored, rel_upgraded = f"{database}_rel", f"{database}_relup"
             try:
                 with contextlib.redirect_stdout(io.StringIO()):
                     cmd_init(old, old_schema)
@@ -1092,9 +1124,40 @@ def self_test(schema: Path) -> int:
                              and not Session(options, tls_refused_up).exists() and users == "0"
                              and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state,
                              f"restore said {said_restore!r}; upgrade said {said_upgrade!r}; restore users left {users}")
+
+                # A CA named relative to the author's option file names the same file for the restore's connection.
+                beside = Path(tmp) / "relative"
+                beside.mkdir()
+                (beside / "server-ca.pem").write_bytes(ca.read_bytes())
+                relative = beside / "relative.cnf"
+                relative.write_bytes(options.read_bytes().rstrip(b"\r\n") + b"\r\nssl-mode=VERIFY_CA\r\nssl-ca=server-ca.pem\r\n")
+                code, out = call(["restore", str(tls_dump), "--options", str(relative), "--database", rel_restored])
+                code2, out2 = call(["upgrade", "--options", str(relative), "--database", old.database, "--to", rel_upgraded])
+                checks.check("a CA named relative to the author's option file verifies the restore's and the upgrade's connection too",
+                             code == 0 and code2 == 0 and Session(options, rel_restored).exists() and Session(options, rel_upgraded).exists(),
+                             f"restore {code} {out.strip()!r}; upgrade {code2} {out2.strip()!r}")
+
+                # An option file that includes others is refused: what they hold could not be carried safely.
+                including = Path(tmp) / "including.cnf"
+                including.write_bytes(options.read_bytes().rstrip(b"\r\n") + f"\r\n!include {secure.as_posix()}\r\n".encode("ascii"))
+                code, out = safe_call(["restore", str(tls_dump), "--options", str(including), "--database", f"{database}_inc"])
+                checks.check("a restore through an option file that includes others is refused by name, no database created",
+                             code == 1 and "uses !include" in out and not Session(options, f"{database}_inc").exists(), f"exit {code}, said {out.strip()!r}")
             finally:
-                for name in (old.database, upgraded, lossy, tls_restored, tls_upgraded, tls_refused, tls_refused_up):
+                for name in (old.database, upgraded, lossy, tls_restored, tls_upgraded, tls_refused, tls_refused_up, rel_restored, rel_upgraded, f"{database}_inc"):
                     run_sql(f"DROP DATABASE IF EXISTS `{name}`;", options=options)
+
+            # An option file that tells the client to go on past errors cannot make a refused proposal commit.
+            forcing = Path(tmp) / "forcing.cnf"
+            forcing.write_bytes(options.read_bytes().rstrip(b"\r\n") + b"\r\n[mysql]\r\nforce\r\n")
+            versions_before = session.sql("SELECT COUNT(*) FROM versions;")[0][0]
+            code, out = call(["propose", proposal("forced", {"dataset": "fixture", "author": "author-one", "reason": "two changes, the second refused", "changes": [
+                {"add": "beep-forced", "text": "kept only if force wins", "reason": "first"}, {"add": "beep-1-long", "text": "a reused key", "reason": "second"}]}),
+                "--version", "6", "--options", str(forcing), "--database", database])
+            forced_left = session.sql("SELECT COUNT(*) FROM entries WHERE entry_key = 'beep-forced';")[0][0]
+            checks.check("an option file with force cannot make a refused proposal commit the changes before it",
+                         code == 1 and "keys are never reused" in out and forced_left == "0" and session.sql("SELECT COUNT(*) FROM versions;")[0][0] == versions_before,
+                         f"exit {code}, entry left {forced_left}, said {out.strip()!r}")
 
             # A dataset and an author named NULL list as that text.
             call(["propose", proposal("named-null", {"dataset": "NULL", "create": "a dataset named NULL", "author": "NULL",
