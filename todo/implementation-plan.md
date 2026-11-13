@@ -184,7 +184,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files               |  18   |
 | [ ] | `D00 T05 §3`  | Setup-Path CI Plus Reproducibility                |   5   |
 | [ ] | `D00 T05 §4`  | Sidecar Reproduction Command Carries -Visible     |   3   |
-| [ ] | `D00 T06 §1`  | MySQL Schema, Authoring Workflow                  |   5   |
+| [ ] | `D00 T06 §1`  | MySQL Schema, Authoring Workflow                  |   6   |
 | [ ] | `D00 T06 §2`  | Export, Embedding, Versioning                     |   7   |
 | [ ] | `D00 T06 §3`  | Beep Database Migration Off Packs                 |   5   |
 | [ ] | `D00 T06 §4`  | Data Extension: Vendors, Blink, POST              |   5   |
