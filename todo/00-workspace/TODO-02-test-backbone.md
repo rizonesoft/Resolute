@@ -56,6 +56,7 @@ track: W1
 |  11   |   §11   | Nightly full-suite regression run          | §10            |  [x]   |
 |  12   |   §12   | Port-vs-port visual comparison             | §9, §10        |  [x]   |
 |  13   |   §13   | Capture pairs are replaced atomically       | §3             |  [ ]   |
+|  14   |   §14   | A capture refuses a covered window          | §3             |  [ ]   |
 
 ---
 
@@ -739,6 +740,20 @@ No surface of its own: the capture writer `scripts/capture-window.ps1` and its s
 -> SOURCE: review-2026-11-09-d00-t05-s1-repair-completion (gap 4, out of scope)
 
 **Test checkpoint:** the self-test case for a refused sidecar write passes and fails with the readback removed, quoted; one real capture through `scripts/capture-window.ps1` still writes a matching pair. All from real runs.
+
+## 14. A Capture Refuses a Covered Window
+
+**Filed 2026-11-13** from the completion review of `D00 T05 §1`'s sixth repair (`docs/reviews/00-workspace/D00-T05-s1-repair6.md`, one gap, owning layer the capture helper). `scripts/capture-window.ps1` checks that the target owns the foreground and then copies the screen's pixels over the window's frame. Owning the foreground does not mean nothing covers it: an always-on-top window of another application can lie over part of the target while the operator is idle, and its pixels are then saved, with a sidecar, as evidence of the target. -> XREF: §3
+
+No surface of its own: the capture writer `scripts/capture-window.ps1` and its self-test.
+
+- [ ] Refuse a covered window: immediately before it copies the screen, and again after, the writer walks the windows above the target in z-order and refuses, naming each window's title and process, when any visible window that is not cloaked by the compositor intersects the target's frame; nothing is written. Windows above the target that do not intersect it, and the target's own windows, never refuse it. Done when: the self-test's overlap rule refuses a rectangle that intersects the frame and accepts one beside it, and fails by name with the rule removed; and a driven capture with an always-on-top window of another process laid over part of the target refuses naming that window, writes nothing, and leaves that window as it was, while the same capture with the window moved aside writes its pair.
+- [ ] Commit: `"workspace: a capture refuses a covered window"`
+
+-> XREF: D00 T05 §1 -- the README driver whose shots consume this refusal
+-> SOURCE: review-2026-11-13-d00-t05-s1-repair6-completion (one gap, capture helper)
+
+**Test checkpoint:** the overlap rule's self-test cases pass and fail with the rule removed, quoted; a driven capture under an always-on-top window refuses naming it and writes nothing, and the same capture beside it writes its pair. All from real runs.
 
 ## Verification
 

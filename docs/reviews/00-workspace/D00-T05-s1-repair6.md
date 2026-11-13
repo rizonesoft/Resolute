@@ -52,3 +52,70 @@ HIGHEST: P1
 OVERALL: needs-attention
 
 - Fixed: finding 1 (the display was read once, before a long admission wait). ecf69206: `Read-WorkArea` runs at the start, before each launch, after positioning, before the capture child starts and after it exits, and `-DrillShrinkAt launch|capture` shrinks the display at that point. Driven, each into a folder holding an earlier set: shrinking at launch printed `stood down during the launch of ...-details-dark: the display's work area is 1366 x 728, too small for a 1600 x 1000 window`, exit 3, earlier set unchanged, no process left; shrinking at capture printed `stood down during the capture of ...-details-dark: the display's work area is 1366 x 728 ...`, exit 3, unchanged; the same with the before-capture check removed printed `published 4 shots`, exit 0, set replaced. The README shots are restaked at ecf69206.
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T04:13:38Z
+- Effort: low
+- Writer model: claude-opus-5-5
+- Policy: ff5a26445c9e803de5652ab66b2b8da4ebc2ac34
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 6
+- Digest: 2291529e4ac60549
+
+### consistency: approve
+
+No actionable consistency findings in the candidate diff. Review limited to source inspection; capture drills were not run.
+
+HIGHEST: none
+OVERALL: approve
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T04:15:20Z
+- Candidate: b9909cba3f12bf1abb72346ef735d40717d0877d
+- Effort: medium
+- Writer model: claude-opus-5-5
+- Policy: ff5a26445c9e803de5652ab66b2b8da4ebc2ac34
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 29
+- Digest: f322b5e25dc3f6a8
+
+The feature has one remaining gap: being inside the display and owning the foreground does not prove the launcher is unobscured.
+
+Reviewed the candidate diff, source, recorded evidence and all four PNGs. No files changed. Tests and desktop drills were not rerun because they write files.
+
+**Part 1: completeness**
+
+1. **present**: Reproducible build and capture entry point. Commands are documented at `scripts/capture-launcher-readme.ps1:13`; the clean-checkout build evidence is at `todo/00-workspace/TODO-05-repo-face.md:61`.
+2. **present**: Two views, each captured in light and dark. All four committed `2026-11-13-D00-T05-s1-launcher-*.png` images were visually inspected and measure 1582 × 991 pixels. Capture sequencing is at `scripts/capture-launcher-readme.ps1:755`.
+3. **present**: Provenance and reproduction commands. The four sidecars record binary hash, revision, date, host, geometry, DPI, appearance and launch context. Command quoting has regression checks at `scripts/capture-launcher-readme.ps1:452`.
+4. **present**: Explicit desktop admission and cancellation on resumed input. Enforcement is at `scripts/capture-launcher-readme.ps1:563`, `:738` and `:693`; interruption and failed-query runs are recorded at `todo/00-workspace/TODO-05-repo-face.md:82`.
+5. **present**: Insufficient-display refusal and refreshed bounds checks. Checks run before admission, before launch, after positioning and around capture at `scripts/capture-launcher-readme.ps1:643`, `:661`, `:688`, `:698` and `:717`. Fit tests are at `:486`; production-check drills are recorded at `todo/00-workspace/TODO-05-repo-face.md:89`.
+6. **present**: Bounded launcher interaction and capture waits. Positioning has a five-second deadline at `scripts/capture-launcher-readme.ps1:330`; capture has a configurable deadline at `:691`. Hung-window regression cases are at `:474`.
+7. **present**: Owned-process cleanup, including abrupt driver termination. Job binding is at `scripts/capture-launcher-readme.ps1:727`, cleanup at `:702`, and the recorded termination drill at `todo/00-workspace/TODO-05-repo-face.md:87`.
+8. **present**: File publication, readback and recovery. Staging, journalled replacement, hash verification and rollback are implemented at `scripts/capture-launcher-readme.ps1:346`; next-start recovery is at `:407`. Locked-file, readback-failure and interrupted-publication tests begin at `:492`. Capture failures prevent publication.
+9. **missing-in-scope**: Refusal when another window obscures the launcher. `scripts/capture-window.ps1:203` checks foreground ownership, then `:233` copies screen pixels. An existing always-on-top window can overlap the launcher while the launcher owns the foreground and the operator remains idle. Bounds checks still pass, so unrelated application pixels can be published as launcher evidence. No regression case covers this condition.
+
+GUI controls, focus order, application settings, elevation and system-state undo are not surfaces this repository tool introduces.
+
+**Part 2: excellence**
+
+Counterpart: none in `resolute_au3/`; behavioral parity is not applicable. `DESIGN.md` supplies the visual-proof standard, but this section does not implement the launcher's controls or accessibility.
+
+1. **in-scope**: Capture integrity remains weaker than the promised whole-window proof. The foreground-only check cannot exclude always-on-top overlap (`scripts/capture-window.ps1:203`, `:233`). **Target:** with an overlapping always-on-top window, either capture only the complete launcher or refuse with a clear reason, preserve the earlier output set and leave the operator's window untouched. Add one regression case for that ordinary desktop condition. This is a source-derived finding, not a reproduced failure.
+
+**Gap list**
+
+1. **missing-in-scope; in-scope**: Detect or exclude overlapping always-on-top windows before publishing screen captures, with one regression case proving that unrelated pixels cannot become launcher evidence. Owning layer: capture helper, consumed by D00 T05 §1.
+
+COMPLETION: gaps
