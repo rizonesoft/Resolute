@@ -699,7 +699,10 @@ def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, 
     # literal so a $ or a backtick in it is passed as it is.
     retry = (f"python {powershell_literal(str(Path(__file__).resolve()))} upgrade --database {s.database} "
              f"--options {powershell_literal(str(s.options.resolve()))} --to <a new name>")
-    keep_old = f"'{s.database}' is unchanged and keeps every version; fix the cause named here and run, in PowerShell: {retry}"
+    # The retry ends the refusal alone on its own line, after anything else the author is asked to do, so the line can
+    # be copied whole.
+    keep_old = (f"'{s.database}' is unchanged and keeps every version; fix the cause named here, then run this in PowerShell, "
+                f"with a new name for <a new name>:\n{retry}")
     with tempfile.TemporaryDirectory(prefix="refdata-upgrade-") as tmp:
         dump = Path(tmp) / "upgrade.sql"
         with contextlib.redirect_stdout(io.StringIO()):
@@ -713,8 +716,8 @@ def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, 
                 # (a name another author took meanwhile among them) names no database of this upgrade's to drop.
                 if not refusal.loaded:
                     raise Refused(f"{refusal}; {keep_old}") from None
-                raise Refused(f"{refusal}; the upgrade stopped before comparing, so '{to}' is loaded but unverified: do not use it. "
-                              f"{keep_old}, and drop the copy with: DROP DATABASE IF EXISTS `{to}`;") from None
+                raise Refused(f"{refusal}; the upgrade stopped before comparing, so '{to}' is loaded but unverified: do not use it; "
+                              f"drop it with: DROP DATABASE IF EXISTS `{to}`; then {keep_old}") from None
             except Refused as refusal:
                 # The copy began and failed: its own refusal says what was left, and the next step is the same.
                 raise Refused(f"{refusal}; {keep_old}") from None
@@ -723,9 +726,9 @@ def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, 
         # The reason first, then what became of the copy, as far as it is known.
         try:
             run_sql(f"DROP DATABASE IF EXISTS `{to}`;", options=s.options)
-            return Refused(f"{reason}; '{to}' was dropped and {keep_old}")
+            return Refused(f"{reason}; '{to}' was dropped. {keep_old}")
         except Refused as refusal:
-            return Refused(f"{reason}; '{to}' could not be confirmed removed ({refusal}): drop it with: DROP DATABASE IF EXISTS `{to}`; and {keep_old}")
+            return Refused(f"{reason}; '{to}' could not be confirmed removed ({refusal}): drop it with: DROP DATABASE IF EXISTS `{to}`; then {keep_old}")
 
     try:
         if after_restore:
@@ -839,6 +842,25 @@ class SelfTestRun:
         if handle in (None, ctypes.c_void_p(-1).value):
             raise Refused(f"refused: the self-test could not hold {path} (error {ctypes.get_last_error()})")
         return handle
+
+    @staticmethod
+    def retry_line(said: str | None) -> str | None:
+        """The refusal's last line when it is exactly the upgrade retry, else None."""
+        last = (said or "").splitlines()[-1:] or [""]
+        pattern = r"python '(?:[^']|'')*' upgrade --database \S+ --options '(?:[^']|'')*' --to <a new name>"
+        return last[0] if re.fullmatch(pattern, last[0]) else None
+
+    @staticmethod
+    def run_retry(line: str, name: str) -> tuple[int | None, str]:
+        """The retry line run unedited through PowerShell with a name put in; its whole tree ends on a timeout."""
+        proc = subprocess.Popen(["pwsh", "-NoProfile", "-Command", line.replace("<a new name>", name)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        try:
+            said, _ = proc.communicate(timeout=600)
+        except subprocess.TimeoutExpired:
+            # The whole tree (pwsh, its python and the clients it runs), so nothing writes while cleanup drops.
+            _end_tree(proc)
+            said = b"the retry did not finish within 600s and was ended with its children"
+        return proc.returncode, said.decode("utf-8", "replace")
 
     @staticmethod
     def server(flag: str) -> str:
@@ -1302,7 +1324,16 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
                      unverified_said is not None and f"'{unverified}' is loaded but unverified" in unverified_said and f"upgrade --database {old.database} --options" in unverified_said
                      and f"DROP DATABASE IF EXISTS `{unverified}`;" in unverified_said
                      and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state, repr(unverified_said))
+        # Followed as written: the copy dropped by the command given, then the last line run, which upgrades.
+        for command in re.findall(r"DROP DATABASE IF EXISTS `[^`]+`;", unverified_said or ""):
+            run_sql(command, options=options)
+        retried = f"{database}_afterunverified"
+        line = t.retry_line(unverified_said)
+        code, out = t.run_retry(line, retried) if line else (None, f"the refusal's last line is not the retry: {unverified_said!r}")
+        checks.check("an unverified copy's refusal, followed as written (the drop, then its last line), upgrades",
+                     not Session(options, unverified).exists() and code == 0 and Session(options, retried).exists(), f"exit {code}: {out.strip()[-300:]}")
         run_sql(f"DROP DATABASE IF EXISTS `{unverified}`;", options=options)
+        run_sql(f"DROP DATABASE IF EXISTS `{retried}`;", options=options)
 
         # Another author's upgrade takes the new name after this one's check and before its restore: this one is
         # refused, and never tells anybody to drop the database the other author made.
@@ -1344,26 +1375,15 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
         if outage_up_said and command in outage_up_said:
             run_sql(command, options=options)   # the command the refusal gave, run as given
         checks.check("an upgrade's rollback keeps the comparison's reason, and on an outage names the copy it could not remove with the command that removes it",
-                     failed_said is not None and "the drill's comparison read failed" in failed_said and "was dropped" in failed_said and f"upgrade --database {old.database} --options" in failed_said
+                     failed_said is not None and "the drill's comparison read failed" in failed_said and "was dropped" in failed_said and t.retry_line(failed_said) is not None
                      and not Session(options, f"{database}_cmpfail").exists()
                      and outage_up_said is not None and "could not be compared" in outage_up_said and "could not be confirmed removed" in outage_up_said
                      and command in outage_up_said and started.startswith("exit 0") and left_after_outage and not Session(options, outage_copy).exists(),
                      f"failed {failed_said!r}; outage {outage_up_said!r}; restart {started!r}; copy left {left_after_outage}")
 
         # The upgrade that follows is the one the lossy refusal advised: its PowerShell line, a name put in, run unedited.
-        advised = re.search(r"run, in PowerShell: (python '(?:[^']|'')*' upgrade --database \S+ --options '(?:[^']|'')*' --to <a new name>)", lossy_said or "")
-        if advised:
-            proc = subprocess.Popen(["pwsh", "-NoProfile", "-Command", advised.group(1).replace("<a new name>", upgraded)],
-                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            try:
-                said_bytes, _ = proc.communicate(timeout=600)
-            except subprocess.TimeoutExpired:
-                # The whole tree (pwsh, its python and the clients it runs), so nothing writes while cleanup drops.
-                _end_tree(proc)
-                said_bytes = b"the retry did not finish within 600s and was ended with its children"
-            code, out = proc.returncode, said_bytes.decode("utf-8", "replace")
-        else:
-            code, out = None, f"no runnable PowerShell retry in the refusal: {lossy_said!r}"
+        advised = t.retry_line(lossy_said)
+        code, out = t.run_retry(advised, upgraded) if advised else (None, f"the refusal's last line is not the retry: {lossy_said!r}")
         new = Session(options, upgraded)
         code2, said = call(["history", "fixture", "--options", str(options), "--database", upgraded]) if new.exists() else (None, "")
         checks.check("a revision 1 database with a stamped and a proposed version upgrades with every version and changelog row the same, "
