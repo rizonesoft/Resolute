@@ -721,10 +721,13 @@ function Start-Cover {
     $info.UseShellExecute = $false
     $info.CreateNoWindow = $true
     $proc = [System.Diagnostics.Process]::Start($info)
+    # [NullString]::Value, not $null: PowerShell hands $null to a string parameter as "", a class name no window has.
+    $clock = [System.Diagnostics.Stopwatch]::StartNew()
     $deadline = (Get-Date).AddSeconds(20)
-    while ((Get-Date) -lt $deadline -and [ZOrder]::FindWindowW($null, 'Resolute capture drill cover') -eq [IntPtr]::Zero) { Start-Sleep -Milliseconds 100 }
+    while ((Get-Date) -lt $deadline -and [ZOrder]::FindWindowW([NullString]::Value, 'Resolute capture drill cover') -eq [IntPtr]::Zero) { Start-Sleep -Milliseconds 100 }
+    $found = [ZOrder]::FindWindowW([NullString]::Value, 'Resolute capture drill cover') -ne [IntPtr]::Zero
     Start-Sleep -Milliseconds 300
-    Write-Host "drill: a covering window of process $($proc.Id) is over the target ($DrillCoverAt)"
+    Write-Host "drill: a covering window of process $($proc.Id) is over the target ($DrillCoverAt), $(if ($found) { "found after $($clock.ElapsedMilliseconds) ms" } else { 'not found within 20 s' })"
     return $proc
 }
 function Stop-Cover { if ($script:cover -and -not $script:cover.HasExited) { & taskkill.exe /T /F /PID $script:cover.Id 2>&1 | Out-Null; $null = $script:cover.WaitForExit(10000) } }
