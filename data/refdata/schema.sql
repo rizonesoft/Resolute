@@ -209,6 +209,10 @@ BEGIN
     IF p_reviewer = v_author THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: the reviewer is the author';
     END IF;
+    -- Anyone who changed the version is one of its authors, whoever opened it.
+    IF EXISTS (SELECT 1 FROM changelog WHERE version_id = v_version AND action IN ('open', 'add', 'reword') AND actor = p_reviewer) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: the reviewer changed this version';
+    END IF;
     UPDATE versions SET status = 'reviewed', reviewer = p_reviewer WHERE id = v_version AND status = 'proposed';
     IF ROW_COUNT() <> 1 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'refused: the version changed while it was being reviewed';

@@ -293,8 +293,12 @@ function Complete-Credentials([int]$OnPort) {
 }
 
 function Stop-Started([System.Diagnostics.Process]$Proc) {
-    if ($Proc -and -not $Proc.HasExited) { $Proc.Kill($true); $null = $Proc.WaitForExit(10000) }
-    if (Test-Path -LiteralPath $StateFile) { Remove-Item -LiteralPath $StateFile -Force }
+    # Ends the server this start launched and forgets it. A server an earlier
+    # start launched ($Proc is $null) is left running and its record kept, so
+    # -Status and -Stop still find it.
+    if (-not $Proc) { return }
+    if (-not $Proc.HasExited) { $Proc.Kill($true); $null = $Proc.WaitForExit(10000) }
+    if ($Proc.HasExited -and (Test-Path -LiteralPath $StateFile)) { Remove-Item -LiteralPath $StateFile -Force }
 }
 
 function Invoke-Start {

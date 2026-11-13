@@ -524,6 +524,7 @@ def self_test(schema: Path) -> int:
             code2, _ = call(["stamp", "fixture", "3", "--as", "author-one", "--reason", "release the third version"] + base)
             checks.check("the reopened version is stamped after a second review", code == 0 and code2 == 0)
 
+            # Someone who changed a version is not its reviewer, whoever opened it (the cases follow the failed review below).
             # A step whose changelog row cannot be written, on a proposed version: still proposed afterwards.
             call(["propose", proposal("v4", {"dataset": "fixture", "author": "author-one", "reason": "a fourth version", "changes": [
                 {"add": "beep-d", "text": "D", "reason": "a new entry"}]})] + base)
@@ -536,6 +537,12 @@ def self_test(schema: Path) -> int:
             checks.check("a review whose changelog row fails leaves the version proposed, with no row of it",
                          refused_step is not None and require_version(session, "fixture", 4) == "proposed" and [r[1] for r in log_rows] == ["open", "add"],
                          f"refused {refused_step!r}, status {require_version(session, 'fixture', 4)}, changelog {log_rows}")
+            code, _ = call(["propose", proposal("v4-contribution", {"dataset": "fixture", "author": "author-two", "changes": [
+                {"add": "beep-c", "text": "C", "reason": "a contribution to version 4"}]}), "--version", "4"] + base)
+            checks.check("a second author can add to a proposed version", code == 0)
+            refused("a reviewer who changed the version", ["review", "fixture", "4", "--as", "author-two", "--reason", "my contribution looks right"], "the reviewer changed this version")
+            code, _ = call(["review", "fixture", "4", "--as", "author-three", "--reason", "neither of us wrote it"] + base)
+            checks.check("a reviewer who changed nothing reviews it", code == 0)
 
             # A dump that names a database is refused before anything is restored.
             named = Path(tmp) / "named.sql"
