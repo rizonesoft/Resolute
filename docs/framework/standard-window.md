@@ -24,7 +24,7 @@ The AutoIt window is built by `_StartCoreGui` (`resolute_au3/SDK/Concrete/ReBar/
 | Subheading, `Label_Status_Welcome` formatted, rewritten with status during an update check | `ReBar.au3:575-577`, `:905`, `:914` | The heading block's subheading, which is the tool's purpose and never a status. Status goes to the status bar. |
 | Open log file, which handed the log to its associated program (`_Logging_OpenFile`) | `SDK/Includes/Logging.au3:265-275`, `:269` | Kept in two places: File, Open log file opens the log in the tool's own log surface, and that surface's "Open in default app" (`D01 T03 §4`) hands the file to its associated program as the AutoIt item did. |
 | Status list, a 125 px report list view docked at the bottom, written by `_Logging_EditWrite` | `ReBar.au3:579-594`, `SDK/Includes/Logging.au3:76-104` | The per-tool log surface, `D01 T03 §4`. The status bar shows its latest line. |
-| Donate icon and label | `ReBar.au3:596-599` | Not in the window. The verdict on Donate is `D01 T03 §7`'s. |
+| Donate icon and label | `ReBar.au3:596-599` | Not in the window. Donate is cut on every surface by `D01 T03 §7` ([`string-audit.md`](string-audit.md#donate)). |
 | `HotKeySet("{ESC}", "_MinimizeProgram")` | `ReBar.au3:506` | File, Minimize, with Esc as its accelerator. |
 | Tool-added menus: ComIntRep's Maintenance, Troubleshoot and Tools (`ComIntRep.au3:620-622`), DVDRepair's and USBRepair's Troubleshoot and Tools (`DVDRepair.au3:532-533`, `USBRepair.au3:520-521`), Distro's Debug (`Distro.au3:580`) | | Not menus. Each tool's actions live in its content region, in the tool's own toolbar, specified by that tool's port file under `todo/04-tools-port/`. Debug is cut: no shipped tool has a debug menu. |
 | Tool-added File items: `File_Reboot` (ComIntRep, DVDRepair, USBRepair), `File_Export*` and `File_Event_Log` (ComIntRep) | the tools' `[Menus]` packs | Content-region actions of those tools, as above. Reboot after a repair is the repair contract's offer (`D02 T01`), not a menu item. |
@@ -79,8 +79,6 @@ Exactly these items, in this order, built the same way.
 | Get Support | `Help_Support` (`&Get support`) | | Always | `https://rizonesoft.com/contact-us/` (`ReBar.au3:282`). |
 | Report a problem | `Help_Issue` (`&Report a problem`) | | Always | `https://github.com/rizonesoft/Resolute/issues/new`, with the tool's short name and version in the issue title (`ReBar.au3:290` opened the list; a new issue is the action the label names). |
 | (separator) | | | | |
-| Donate | `Help_Donate` | | Per `D01 T03 §7` | Shown only if `D01 T03 §7` keeps Donate, with its target and text from that verdict. The AutoIt value carries a trailing space (`en.lng:113`), which goes either way. |
-| (separator, with Donate) | | | | |
 | About | `Help_About` (`&About %{Program.Name}`, gaining its access key) | | Always | Opens the About dialog for the running tool's descriptor, built by `D01 T01 §7` from the descriptor and enriched by `D06 T01 §17`. |
 
 - **The URLs are framework constants**, defined once in the framework at build time and shared by every tool, never typed in a tool: one support link that is right everywhere, not fourteen that rot separately.
@@ -110,7 +108,7 @@ A message has:
 - **Announced:** opening raises a UI Automation notification with the summary, and the dialog's name is its summary (`DESIGN.md` §9).
 - **Logged:** every message writes one log line with its severity, its key and the button chosen.
 - **The titles change:** `Info_Title` "Please Take Note" becomes "Information", `Warning_Title` "Warning!" becomes "Warning", and `Error_Title` "Oops! Something went wrong!" becomes "Error" (`en.lng:118-120`). `Error_Oops` ("Oops!", `en.lng:121`), which the AutoIt boxes used as their title (`ReBar.au3:434`, `:441`, `:461`), is cut: a user whose tool failed needs to know what failed, not a sound effect. Each verdict is recorded in `D01 T03 §7`'s string audit.
-- **The dead calls are cut.** Eighteen `MsgBox(0, "")` lines across the AutoIt tools are commented-out debug output (`grep -rnE 'MsgBox\(\s*0\s*,\s*""' resolute_au3 --include=*.au3`, outside `samples/` and `todo/`, every one a comment), and the one live debug box, `MsgBox(0, "Error", $g_sSplashAniPath)` (`SDK/Includes/Splash.au3:50`), prints a file path as an error. None is ported; a missing splash animation is a log line (`D01 T03 §7`).
+- **The dead calls are cut.** Eighteen `MsgBox(0, "")` lines across the AutoIt tools are commented-out debug output (`grep -rnE 'MsgBox\(\s*0\s*,\s*""' resolute_au3 --include=*.au3`, outside `samples/` and `todo/`, every one a comment), and the one live debug box, `MsgBox(0, "Error", $g_sSplashAniPath)` (`SDK/Includes/Splash.au3:50`), prints a file path as an error. None is ported; the splash itself is cut (`D01 T03 §7`, [`string-audit.md`](string-audit.md#the-splash-screen)), so there is no animation to look for and nothing to log.
 
 ## Which keys does the window answer?
 

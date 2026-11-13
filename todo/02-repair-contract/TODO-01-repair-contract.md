@@ -121,9 +121,11 @@ A repair run that reports "done" tells a user nothing and tells a support reader
 - [ ] Verify each repair by reading the effect back, and report a repair whose verify failed as failed rather than repaired. Done when: a fixture item whose repair is deliberately made ineffective reports failed, not repaired.
 - [ ] Account for the surface: every control on the result list is working or deferred to a named section. Done when: the account is written and each deferral resolves.
 - [ ] Add assertions for the outcome set, the reconciliation, and the failed-verify case. Done when: three assertions run.
+- [ ] Write a run's closing line from the outcome counts (`docs/framework/string-audit.md`, `D01 T03 §7`): the AutoIt closing line counted "errors" found by searching the log's text and built its plural by gluing a word on (`Global_Errors`, `Global_Errors_Error`, `Global_Errors_Errors`, `Global_Finished`, all cut); the closing line here states how many items ended in each outcome, from one key per form that a translator can render whole. Done when: a mixed fixture run's closing line gives the counts that the result list shows, in two languages. **Filed 2026-11-13** from `D01 T03 §7`.
 - [ ] Commit: `"repair: per-item results that reconcile"`
 
 **Test checkpoint:** A mixed fixture run renders one row per item with counts reconciling to the item set. An item whose repair is made ineffective reports failed rather than repaired. The rendered list is captured under `docs/captures/runs/` and compared against the house-style capture.
+-> XREF: D01 T03 §7 -- the string audit that cuts the AutoIt closing-line keys this section replaces
 
 ## 4. Restore Record and Undo
 
@@ -193,11 +195,13 @@ The audit trail. The AutoIt suite has six tools that write nothing at all, so th
 - [ ] Log the undo as its own action, not as a repair. Done when: a run followed by undo produces distinguishable lines, asserted.
 - [ ] Prove no action can bypass the log. Done when: this section names the enforcement and an assertion covers it.
 - [ ] Write a registry failure as `docs/framework/notices.md` specifies (`D01 T03 §6`): one error line naming the action, the key's full path and the value's name, and the Windows reason in words, with no second line. Done when: every matrix row naming this section names a check here that passes, each driven against a fixture key that refuses the action. **Filed 2026-11-13** from `D01 T03 §6`.
+- [ ] Write the library-registration lines as `docs/framework/string-audit.md` gives them (`D01 T03 §7`): one line per registration naming the library's full path, at the success level when it registered and at the error level with Windows' reason in words when it did not, an access failure ending with what was needed. Done when: a fixture item registering a library produces each of the four lines from its seeded outcome. **Filed 2026-11-13** from `D01 T03 §7`.
 - [ ] Commit: `"repair: one log line per action and per refusal"`
 
 - [ ] Extend `scripts/conformance-check.py` with evaluators for `C30` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C30` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A mixed fixture run produces exactly one line per item, each naming item and target. Lines and rendered rows are compared and agree. Undo lines are distinguishable from repair lines. All quoted.
 -> XREF: D01 T03 §6 -- the registry failure lines this section writes
+-> XREF: D01 T03 §7 -- the string audit that rewords the library-registration lines this section writes
 
 ## Verification
 

@@ -228,10 +228,10 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T01 §11` | Command Line and Exit Codes                   |  11   |
 | [ ] | `D02 T01 §1`  | The repair item and the run loop              |   7   |
 | [ ] | `D02 T01 §2`  | Diagnose before repair                        |  10   |
-| [ ] | `D02 T01 §3`  | Per-item result and the surface               |   6   |
+| [ ] | `D02 T01 §3`  | Per-item result and the surface               |   7   |
 | [ ] | `D02 T01 §4`  | Restore record and undo                       |  10   |
 | [ ] | `D02 T01 §5`  | Transcript the user can carry                 |   6   |
-| [ ] | `D02 T01 §6`  | One log line per action and per refusal       |   7   |
+| [ ] | `D02 T01 §6`  | One log line per action and per refusal       |   8   |
 | [ ] | `D01 T02 §1`  | Tokens made unbypassable                      |   7   |
 | [ ] | `D01 T02 §2`  | Spacing grid, density, and responsive layout  |   7   |
 | [ ] | `D01 T02 §3`  | Content area: virtualization and scrolling    |   6   |
