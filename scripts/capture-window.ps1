@@ -188,6 +188,19 @@ function Get-Covering([IntPtr[]]$Above, [int[]]$Frame, [uint32]$TargetPid, [scri
     return $found
 }
 
+function Resolve-TargetFrame($Info, [IntPtr]$Hwnd) {
+    # The target's first frame, from the same inspection the checks use, as
+    # @{ Frame = left, top, right, bottom } or @{ Refusal = why }, naming the
+    # target and the step the way every other refusal does.
+    $who = "the target window $Hwnd"
+    if ($null -ne $Info -and ($Info.Title -or $Info.Pid)) { $who += " ('$($Info.Title)', pid $($Info.Pid))" }
+    if ($null -eq $Info) { return @{ Refusal = "$who is gone" } }
+    if ($Info.Error -and $Info.Gone) { return @{ Refusal = "$who is gone ($($Info.Error))" } }
+    if ($Info.Error) { return @{ Refusal = "$who could not be read: $($Info.Error)" } }
+    if (-not $Info.Visible -or $Info.Cloaked) { return @{ Refusal = "$who is not visible" } }
+    return @{ Frame = @($Info.Frame.Left, $Info.Frame.Top, $Info.Frame.Right, $Info.Frame.Bottom) }
+}
+
 function Test-Target($Info, [int[]]$Frame, [IntPtr]$Hwnd = [IntPtr]::Zero) {
     # $null when the target is still there, visible, and where it was
     # measured; the refusal otherwise, naming the target's handle and, when
@@ -493,6 +506,10 @@ function Invoke-SelfTest {
     $here = & $record 100 100 900 700 7
     $hidden = & $record 100 100 900 700 7; $hidden.Visible = $false
     $moved = & $record 140 100 940 700 7
+    $firstGone = Resolve-TargetFrame $vanished ([IntPtr]77)
+    $firstBlind = Resolve-TargetFrame $blind ([IntPtr]77)
+    $firstHere = Resolve-TargetFrame $here ([IntPtr]77)
+    Check 'the first frame read refuses a gone or unreadable target naming it and the step, and yields a readable one''s frame' ($firstGone.Refusal -like "*target window 77 ('Launcher', pid 7) is gone (it no longer exists)*" -and $firstBlind.Refusal -like "*target window 77 ('Launcher', pid 7) could not be read: its compositor state*" -and ($firstHere.Frame -join ',') -eq '100,100,900,700' -and -not $firstHere.ContainsKey('Refusal'))
     Check 'a target that is gone, hidden or moved is refused naming it, and one where it was is not' ((Test-Target $null $frame ([IntPtr]77)) -like '*target window 77 is gone*' -and (Test-Target $hidden $frame ([IntPtr]77)) -like "*target window 77 ('w100', pid 7) is no longer visible*" -and (Test-Target $moved $frame ([IntPtr]77)) -like "*target window 77 ('w140', pid 7) moved*" -and $null -eq (Test-Target $here $frame ([IntPtr]77)))
 
     # The pair lock is released however the script ends, even run in this process, where exit does not end the thread.
@@ -564,10 +581,6 @@ try {
 function Exit-Capture([int]$Code) {
     # The finally below releases the pair on this way out as on every other.
     exit $Code
-}
-trap {
-    Write-Host "capture-window: $($_.Exception.Message)" -ForegroundColor Red
-    Exit-Capture 1
 }
 # Everything from here to the end holds the pair, and the finally at the end
 # releases it however the script stops: an exit, an error, or Ctrl+C, which
@@ -696,13 +709,16 @@ $rect = New-Object Win32Capture+RECT
 # The frame DWM draws, not the window rectangle: on Windows 10 and 11 the
 # rectangle includes invisible resize borders, and copying it saves a strip
 # of whatever sits behind the window (the operator's other windows) into a
-# committed capture. Found by D00 T02 §10's launcher captures.
-$framed = [Win32Capture]::DwmGetWindowAttribute($hwnd, 9, [ref]$rect, [System.Runtime.InteropServices.Marshal]::SizeOf($rect)) -eq 0   # DWMWA_EXTENDED_FRAME_BOUNDS
-if (-not $framed -and -not [Win32Capture]::GetWindowRect($hwnd, [ref]$rect)) {
-    Write-Host "capture-window: could not read the window rect" -ForegroundColor Red
+# committed capture. Found by D00 T02 §10's launcher captures. Read through
+# the same inspection the covered-window checks use (DWMWA_EXTENDED_FRAME_BOUNDS,
+# then the window rectangle), so a failure here names the target and the step.
+$first = Resolve-TargetFrame ([ZOrder]::Inspect($hwnd)) $hwnd
+if ($first.ContainsKey('Refusal')) {
+    Write-Host "capture-window: refused: $($first.Refusal)" -ForegroundColor Red
     Stop-Ours
     Exit-Capture 1
 }
+$rect.Left = $first.Frame[0]; $rect.Top = $first.Frame[1]; $rect.Right = $first.Frame[2]; $rect.Bottom = $first.Frame[3]
 $width = $rect.Right - $rect.Left
 $height = $rect.Bottom - $rect.Top
 if ($width -le 0 -or $height -le 0) {
