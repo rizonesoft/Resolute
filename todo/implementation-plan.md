@@ -160,7 +160,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D07 T01 §8`  | Smoke forwarding-test assertion                   |   2   |
 | [x] | `D07 T01 §9`  | Smoke fixture release in finally                  |   2   |
 | [ ] | `D07 T01 §10` | Elevated smoke ends with the run that started it  |   8   |
-| [ ] | `D07 T01 §11` | An interrupted registration is recovered          |  11   |
+| [ ] | `D07 T01 §11` | An interrupted registration is recovered          |  12   |
 | [x] | `D09 T01 §1`  | Make the AutoIt suite buildable again             |   6   |
 | [x] | `D09 T01 §2`  | Clear the housekeeping defects                    |   5   |
 | [x] | `D09 T01 §3`  | Maintenance scope and retirement procedure        |   7   |
