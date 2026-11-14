@@ -1092,8 +1092,8 @@ class MultiCli(Harness):
         settings_path = Path(call["argv"][call["argv"].index("--settings") + 1])
         settings = json.loads(settings_path.read_text())
         self.assertEqual(settings["agentMode"], "")
-        self.assertEqual(settings["toolPermission"], "request-review")
-        self.assertIn("command(Get-ChildItem)", settings["permissions"]["allow"])
+        self.assertEqual(settings["toolPermission"], "proceed-in-sandbox")
+        self.assertEqual(settings["permissions"]["allow"], [])
         self.assertNotIn("command(*)", settings["permissions"]["allow"])
         self.assertIn("write_file(*)", settings["permissions"]["deny"])
         if os.name == "nt":

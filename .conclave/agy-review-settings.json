@@ -1,20 +1,9 @@
 {
   "agentMode": "",
-  "toolPermission": "request-review",
+  "toolPermission": "proceed-in-sandbox",
   "allowNonWorkspaceAccess": false,
   "permissions": {
-    "allow": [
-      "command(Get-ChildItem)",
-      "command(Get-Content)",
-      "command(Select-String)",
-      "command(Select-Object)",
-      "command(rg)",
-      "command(git status)",
-      "command(git diff)",
-      "command(git show)",
-      "command(git log)",
-      "command(git rev-parse)"
-    ],
+    "allow": [],
     "deny": [
       "write_file(*)",
       "mcp(*)"
