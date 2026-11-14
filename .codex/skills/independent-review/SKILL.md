@@ -1,20 +1,20 @@
 ---
 name: independent-review
-description: Get an independent review of your own work from the reviewer pinned in .conclave/reviewers.toml (a different model family from yours, capped at medium effort), through scripts/review-dispatch.py, then verify and act on every finding. Use before calling a nontrivial change done, before a commit that ships, or when a TODO section needs its review round.
+description: Get an independent review of your own work from the reviewer pinned in .conclave/reviewers.toml (a different model family from yours, with explicit effort capped at medium), through scripts/review-dispatch.py, then verify and act on every finding. Use before calling a nontrivial change done, before a commit that ships, or when a TODO section needs its review round.
 ---
 
 # Independent review
 
-Your own review is not enough for a nontrivial change: a different model reviews it. One writer and one independent reviewer per session: Codex (`--writer codex`) uses Argon (`agy` CLI); Claude (`--writer claude`), Antigravity/Gemini (`--writer gemini`), and Meta/Muse (`--writer muse` or `--writer meta`) use GPT-6 Astra (`codex` CLI). Claude is never a reviewer. Reviewer effort is strictly capped at `medium` (`low` or `medium` only; `scripts/review-dispatch.py` refuses any effort above `medium`). The pin's `[schedule]` sets each pass's lenses and effort (`plan` at `medium`, round 1 at `medium` with `adversarial` alone, later rounds at `low` rotating through the pin’s `rotation` lenses up to `max_low_rounds = 32`, a `P1` on a low round using the `low` adversarial escalation, and final `completion` at `medium`). Pass `--writer <claude|codex|gemini|muse|meta> --writer-model <exact-model-version>` and keep one findings file. `scripts/review-dispatch.py` writes the review to the `--record` findings file and appends the writer's settled items (`- Filed:`, `- Not taken:`, `- Settled:` lines in that file) to every prompt.
+Your own review is not enough for a nontrivial change: a different model reviews it. The current pin routes Codex to Orchestrator (Carbon), `gemini-pro-orchestrator` through `agy`, with no effort setting or model variants. It omits all scheduled effort overrides because Orchestrator does not support them. Other writer routes remain on Astra (`gpt-6-astra` through `codex`), whose pinned `medium` effort now applies to every pass, including follow-ups previously run at `low`. Plan, adversarial round 1, rotating follow-up lenses, adversarial escalation and completion-last ordering are preserved, with up to 32 follow-ups (33 rounds total). Historical receipts replay their original policy. Pass `--writer <claude|codex|gemini|muse|meta> --writer-model <exact-model-version>` and keep one findings file. `scripts/review-dispatch.py` writes the review to the `--record` findings file and appends the writer's settled items (`- Filed:`, `- Not taken:`, `- Settled:` lines in that file) to every prompt.
 
-| Work written by | `--writer` flag | Reviewer (every pass, max `medium` effort) | Fallback |
+| Work written by | `--writer` flag | Reviewer (explicit effort capped at `medium`) | Fallback |
 | --- | --- | --- | --- |
 | Claude (`claude`) | `--writer claude` | GPT-6 Astra (`codex`) | none |
 | Antigravity / Gemini (`agy`) | `--writer gemini` | GPT-6 Astra (`codex`) | none |
-| Codex (`codex`) | `--writer codex` | Gemini 4 Argon (`agy`) | none |
+| Codex (`codex`) | `--writer codex` | Orchestrator (Carbon) (`agy`) | none |
 | Muse / Meta | `--writer muse` / `--writer meta` | GPT-6 Astra (`codex`) | none |
 
-The pin refuses an unknown writer or reviewer CLI, an effort above `medium`, a reviewer named twice or more than four, and a reviewer of the writer's own model family. A loop ends on the first clean round. The dispatcher judges cleanliness from declarations alone: exactly one standalone `HIGHEST: P3` or `HIGHEST: none` line (a missing, duplicate, or contradictory declaration is not clean). Declaring P3 or none while a `P1` or `P2` finding stands is a false declaration, not a clean round: the reviewer's duty is to report severity truthfully, and the dispatcher does not scan findings to check; an outage is no review, so run the round again.
+The pin refuses an unknown writer or reviewer CLI, an effort above `medium`, a route with anything other than one reviewer, and a reviewer of the writer's own model family. A loop ends on the first clean round. The dispatcher judges cleanliness from declarations alone: exactly one standalone `HIGHEST: P3` or `HIGHEST: none` line (a missing, duplicate, or contradictory declaration is not clean). Declaring P3 or none while a `P1` or `P2` finding stands is a false declaration, not a clean round: the reviewer's duty is to report severity truthfully, and the dispatcher does not scan findings to check; an outage is no review, so run the round again.
 
 ## Steps
 
@@ -27,7 +27,7 @@ The pin refuses an unknown writer or reviewer CLI, an effort above `medium`, a r
    ```
 
 4. Read the review. Verify every finding against the code before acting: fix what is real, and record why anything else is not.
-5. Commit fixes as new commits and run another round on the new tip, up to `max_low_rounds` low rounds after round 1; the first clean round (exactly one standalone `HIGHEST: P3` or `HIGHEST: none` declaration, truthfully reporting no standing `P1` or `P2` finding) is the clean terminal round, its findings are filed as follow-up work through `add-todo`, and on every record the completion pass follows it last. Budget exhaustion (`1 + max_low_rounds` rounds) with findings open is operator recovery, never approval. A unit that needs patching three rounds running gets re-thought, not patched again.
+5. Commit fixes as new commits and run another round on the new tip, up to `max_low_rounds` follow-up rounds after round 1; the first clean round (exactly one standalone `HIGHEST: P3` or `HIGHEST: none` declaration, truthfully reporting no standing `P1` or `P2` finding) is the clean terminal round, its findings are filed as follow-up work through `add-todo`, and on every record the completion pass follows it last. Budget exhaustion (`1 + max_low_rounds` rounds) with findings open is operator recovery, never approval. A unit that needs patching three rounds running gets re-thought, not patched again.
 
 ## Rules
 

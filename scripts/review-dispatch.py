@@ -38,7 +38,7 @@ NEVER_REVIEWS = frozenset({"claude"})
 # A reviewer is never of the writer's own model family: its CLI names the family, and so does the writer.
 FAMILY = {"codex": "openai", "agy": "google", "claude": "anthropic"}
 WRITER_FAMILY = {"claude": "anthropic", "codex": "openai", "gemini": "google", "muse": "meta", "meta": "meta"}
-# Antigravity carries effort in its model name; models_by_effort selects the scheduled variant.
+# Antigravity uses a fixed model, or historical models_by_effort scheduled variants.
 # Operator constraint: reviewers never go past medium effort.
 EFFORTS = {"codex": ("low", "medium"), "claude": ("low", "medium")}
 MODEL = re.compile(r"^[a-z0-9][a-z0-9.-]*$")
@@ -134,7 +134,7 @@ def load_pin(path=PIN, data=None):
             raise Refused(f"reviewer {name!r} has a malformed model")
         if cli == "agy":
             if effort is not None:
-                raise Refused(f"reviewer {name!r}: Antigravity carries the effort in the model name, so set no effort")
+                raise Refused(f"reviewer {name!r}: Antigravity accepts no explicit effort, so set no effort")
             variants = entry.get("models_by_effort")
             if variants is not None and (not isinstance(variants, dict) or set(variants) != {"low", "medium"}
                     or any(not isinstance(v, str) or not MODEL.fullmatch(v) for v in variants.values())):
@@ -160,7 +160,7 @@ def load_pin(path=PIN, data=None):
                           f"a review comes from a different family")
     if "schedule" in pin:
         check_schedule(pin["schedule"], {reviewers[chain[0]]["cli"] for chain in routes.values()})
-        if pin["schedule"].get("completion_order") == "last":
+        if pin["schedule"].get("completion_order") == "last" and schedule_has_effort(pin["schedule"]):
             for chain in routes.values():
                 entry = reviewers[chain[0]]
                 if entry["cli"] == "agy" and "models_by_effort" not in entry:
@@ -191,11 +191,11 @@ STEP_KEYS = {"effort", "lenses"}
 
 
 def check_step(where, step, efforts, lenses=True):
-    if not isinstance(step, dict) or set(step) - STEP_KEYS or "effort" not in step \
+    if not isinstance(step, dict) or set(step) - STEP_KEYS \
             or (lenses and "lenses" not in step) or (not lenses and "lenses" in step):
-        need = "effort and lenses" if lenses else "only effort"
+        need = "lenses and optional effort" if lenses else "only optional effort"
         raise Refused(f"[schedule] {where} needs {need}")
-    if step["effort"] not in efforts:
+    if "effort" in step and step.get("effort") not in efforts:
         raise Refused(f"[schedule] {where} needs effort = one of {', '.join(efforts)}")
     if lenses:
         names = step["lenses"]
@@ -205,6 +205,12 @@ def check_step(where, step, efforts, lenses=True):
                           f"{', '.join(LENSES)}")
 
 
+def schedule_has_effort(schedule):
+    steps = [schedule[k] for k in ("plan", "completion", "rotation", "escalation")]
+    steps += schedule["rounds"]
+    return any("effort" in step for step in steps)
+
+
 def check_schedule(schedule, clis):
     """The review schedule, as strictly as the reviewers: every effort valid for every routed CLI that takes one (an
     Antigravity reviewer keeps the effort its model name carries), every lens known."""
@@ -212,19 +218,6 @@ def check_schedule(schedule, clis):
     keys = {"plan", "completion", "rounds", "rotation", "escalation", "severity_stop_after"}
     if not isinstance(schedule, dict) or not keys <= set(schedule) <= keys | {"completion_order", "max_low_rounds"}:
         raise Refused(f"[schedule] needs exactly {', '.join(sorted(keys))}")
-    if "completion_order" in schedule or "max_low_rounds" in schedule:
-        if schedule.get("completion_order") != "last":
-            raise Refused("completion_order must be last")
-        cap = schedule.get("max_low_rounds", 8)
-        if type(cap) is not int or not 0 <= cap <= 32:
-            raise Refused("max_low_rounds must be an integer from 0 to 32")
-        if (schedule["plan"] != {"effort": "medium", "lenses": ["plan"]}
-                or schedule["completion"] != {"effort": "medium"}
-                or schedule["rounds"] != [{"effort": "medium", "lenses": ["adversarial"]}]
-                or not isinstance(schedule["rotation"], dict) or schedule["rotation"].get("effort") != "low"
-                or schedule["escalation"] != {"effort": "low", "lenses": ["adversarial"]}
-                or schedule["severity_stop_after"] != 0):
-            raise Refused("completion-last requires medium plan/adversarial/completion and low follow-ups")
     check_step("plan", schedule["plan"], efforts)
     check_step("completion", schedule["completion"], efforts, lenses=False)
     check_step("escalation", schedule["escalation"], efforts)
@@ -234,6 +227,28 @@ def check_schedule(schedule, clis):
         raise Refused("[schedule] rounds needs at least one round")
     for n, step in enumerate(rounds, 1):
         check_step(f"round {n}", step, efforts)
+    if "completion_order" in schedule or "max_low_rounds" in schedule:
+        if schedule.get("completion_order") != "last":
+            raise Refused("completion_order must be last")
+        cap = schedule.get("max_low_rounds", 8)
+        if type(cap) is not int or not 0 <= cap <= 32:
+            raise Refused("max_low_rounds must be an integer from 0 to 32")
+        # Historical policies keep their exact medium/low schedule. A fixed-model
+        # policy omits every override and uses each reviewer's pinned default.
+        expected = {"plan": {"lenses": ["plan"]}, "completion": {},
+                    "rounds": [{"lenses": ["adversarial"]}],
+                    "escalation": {"lenses": ["adversarial"]}}
+        if schedule_has_effort(schedule):
+            expected["plan"]["effort"] = "medium"
+            expected["completion"]["effort"] = "medium"
+            expected["rounds"][0]["effort"] = "medium"
+            expected["escalation"]["effort"] = "low"
+        if (any(schedule[k] != v for k, v in expected.items())
+                or not isinstance(schedule["rotation"], dict)
+                or schedule["rotation"].get("effort") != ("low" if schedule_has_effort(schedule) else None)
+                or schedule["severity_stop_after"] != 0):
+            raise Refused("completion-last requires medium plan/adversarial/completion and low follow-ups, "
+                          "or no scheduled effort overrides")
     stop = schedule["severity_stop_after"]
     if type(stop) is not int or not 0 <= stop <= 33:
         raise Refused("[schedule] severity_stop_after needs a whole number of rounds from 0 to 33")
@@ -336,7 +351,7 @@ def validate_current_record(pin, found):
             raise Refused("current review lacks its pinned attempt identity")
         reviewer = pin["reviewers"][route[0]]
         step = scheduled(pin["schedule"], kind, prior["rounds"], "design" in (e.get("lenses") or []))
-        model = reviewer.get("models_by_effort", {}).get(step["effort"], reviewer["model"])
+        model = reviewer.get("models_by_effort", {}).get(step.get("effort"), reviewer["model"])
         if e.get("attempt_model") != model or e.get("attempt_cli") != reviewer["cli"]:
             raise Refused("attempt model or CLI differs from the pinned policy")
         if e.get("execution") not in ("returned", "timeout", "missing", "empty", "failed", "invalid"):
@@ -368,30 +383,34 @@ def scheduled(schedule, kind, rounds, surface):
     pass, so it is the one copy of the schedule rule."""
     if kind in ("plan", "completion"):
         step = schedule[kind]
-        return {"position": None, "effort": step["effort"], "lenses": list(step.get("lenses", [])),
+        return {"position": None, "effort": step.get("effort"), "lenses": list(step.get("lenses", [])),
                 "escalated": False}
     returned = [r for r in rounds if returned_review(r)]
     position = len(returned) + 1
     last = returned[-1] if returned else None
-    if last is not None and last.get("effort") == "low" and highest(last.get("review")) == "P1":
+    follow_up = last is not None and (last.get("effort") == "low"
+                                     or (not schedule_has_effort(schedule) and position > 2))
+    if follow_up and highest(last.get("review")) == "P1":
         step, escalated = schedule["escalation"], True
     elif position <= len(schedule["rounds"]):
         step, escalated = schedule["rounds"][position - 1], False
     else:
         rotation = [n for n in schedule["rotation"]["lenses"] if surface or n != "design"] \
             or schedule["rotation"]["lenses"]
-        step = {"effort": schedule["rotation"]["effort"],
+        step = {"effort": schedule["rotation"].get("effort"),
                 "lenses": [rotation[(position - len(schedule["rounds"]) - 1) % len(rotation)]]}
         escalated = False
-    return {"position": position, "effort": step["effort"], "lenses": list(step["lenses"]), "escalated": escalated}
+    return {"position": position, "effort": step.get("effort"), "lenses": list(step["lenses"]), "escalated": escalated}
 
 
 def lens_block(plan):
     """The prompt section naming this pass's scheduled lenses and effort, appended after the writer's prompt."""
     where = f"Round {plan['position']}" if plan["position"] else "This pass"
     lines = ["", "", "## Lenses for this pass (scheduled by scripts/review-dispatch.py)", "",
-             f"{where} runs at {plan['effort']} reasoning effort"
-             + (", escalated after a low-effort round found a P1" if plan["escalated"] else "")
+             (f"{where} runs at {plan['effort']} reasoning effort" if plan.get("effort")
+              else f"{where} uses the pinned reviewer default without a scheduled effort override")
+             + ((", escalated after a low-effort round found a P1" if plan.get("effort")
+                 else ", escalated after a follow-up round found a P1") if plan["escalated"] else "")
              + ". Review through these lenses only, each as its own verdict, and ignore any other lens list above:",
              ""]
     lines += [f"- `{name}`: {LENSES[name]}" for name in plan["lenses"]]
@@ -529,7 +548,7 @@ def run(argv, stdin_text, timeout, watched):
 def review(pin, writer, prompt_path, timeout, plan=None):
     """Run the writer's one reviewer. Returns the summary dict: `reviewer` is None when no review came back, and
     `failover` then names the reviewer and why (there is no fallback). `plan` is the scheduled step (see `scheduled`):
-    its effort replaces the reviewer's, and its lenses are appended to the prompt and recorded."""
+    its optional effort replaces the reviewer's default, and its lenses are appended to the prompt and recorded."""
     if writer not in pin["routes"]:
         raise Refused(f"the reviewer pin has no route for writer {writer!r}")
     prompt = Path(prompt_path).read_text(encoding="utf-8")
@@ -542,12 +561,12 @@ def review(pin, writer, prompt_path, timeout, plan=None):
     # A replayed lineage hands back its original pin, which load_pin lets through, so this gate covers it too.
     if reviewer["cli"] in NEVER_REVIEWS:
         raise Refused(f"reviewer {name!r} uses the {reviewer['cli']} CLI; Claude is never a reviewer")
-    effort = plan["effort"] if plan else reviewer.get("effort")
+    effort = (plan.get("effort") if plan else None) or reviewer.get("effort")
     if reviewer["cli"] == "agy":
         variants = reviewer.get("models_by_effort")
         if variants and effort:
             if effort not in variants:
-                raise Refused(f"no pinned Argon model for effort {effort}")
+                raise Refused(f"no pinned Antigravity model for effort {effort}")
             reviewer = {**reviewer, "model": variants[effort]}
         else:
             effort = None

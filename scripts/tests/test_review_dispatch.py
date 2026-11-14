@@ -51,13 +51,13 @@ FAKE_CLI = textwrap.dedent('''\
     if mode == "sleep":
         time.sleep(30)
     if mode == "flood":
-        while True:
+        for _ in range(64):  # Bound fixture output to 4 MiB even if the dispatcher fails.
             sys.stdout.write("x" * 65536)
             sys.stdout.flush()
             time.sleep(0.01)
     if mode == "floodfile":
         with open(args[args.index("-o") + 1], "w") as out:
-            while True:
+            for _ in range(64):
                 out.write("x" * 65536)
                 out.flush()
                 time.sleep(0.01)
@@ -1135,6 +1135,55 @@ class MultiCli(Harness):
                 module.check_schedule({**schedule, "plan": {"effort": high_effort, "lenses": ["plan"]}}, {"codex", "agy"})
 
 
+class FixedModelSchedule(Harness):
+    def test_fixed_model_schedule_uses_reviewer_defaults(self):
+        module = self.module()
+        schedule = {"completion_order": "last", "max_low_rounds": 32, "severity_stop_after": 0,
+                    "plan": {"lenses": ["plan"]}, "completion": {},
+                    "rounds": [{"lenses": ["adversarial"]}],
+                    "rotation": {"lenses": ["quality"]}, "escalation": {"lenses": ["adversarial"]}}
+        module.check_schedule(schedule, {"codex", "agy"})
+        plan = module.scheduled(schedule, "plan", [], False)
+        self.assertIsNone(plan["effort"])
+        self.assertNotIn("None reasoning", module.lens_block(plan))
+        prompt = self.repo / "prompt.md"
+        prompt.write_text("Review the pin.")
+        for cli, model, default in (("agy", "gemini-pro-orchestrator", None),
+                                    ("codex", "gpt-6-astra", "medium")):
+            reviewer = {"cli": cli, "model": model}
+            if default:
+                reviewer["effort"] = default
+            pin = {"routes": {"writer": ["reviewer"]}, "reviewers": {"reviewer": reviewer}}
+            def returned(argv, stdin, timeout, watched):
+                source = watched[1] if cli == "codex" else watched[0]
+                source.write_text("HIGHEST: none\nOVERALL: approve")
+                return 0, None
+
+            with unittest.mock.patch.object(module, "find_cli", return_value=f"C:/{cli}.exe"), \
+                    unittest.mock.patch.object(module, "run", side_effect=returned) as run:
+                result = module.review(pin, "writer", prompt, 5, plan)
+            self.assertEqual(result["effort"], default)
+            self.assertEqual(result["model"], model)
+            argv = run.call_args.args[0]
+            self.assertIn(model, argv)
+            if cli == "codex":
+                self.assertIn("model_reasoning_effort=medium", argv)
+            else:
+                self.assertFalse(any("effort" in arg for arg in argv if not arg.startswith("-p=")))
+
+    def test_fixed_model_follow_up_p1_keeps_adversarial_escalation(self):
+        module = self.module()
+        pin = module.load_pin(REPO_PIN)
+        prior = {"reviewer": "carbon", "writer": "codex", "cli": "agy", "effort": None,
+                 "review": "HIGHEST: P1\nOVERALL: needs-attention"}
+        first_follow_up = module.scheduled(pin["schedule"], "round", [prior], False)
+        self.assertEqual(first_follow_up["lenses"], ["consistency"])
+        escalated = module.scheduled(pin["schedule"], "round", [prior, prior], False)
+        self.assertEqual(escalated["lenses"], ["adversarial"])
+        self.assertTrue(escalated["escalated"])
+
+
+
 class RepositoryPin(unittest.TestCase):
     def test_the_repository_pin_loads_under_the_dispatchers_rules(self):
         spec = importlib.util.spec_from_file_location("dispatch_pin_check", SCRIPTS / "review-dispatch.py")
@@ -1146,20 +1195,20 @@ class RepositoryPin(unittest.TestCase):
     def test_the_repository_pin_is_one_reviewer_per_writer_on_the_schedule(self):
         with open(REPO_PIN, "rb") as handle:
             pin = tomllib.load(handle)
-        self.assertEqual(pin["reviewers"]["argon"], {
-            "cli": "agy", "model": "gemini-4-argon-medium",
-            "models_by_effort": {"low": "gemini-4-argon-low", "medium": "gemini-4-argon-medium"}})
+        self.assertEqual(pin["reviewers"]["carbon"], {
+            "cli": "agy", "model": "gemini-pro-orchestrator"})
         self.assertEqual(pin["reviewers"]["astra"], {"cli": "codex", "model": "gpt-6-astra", "effort": "medium"})
-        self.assertEqual(pin["routes"], {"claude": ["astra"], "codex": ["argon"],
+        self.assertEqual(pin["routes"], {"claude": ["astra"], "codex": ["carbon"],
                                        "gemini": ["astra"], "muse": ["astra"], "meta": ["astra"]})
         schedule = pin["schedule"]
         self.assertEqual(schedule["completion_order"], "last")
         self.assertEqual(schedule["max_low_rounds"], 32)
-        self.assertEqual(schedule["plan"], {"effort": "medium", "lenses": ["plan"]})
-        self.assertEqual(schedule["completion"], {"effort": "medium"})
-        self.assertEqual(schedule["rounds"], [{"effort": "medium", "lenses": ["adversarial"]}])
-        self.assertEqual(schedule["escalation"], {"effort": "low", "lenses": ["adversarial"]})
-        self.assertEqual(schedule["rotation"]["effort"], "low")
+        self.assertEqual(schedule["plan"], {"lenses": ["plan"]})
+        self.assertEqual(schedule["completion"], {})
+        self.assertEqual(schedule["rounds"], [{"lenses": ["adversarial"]}])
+        self.assertEqual(schedule["escalation"], {"lenses": ["adversarial"]})
+        self.assertEqual(schedule["rotation"], {"lenses": ["consistency", "quality", "integration",
+                         "source-defect", "design", "optimization", "record", "plan-delivery"]})
 
     def test_the_pins_severity_stop_is_the_stamps_cutoff(self):
         # The dispatcher reports severity_stop from the pin and `stamp` re-checks it against SEVERITY_CUTOFF_ROUND: the

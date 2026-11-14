@@ -329,7 +329,7 @@ $session = if ($Runner -eq 'claude') { [guid]::NewGuid().ToString() } else { "$R
 $command = if ($Runner -eq 'claude') {
     @($cli, '--dangerously-skip-permissions', '--disallowedTools', 'AskUserQuestion', '--session-id', $session, '--name', $windowTitle, '--model', $model, '--effort', $effort, $goal)
 } elseif ($Runner -eq 'codex') {
-    $codexGoal = $goal.Substring(6).Replace('GPT-6 Astra', 'the pinned Argon reviewer') + ' Set this as your Codex session goal. Use .codex/skills/process-plan/SKILL.md, writer codex and the existing RESOLUTE_RUN_SESSION guard; never request a Claude heartbeat.'
+    $codexGoal = $goal.Substring(6).Replace('GPT-6 Astra', 'the pinned Orchestrator (Carbon) reviewer') + ' Set this as your Codex session goal. Use .codex/skills/process-plan/SKILL.md, writer codex and the existing RESOLUTE_RUN_SESSION guard; never request a Claude heartbeat.'
     @($cli, '--dangerously-bypass-approvals-and-sandbox', '-c', 'model_reasoning_effort=medium', $codexGoal)
 } else {
     @($cli, '--model', $carbon, '--dangerously-skip-permissions', '-i', $goal)

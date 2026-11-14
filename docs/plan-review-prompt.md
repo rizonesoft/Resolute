@@ -1,6 +1,8 @@
 # Plan review prompt
 
-Copy this into a scratch file, fill in the placeholders, delete the lines that do not apply, and pass it to `scripts/review-dispatch.py --kind plan --candidate <FULL_SHA of the commit that holds the section as it will be built> --writer claude --prompt <file> --record docs/reviews/<NN-domain>/D<NN>-T<NN>-s<N>.md`. It runs once per section, after the section is validated and before any code is written, and is not counted as a round. The pin's `[schedule] plan` step sets its effort (capped at `medium`) and appends the `plan` lens.
+Copy this into a scratch file, fill in the placeholders, delete the lines that do not apply, and pass it to `scripts/review-dispatch.py --kind plan --candidate <FULL_SHA of the commit that holds the section as it will be built> --writer claude --prompt <file> --record docs/reviews/<NN-domain>/D<NN>-T<NN>-s<N>.md`. It runs once per section, after the section is validated and before any code is written, and is not counted as a round. The pin's `[schedule] plan` step sets optional effort overrides and appends the `plan` lens.
+
+The current pin routes Codex to Orchestrator (Carbon), `gemini-pro-orchestrator` through `agy`, with no effort setting or model variants. It omits all scheduled effort overrides because Orchestrator does not support them. Other writer routes remain on Astra (`gpt-6-astra` through `codex`), whose pinned `medium` effort now applies to every pass, including follow-ups previously run at `low`. Plan, adversarial round 1, rotating follow-up lenses, adversarial escalation and completion-last ordering are preserved, with up to 32 follow-ups (33 rounds total). Historical receipts replay their original policy.
 
 ---
 

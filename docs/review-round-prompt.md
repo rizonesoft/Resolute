@@ -1,6 +1,8 @@
 # Review round prompt
 
-Copy this into a scratch file, fill in the placeholders, delete the lines that do not apply, and pass it to `scripts/review-dispatch.py --prompt` (add `--surface` when the section builds a user-facing surface). The prompt does not pick the lenses or the effort: the pin's `[schedule]` in `.conclave/reviewers.toml` does (with reviewer effort capped at `medium`). The dispatcher counts the rounds already in the `--record` file, sets the reasoning effort and appends a `## Lenses for this pass` block naming this round's lenses, so the same prompt file serves every round. The lens list below is the fallback for a pin without a schedule.
+Copy this into a scratch file, fill in the placeholders, delete the lines that do not apply, and pass it to `scripts/review-dispatch.py --prompt` (add `--surface` when the section builds a user-facing surface). The prompt does not pick the lenses or the effort: the pin's `[schedule]` in `.conclave/reviewers.toml` does (explicit effort capped at `medium`). The dispatcher counts the rounds already in the `--record` file, uses the reviewer default when the schedule omits effort and appends a `## Lenses for this pass` block naming this round's lenses, so the same prompt file serves every round. The lens list below is the fallback for a pin without a schedule.
+
+The current pin routes Codex to Orchestrator (Carbon), `gemini-pro-orchestrator` through `agy`, with no effort setting or model variants. It omits all scheduled effort overrides because Orchestrator does not support them. Other writer routes remain on Astra (`gpt-6-astra` through `codex`), whose pinned `medium` effort now applies to every pass, including follow-ups previously run at `low`. Plan, adversarial round 1, rotating follow-up lenses, adversarial escalation and completion-last ordering are preserved, with up to 32 follow-ups (33 rounds total). Historical receipts replay their original policy.
 
 ---
 

@@ -1,7 +1,7 @@
 # One writer and one reviewer per section. Historical receipts replay their original pin.
-# Steward operator 2026-11-06 (published JMR policy parity): plan medium, adversarial medium, up to eight low rounds,
-# raised to thirty-two low rounds (cap 33) by operator decision 2026-11-09 for continuity with the other repositories.
-# completion medium last. Codex is reviewed by Argon; other writers by Astra. Claude is never a reviewer.
+# Operator 2026-11-14: Carbon uses its provider default; Astra uses pinned medium.
+# Preserve completion-last, lenses and the 32 follow-up limit (33 rounds total).
+# Codex is reviewed by Carbon; other writers by Astra. Claude is never a reviewer.
 schema_version = 1
 
 [reviewers.astra]
@@ -9,38 +9,33 @@ cli = "codex"
 model = "gpt-6-astra"
 effort = "medium"
 
-[reviewers.argon]
+[reviewers.carbon]
 cli = "agy"
-model = "gemini-4-argon-medium"
-models_by_effort = { low = "gemini-4-argon-low", medium = "gemini-4-argon-medium" }
+model = "gemini-pro-orchestrator"
 
 [routes]
 claude = ["astra"]
-codex = ["argon"]
+codex = ["carbon"]
 gemini = ["astra"]
 muse = ["astra"]
 meta = ["astra"]
 
+# Carbon takes no effort override. Astra uses its pinned medium on every pass.
 [schedule]
 completion_order = "last"
 max_low_rounds = 32
 severity_stop_after = 0
 
 [schedule.plan]
-effort = "medium"
 lenses = ["plan"]
 
 [[schedule.rounds]]
-effort = "medium"
 lenses = ["adversarial"]
 
 [schedule.rotation]
-effort = "low"
 lenses = ["consistency", "quality", "integration", "source-defect", "design", "optimization", "record", "plan-delivery"]
 
 [schedule.escalation]
-effort = "low"
 lenses = ["adversarial"]
 
 [schedule.completion]
-effort = "medium"
