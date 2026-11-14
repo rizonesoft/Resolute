@@ -220,6 +220,19 @@ class Dispatch(Harness):
                 self.assertIn(f"the reviewer pin has no route for writer {writer!r}", result.stderr)
         self.assertEqual(self.calls(), [])
 
+    def test_removed_writer_is_refused_before_historical_policy_is_loaded(self):
+        module = self.module()
+        pin = module.load_pin(self.repo / ".conclave/reviewers.toml")
+        pin["schedule"] = {"completion_order": "last"}
+        with unittest.mock.patch.object(module, "load_pin", return_value=pin), \
+                unittest.mock.patch.object(module, "record_policy") as replay, \
+                unittest.mock.patch.object(module, "read_findings", return_value={}), \
+                unittest.mock.patch.object(module, "existing_findings", return_value=""):
+            result = module.main(["--writer", "codex", "--writer-model", "gpt-6", "--prompt", str(self.prompt),
+                                  "--record", str(self.repo / "historical.md")])
+        self.assertEqual(result, 2)
+        replay.assert_not_called()
+
     def test_rounds_are_numbered_and_appended(self):
         record = self.repo / "docs/reviews/round.md"
         record.parent.mkdir(parents=True)
@@ -271,7 +284,7 @@ class Dispatch(Harness):
         module, pin, good = self.module(), self.repo / ".conclave/reviewers.toml", FIXTURE_PIN
         mini = '\n[reviewers.mini]\ncli = "codex"\nmodel = "gpt-6-mini"\neffort = "low"\n'
         cases = {good.replace('cli = "codex"', 'cli = "agy"'):
-                     "reviewer 'sol': Antigravity carries the effort in the model name, so set no effort",
+                     "reviewer 'sol': Antigravity accepts no explicit effort, so set no effort",
                  good.replace('cli = "codex"', 'cli = "bash"'): "reviewer 'sol' needs cli = one of " + ", ".join(module.CLIS),
                  good.replace('claude = ["sol"]', 'claude = ["sol", "mini"]') + mini:
                      "route 'claude' must list exactly one reviewer",
@@ -437,11 +450,11 @@ class Dispatch(Harness):
         self.assertIsNone(module.read_rounds(text.replace("Plain.", "Plain.\nAdded by hand.")))
 
     def test_a_lines_value_that_is_not_ascii_digits_is_unreadable_not_a_crash(self):
-        # D06 T01 §8 (1): "²" passes str.isdigit and int() raises; so does a count past Python's digit limit.
+        # D06 T01 Â§8 (1): "Â²" passes str.isdigit and int() raises; so does a count past Python's digit limit.
         good = self.repo / "docs/reviews/good.md"
         self.dispatch("--writer", "claude", "--prompt", str(self.prompt), "--record", str(good))
         recorded = good.read_text(encoding="utf-8")
-        for name, value in (("superscript.md", "²"), ("huge.md", "9" * 5000)):
+        for name, value in (("superscript.md", "Â²"), ("huge.md", "9" * 5000)):
             body = re.sub(r"- Lines: \d+", "- Lines: " + value, recorded)
             self.assertNotEqual(body, recorded, name)
             (self.repo / "docs/reviews" / name).write_text(body, encoding="utf-8")
@@ -451,7 +464,7 @@ class Dispatch(Harness):
         self.assertEqual(sorted(listing["unreadable"]), ["docs/reviews/huge.md", "docs/reviews/superscript.md"])
 
     def test_an_edit_inside_a_review_that_keeps_its_line_count_is_refused(self):
-        # D06 T01 §8 (2): the count alone cannot see an edit of the same length; the digest can.
+        # D06 T01 Â§8 (2): the count alone cannot see an edit of the same length; the digest can.
         module, path = self.module(), self.repo / "docs/reviews/d.md"
         module.record(path, {**self.RESULT, "review": "Finding one.\nOVERALL: needs-attention"}, "2026-10-20T00:00:00Z")
         text = path.read_bytes().decode("utf-8")
@@ -462,7 +475,7 @@ class Dispatch(Harness):
         self.assertEqual(len(module.read_rounds(text.replace("\n", "\r\n"))), 1)
 
     def test_a_review_is_stored_byte_for_byte_and_an_append_keeps_it_readable(self):
-        # D06 T01 §8 (3): a CRLF pair and a lone CR inside a review are stored as they came, and a second round
+        # D06 T01 Â§8 (3): a CRLF pair and a lone CR inside a review are stored as they came, and a second round
         # appended after them does not turn the lone CR into a line break that breaks the first round's count.
         module, path = self.module(), self.repo / "docs/reviews/b.md"
         module.record(path, {**self.RESULT, "review": "A\r\nB\rC\nD"}, "2026-10-20T00:00:00Z")
@@ -473,7 +486,7 @@ class Dispatch(Harness):
         self.assertEqual([r["number"] for r in module.read_rounds(raw.decode("utf-8"))], [1, 2])
 
     def test_a_model_or_name_ending_in_a_newline_is_refused(self):
-        # D06 T01 §8 (4): `$` in MODEL and NAME accepted a trailing newline, which then broke the round heading.
+        # D06 T01 Â§8 (4): `$` in MODEL and NAME accepted a trailing newline, which then broke the round heading.
         pin = self.repo / ".conclave/reviewers.toml"
         good = pin.read_text(encoding="utf-8")
         cases = {'model = "gpt-6.1-sol\\n"': "reviewer 'sol' has a malformed model",
@@ -490,7 +503,7 @@ class Dispatch(Harness):
         self.assertEqual(self.calls(), [])
 
     def test_record_refuses_to_append_to_a_findings_file_it_cannot_read(self):
-        # D06 T01 §8 (5): numbering an unreadable file by counting headings counted quoted ones; now nothing is
+        # D06 T01 Â§8 (5): numbering an unreadable file by counting headings counted quoted ones; now nothing is
         # appended, the review still reaches stdout, and the exit is 2.
         bad = self.repo / "docs/reviews/bad.md"
         bad.parent.mkdir(parents=True)
@@ -504,7 +517,7 @@ class Dispatch(Harness):
         self.assertIn("cannot be read back", result.stderr)
 
     def test_a_cli_in_the_working_directory_is_not_on_path(self):
-        # D01 T01 §5: Windows shutil.which looks in the working directory first unless NoDefaultCurrentDirectoryInExePath
+        # D01 T01 Â§5: Windows shutil.which looks in the working directory first unless NoDefaultCurrentDirectoryInExePath
         # is set, so a codex committed to the reviewed repository was reported as installed and run as the reviewer.
         # The dispatch() environment never sets that variable, so this runs as a plain Windows shell would.
         self.codex.unlink()
@@ -525,7 +538,7 @@ class Dispatch(Harness):
 
     @unittest.skipUnless(os.name == "nt", "drive-relative paths, PATHEXT and extensionless lookups are Windows rules")
     def test_find_cli_on_windows_paths(self):
-        # Review round 1 of D01 T01 §5: a drive-relative entry (\work\repo) passed os.path.isabs on Python 3.11 and
+        # Review round 1 of D01 T01 Â§5: a drive-relative entry (\work\repo) passed os.path.isabs on Python 3.11 and
         # 3.12; an empty PATHEXT found nothing; an extensionless executable was no longer found.
         module = self.module()
         folder = Path(self._tmp.name) / "clis"
@@ -554,7 +567,7 @@ class Dispatch(Harness):
             self.assertEqual(module.find_cli("codex"), str(folder / "codex"), "an extensionless executable was lost")
 
     def test_a_round_number_past_the_digit_limit_is_unreadable_and_keeps_the_review(self):
-        # Review round 1 of D06 T01 §8: a 5,000-digit round number made the reader's int() raise, so record lost the
+        # Review round 1 of D06 T01 Â§8: a 5,000-digit round number made the reader's int() raise, so record lost the
         # finished review's output and the listing would abort. The reader never raises; the file is just unreadable.
         bad = self.repo / "docs/reviews/huge-number.md"
         bad.parent.mkdir(parents=True)
@@ -569,7 +582,7 @@ class Dispatch(Harness):
         self.assertEqual((result.returncode, listing["unreadable"]), (0, ["docs/reviews/huge-number.md"]))
 
     def test_the_largest_review_record_writes_is_one_its_reader_reads(self):
-        # Review round 1 of D06 T01 §8: record wrote a 7-digit Lines count the 6-digit reader refused. The largest
+        # Review round 1 of D06 T01 Â§8: record wrote a 7-digit Lines count the 6-digit reader refused. The largest
         # review a reviewer can return (MAX_OUTPUT_BYTES of newlines) must read back and take another round.
         module, path = self.module(), self.repo / "docs/reviews/large.md"
         module.record(path, {**self.RESULT, "review": "\n" * module.MAX_OUTPUT_BYTES}, "2026-10-20T00:00:00Z")
@@ -801,11 +814,11 @@ class Dispatch(Harness):
         record = self.repo / "docs/reviews/c.md"
         self.complete(record, codex="completion")
         with open(record, "a", encoding="utf-8", newline="") as handle:
-            handle.write("\n- Implemented: gap 1 in abc1234.\n- Filed: D02 T01 §9 (gap 2)\n")
+            handle.write("\n- Implemented: gap 1 in abc1234.\n- Filed: D02 T01 Â§9 (gap 2)\n")
         self.dispatch("--writer", "claude", "--prompt", str(self.prompt), "--record", str(record))
         found = self.module().read_findings(record.read_bytes().decode("utf-8"))
         self.assertEqual(found["completions"][0]["notes"], ["- Implemented: gap 1 in abc1234.",
-                                                            "- Filed: D02 T01 §9 (gap 2)"])
+                                                            "- Filed: D02 T01 Â§9 (gap 2)"])
         self.assertEqual([r["number"] for r in found["rounds"]], [1])
 
 
@@ -1199,6 +1212,8 @@ class FixedModelSchedule(Harness):
     def test_shared_schedule_keeps_astra_effort_and_exempts_carbon(self):
         module = self.module()
         pin = module.load_pin(REPO_PIN)
+        pin["reviewers"]["carbon"] = {"cli": "agy", "model": "gemini-pro-orchestrator", "schedule_effort": False}
+        pin["routes"]["codex"] = ["carbon"]
         for effort in ("medium", "low"):
             plan = {"effort": effort, "lenses": ["adversarial"], "position": 1, "escalated": False}
             for writer, expected in (("claude", effort), ("codex", None)):
@@ -1212,6 +1227,8 @@ class FixedModelSchedule(Harness):
     def test_fixed_model_follow_up_p1_keeps_adversarial_escalation(self):
         module = self.module()
         pin = module.load_pin(REPO_PIN)
+        pin["reviewers"]["carbon"] = {"cli": "agy", "model": "gemini-pro-orchestrator", "schedule_effort": False}
+        pin["routes"]["codex"] = ["carbon"]
         prior = {"reviewer": "carbon", "writer": "codex", "cli": "agy", "effort": None,
                  "review": "HIGHEST: P1\nOVERALL: needs-attention"}
         first_follow_up = module.scheduled(pin["schedule"], "round", [prior], False)
@@ -1233,11 +1250,8 @@ class RepositoryPin(unittest.TestCase):
     def test_the_repository_pin_is_one_reviewer_per_writer_on_the_schedule(self):
         with open(REPO_PIN, "rb") as handle:
             pin = tomllib.load(handle)
-        self.assertEqual(pin["reviewers"]["carbon"], {
-            "cli": "agy", "model": "gemini-pro-orchestrator", "schedule_effort": False})
-        self.assertEqual(pin["reviewers"]["astra"], {"cli": "codex", "model": "gpt-6-astra", "effort": "medium"})
-        self.assertEqual(pin["routes"], {"claude": ["astra"], "codex": ["carbon"],
-                                       "gemini": ["astra"], "muse": ["astra"], "meta": ["astra"]})
+        self.assertEqual(pin["reviewers"], {"astra": {"cli": "codex", "model": "gpt-6-astra", "effort": "medium"}})
+        self.assertEqual(pin["routes"], {"claude": ["astra"], "gemini": ["astra"]})
         schedule = pin["schedule"]
         self.assertEqual(schedule["completion_order"], "last")
         self.assertEqual(schedule["max_low_rounds"], 32)
@@ -1247,6 +1261,14 @@ class RepositoryPin(unittest.TestCase):
         self.assertEqual(schedule["escalation"], {"effort": "low", "lenses": ["adversarial"]})
         self.assertEqual(schedule["rotation"], {"effort": "low", "lenses": ["consistency", "quality", "integration",
                          "source-defect", "design", "optimization", "record", "plan-delivery"]})
+
+    def test_launcher_supports_only_the_two_writers_and_codex_has_no_campaign_hook(self):
+        launcher = (SCRIPTS / "start-unattended-run.ps1").read_text(encoding="utf-8")
+        self.assertIn("[ValidateSet('claude', 'agy')]", launcher)
+        self.assertNotIn("$Runner -eq 'codex'", launcher)
+        self.assertNotIn("Runner = 'codex'", launcher)
+        hooks = json.loads((SCRIPTS.parent / ".codex/hooks.json").read_text(encoding="utf-8"))
+        self.assertNotIn("Stop", hooks["hooks"])
 
     def test_the_pins_severity_stop_is_the_stamps_cutoff(self):
         # The dispatcher reports severity_stop from the pin and `stamp` re-checks it against SEVERITY_CUTOFF_ROUND: the

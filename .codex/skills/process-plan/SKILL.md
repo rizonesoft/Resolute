@@ -5,6 +5,8 @@ description: Front door for todo/implementation-plan.md. Audit the plan, then ru
 
 # Process the Implementation Plan
 
+Codex does not execute this writer workflow. Claude Code and Antigravity are the only writers; Codex reviews their work.
+
 The only front door for `todo/implementation-plan.md` when the user did not name a single phase. The file is a generated projection of the 100% complete development plan (small, single-responsibility sections and granular micro-steps): processing it is not "pick a row and improvise", and it is not "tick the boxes".
 
 This skill does not ship a section and does not write a stamp. It audits, then chains `process-phase` runs until the plan is 100% complete or every leftover row is blocked here. Writes stay serial: the run this skill starts is the only writer on the tree.
@@ -78,4 +80,4 @@ Re-run `python scripts/todo-graph.py query ready`. If another phase has a ready 
 
 ## Codex campaign runtime
 
-The Codex launcher admits the run under `RESOLUTE_RUN_SESSION` and ties its process tree to the window. The Codex Stop hook maps native events to that launch identity. Use that existing guard; never start a second guard or a Claude heartbeat. Wait for reviews and CI inside the session, then continue. Use writer `codex` and its pinned Orchestrator (Carbon) reviewer. An operator stop calls `python scripts/run-guard.py halt --ground operator --reason <words>` before ending. Set the campaign objective as this session's goal when available.
+Codex is reviewer only (operator decision 2026-11-14). This workflow is reference material for reviewing the two writers, not a Codex campaign entry point. Start campaigns with the Claude or Carbon Desktop shortcut.

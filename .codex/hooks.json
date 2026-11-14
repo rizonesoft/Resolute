@@ -1,16 +1,3 @@
 {
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 scripts/codex-campaign-hook.py",
-            "commandWindows": "python scripts/codex-campaign-hook.py",
-            "timeout": 60
-          }
-        ]
-      }
-    ]
-  }
+  "hooks": {}
 }

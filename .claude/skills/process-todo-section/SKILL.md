@@ -86,7 +86,7 @@ Correct the plan, never the goalpost: narrowing a section so the code you were a
 Once the section is corrected, commit it (with `plan --sync`) so the reviewer reads the exact contract you will build, then have the pinned reviewer judge whether that contract produces a 100% complete feature. Write the prompt to a scratch file from `docs/plan-review-prompt.md`, then run (using `run_in_background`, which `scripts/dispatch_hook.py` enforces):
 
 ```powershell
-python scripts/review-dispatch.py --kind plan --candidate <full SHA of that commit> --writer <claude|codex|gemini|muse|meta> --writer-model <exact-model-version> --prompt <scratch-plan-prompt.md> --record docs/reviews/<NN-domain>/D<NN>-T<NN>-s<N>.md
+python scripts/review-dispatch.py --kind plan --candidate <full SHA of that commit> --writer <claude|gemini> --writer-model <exact-model-version> --prompt <scratch-plan-prompt.md> --record docs/reviews/<NN-domain>/D<NN>-T<NN>-s<N>.md
 ```
 
 The dispatcher sets the effort (`medium`, never past `medium`) and the `plan` lens from the pin's `[schedule] plan` step and appends a `## Plan review` section; it is not a round and does not move the round schedule. Fix every `P1` and `P2` gap in the section the same way as step 3 (corrected in place, dated), and file a `P3` you do not take through `add-todo`. Under the plan review in the findings file, add one line per gap: `- Planned: <gap> in <commit>` or `- Filed: DNN TNN §N (<gap>)`. When the dispatcher exits 1, run the pass again before building.

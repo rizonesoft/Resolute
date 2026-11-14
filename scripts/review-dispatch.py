@@ -1024,6 +1024,9 @@ def main(argv=None):
         parser.error("--candidate goes with --kind completion or plan; a round names its candidate in its prompt")
     try:
         pin = load_pin(args.pin)
+        # Admission uses today's routes, before historical receipts select their policy.
+        if args.writer not in pin["routes"]:
+            raise Refused(f"the reviewer pin has no route for writer {args.writer!r}")
         policy_sha = None
         if pin.get("schedule", {}).get("completion_order") == "last":
             if not args.record:

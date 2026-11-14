@@ -61,7 +61,7 @@
 #>
 [CmdletBinding()]
 param(
-    [ValidateSet('claude', 'agy', 'codex')][string]$Runner = 'claude',
+    [ValidateSet('claude', 'agy')][string]$Runner = 'claude',
     [switch]$PrintOnly,
     [switch]$InstallShortcut,
     [switch]$Stop,
@@ -81,8 +81,8 @@ $carbon = 'gemini-pro-orchestrator'
 $tokenVault = 'Conclave'
 $tokenItem = 'Claude Code OAuth token (1 year, setup-token)'
 $lowMemoryMb = 3000
-$runnerName = @{ codex = 'Codex'; claude = 'Claude Code'; agy = 'Google Antigravity (Orchestrator (Carbon))' }[$Runner]
-$windowTitle = @{ codex = 'Resolute Codex campaign'; claude = 'Resolute Claude campaign'; agy = 'Resolute Carbon campaign' }[$Runner]
+$runnerName = @{ claude = 'Claude Code'; agy = 'Google Antigravity (Orchestrator (Carbon))' }[$Runner]
+$windowTitle = @{ claude = 'Resolute Claude campaign'; agy = 'Resolute Carbon campaign' }[$Runner]
 
 if ($InstallShortcut) {
     # Every path comes from where this clone, PowerShell and the Desktop are on this machine; none is written here.
@@ -100,9 +100,7 @@ if ($InstallShortcut) {
         @{ Runner = 'claude'; Name = 'Resolute Claude campaign'; Icon = 'resolute-campaign-claude.ico'; Fill = '#D97757'; Mark = 'claude.svg'
            Description = 'Start the unattended Resolute campaign in Claude Code' },
         @{ Runner = 'agy'; Name = 'Resolute Carbon campaign'; Icon = 'resolute-campaign-carbon.ico'; Fill = '#4C8DF6'; Mark = 'gemini.svg'
-           Description = 'Start the unattended Resolute campaign in Google Antigravity on Orchestrator (Carbon)' },
-        @{ Runner = 'codex'; Name = 'Resolute Codex campaign'; Icon = 'resolute-campaign-codex.ico'; Fill = '#10A37F'; Mark = 'codex.svg'
-           Description = 'Start the unattended Resolute campaign with Codex as writer' }
+           Description = 'Start the unattended Resolute campaign in Google Antigravity on Orchestrator (Carbon)' }
     )
     foreach ($s in $shortcuts) {
         $icon = Join-Path $local $s.Icon
@@ -128,6 +126,12 @@ if ($InstallShortcut) {
         Remove-Item -LiteralPath $old
         Write-Host "Removed the earlier shortcut: $old"
     }
+    # Codex is reviewer only; remove the campaign shortcut installed by the earlier policy.
+    $obsolete = Join-Path $desktop 'Resolute Codex campaign.lnk'
+    if (Test-Path -LiteralPath $obsolete) {
+        Remove-Item -LiteralPath $obsolete
+        Write-Host "Removed the Codex writer shortcut: $obsolete"
+    }
     exit 0
 }
 
@@ -142,7 +146,7 @@ if ($Stop) {
 $goal = @'
 /goal Resolute's implementation plan (todo/implementation-plan.md in {ROOT}) is 100 percent complete: `python scripts/todo-graph.py query stats` shows every section done, each one built, proven by its checkpoint from a real run, reviewed by the pinned reviewer (GPT-6 Astra, through scripts/review-dispatch.py) and stamped through the review-todo-section skill, with no partial ships and `pwsh scripts/check-all.ps1` green. The goal is also met when the run has ended the way the process-plan skill allows while rows are still open: `python scripts/run-guard.py status` no longer prints active, every remaining row is blocked here (an unmet dependency, a waiting Need, a host this session cannot reach, or a section its last completion review left with gaps), and the last message lists each leftover row with what blocks it and what the owner must do to release it. The goal is met at once when the operator stops the run (the same command prints stopped or halted): end what you started in the background and do nothing more. Nothing else counts as done: not an audit, not a status report, not a finished phase while another phase has a ready row. The work: process the plan through the process-plan skill, starting now, unattended, on main and nowhere else. Follow AGENTS.md, DESIGN.md and the skills exactly. Never ask the operator a question: where the answer can be worked out, work it out; otherwise take the industry-standard option, record it with its cost of reversing, and carry on. Act with full autonomy, as the owner would and better: improve the plan, the skills, the agents, the tools and the methods whenever they could be better, repair the run's own failures at their cause, and keep going. Aim for excellence in every section. Resolute must end as the best Windows system utility suite in its class, the one users choose over Sysinternals, PowerToys, CCleaner and every other rival: before building a surface or a feature, look at how the best competitor does it and make Resolute faster, with fewer steps, smarter defaults, better recovery from errors and better accessibility, proven with measurements. Nothing is impossible here: never plan less because something is hard or because no competitor has done it, and never call a row blocked that effort can unblock. No shortcuts, no workarounds, no weakened tests. Frozen behavior stays frozen and proven by parity. Hand fetching and routine checking to {DELEGATES}, and keep every decision and every write. This machine is shared with other work: run full builds and full test suites through `bosun run --`, one heavy job at a time.
 '@
-$delegates = @{ codex = 'read-only tools in this session'; claude = 'the Sonnet delegates as AGENTS.md says'; agy = 'read-only subagents under the rules AGENTS.md sets for them' }[$Runner]
+$delegates = @{ claude = 'the Sonnet delegates as AGENTS.md says'; agy = 'read-only subagents under the rules AGENTS.md sets for them' }[$Runner]
 $goal = $goal.Trim().Replace('{ROOT}', $root).Replace('{DELEGATES}', $delegates)
 if ($goal.Contains('"') -or $goal.Contains("`n")) { throw 'the goal must be one line with no double quote' }
 if ($goal.Length -gt 4000) { throw "the goal is $($goal.Length) characters; /goal allows 4,000" }
@@ -314,10 +318,8 @@ if ($Runner -eq 'claude') {
     Write-Host "Model: $model at $effort effort, permission prompts off, questions off, goal of $($goal.Length) characters."
 } else {
     Write-Host "Sign-in: $runnerName's own account on this PC."
-    if ($Runner -eq "codex") { Write-Host "Model: configured Codex model at medium effort, permission prompts off." }
-    else { Write-Host "Model: $carbon, permission prompts off, goal of $($goal.Length) characters." }
-    if ($Runner -eq 'codex') { Write-Host 'The native Codex Stop hook keeps this session working under its launch guard.' }
-    else { Write-Host 'The run guard reserves the tree for this session. Its Stop hook and heartbeat are Claude Code''s: this session is kept working by its goal alone.' -ForegroundColor DarkGray }
+    Write-Host "Model: $carbon, permission prompts off, goal of $($goal.Length) characters."
+    Write-Host 'The run guard reserves the tree for this session. Its Stop hook and heartbeat are Claude Code''s: this session is kept working by its goal alone.' -ForegroundColor DarkGray
 }
 
 # A new session, named to the guard before it starts, so the Stop hook holds a Claude Code session from its first
@@ -328,9 +330,6 @@ $session = if ($Runner -eq 'claude') { [guid]::NewGuid().ToString() } else { "$R
 # the opening prompt and keeps the conversation open, as Claude Code does with its prompt argument.
 $command = if ($Runner -eq 'claude') {
     @($cli, '--dangerously-skip-permissions', '--disallowedTools', 'AskUserQuestion', '--session-id', $session, '--name', $windowTitle, '--model', $model, '--effort', $effort, $goal)
-} elseif ($Runner -eq 'codex') {
-    $codexGoal = $goal.Substring(6).Replace('GPT-6 Astra', 'the pinned Orchestrator (Carbon) reviewer') + ' Set this as your Codex session goal. Use .codex/skills/process-plan/SKILL.md, writer codex and the existing RESOLUTE_RUN_SESSION guard; never request a Claude heartbeat.'
-    @($cli, '--dangerously-bypass-approvals-and-sandbox', '-c', 'model_reasoning_effort=medium', $codexGoal)
 } else {
     @($cli, '--model', $carbon, '--dangerously-skip-permissions', '-i', $goal)
 }
@@ -355,12 +354,10 @@ Write-Host 'To stop: type stop in the session, leave it with /exit, or close thi
 Write-Host 'One exception until D07 T01 S10 is built: an elevated smoke test already running through the ElevatedSmoke task finishes by itself.' -ForegroundColor DarkGray
 
 $before = $env:CLAUDE_CODE_OAUTH_TOKEN
-$beforeCodexRun = $env:RESOLUTE_RUN_SESSION
 $code = 0
 $admitted = $false
 try {
     if ($Runner -ne 'claude') { Remove-Item Env:CLAUDE_CODE_OAUTH_TOKEN -ErrorAction SilentlyContinue }
-    if ($Runner -eq 'codex') { $env:RESOLUTE_RUN_SESSION = $session }
     if ($token) { $env:CLAUDE_CODE_OAUTH_TOKEN = $token }
     $token = $null
     # The one admission: the guard refuses when another session, another launcher or a review holds the tree.
@@ -383,7 +380,6 @@ try {
         python scripts/run-guard.py ended --session $session --reason "its session ended (exit $code) with the run still open; nothing starts another: start the run again yourself" | Out-Null
     }
     $env:CLAUDE_CODE_OAUTH_TOKEN = $before
-    $env:RESOLUTE_RUN_SESSION = $beforeCodexRun
 }
 
 $status = @(python scripts/run-guard.py status)

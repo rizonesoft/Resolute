@@ -1,7 +1,5 @@
-# One writer and one reviewer per section. Historical receipts replay their original pin.
-# Operator 2026-11-14: Carbon uses its provider default; Astra keeps scheduled medium/low.
-# Preserve completion-last, lenses and the 32 follow-up limit (33 rounds total).
-# Codex is reviewed by Carbon; other writers by Astra. Claude is never a reviewer.
+# Operator 2026-11-14: Claude and Antigravity write; Codex Astra reviews both.
+# Medium first pass, low follow-ups; preserve lenses and the 33-round cap.
 schema_version = 1
 
 [reviewers.astra]
@@ -9,19 +7,10 @@ cli = "codex"
 model = "gpt-6-astra"
 effort = "medium"
 
-[reviewers.carbon]
-cli = "agy"
-model = "gemini-pro-orchestrator"
-schedule_effort = false
-
 [routes]
 claude = ["astra"]
-codex = ["carbon"]
 gemini = ["astra"]
-muse = ["astra"]
-meta = ["astra"]
 
-# Carbon opts out of effort overrides; the Codex CLI reviewer keeps this schedule.
 [schedule]
 completion_order = "last"
 max_low_rounds = 32

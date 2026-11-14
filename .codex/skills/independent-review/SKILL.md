@@ -5,14 +5,12 @@ description: Get an independent review of your own work from the reviewer pinned
 
 # Independent review
 
-Your own review is not enough for a nontrivial change: a different model reviews it. The current pin routes Codex to Orchestrator (Carbon), `gemini-pro-orchestrator` through `agy`, with no effort setting or model variants. Its reviewer entry sets `schedule_effort = false` because Orchestrator does not support effort overrides; neither its CLI invocation nor its prompt receives one. Other writer routes remain on Astra (`gpt-6-astra` through `codex`), with `medium` plan, first round and completion, and `low` follow-ups and escalation. The dispatcher reads Antigravity JSON results and requires `status: SUCCESS` plus a nonempty response and a valid terminal verdict. Plan, adversarial round 1, rotating follow-up lenses, adversarial escalation and completion-last ordering are preserved, with up to 32 follow-ups (33 rounds total). Historical receipts replay their original policy. Pass `--writer <claude|codex|gemini|muse|meta> --writer-model <exact-model-version>` and keep one findings file. `scripts/review-dispatch.py` writes the review to the `--record` findings file and appends the writer's settled items (`- Filed:`, `- Not taken:`, `- Settled:` lines in that file) to every prompt.
+Your own review is not enough for a nontrivial change: a different model reviews it. The supported writers are Claude Code (`claude`) and Antigravity (`gemini`, through `agy`). Codex is reviewer only: both routes use Astra (`gpt-6-astra` through `codex`), with `medium` plan, first round and completion, and `low` follow-ups and escalation. Plan, adversarial round 1, rotating follow-up lenses and completion-last ordering remain unchanged, with up to 32 follow-ups (33 rounds total). A timeout, empty response or malformed verdict is not approval. Historical receipts remain readable; removed writer routes cannot start or resume reviews. Pass `--writer <claude|gemini> --writer-model <exact-model-version>` and keep one findings file. `scripts/review-dispatch.py` writes the review to the `--record` findings file and appends the writer's settled items (`- Filed:`, `- Not taken:`, `- Settled:` lines in that file) to every prompt.
 
 | Work written by | `--writer` flag | Reviewer (explicit effort capped at `medium`) | Fallback |
 | --- | --- | --- | --- |
 | Claude (`claude`) | `--writer claude` | GPT-6 Astra (`codex`) | none |
 | Antigravity / Gemini (`agy`) | `--writer gemini` | GPT-6 Astra (`codex`) | none |
-| Codex (`codex`) | `--writer codex` | Orchestrator (Carbon) (`agy`) | none |
-| Muse / Meta | `--writer muse` / `--writer meta` | GPT-6 Astra (`codex`) | none |
 
 The pin refuses an unknown writer or reviewer CLI, an effort above `medium`, a route with anything other than one reviewer, and a reviewer of the writer's own model family. A loop ends on the first clean round. The dispatcher judges cleanliness from declarations alone: exactly one standalone `HIGHEST: P3` or `HIGHEST: none` line (a missing, duplicate, or contradictory declaration is not clean). Declaring P3 or none while a `P1` or `P2` finding stands is a false declaration, not a clean round: the reviewer's duty is to report severity truthfully, and the dispatcher does not scan findings to check; an outage is no review, so run the round again.
 
@@ -23,7 +21,7 @@ The pin refuses an unknown writer or reviewer CLI, an effort above `medium`, a r
 3. Run the passes in the dispatcher's order on the one findings record: a section record takes its plan pass first (`--kind plan`, once, before any round), then rounds, then its completion pass (`--kind completion`) after a clean terminal round. The dispatcher refuses a round on a record with no returned plan review, refuses rounds after a clean terminal round, and refuses every pass after a returned completion (its gaps open a new `-repair` record). Every record takes that plan pass first, section or topic alike: the dispatcher refuses a round on any record with no returned plan review. Run the round:
 
    ```bash
-   python scripts/review-dispatch.py --writer <claude|codex|gemini|muse|meta> --writer-model <exact-model-version> --prompt <scratch>/review-prompt.md --record docs/reviews/<topic>.md
+   python scripts/review-dispatch.py --writer <claude|gemini> --writer-model <exact-model-version> --prompt <scratch>/review-prompt.md --record docs/reviews/<topic>.md
    ```
 
 4. Read the review. Verify every finding against the code before acting: fix what is real, and record why anything else is not.
