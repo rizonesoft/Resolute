@@ -212,7 +212,7 @@ def heartbeat_current(state: dict, now: float | None = None) -> bool:
 
 def send_back(left: list[str] | None, state: dict) -> str:
     rows = "the next ready row" if not left else f"{len(left)} runnable rows, first {left[0]}"
-    heartbeat = "" if heartbeat_current(state) else "The heartbeat is not armed or is about to expire: create it again with CronCreate if this session is interactive, deleting any old one. "
+    heartbeat = "" if state.get("runner") == "codex" or heartbeat_current(state) else "The heartbeat is not armed or is about to expire: create it again with CronCreate if this session is interactive, deleting any old one. "
     return heartbeat + (
         f"Unattended run is active: {rows}. Do not stop or report: continue process-plan now. A section that cannot be "
         "stamped is recorded and passed over, not a reason to end the run. Halting needs data loss, credentials, shared "
@@ -224,6 +224,8 @@ def on_stop(state: dict, data: dict, env: Env) -> str | None:
     if not state.get("active") or state.get("session_id") != data.get("session_id"):
         return None
     if env.reviewing():
+        if state.get("runner") == "codex":
+            return "Wait for the independent review inside this session, then continue process-plan. Codex has no timer to wake an ended turn."
         # A review runs alone and its end wakes this session, so the turn may end here. It is not an idle attempt:
         # counting it would stall a run for doing exactly what a review requires.
         return None
@@ -241,6 +243,8 @@ def on_stop(state: dict, data: dict, env: Env) -> str | None:
         state["yields"] = state.get("yields", 0) + 1
         if state["yields"] >= MAX_YIELDS:
             end_run(state, "stalled", "no commit or change to the tree across repeated attempts")
+        if state.get("runner") == "codex" and state.get("active"):
+            return send_back(left, state)
         return None
     state["last_block"] = stamp()
     return send_back(left, state)
@@ -264,7 +268,7 @@ def on_stop_failure(state: dict, data: dict) -> None:
         state["last_api_failure"] = f"{stamp()} {data.get('error') or 'unknown'}"
 
 
-def start(state: dict, session: str, env: Env, launcher: dict | None = None, *, open_ok: bool = False) -> None:
+def start(state: dict, session: str, env: Env, launcher: dict | None = None, *, open_ok: bool = False, runner: str = "claude") -> None:
     """Switch the run on for `session`, or refuse with the reason. This is the one admission for a session that is
     about to write, taken under the state lock, so two starts cannot both pass it.
 
@@ -275,6 +279,7 @@ def start(state: dict, session: str, env: Env, launcher: dict | None = None, *, 
     if refused:
         raise ValueError(refused)
     begin(state, session)
+    state["runner"] = runner
     if launcher:
         state["launcher"] = launcher
     else:

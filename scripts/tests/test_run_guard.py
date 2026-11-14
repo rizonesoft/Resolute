@@ -54,6 +54,21 @@ def active(**extra):
     return {"active": True, "status": "active", "session_id": "me", **extra}
 
 
+class CodexRuns(unittest.TestCase):
+    def test_review_wait_keeps_codex_in_session_without_a_claude_timer(self):
+        state = active(runner="codex")
+        reason = guard.on_stop(state, {"session_id": "me"}, World(reviewing=True).env())
+        self.assertIsNotNone(reason)
+        self.assertIn("wait", reason.lower())
+        self.assertNotIn("CronCreate", guard.send_back(["row"], state))
+
+    def test_codex_admission_records_runner_and_launcher(self):
+        state = {}
+        guard.start(state, "me", World().env(), {"pid": 42, "started": 7}, runner="codex")
+        self.assertEqual(state["runner"], "codex")
+        self.assertEqual(state["launcher"]["pid"], 42)
+
+
 class Prompts(unittest.TestCase):
     def test_process_plan_switches_the_run_on_in_each_spelling(self):
         for prompt in ("process plan", "/process-plan", "Process the plan", "process plan."):

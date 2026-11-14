@@ -47,6 +47,7 @@ def main() -> int:
         commands.add_parser(name)
     start = commands.add_parser("start")
     start.add_argument("--session", required=True)
+    start.add_argument("--runner", choices=("claude", "agy", "codex"), default="claude")
     start.add_argument("--launcher-pid", type=int, help="the launcher that is starting this session and holds the run until it exists")
     start.add_argument("--open-ok", action="store_true", help="the operator accepted the other sessions open in this clone")
     ended = commands.add_parser("ended")
@@ -93,7 +94,7 @@ def main() -> int:
                     launcher = {"pid": args.launcher_pid, "started": guard.process_started(args.launcher_pid)}
                     if launcher["started"] is None:
                         raise ValueError(f"launcher process {args.launcher_pid} is not running")
-                guard.start(state, args.session, guard.REAL, launcher, open_ok=args.open_ok)
+                guard.start(state, args.session, guard.REAL, launcher, open_ok=args.open_ok, runner=args.runner)
             except (ValueError, OSError) as error:
                 say(str(error))
                 return 1

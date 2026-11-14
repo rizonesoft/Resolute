@@ -75,3 +75,7 @@ Re-run `python scripts/todo-graph.py query ready`. If another phase has a ready 
 - Do not claim a phase complete while its table has `[ ]` rows.
 - Do not treat a named phase as the whole plan. Chaining is this skill's job, and only this skill's.
 - Do not end the turn on the audit table.
+
+## Codex campaign runtime
+
+The Codex launcher admits the run under `RESOLUTE_RUN_SESSION` and ties its process tree to the window. The Codex Stop hook maps native events to that launch identity. Use that existing guard; never start a second guard or a Claude heartbeat. Wait for reviews and CI inside the session, then continue. Use writer `codex` and its existing pinned Argon reviewer. An operator stop calls `python scripts/run-guard.py halt --ground operator --reason <words>` before ending. Set the campaign objective as this session's goal when available.
