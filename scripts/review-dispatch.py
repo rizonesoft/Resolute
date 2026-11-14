@@ -124,7 +124,7 @@ def load_pin(path=PIN, data=None):
         # fullmatch: `$` alone also matches before a trailing newline, which would then break the round heading.
         if not NAME.fullmatch(name) or not isinstance(entry, dict):
             raise Refused(f"invalid reviewer {name!r}")
-        unknown = set(entry) - {"cli", "model", "effort", "models_by_effort"}
+        unknown = set(entry) - {"cli", "model", "effort", "models_by_effort", "schedule_effort"}
         if unknown:
             raise Refused(f"reviewer {name!r} has unknown keys: {', '.join(sorted(unknown))}")
         cli, model, effort = entry.get("cli"), entry.get("model"), entry.get("effort")
@@ -132,6 +132,9 @@ def load_pin(path=PIN, data=None):
             raise Refused(f"reviewer {name!r} needs cli = one of {', '.join(CLIS)}")
         if not isinstance(model, str) or not MODEL.fullmatch(model):
             raise Refused(f"reviewer {name!r} has a malformed model")
+        if "schedule_effort" in entry and (cli != "agy" or entry["schedule_effort"] is not False
+                                            or "models_by_effort" in entry):
+            raise Refused("schedule_effort = false is only supported for a fixed Antigravity model")
         if cli == "agy":
             if effort is not None:
                 raise Refused(f"reviewer {name!r}: Antigravity accepts no explicit effort, so set no effort")
@@ -163,7 +166,8 @@ def load_pin(path=PIN, data=None):
         if pin["schedule"].get("completion_order") == "last" and schedule_has_effort(pin["schedule"]):
             for chain in routes.values():
                 entry = reviewers[chain[0]]
-                if entry["cli"] == "agy" and "models_by_effort" not in entry:
+                if (entry["cli"] == "agy" and "models_by_effort" not in entry
+                        and entry.get("schedule_effort") is not False):
                     raise Refused("current-policy Antigravity requires low and medium model variants")
     return pin
 
@@ -389,7 +393,7 @@ def scheduled(schedule, kind, rounds, surface):
     position = len(returned) + 1
     last = returned[-1] if returned else None
     follow_up = last is not None and (last.get("effort") == "low"
-                                     or (not schedule_has_effort(schedule) and position > 2))
+                                     or (last.get("effort") is None and position > len(schedule["rounds"]) + 1))
     if follow_up and highest(last.get("review")) == "P1":
         step, escalated = schedule["escalation"], True
     elif position <= len(schedule["rounds"]):
@@ -466,7 +470,8 @@ def command(reviewer, executable, prompt, prompt_path, output_path, timeout, eff
     shim = Path(executable).suffix.lower() in (".cmd", ".bat")
     if shim or len(prompt.encode()) > ARGV_PROMPT_LIMIT or len(prompt) > ARGV_PROMPT_LIMIT:
         text = f"Follow the review instructions in the file {prompt_path} exactly. Do not modify any file."
-    return [executable, "--model", model, "--mode", "plan", "--sandbox", "--print-timeout", f"{timeout}s",
+    return [executable, "--model", model, "--mode", "plan", "--sandbox",
+            "--output-format", "json", "--print-timeout", f"{timeout}s",
             f"-p={text}"], None
 
 
@@ -545,6 +550,20 @@ def run(argv, stdin_text, timeout, watched):
     return process.returncode, None
 
 
+def agy_response(raw):
+    """Read the CLI's terminal JSON result, never treating transport success as a verdict."""
+    try:
+        result = json.loads(raw)
+    except (ValueError, RecursionError):
+        return None, "invalid Antigravity JSON result"
+    if not isinstance(result, dict) or result.get("status") != "SUCCESS":
+        return None, "Antigravity did not report SUCCESS"
+    text = result.get("response")
+    if not isinstance(text, str) or not text.strip():
+        return None, "returned no review"
+    return text, None
+
+
 def review(pin, writer, prompt_path, timeout, plan=None):
     """Run the writer's one reviewer. Returns the summary dict: `reviewer` is None when no review came back, and
     `failover` then names the reviewer and why (there is no fallback). `plan` is the scheduled step (see `scheduled`):
@@ -572,7 +591,7 @@ def review(pin, writer, prompt_path, timeout, plan=None):
             effort = None
     lenses = plan["lenses"] if plan else []
     if lenses:
-        prompt = prompt.rstrip("\n") + lens_block(plan)
+        prompt = prompt.rstrip("\n") + lens_block({**plan, "effort": effort})
     scheduled_fields = {"effort": effort, "lenses": lenses} if plan else {}
 
     def none(reason):
@@ -603,6 +622,8 @@ def review(pin, writer, prompt_path, timeout, plan=None):
             text = source.read_text(encoding="utf-8", errors="replace") if source.is_file() else ""
     finally:
         remove_scratch(tmp)
+    if problem is None and reviewer["cli"] == "agy":
+        text, problem = agy_response(text or "")
     if problem is None and not (text or "").strip():
         problem = "returned no review"
     if problem is None:

@@ -77,6 +77,8 @@ FAKE_CLI = textwrap.dedent('''\
         text = "I could not read the candidate commit.\\n\\nCOMPLETION: blocked"
     if name == "codex":
         open(args[args.index("-o") + 1], "w").write(text)
+    elif name == "agy" and "--output-format" in args:
+        print(json.dumps({"status": "SUCCESS", "response": text}))
     else:
         print(text)
     if mode == "linger":
@@ -1156,7 +1158,8 @@ class FixedModelSchedule(Harness):
             pin = {"routes": {"writer": ["reviewer"]}, "reviewers": {"reviewer": reviewer}}
             def returned(argv, stdin, timeout, watched):
                 source = watched[1] if cli == "codex" else watched[0]
-                source.write_text("HIGHEST: none\nOVERALL: approve")
+                source.write_text(json.dumps({"status": "SUCCESS", "response": "HIGHEST: none\nOVERALL: approve"})
+                                  if cli == "agy" else "HIGHEST: none\nOVERALL: approve")
                 return 0, None
 
             with unittest.mock.patch.object(module, "find_cli", return_value=f"C:/{cli}.exe"), \
@@ -1170,6 +1173,32 @@ class FixedModelSchedule(Harness):
                 self.assertIn("model_reasoning_effort=medium", argv)
             else:
                 self.assertFalse(any("effort" in arg for arg in argv if not arg.startswith("-p=")))
+
+    def test_agy_structured_result_requires_success_and_nonempty_response(self):
+        module = self.module()
+        verdict = "HIGHEST: none\nOVERALL: approve"
+        self.assertEqual(module.agy_response(json.dumps({"status": "SUCCESS", "response": verdict})),
+                         (verdict, None))
+        for data in ({"status": "ERROR", "response": verdict}, {"status": "SUCCESS", "response": ""},
+                     {"status": "SUCCESS", "response": None}, {}, []):
+            text, problem = module.agy_response(json.dumps(data))
+            self.assertIsNone(text)
+            self.assertTrue(problem)
+        self.assertIsNotNone(module.agy_response("not JSON")[1])
+
+
+    def test_shared_schedule_keeps_astra_effort_and_exempts_carbon(self):
+        module = self.module()
+        pin = module.load_pin(REPO_PIN)
+        for effort in ("medium", "low"):
+            plan = {"effort": effort, "lenses": ["adversarial"], "position": 1, "escalated": False}
+            for writer, expected in (("claude", effort), ("codex", None)):
+                with unittest.mock.patch.object(module, "find_cli", return_value=None), \
+                        unittest.mock.patch.object(module, "lens_block", wraps=module.lens_block) as block:
+                    result = module.review(pin, writer, self.prompt, 5, plan)
+                self.assertEqual(result["effort"], expected)
+                self.assertEqual(block.call_args.args[0]["effort"], expected)
+
 
     def test_fixed_model_follow_up_p1_keeps_adversarial_escalation(self):
         module = self.module()
@@ -1196,18 +1225,18 @@ class RepositoryPin(unittest.TestCase):
         with open(REPO_PIN, "rb") as handle:
             pin = tomllib.load(handle)
         self.assertEqual(pin["reviewers"]["carbon"], {
-            "cli": "agy", "model": "gemini-pro-orchestrator"})
+            "cli": "agy", "model": "gemini-pro-orchestrator", "schedule_effort": False})
         self.assertEqual(pin["reviewers"]["astra"], {"cli": "codex", "model": "gpt-6-astra", "effort": "medium"})
         self.assertEqual(pin["routes"], {"claude": ["astra"], "codex": ["carbon"],
                                        "gemini": ["astra"], "muse": ["astra"], "meta": ["astra"]})
         schedule = pin["schedule"]
         self.assertEqual(schedule["completion_order"], "last")
         self.assertEqual(schedule["max_low_rounds"], 32)
-        self.assertEqual(schedule["plan"], {"lenses": ["plan"]})
-        self.assertEqual(schedule["completion"], {})
-        self.assertEqual(schedule["rounds"], [{"lenses": ["adversarial"]}])
-        self.assertEqual(schedule["escalation"], {"lenses": ["adversarial"]})
-        self.assertEqual(schedule["rotation"], {"lenses": ["consistency", "quality", "integration",
+        self.assertEqual(schedule["plan"], {"effort": "medium", "lenses": ["plan"]})
+        self.assertEqual(schedule["completion"], {"effort": "medium"})
+        self.assertEqual(schedule["rounds"], [{"effort": "medium", "lenses": ["adversarial"]}])
+        self.assertEqual(schedule["escalation"], {"effort": "low", "lenses": ["adversarial"]})
+        self.assertEqual(schedule["rotation"], {"effort": "low", "lenses": ["consistency", "quality", "integration",
                          "source-defect", "design", "optimization", "record", "plan-delivery"]})
 
     def test_the_pins_severity_stop_is_the_stamps_cutoff(self):

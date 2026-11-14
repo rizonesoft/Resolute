@@ -1,5 +1,5 @@
 # One writer and one reviewer per section. Historical receipts replay their original pin.
-# Operator 2026-11-14: Carbon uses its provider default; Astra uses pinned medium.
+# Operator 2026-11-14: Carbon uses its provider default; Astra keeps scheduled medium/low.
 # Preserve completion-last, lenses and the 32 follow-up limit (33 rounds total).
 # Codex is reviewed by Carbon; other writers by Astra. Claude is never a reviewer.
 schema_version = 1
@@ -12,6 +12,7 @@ effort = "medium"
 [reviewers.carbon]
 cli = "agy"
 model = "gemini-pro-orchestrator"
+schedule_effort = false
 
 [routes]
 claude = ["astra"]
@@ -20,22 +21,27 @@ gemini = ["astra"]
 muse = ["astra"]
 meta = ["astra"]
 
-# Carbon takes no effort override. Astra uses its pinned medium on every pass.
+# Carbon opts out of effort overrides; the Codex CLI reviewer keeps this schedule.
 [schedule]
 completion_order = "last"
 max_low_rounds = 32
 severity_stop_after = 0
 
 [schedule.plan]
+effort = "medium"
 lenses = ["plan"]
 
 [[schedule.rounds]]
+effort = "medium"
 lenses = ["adversarial"]
 
 [schedule.rotation]
+effort = "low"
 lenses = ["consistency", "quality", "integration", "source-defect", "design", "optimization", "record", "plan-delivery"]
 
 [schedule.escalation]
+effort = "low"
 lenses = ["adversarial"]
 
 [schedule.completion]
+effort = "medium"
