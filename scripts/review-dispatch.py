@@ -470,7 +470,8 @@ def command(reviewer, executable, prompt, prompt_path, output_path, timeout, eff
     shim = Path(executable).suffix.lower() in (".cmd", ".bat")
     if shim or len(prompt.encode()) > ARGV_PROMPT_LIMIT or len(prompt) > ARGV_PROMPT_LIMIT:
         text = f"Follow the review instructions in the file {prompt_path} exactly. Do not modify any file."
-    return [executable, "--model", model, "--mode", "plan", "--sandbox",
+    return [executable, "--model", model, "--sandbox",
+            "--settings", str(ROOT / ".conclave" / "agy-review-settings.json"),
             "--output-format", "json", "--print-timeout", f"{timeout}s",
             f"-p={text}"], None
 
@@ -558,6 +559,8 @@ def agy_response(raw):
         return None, "invalid Antigravity JSON result"
     if not isinstance(result, dict) or result.get("status") != "SUCCESS":
         return None, "Antigravity did not report SUCCESS"
+    if result.get("denied_actions"):
+        return None, "Antigravity tool permission denied"
     text = result.get("response")
     if not isinstance(text, str) or not text.strip():
         return None, "returned no review"

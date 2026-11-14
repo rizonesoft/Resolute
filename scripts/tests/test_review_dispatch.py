@@ -114,6 +114,7 @@ class Harness(unittest.TestCase):
         shutil.copy(SCRIPTS / "review-dispatch.py", self.repo / "scripts/review-dispatch.py")
         (self.repo / "scripts/lib").mkdir(exist_ok=True)
         shutil.copy(SCRIPTS / "lib" / "win_job.py", self.repo / "scripts/lib/win_job.py")
+        shutil.copy(REPO_PIN.with_name("agy-review-settings.json"), self.repo / ".conclave/agy-review-settings.json")
         (self.repo / ".conclave/reviewers.toml").write_text(FIXTURE_PIN, encoding="utf-8")
         self.bin = Path(self._tmp.name) / "bin"
         self.bin.mkdir()
@@ -1079,7 +1080,7 @@ class MultiCli(Harness):
         super().setUp()
         (self.repo / ".conclave/reviewers.toml").write_text(self.PIN, encoding="utf-8")
 
-    def test_gemini_runs_in_plan_mode_with_the_prompt_as_the_p_value(self):
+    def test_gemini_runs_with_read_only_permissions_and_the_prompt_as_the_p_value(self):
         result, summary = self.dispatch("--writer", "codex", "--prompt", str(self.prompt))
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual((summary["reviewer"], summary["model"], summary["effort"]), ("gemini", "gemini-4-argon-high", None))
@@ -1087,7 +1088,14 @@ class MultiCli(Harness):
         (call,) = self.calls()
         self.assertEqual(call["cli"], "agy")
         self.assertIn("--sandbox", call["argv"])
-        self.assertEqual(call["argv"][call["argv"].index("--mode") + 1], "plan")
+        self.assertNotIn("--mode", call["argv"])
+        settings_path = Path(call["argv"][call["argv"].index("--settings") + 1])
+        settings = json.loads(settings_path.read_text())
+        self.assertEqual(settings["agentMode"], "")
+        self.assertEqual(settings["toolPermission"], "request-review")
+        self.assertIn("command(Get-ChildItem)", settings["permissions"]["allow"])
+        self.assertNotIn("command(*)", settings["permissions"]["allow"])
+        self.assertIn("write_file(*)", settings["permissions"]["deny"])
         if os.name == "nt":
             # The fake is a .cmd shim on Windows, so the prompt must arrive by file, never as argument text.
             self.assertTrue(call["argv"][-1].startswith("-p=Follow the review instructions in the file "))
@@ -1179,7 +1187,8 @@ class FixedModelSchedule(Harness):
         verdict = "HIGHEST: none\nOVERALL: approve"
         self.assertEqual(module.agy_response(json.dumps({"status": "SUCCESS", "response": verdict})),
                          (verdict, None))
-        for data in ({"status": "ERROR", "response": verdict}, {"status": "SUCCESS", "response": ""},
+        for data in ({"status": "SUCCESS", "response": verdict, "denied_actions": [{"action": "command"}]},
+                     {"status": "ERROR", "response": verdict}, {"status": "SUCCESS", "response": ""},
                      {"status": "SUCCESS", "response": None}, {}, []):
             text, problem = module.agy_response(json.dumps(data))
             self.assertIsNone(text)
