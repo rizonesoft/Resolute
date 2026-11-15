@@ -1,0 +1,249 @@
+{
+  "name": "ProfileManager",
+  "slug": "profilemanager",
+  "display": "Profile Manager",
+  "job": "it lists every Windows user profile on the PC with its account, security identifier, path, size and last use, flags orphans and broken profiles, and removes a profile so that its folder, its registry entry and its identifier go together or not at all.",
+  "tagline": "See every user profile on this PC and remove one properly",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Magenta",
+    "light": "#F0ABFC",
+    "dark": "#C026D3",
+    "social_ground": "#2C0A31",
+    "social_muted": "#F2D3F7"
+  },
+  "icon": {
+    "idea": "A folder with a person on it: a user's profile.",
+    "points": [
+      "The icon stands free with no tile: a folder with a tab.",
+      "The folder is Magenta and the person on it is Magenta light.",
+      "The small drawing, used below 40 pixels, enlarges the person so it still reads."
+    ],
+    "large": "<path d=\"M8 18 H36 L44 26 H88 V82 H8 Z\" fill=\"#C026D3\" stroke=\"#C026D3\" stroke-width=\"5\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"48\" cy=\"46\" r=\"10\" fill=\"#F0ABFC\"/><path d=\"M30 76 C30 64 38 60 48 60 C58 60 66 64 66 76 Z\" fill=\"#F0ABFC\" stroke=\"#F0ABFC\" stroke-width=\"2\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<path d=\"M8 18 H36 L44 26 H88 V82 H8 Z\" fill=\"#C026D3\" stroke=\"#C026D3\" stroke-width=\"5\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"48\" cy=\"44\" r=\"12\" fill=\"#F0ABFC\"/><path d=\"M26 78 C26 64 36 60 48 60 C60 60 70 64 70 78 Z\" fill=\"#F0ABFC\" stroke=\"#F0ABFC\" stroke-width=\"2\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Profiles",
+        "One row per user profile: account, folder, size, last use and state"
+      ],
+      [
+        "Details",
+        "The selected profile's identifier, registry entry and what removal would take"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every profile on the PC, tells which are in use, orphaned or broken, and removes one without breaking sign-in.",
+    "primary": "Remove",
+    "secondary": "Refresh",
+    "rows": [
+      [
+        "In use",
+        "The profile is loaded now and cannot be removed"
+      ],
+      [
+        "Normal",
+        "The account exists and the folder and registry entry agree"
+      ],
+      [
+        "Orphan",
+        "The account no longer exists"
+      ],
+      [
+        "Broken",
+        "A .bak entry, a missing folder or a missing path"
+      ]
+    ],
+    "status": "14 profiles, 2 orphans, 1 broken",
+    "notes": [
+      "Each row shows the account, the folder, the size, when the profile was last used and its state, with an icon and a word for the state, never colour alone.",
+      "Remove acts on the selected profile and is disabled for a profile in use, a system profile, the current user's profile and, when the tool is not elevated, for every profile, each with a tooltip naming the reason.",
+      "Remove opens a confirmation that names the profile path and its size and says plainly that the user's files are deleted. Declining does nothing.",
+      "Refresh reads the registry, the profile directory and Windows again, so the rows come from a fresh read and not from the last one.",
+      "The Details section shows the selected profile's identifier, its registry entry and exactly what removal would take, before anything is removed.",
+      "The status bar says the counts in words, for example \"14 profiles, 2 orphans, 1 broken\".",
+      "When the tool is not elevated it says so in the status bar and refuses every removal by name before any change."
+    ],
+    "cut": "There is no earlier window to compare with: Profile Manager is a new tool and nothing was ported. It has no menus, no splash, no animations and no donate strip, because the suite's tool window does not have them. Anything a user could want from a menu is a section or an action of the window, and what the plan adds beyond the first screen is recorded as enhancements in the plan."
+  },
+  "readme": {
+    "lead": "Profile Manager shows every user profile on a Windows PC and removes one without breaking sign-in.",
+    "what": [
+      "It lists each profile with its account, security identifier, folder, size and last use, and marks it as in use, normal, orphan or broken. An orphan is a profile whose account no longer exists. A broken profile is one whose registry entry and folder do not agree.",
+      "When you remove a profile, the folder, the registry entry and the identifier go together or not at all. The tool records the profile's prior state first, and refuses a profile that is in use, a system profile, your own profile, and every removal when it is not run as administrator."
+    ],
+    "new_intro": "Profile Manager is a new tool, built for the suite and not ported from anything.",
+    "new": [
+      [
+        "Removal is all or nothing.",
+        "The folder, the ProfileList entry and the identifier are taken together, so the PC does not fall back to a temporary profile at the next sign-in."
+      ],
+      [
+        "Orphans come with a reason.",
+        "A profile is flagged as an orphan only when Windows says its account does not exist, and the row says why."
+      ],
+      [
+        "A copy can be kept first.",
+        "The tool can copy a profile folder elsewhere before removing it, and says plainly that the files are deleted and only that copy brings them back."
+      ],
+      [
+        "A temporary-profile sign-in can be repaired.",
+        "A broken .bak entry is fixed with the prior state recorded."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Profile Manager ships as a complete, standalone C++ tool: it lists every profile from the registry and the profile directory, compared entry by entry, with its account, identifier, path, size and last use, flags orphans and broken entries with the reasoning, and removes a profile atomically across its folder, its registry entry and its identifier with the prior state recorded first, refusing by name a profile in use, a system profile, the current user's profile and any removal when not elevated.",
+    "current_state": "Nothing exists yet: there is no code, no AutoIt original and no `reference/au3/` folder, because this is a new tool and nothing is ported. The repository holds only the plan section as it stood in Resolute (`docs/origin/resolute-D05-T06-s4.md`, which names a list with account, identifier, path, size and last use, orphan detection, atomic removal, a recorded prior state, refusal of a profile in use or the last administrator, and a confirmation naming path and size), and the kits the generator writes: the identity under `brand/`, `DESIGN.md` with the Sidebar window, and the plan. Windows supplies what the tool reads and does: `HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList`, whose per-identifier keys carry `ProfileImagePath` and `State` and whose `.bak` twin marks a broken profile, the `Win32_UserProfile` WMI class with `LastUseTime`, `Loaded` and `Special`, `LookupAccountSidW` to tell whether an account exists, and `DeleteProfileW` from `userenv.dll` as Windows' own removal. A profile folder can be very large and can hold the user's only copy of their files, which is why removal is recorded and confirmed. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T06-s4.md`: the plan section this tool starts from, whose rules the engine follows closely.",
+      "`HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList` and the profile directory it names: the two sources the list is built from and compared against.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the window's sections and the suite's design contract."
+    ],
+    "outcome": [
+      "`ProfileManager.exe` lists every profile with account, identifier, path, size, last use and state, and the list matches `ProfileList` and the profile directory entry by entry.",
+      "A removal takes the folder, the registry entry and the identifier together or nothing, proven by interrupting it, with the prior state recorded before the first change.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Profiles screen, where a person finds a profile by its account and sees its state, and Details is the same profile read closely before anything is removed. Reporting and audit are the Activity section, which records each listing and each removal with its outcome. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated removal is refused by name before any change, and where a profile in use, a system profile and the current user's profile are refused. Reverse anchors on the Keep a Copy Before Removing section: it restores the registry entry and identifier from the recorded prior state and the files only from the copy the person chose to make, and says so plainly, because the files cannot come back from anywhere else.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Profile Listing and Removal Engine",
+      "intro": "The tool's whole system effect, independent of any window: read every profile from the registry and the profile directory and compare them entry by entry, size each, flag orphans and broken entries with the reasoning, and remove a profile so that the folder, the registry entry and the identifier go together or not at all, with the prior state recorded first. Every refusal is by name, and nothing is changed when any refusal applies.",
+      "needs": "windows-host",
+      "build": [
+        "Implement the listing, flags and refusals in `src/core/Profiles.cpp` against a registry root and a profile directory the tests can redirect. Done when: the unit tests pass against a disposable key and a fixture folder.",
+        "Implement the prior-state record and the staged removal in `src/core/Removal.cpp`. Done when: a fixture removal takes all three parts and an interrupted one takes none."
+      ],
+      "items": [
+        "Implement `ListProfiles()` in `src/core/Profiles.cpp` reading every identifier under `ProfileList` with its `ProfileImagePath`, enumerating the profile directory, and returning each entry from either source, with entries present in only one source marked as such. Done when: a fixture with one registry-only entry and one folder-only entry returns both, and the result matches the fixture entry by entry. Cheaper substitute: listing only the folders, which hides every entry whose folder is gone.",
+        "Compute each profile's size and last use in `src/core/Profiles.cpp`: size by walking the folder without following junctions or symbolic links, last use from `Win32_UserProfile` `LastUseTime` with the `NTUSER.DAT` write time named as the fallback, and `Loaded` and `Special` read from the same class. Done when: a fixture folder of known bytes reports exactly those bytes and a profile with a junction loop returns instead of hanging. Cheaper substitute: asking Explorer or `dir /s`, which follows the loops and cannot be tested.",
+        "Flag orphans and broken entries in `src/core/Profiles.cpp` with a reason string: an orphan when `LookupAccountSidW` reports no account for the identifier, never when the lookup merely failed (an unreachable domain is reported as unknown), and broken when a `.bak` twin exists, `ProfileImagePath` is missing or the folder is gone. Done when: a fixture orphan is flagged with its reasoning, a live profile is not, and a lookup that fails for another reason is unknown and not an orphan. Cheaper substitute: treating any failed lookup as an orphan, which offers the removal of a live domain user.",
+        "Implement the refusals in `src/core/Profiles.cpp` as `CanRemove(profile)` returning the named reason: a profile in use (`Loaded`), a system profile (`Special`), the current user's profile, the last administrator, and any removal when the process is not elevated. Done when: each of the five is refused by name in a test, with nothing changed, and a removable fixture profile is allowed. Cheaper substitute: letting the delete fail with access denied halfway through.",
+        "Record the prior state in `src/core/Removal.cpp` before any change: the profile path, the exported `ProfileList` key for the identifier and its `.bak` twin, the `ProfileGuid` entry that maps to it, and the identifier itself, written to disk and flushed. Done when: a test finds the record on disk naming the path, the registry entry and the identifier before the first change is made. Cheaper substitute: keeping the record in memory, which is lost if the tool closes mid-removal.",
+        "Implement `Remove(profile)` in `src/core/Removal.cpp` as staged steps in which every step before the last can be undone: rename the folder to a staging name on the same volume (which also proves no handle is open), delete the registry entry and identifier through `DeleteProfileW` from `userenv.dll`, and delete the staged folder last. Done when: a fixture removal leaves no folder, no `ProfileList` key and no `ProfileGuid` entry for the profile, and the result is read back from the registry and the disk. Cheaper substitute: deleting the folder alone, which is exactly what produces the temporary-profile sign-in.",
+        "Roll back in `src/core/Removal.cpp` when any step before the last fails: rename the staged folder back and restore the exported keys from the record, then read all three back. Done when: a test that fails the step after the rename leaves the folder, the key and the identifier as they were, compared with the record entry by entry. Cheaper substitute: reporting the failure and leaving the half-removed state for the person to repair.",
+        "Cover every path in `tests/profiles_test.cpp` and `tests/removal_test.cpp` with a disposable root and a step interface a test can make fail at each point. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L profiles` passes, and fails when the rollback is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L profiles` passes: the list matches the fixture entry by entry, a fixture orphan is flagged with its reasoning and a live profile is not, an interrupted removal takes nothing, and all five refusals are by name.",
+      "commit": "core: list profiles and remove one atomically, with the prior state recorded"
+    },
+    "enhancements": [
+      {
+        "title": "Find Orphans",
+        "intro": "A profile whose account no longer exists is the one most people want to remove, and the one a wrong guess hurts most. This section shows the orphans together, each with the reason it is called one, so a person removes them knowing why, and never offers a profile whose account only could not be reached.",
+        "surface": {
+          "fidelity": "the Profiles list with the orphan view, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person finds every profile whose account is gone and sees why each is flagged. Consumer: the list, compared with the engine's flags.",
+          "treatment": "an Orphans filter on the list and, in Details, the reason in a sentence. Cheaper substitute that fails the checkpoint: a bare Orphan label with no reason, which asks the person to trust it."
+        },
+        "build": [
+          "Add the Orphans filter and the reason line in `src/ui/ProfilesView.cpp`. Done when: the filter shows only orphans and each shows its reason.",
+          "Show unknown accounts apart from orphans. Done when: a profile whose lookup failed shows as unknown with its reason and is not in the Orphans filter."
+        ],
+        "items": [
+          "Add an Orphans filter to the list in `src/ui/ProfilesView.cpp` through the framework's filter control. Done when: a fixture with two orphans and three live profiles shows two rows. Cheaper substitute: a private filter box, which the contract forbids.",
+          "Show the reason for each flagged row in `src/ui/DetailsView.cpp`, taken from the engine's reason string. Done when: an orphan shows that Windows reports no account for its identifier, and a broken profile shows which of the three causes applies.",
+          "Show a profile whose account lookup failed as unknown, with the reason, outside the Orphans filter. Done when: a fixture lookup failure shows unknown and the filter does not include it.",
+          "Cover it in `tests/orphans_test.cpp` through the engine. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L orphans` passes, and fails when an unknown account is counted as an orphan."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L orphans` passes: the filter lists exactly the fixture orphans, each with its reason, and an unreachable account is shown as unknown.",
+        "commit": "feature: find orphans, each with the reason it is one"
+      },
+      {
+        "title": "Keep a Copy Before Removing",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Removal deletes the user's files, and the profile folder may hold their only copy. Before a removal the tool offers to copy the folder somewhere else, and says plainly that removal deletes the files: the registry entry and the identifier can be put back from the recorded prior state, but the files only from that copy. The record and the restore are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the removal confirmation and the Undo result, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 11.",
+          "job": "a person keeps a copy of a profile before it is removed and can put the profile back from it. Consumer: the profile folder and the registry, compared with the record.",
+          "treatment": "a confirmation naming the profile path and its size, offering a destination for the copy and stating that the files are deleted, with Undo restoring the entry and the files from the copy. Cheaper substitute that fails the checkpoint: an Undo that restores the registry entry only, which brings back a profile with no files in it."
+        },
+        "build": [
+          "Copy and verify the folder in `src/core/Removal.cpp`. Done when: the copy equals the source in file count and bytes before the removal starts.",
+          "Wire the copy offer and Undo in `src/ui/ProfilesView.cpp`. Done when: remove with a copy, then Undo, leaves the profile as it was."
+        ],
+        "items": [
+          "Add a copy step in `src/core/Removal.cpp` that copies the profile folder to a destination the person chose, refusing a destination inside the profile and a destination without enough free space, and verifying file count and bytes before the removal may start. Done when: a fixture copy equals its source and a short copy stops the removal with nothing changed. Cheaper substitute: starting the removal after the copy command returns, without reading the copy back.",
+          "Show a confirmation in `src/ui/ProfilesView.cpp` through the framework's message surface that names the profile path and its size, offers the copy, and says plainly that removal deletes the user's files and that only the copy brings them back. Done when: the text is on screen for a fixture profile and declining performs nothing. Cheaper substitute: a generic \"Are you sure?\" box.",
+          "Implement Undo through the repair contract's restore record: put back the exported registry entry and identifier from the record, and the files from the copy. Done when: remove with a copy then Undo leaves the folder, the `ProfileList` key and the identifier equal to the record, asserted entry by entry.",
+          "Handle Undo when no copy was made: restore the registry entry and identifier and say plainly that the files cannot be restored. Done when: the result names the folder as missing and does not report success. Cheaper substitute: reporting the undo as complete, which is false.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one removal.",
+          "Cover it in `tests/copy_undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one file is left out of the restore."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: remove with a copy then Undo restores the folder, the key and the identifier, and without a copy Undo says the files are gone.",
+        "commit": "feature: keep a copy before removing, and undo from it"
+      },
+      {
+        "title": "Repair a Temporary Profile Sign-In",
+        "intro": "When a user is signed in to a temporary profile, the usual cause is a `.bak` entry beside the real one under `ProfileList`, or a `.bak` entry with no real one. This section fixes the entry, with the prior state recorded first, so the user gets their own profile back at the next sign-in without any folder being touched.",
+        "surface": {
+          "fidelity": "the Repair action in the Profiles list and Details, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 11.",
+          "job": "a person fixes a profile that signs the user in to a temporary one. Consumer: the `ProfileList` keys, read back after the change.",
+          "treatment": "Details states which case applies and what the repair will rename, and Repair performs only that. Cheaper substitute that fails the checkpoint: deleting the `.bak` key, which loses the entry that holds the real path."
+        },
+        "build": [
+          "Implement the repair in `src/core/Repair.cpp` for each `.bak` case. Done when: each fixture case ends with one correct key and no `.bak`.",
+          "Add the Repair action in `src/ui/DetailsView.cpp`. Done when: it is offered only for a broken profile and names what it will do."
+        ],
+        "items": [
+          "Implement `RepairProfile(profile)` in `src/core/Repair.cpp` for the two cases: a `.bak` key beside a real key (swap them so the `.bak` key holding the real path takes the name) and a `.bak` key with no real key (rename it). Done when: both fixtures end with one key named by the identifier, with the right `ProfileImagePath` and `State` read back. Cheaper substitute: deleting the `.bak` key.",
+          "Record the prior state of both keys before the repair, through the same record as the removal. Done when: a test finds the record on disk, naming both keys, before the first rename.",
+          "Refuse the repair by name when the profile is in use or the process is not elevated, before any change. Done when: both refusals leave the fixture unchanged.",
+          "Show in `src/ui/DetailsView.cpp` which case applies and what the repair will rename, and offer Repair only for a broken profile. Done when: a normal profile shows no Repair and a fixture `.bak` profile names its case. Cheaper substitute: a Repair button on every row.",
+          "Cover it in `tests/repair_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L repair` passes, and fails when the swap is replaced by a delete."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L repair` passes: both `.bak` cases end with one correct key, the prior state is on disk before the change, and a profile in use is refused.",
+        "commit": "feature: repair a temporary-profile sign-in, with the prior state recorded"
+      },
+      {
+        "title": "Size on Disk",
+        "intro": "A profile folder can be very large, and its size is what a person weighs before removing it. The engine sizes by file length; this section adds the space the folder really takes on disk, and computes both in the background so the list is usable while a large profile is still being measured.",
+        "surface": {
+          "fidelity": "the Size column of the Profiles list, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person sees how much space each profile takes without the window freezing. Consumer: the list, compared with the engine's measurement.",
+          "treatment": "each size shown in words and units, with a measuring state until it is known, and the column sortable. Cheaper substitute that fails the checkpoint: measuring on the interface thread, which freezes the window on a large profile."
+        },
+        "build": [
+          "Measure allocated size in `src/core/Profiles.cpp` on a background thread. Done when: a fixture file smaller than a cluster reports the cluster.",
+          "Show the measuring state and sort in `src/ui/ProfilesView.cpp`. Done when: the list responds while a large fixture is measured."
+        ],
+        "items": [
+          "Add `SizeOnDisk(path)` in `src/core/Profiles.cpp` returning allocated bytes (compressed and sparse files by their allocated size) beside the length total, without following junctions. Done when: a fixture of one small file reports the cluster size on disk and its length in bytes.",
+          "Measure on a background thread with a cancel, returning to the list as each profile finishes. Done when: a test with a slow fixture shows the list answering before the measurement ends, and cancel stops it. Cheaper substitute: measuring on the interface thread.",
+          "Show the size in `src/ui/ProfilesView.cpp` in words and units, with a measuring state, and sort by it. Done when: sorting by size orders the rows by bytes and a row being measured says so.",
+          "Cover it in `tests/size_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L size` passes, and fails when the cluster rounding is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L size` passes: the size on disk equals the fixture's allocated bytes, and the list responds while a large profile is measured.",
+        "commit": "feature: size on disk, measured in the background"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a disposable machine with fixture accounts, the list matches `ProfileList` and the profile directory entry by entry, and a fixture orphan is flagged with its reasoning while a live profile is not.",
+      "A removal interrupted at each step takes nothing, a completed one takes the folder, the registry entry and the identifier together, and the next sign-in of a fixture account creates no temporary profile.",
+      "On a real machine the tool lists, flags, refuses, removes and undoes, in light and dark, by keyboard alone."
+    ]
+  }
+}

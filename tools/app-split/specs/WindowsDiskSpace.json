@@ -1,0 +1,253 @@
+{
+  "name": "WindowsDiskSpace",
+  "slug": "windowsdiskspace",
+  "display": "Windows Disk Space",
+  "job": "it measures what Windows itself holds on the system drive (the component store, the hibernation file, the page file, Windows.old, Reserved Storage and the update and delivery caches), explains each in plain words with what removing it costs, and removes a chosen one through Windows' own mechanism.",
+  "tagline": "Why is Windows itself using so much space",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Tangerine",
+    "light": "#FDBA74",
+    "dark": "#EA580C",
+    "social_ground": "#2E1305",
+    "social_muted": "#F8D9BF"
+  },
+  "icon": {
+    "idea": "A pie with one slice lifted out: where the space went.",
+    "points": [
+      "Free-standing, with no tile behind it.",
+      "A disc with a quarter slice set apart at the upper right: the disc is Tangerine and the slice Tangerine light.",
+      "The small drawing, below 40 pixels, widens the gap around the slice."
+    ],
+    "large": "<circle cx=\"46\" cy=\"50\" r=\"36\" fill=\"#EA580C\"/><path d=\"M52 44 V8 A36 36 0 0 1 88 44 Z\" fill=\"#FDBA74\" stroke=\"#FDBA74\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<circle cx=\"44\" cy=\"52\" r=\"36\" fill=\"#EA580C\"/><path d=\"M56 40 V6 A34 34 0 0 1 90 40 Z\" fill=\"#FDBA74\" stroke=\"#FDBA74\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Space",
+        "The total Windows uses, and one row per category with its size, whether it can be removed and what removing it costs"
+      ],
+      [
+        "Details",
+        "The selected category explained in plain words, with its deadline if it has one"
+      ],
+      [
+        "Activity",
+        "What the tool measured and removed, newest first, with the space recovered"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees what Windows is holding, understands each part, and recovers the parts that are safe to recover.",
+    "primary": "Free space",
+    "secondary": "Refresh",
+    "rows": [
+      [
+        "Component store",
+        "Removable in part, cannot be undone"
+      ],
+      [
+        "Hibernation file",
+        "Removable, can be turned back on"
+      ],
+      [
+        "Page file",
+        "Needed by Windows, no removal offered"
+      ],
+      [
+        "Windows.old",
+        "Removable, ends the way back to the last version"
+      ],
+      [
+        "Reserved Storage",
+        "Held by Windows, can be switched off"
+      ]
+    ],
+    "status": "Windows uses a measured total; 2 categories selected to free",
+    "notes": [
+      "The header of the Space section shows the total Windows uses, in words and a size, from the sum of the measured categories.",
+      "Each category is a row with its name, its size, a word and an icon for whether it can be removed (Removable, Removable and reversible, Not offered), and one line on what removing it costs. State is never shown by colour alone.",
+      "The primary button, Free space, acts on the checked rows only, names the total it expects to free, and opens a confirmation that states what each chosen removal loses and whether it can be undone, before anything runs.",
+      "Refresh measures every category again. A size that could not be measured shows a word saying why, never zero and never a guess.",
+      "After a removal the tool measures the drive again and reports the space actually recovered beside the figure it promised.",
+      "The status bar reads in words, for example how many categories are checked and how much they would free.",
+      "When the process is not elevated the tool says so by name at the first action and removes nothing; measuring what needs no elevation still works."
+    ],
+    "cut": "This is a new tool, so there is no earlier window to cut from. It has none of the suite's older chrome: no menus, no splash, no animations and no donate strip. Settings and About are the framework's pages, and what the tool reports lives in Activity."
+  },
+  "readme": {
+    "lead": "Windows Disk Space explains why Windows itself is using so much space, and frees the parts that are safe to free.",
+    "what": [
+      "A folder-size chart cannot answer this question, because Windows spreads its own space across the component store, a hibernation file, a page file, a previous-version folder, reserved space and update caches. Windows Disk Space measures each one, tells you in plain words what it is and what you lose if you remove it, and shows the date Windows will clear it by itself where there is one.",
+      "Every removal is an explicit action you confirm, and the tool says honestly whether it can be undone. Most cannot. It removes things only through Windows' own mechanisms, never by deleting system files by hand, and it measures the space you actually got back."
+    ],
+    "new_intro": "This is a new tool, written for the suite from the start in C++.",
+    "new": [
+      [
+        "Sizes that are right.",
+        "The component store is measured with its hard links counted once, because the size Explorer shows for the WinSxS folder is wrong."
+      ],
+      [
+        "Costs before commitment.",
+        "Each category states what removing it loses, on screen, before you confirm. Removing Windows.old, for example, ends the way back to the previous version of Windows."
+      ],
+      [
+        "Deadlines shown.",
+        "Where Windows will remove a category by itself, the tool shows the date, so you can wait instead of removing it."
+      ],
+      [
+        "One removal you can take back.",
+        "Turning hibernation off frees its file, and turning it on brings it back."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new tool: measure, explain and remove what Windows holds",
+    "goal": "Windows Disk Space ships as a complete, standalone C++ tool that measures the seven categories of space Windows itself holds, checks every size against an independent measurement, explains each in plain words with what removing it loses, shows the deadline where Windows removes one by itself, removes a chosen category only through Windows' own mechanism after an explicit confirmation, says honestly whether each removal can be undone, and reports the space actually recovered.",
+    "current_state": "Nothing exists yet: there is no AutoIt original, no C++ and no baseline, so nothing is ported. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the tool's plan text as it stood in the Resolute repository under `docs/origin/` (one section, `resolute-D05-T06-s2.md`, 20 lines, seven checklist items and one test checkpoint). That text asks for seven categories measured, each explained with its loss, a deadline where one exists, a reversibility answer per category, the supported mechanism per category, and recovered space measured; the rest of this plan comes from how Windows works. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T06-s2.md`: the plan section this tool started as, including its rule that a list of sizes with a delete button fails the checkpoint.",
+      "Windows' own tools, read on a real machine and never assumed: `DISM /Online /Cleanup-Image /AnalyzeComponentStore`, `DISM /Online /Cleanup-Image /StartComponentCleanup`, `DISM /Online /Get-ReservedStorageState`, `DISM /Online /Get-OSUninstallWindow` and `powercfg /h`.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the tool's identity and window, and the suite's contract every surface answers to."
+    ],
+    "outcome": [
+      "`WindowsDiskSpace.exe` shows each of the seven categories with a size that matches an independent measurement, a plain explanation, what removal loses, whether it can be undone, and the deadline where one exists.",
+      "A removal runs only after a confirmation that names its cost, only through the category's declared Windows mechanism, and is refused by name when the process is not elevated; the space recovered is measured before and after and matches the reported total.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Space section, where a person sees each category and chooses. Reporting and audit are the Activity section, which holds what was measured and removed and the space recovered. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated removal is refused by name before any command runs. Reverse here means taking a removal back: it applies to hibernation only, because turning it on again recreates the file, and every other category declares honestly that its removal cannot be undone.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Windows Space Category Engine",
+      "intro": "The tool's whole system effect, independent of any window: one table of categories declared as data, a measurement of each checked against an independent one, and removal of a chosen category through Windows' own mechanism, never by deleting system files by hand. Every removal is refused by name when the process is not elevated.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the categories as data in `src/core/Categories.h`. Done when: the seven categories each state what they are, how they are measured, how they are removed, whether removal can be undone and what is lost, once.",
+        "Implement measurement, removal and recovered-space accounting in `src/core/Measure.cpp` and `src/core/Remove.cpp` against a command runner and a drive the tests can replace. Done when: the unit tests pass without touching the real system."
+      ],
+      "items": [
+        "Declare in `src/core/Categories.h` the seven categories (component store, hibernation file `C:\\hiberfil.sys`, page file `C:\\pagefile.sys`, `C:\\Windows.old`, Reserved Storage, the Delivery Optimization cache, the update cache `C:\\Windows\\SoftwareDistribution\\Download`), each with its explanation, measurement method, independent check, removal mechanism, reversibility answer and loss, from `docs/origin/resolute-D05-T06-s2.md:11-15`. Done when: a test fails for any category that leaves a field empty, and the header is the only place a mechanism is named.",
+        "Measure the component store in `src/core/Measure.cpp` from `DISM /Online /Cleanup-Image /AnalyzeComponentStore` (its actual size and its reclaimable packages) and check it against a walk of `C:\\Windows\\WinSxS` that counts each file once by its file identity. Done when: both figures are shown and a test with hard-linked fixture files reports the shared bytes once. Cheaper substitute: the folder's apparent size from Explorer, which counts every hard link again and is wrong.",
+        "Measure the hibernation file, the page file, `Windows.old` and the update cache by their size on disk, and the Delivery Optimization cache from the Windows cmdlet `Get-DeliveryOptimizationStatus`, each checked against a second method (a directory walk against `robocopy /L`, the file's attributes against the system's own report). Done when: a fixture tree measures identically by both methods and a disagreement is shown, not hidden.",
+        "Measure Reserved Storage from `DISM /Online /Get-ReservedStorageState` for its state and Windows' own report for its size. Done when: the row shows the state and a size, or says that Windows did not report a size. Cheaper substitute: a typed constant, which shows nothing real.",
+        "Implement `Remove(category)` in `src/core/Remove.cpp` running only the category's declared Windows mechanism: `DISM /Online /Cleanup-Image /StartComponentCleanup` for the component store, `powercfg /h off` for hibernation, the Disk Cleanup handlers for `Windows.old` and the update cache, `Delete-DeliveryOptimizationCache` for the delivery cache and `DISM /Online /Set-ReservedStorageState /State:Disabled` for Reserved Storage. Done when: a test with a fake runner sees exactly one declared command per removal and no file deletion call. Cheaper substitute: deleting the folders with `RemoveDirectory`, which breaks servicing and rollback.",
+        "Offer no removal for the page file and declare so in `src/core/Categories.h`. Done when: `Remove` returns a refusal naming the page file and the reason (Windows needs it), and the Space row says Not offered.",
+        "Refuse `Remove` by name when the process is not elevated, before any command, with one activity record. Done when: an unelevated test run reports the refusal and the fake runner saw no command. Cheaper substitute: letting the command fail with access denied halfway through.",
+        "Measure the free space of the drive before and after each removal with `GetDiskFreeSpaceEx` and return the recovered bytes beside the expected ones. Done when: a test with a fake drive reports both and flags any difference. Cheaper substitute: adding up the expected sizes, which reports what was hoped for.",
+        "Cover every category and every refusal in `tests/categories_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L categories` passes, and fails when a category's mechanism is changed to a file deletion."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L categories` passes, including the hard-link, unelevated and page-file cases, and fails when one category's declared mechanism is changed.",
+      "commit": "core: measure Windows' own space and free it only through Windows"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "What You Lose",
+        "intro": "A list of sizes with a delete button is how someone removes Windows.old on day nine and loses their rollback. Here each removal states its cost, in plain words, on the surface and again in the confirmation, before the user commits, and the confirmation says whether the removal can be undone.",
+        "surface": {
+          "fidelity": "the Details section and the cleanup confirmation, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 11.",
+          "job": "a person knows what they will lose before they free it. Consumer: the confirmation text, read against the category table.",
+          "treatment": "the loss and the reversibility answer in words, per chosen category, with the expected space. Cheaper substitute that fails the checkpoint: a generic 'are you sure', which does not say that removing Windows.old ends the way back to the previous version."
+        },
+        "build": [
+          "Write the loss text into the category table in `src/core/Categories.h` and show it in `src/ui/DetailsView.cpp`. Done when: selecting each category shows its explanation and its loss.",
+          "Build the confirmation in `src/ui/SpaceView.cpp`. Done when: it lists each checked category with its loss before any removal runs."
+        ],
+        "items": [
+          "Show in `src/ui/DetailsView.cpp` the plain-words explanation and the loss of the selected category from `src/core/Categories.h`. Done when: all seven categories show both and a test fails for one with no text. Cheaper substitute: text typed into the view, which can disagree with the table.",
+          "State on the surface, before the user commits, that removing `Windows.old` ends the ability to go back to the previous version of Windows. Done when: a driven test reads that sentence from the Details section and from the confirmation (`docs/origin/resolute-D05-T06-s2.md:12`).",
+          "Build the confirmation in `src/ui/SpaceView.cpp` through the framework's message surface, naming each chosen category, its loss, whether it can be undone and the space it expects to free. Done when: choosing three categories lists three, and cancelling runs no command. Cheaper substitute: a private dialog.",
+          "Declare the reversibility answer of every category in `src/core/Categories.h` and show it as a word on the row. Done when: every category says Can be undone or Cannot be undone, and a test fails for one that says nothing (`docs/origin/resolute-D05-T06-s2.md:14`).",
+          "Cover it in `tests/loss_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L loss` passes, and fails when a category's loss text is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L loss` passes: every category shows its loss and reversibility, and the Windows.old rollback sentence appears before the commit.",
+        "commit": "feature: every removal states its cost before the user commits"
+      },
+      {
+        "title": "Deadlines",
+        "intro": "Some of what Windows holds, Windows removes by itself. Windows.old is cleared when the rollback period ends, so a person who waits loses nothing and frees the space anyway. The tool reads the period from Windows and shows the date, not a guess.",
+        "surface": {
+          "fidelity": "the Details section's deadline line, against `DESIGN.md` section 2.",
+          "job": "a person sees the date Windows will remove a category by itself and can choose to wait. Consumer: the date, compared with what Windows reports.",
+          "treatment": "one line in words with the date and how it was worked out, or a line saying there is no deadline. Cheaper substitute that fails the checkpoint: a typed number of days, which is wrong when the period was changed."
+        },
+        "build": [
+          "Read the rollback period and the upgrade date in `src/core/Deadlines.cpp`. Done when: the engine returns a date for Windows.old, or says none exists.",
+          "Show the deadline in `src/ui/DetailsView.cpp`. Done when: Windows.old shows its date."
+        ],
+        "items": [
+          "Read the rollback period with `DISM /Online /Get-OSUninstallWindow` and the date `C:\\Windows.old` was created in `src/core/Deadlines.cpp`, and return the date Windows removes it. Done when: a fixture with a known period and creation date returns the date added, and a machine with no `Windows.old` returns none (`docs/origin/resolute-D05-T06-s2.md:13`). Cheaper substitute: a fixed number of days, which ignores a changed period.",
+          "Declare in `src/core/Categories.h` which categories have a deadline and which have none. Done when: every category says either a way to read the deadline or that it has none, and a test fails for one that says nothing.",
+          "Show the deadline line in `src/ui/DetailsView.cpp` with the date in words and how long remains. Done when: Windows.old shows its date and a category without one shows a sentence saying so. Cheaper substitute: leaving the line out when there is no deadline, which makes a missing deadline look like an error.",
+          "Cover it in `tests/deadlines_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L deadlines` passes, and fails when the period is read as a constant."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L deadlines` passes: Windows.old shows the date from the period Windows reports, and a category with no deadline says so.",
+        "commit": "feature: show the date Windows removes a category by itself"
+      },
+      {
+        "title": "Hibernation Switch",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Hibernation is the one removal that can be taken back: turning it off frees `C:\\hiberfil.sys`, and turning it on brings it back. The tool records what the setting was before it changed it, so undo restores that and not a guess. The record is the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the hibernation row, the Free space confirmation and the undo result, against `DESIGN.md` section 2.",
+          "job": "a person frees the hibernation file and can bring hibernation back. Consumer: the setting and the file, read back.",
+          "treatment": "the hibernation row says Can be undone, and a button turns it back on with the file size it will take. Cheaper substitute that fails the checkpoint: an undo that only runs `powercfg /h on` without recording what the setting was before."
+        },
+        "build": [
+          "Record the prior hibernation state through the repair contract in `src/core/Hibernation.cpp`. Done when: a record exists on disk before `powercfg /h off` runs.",
+          "Wire the switch in `src/ui/SpaceView.cpp`. Done when: off then on leaves hibernation as it was."
+        ],
+        "items": [
+          "Record whether hibernation was on, and its type, through the repair contract's restore record before `powercfg /h off` runs. Done when: a test finds the record on disk before the command is issued. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement turning hibernation off and on in `src/core/Hibernation.cpp` with `powercfg /h off` and `powercfg /h on`, and read the file back to confirm. Done when: a test with a fake runner sees the file go away and come back, and a mismatch is refused by name.",
+          "Show the hibernation row as Can be undone, with the size the file will take when turned back on, in `src/ui/SpaceView.cpp`. Done when: the row and the confirmation both say so. Cheaper substitute: the same wording as the irreversible categories.",
+          "Disable the turn-back-on action with a tooltip when hibernation is already on and nothing was changed. Done when: a first run shows it disabled and it enables after hibernation is turned off.",
+          "Cover it in `tests/hibernation_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L hibernation` passes, and fails when the prior state is not restored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L hibernation` passes: off then on leaves hibernation as it was, and the record exists before the first command.",
+        "commit": "feature: turn hibernation off and bring it back"
+      },
+      {
+        "title": "Honest Sizes",
+        "intro": "The size Explorer shows for the WinSxS folder counts every hard link again, so it is far larger than the space the component store really takes and says nothing about what a cleanup can free. The tool shows the real size, how much is reclaimable, and why the folder's own figure is not the one to trust.",
+        "surface": {
+          "fidelity": "the component store row and its Details text, against `DESIGN.md` section 2.",
+          "job": "a person sees what the component store really costs and what cleanup can free. Consumer: the figure, compared with the DISM analysis.",
+          "treatment": "the real size and the reclaimable part in words, with a sentence on why the folder shows more. Cheaper substitute that fails the checkpoint: the folder's apparent size, which is the figure that misleads."
+        },
+        "build": [
+          "Parse the component store analysis in `src/core/ComponentStore.cpp`. Done when: the engine returns actual size, reclaimable packages and whether cleanup is recommended.",
+          "Show them in `src/ui/DetailsView.cpp`. Done when: the component store shows its real size and its reclaimable part."
+        ],
+        "items": [
+          "Parse the output of `DISM /Online /Cleanup-Image /AnalyzeComponentStore` in `src/core/ComponentStore.cpp` for the actual size, the size shared with Windows, the reclaimable packages and the cleanup recommendation. Done when: fixtures of real output parse to those fields, and unexpected output is reported as unreadable, not as zero. Cheaper substitute: a regular expression for one line, which fails silently when the wording changes.",
+          "Cross-check the figure in `src/core/Measure.cpp` against a walk of `C:\\Windows\\WinSxS` that counts each file once by its file identity. Done when: both figures are shown when they differ, and a fixture with hard links counts shared bytes once.",
+          "Show the real size, the reclaimable part and one sentence on why the folder's apparent size is larger, in `src/ui/DetailsView.cpp`. Done when: the component store row shows the real figure and never the folder's. Cheaper substitute: showing both without saying which is true.",
+          "Cover it in `tests/componentstore_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L componentstore` passes, and fails when the apparent size is used."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L componentstore` passes: the component store shows its real size and reclaimable part, and never the folder's apparent size.",
+        "commit": "feature: the component store's real size, not the folder's"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "Every category shows a size that matches an independent measurement taken on a real machine, and the Windows.old row states the rollback consequence and its deadline before the commit.",
+      "Every removal ran through its declared Windows mechanism with no file deleted by hand, and the space recovered, measured before and after, matches the reported total.",
+      "On a real machine the tool measures, explains, refuses when not elevated, frees and turns hibernation back on, in light and dark, by keyboard alone."
+    ]
+  }
+}

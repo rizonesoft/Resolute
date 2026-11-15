@@ -1,0 +1,259 @@
+{
+  "name": "WiFiDiagnostics",
+  "slug": "wifidiagnostics",
+  "display": "Wi-Fi Diagnostics",
+  "job": "it lists the wireless networks this PC has saved with their security, band and last connection, says in plain words why the current connection is poor, and reveals one saved key at a time, only when elevated, with a log line that never holds the key.",
+  "tagline": "See your saved Wi-Fi networks and find out why the connection is poor",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Emerald",
+    "light": "#6EE7B7",
+    "dark": "#059669",
+    "social_ground": "#07261C",
+    "social_muted": "#BFEBDA"
+  },
+  "icon": {
+    "idea": "Wi-Fi arcs over a pulse line: Wi-Fi, examined.",
+    "points": [
+      "Free-standing, with no tile: the drawing is the icon.",
+      "Two arcs above a heartbeat line. The arcs are Emerald and the pulse is Emerald light.",
+      "The small drawing, used below 40 pixels, thickens both and simplifies the pulse."
+    ],
+    "large": "<path d=\"M25.4 47.4 A32 32 0 0 1 70.6 47.4 M14 36 A48 48 0 0 1 82 36\" fill=\"none\" stroke=\"#059669\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M14 72 H34 L42 58 L52 84 L60 72 H82\" fill=\"none\" stroke=\"#6EE7B7\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M28 46 A30 30 0 0 1 68 46 M12 34 A50 50 0 0 1 84 34\" fill=\"none\" stroke=\"#059669\" stroke-width=\"13\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M12 74 H36 L48 60 L60 74 H84\" fill=\"none\" stroke=\"#6EE7B7\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Connection",
+        "The current network in the header with a one-sentence verdict, and one row per measure"
+      ],
+      [
+        "Saved networks",
+        "Each saved network with its security, band and last connection"
+      ],
+      [
+        "Nearby",
+        "The networks in range and the channel each one uses"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first, including every key reveal"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which network they are on, why it is poor or fine, and which networks the PC remembers, without a command prompt.",
+    "primary": "Refresh",
+    "secondary": "Show key",
+    "rows": [
+      [
+        "Signal",
+        "Excellent, Good, Fair or Poor, with the percentage Windows reports"
+      ],
+      [
+        "Band and channel",
+        "2.4 GHz, 5 GHz or 6 GHz, and the channel number"
+      ],
+      [
+        "Speed",
+        "The receive and transmit rate of the link"
+      ],
+      [
+        "Security",
+        "Modern, Old or None, named in words"
+      ],
+      [
+        "Channel crowding",
+        "Clear, Busy or Crowded, from the neighbours on the same channel"
+      ]
+    ],
+    "status": "Connected to Home, signal good, channel busy",
+    "notes": [
+      "The header names the current network and gives one sentence of verdict, for example that the signal is fine but the channel is shared with several neighbours. A PC with no wireless adapter says so in the header and the rows say Not available, never an empty list.",
+      "Each measure row shows an icon and a word (Good, Fair, Poor, Clear, Busy, Crowded, Old, None), never colour alone.",
+      "Refresh reads the interfaces, the current connection, the saved profiles and the networks in range again. Nothing on the first screen writes to the system, so there is nothing to undo here.",
+      "Show key works on the one selected saved network. When the tool is not elevated it is refused by name before any key is read, and the refusal says how to start the tool as administrator. When elevated it asks to confirm the network's name, shows the key for that network only, and writes one line to Activity naming the network and never the key.",
+      "The tool runs unelevated. Only Show key needs the administrator right, and no part of the window offers to show or save more than one key.",
+      "The status bar says in words what the rows say, for example the network, the signal word and the crowding word."
+    ],
+    "cut": "There is no original window to compare with, so nothing is cut from an older tool. The window has no menus, no splash, no animations and no donate strip: the suite's Sidebar window, status bar and framework pages replace them, and the plan records the same."
+  },
+  "readme": {
+    "lead": "See your saved Wi-Fi networks and find out why the connection is poor.",
+    "what": [
+      "Wi-Fi Diagnostics reads the wireless configuration straight from Windows. It lists every saved network with its security type, its band and when it was last connected, shows the signal, band, channel, speed and security of the network you are on, and tells you in one sentence what is wrong: a weak signal, a crowded channel or old security.",
+      "It also shows the networks around you and the channel each one uses, so you can see who shares your channel. If you need the key for a network this PC already knows, it shows that one key, one network at a time, only when the tool runs as administrator, and it records that you asked without ever writing the key down. It never exports all keys."
+    ],
+    "new_intro": "Wi-Fi Diagnostics is a new tool of the suite. It has no AutoIt version.",
+    "new": [
+      [
+        "One verdict in plain words.",
+        "The Connection screen turns signal, channel crowding and security into one sentence you can act on."
+      ],
+      [
+        "Saved networks at a glance.",
+        "Each saved network is listed with its security, band and last connection, and old or missing security is marked with an icon and a word."
+      ],
+      [
+        "A key reveal that cannot be abused.",
+        "One network at a time, only when elevated, refused before any key is read otherwise, and logged by network name without the key. There is no export-all path."
+      ],
+      [
+        "See your neighbours.",
+        "The Nearby screen shows the networks in range and how many share your channel, with a chart."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Wi-Fi Diagnostics ships as a complete, standalone C++ tool that lists the saved wireless networks with their security, band and last connection, reports the current connection's signal, band, channel, speed and security with a verdict in plain words, shows the networks in range and how crowded the channel is, and reveals one saved key at a time only when elevated, with exactly one log line per reveal that names the network and never the key, and no path that exports all keys.",
+    "current_state": "Nothing exists yet: there is no AutoIt original, no reference folder and no C++ code. The repository holds the identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T06-s3.md` (20 lines), the plan section the tool was specified in, which also names diagnosing authentication, DHCP, DNS and driver failures and a hand-off to `ComIntRep`; this plan starts with signal, crowding and security and leaves those for later. The tool is built on Windows' Native Wifi API (`wlanapi.dll`): `WlanOpenHandle`, `WlanEnumInterfaces`, `WlanGetProfileList`, `WlanGetProfile` (the key only with `WLAN_PROFILE_GET_PLAINTEXT_KEY`), `WlanGetAvailableNetworkList`, `WlanQueryInterface` for the current connection and `WlanGetNetworkBssList` for neighbours. The SDK's framework, repair contract and chart control, which the tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T06-s3.md`: the plan section, whose key rules (gated reveal, one log line, no bulk export) bind this tool.",
+      "The Native Wifi API as documented by Microsoft (`wlanapi.h`), and `netsh wlan show wlanreport`, Windows' own report, which the Connection verdict points to for the full history.",
+      "A Windows machine with a wireless adapter, and a fixture of recorded `WlanGetProfile` XML and `WlanGetNetworkBssList` results, for the tests."
+    ],
+    "outcome": [
+      "`WiFiDiagnostics.exe` runs unelevated, lists the saved networks and the networks in range as Windows reports them, and shows the current connection with a one-sentence verdict.",
+      "A saved key is revealed for one network at a time on explicit request, only when elevated, refused by name before any key is read otherwise, with one log line naming the network and never the key, and a search of the source proves no export-all path.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Saved networks screen, and the Connection screen is the first one a person opens. Reporting and audit are the Activity section, where every key reveal is one line naming the network and never the key. Settings are the framework's pages. Permissions anchor on the reveal in the engine: the tool reads and lists unelevated, and only the key reveal needs the administrator right, checked at the reveal itself. Reverse applies to forgetting a saved network, where the profile is saved first so it can be put back; reading and revealing change nothing, so they have nothing to reverse.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Wireless Read and Verdict Engine",
+      "intro": "The tool's core, independent of any window: reading the wireless interfaces, the current connection, the saved profiles without their keys and the networks in range; a verdict in plain words from signal, crowding and security; and the one key reveal, gated by elevation, for a single network, logged without the key. The tool runs unelevated and only the reveal needs the administrator right.",
+      "needs": "windows-host",
+      "build": [
+        "Wrap the Native Wifi API in `src/core/Wlan.cpp` behind an interface the tests can replace. Done when: the unit tests run against recorded fixtures with no adapter present.",
+        "Implement the reads, the verdict and the reveal in `src/core/Diagnose.cpp` and `src/core/Reveal.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L wifi` passes."
+      ],
+      "items": [
+        "Implement `Wlan::Interfaces()` in `src/core/Wlan.cpp` with `WlanOpenHandle` and `WlanEnumInterfaces`, closing the handle on every path. Done when: a fixture with no interface returns the state No wireless adapter in words, and a fixture with two interfaces returns both by name.",
+        "Implement `ReadConnection()` in `src/core/Wlan.cpp` using `WlanQueryInterface` with `wlan_intf_opcode_current_connection` and `wlan_intf_opcode_channel_number`, returning network name, signal quality, channel, band, receive and transmit rate and security. Done when: a fixture connection returns all of them, and a disconnected interface returns Not connected, not zeros.",
+        "Implement `SavedNetworks()` in `src/core/Wlan.cpp` using `WlanGetProfileList` and `WlanGetProfile` without `WLAN_PROFILE_GET_PLAINTEXT_KEY`, reading the authentication and encryption from the profile XML, the band from the network's last sighting in `WlanGetNetworkBssList` and the last connection from the `Microsoft-Windows-WLAN-AutoConfig/Operational` log. Done when: the list matches `netsh wlan show profiles` for the same machine and no returned field holds key material. Cheaper substitute: shelling out to `netsh` and parsing its text, which breaks on a localized Windows.",
+        "Implement `Nearby()` in `src/core/Wlan.cpp` using `WlanGetAvailableNetworkList` and `WlanGetNetworkBssList`, turning each frequency into a band and channel, and counting the other networks on the same channel and, on 2.4 GHz, on the channels that overlap it. Done when: a fixture of six networks reports the right count for the current channel.",
+        "Implement `Verdict()` in `src/core/Diagnose.cpp` as one table-driven function from signal, crowding and security to one sentence, with its limits declared once in `src/core/Diagnose.h`, and a pointer to `netsh wlan show wlanreport` for the full history. Done when: a fixture each for weak signal, crowded channel, old security and all fine produces the expected sentence. Cheaper substitute: strings built in the view, which cannot be tested.",
+        "Implement `RevealKey(profileName)` in `src/core/Reveal.cpp` so the elevation check through the framework's guard comes first and an unelevated call returns a refusal naming the action and the network before `WlanGetProfile` is called with `WLAN_PROFILE_GET_PLAINTEXT_KEY`. Done when: an unelevated test with a spy on `Wlan` shows zero plaintext-key calls and a refusal naming the network. Cheaper substitute: reading the key and hiding it from an unelevated user, which has already read it.",
+        "Write exactly one activity line per reveal through `src/core/Activity.cpp`, naming the network and the outcome and never the key, and hold the key only until the dialog closes, then overwrite it. Done when: a driven reveal produces exactly one line, a search of the log for the key's value finds nothing, and a refused reveal writes one line saying so with no key read.",
+        "Allow only one network per reveal: `RevealKey` takes one profile name and no list, wildcard or empty name. Done when: an empty or wildcard name is refused by name and no key is read.",
+        "Cover it in `tests/wifi_test.cpp` and `tests/no_export_test.cpp`, the second searching `src/` for `WLAN_PROFILE_GET_PLAINTEXT_KEY` and for any loop or file write that touches it. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L wifi` passes, the search finds the flag in `src/core/Reveal.cpp` only, and the test fails when a second use is added. Record the rule in `docs/key-rule.md`."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L wifi` passes: the saved list matches the system's, an unelevated reveal is refused by name with no key read, a reveal writes one line without the key, and the search finds no export-all path.",
+      "commit": "core: read the wireless state, a plain verdict, and the one gated key reveal"
+    },
+    "enhancements": [
+      {
+        "title": "Reveal One Saved Key",
+        "needs": "sdk-framework",
+        "intro": "The one place the tool needs the administrator right. The Saved networks screen offers Show key for the selected network only, through the framework's elevation guard and activity log, and the proof that no export-all path exists is part of the section, not a promise.",
+        "surface": {
+          "fidelity": "the reveal confirmation, against `DESIGN.md` section 2.",
+          "job": "a person recovers the key of one network the PC already knows. Consumer: the dialog, read back against the log.",
+          "treatment": "a confirmation naming the one network, the key shown for that network only and cleared on close, and a refusal by name when not elevated. Cheaper substitute that fails the checkpoint: a button that saves every saved key to a file, which turns a diagnostic into a harvesting tool."
+        },
+        "build": [
+          "Add the Show key action and its confirmation in `src/ui/SavedNetworksView.cpp`. Done when: it works on the selected row only.",
+          "Prove there is no bulk path. Done when: `tests/no_export_test.cpp` passes against the built source."
+        ],
+        "items": [
+          "Add Show key to the content header of `src/ui/SavedNetworksView.cpp`, enabled for one selected row and disabled with a tooltip for none or several. Done when: selecting two rows disables it. Cheaper substitute: a Show all keys button.",
+          "Show a confirmation through the framework's message surface naming the network, then display the key in a selectable field that clears when the dialog closes. Done when: closing the dialog leaves no key in the window's accessible text. Cheaper substitute: a private dialog.",
+          "When the tool is not elevated, show the refusal returned by `RevealKey`, naming the action and how to start as administrator. Done when: an unelevated driven test shows the refusal text and Activity holds one line.",
+          "Add no copy-all, save-to-file or print path for keys in `src/ui/`. Done when: a search of `src/ui/` for clipboard, file and print calls near the reveal finds only the single selected key's copy to clipboard, if offered.",
+          "Cover it in `tests/reveal_ui_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L reveal` passes, and fails when a second key can be shown at once."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L reveal` passes: one network at a time, refused by name when unelevated, one log line, and `tests/no_export_test.cpp` still finds no export-all path.",
+        "commit": "feature: reveal one saved key, gated and logged"
+      },
+      {
+        "title": "Channel Crowding",
+        "needs": "sdk-framework",
+        "intro": "The Nearby screen shows how many networks use each channel and marks the current network's channel, so a person can see who shares theirs. The chart is the SDK's chart control and the counts come from the engine's `Nearby()`.",
+        "surface": {
+          "fidelity": "the Nearby screen and its chart, against `DESIGN.md` section 2 and `sdk/DESIGN.md`.",
+          "job": "a person sees which channels are busy and which are free. Consumer: the chart, read back against the engine's counts.",
+          "treatment": "one bar per channel with its count in words and numbers, the current channel marked, and a list of the networks beneath. Cheaper substitute that fails the checkpoint: a chart drawn by the tool, which the contract forbids."
+        },
+        "build": [
+          "Build the chart in `src/ui/NearbyView.cpp` from the SDK's chart control. Done when: it shows one bar per channel in range.",
+          "Bind it to `Nearby()`. Done when: the bars equal the engine's counts."
+        ],
+        "items": [
+          "Create `src/ui/NearbyView.cpp` listing each network in range with its name, band, channel and signal, from `Nearby()`. Done when: the list equals the fixture's networks.",
+          "Add the SDK's chart control showing the count of networks per channel, with the current channel marked by an icon and a word. Done when: the bar heights equal the engine's counts. Cheaper substitute: a hand-drawn bar chart.",
+          "Show the crowding word (Clear, Busy or Crowded) on the Connection screen from the same count. Done when: it changes when the fixture's neighbours change.",
+          "Add a text alternative for the chart, one line per channel. Done when: a UI Automation walk reads each channel and its count.",
+          "Cover it in `tests/nearby_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L nearby` passes, and fails when one network is moved to another channel without the chart changing."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L nearby` passes: the chart, the list and the Connection screen's crowding word agree with the engine's counts.",
+        "commit": "feature: channel crowding with the SDK's chart"
+      },
+      {
+        "title": "Weak Security Warning",
+        "intro": "Saved networks that use old or no security are flagged on the Saved networks screen with an icon and a word, so a person sees at a glance which remembered networks are not worth trusting. Open networks and WEP are flagged None and Old, and so is WPA with TKIP.",
+        "surface": {
+          "fidelity": "the Saved networks list, against `DESIGN.md` section 2.",
+          "job": "a person sees which saved networks have weak security. Consumer: the list, read back against the profile XML.",
+          "treatment": "an icon and a word on each row: Modern, Old or None. Cheaper substitute that fails the checkpoint: a red row, which shows state by colour alone."
+        },
+        "build": [
+          "Classify the security in `src/core/Security.cpp`. Done when: every authentication and encryption pair in the fixtures has a class.",
+          "Show the class in `src/ui/SavedNetworksView.cpp`. Done when: each row shows its icon and word."
+        ],
+        "items": [
+          "Implement `Classify(authentication, encryption)` in `src/core/Security.cpp` returning Modern, Old or None, for open, WEP, WPA, WPA2 and WPA3 with each cipher the profile XML can name. Done when: a test lists every pair in the fixtures with its class.",
+          "Show the class on each saved network row with an icon and a word. Done when: an open fixture network shows None and a WEP one shows Old.",
+          "Add the same word to the Connection screen's Security row and to the verdict when the current network is Old or None. Done when: the verdict sentence for an open network names it.",
+          "Cover it in `tests/security_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L security` passes, and fails when WEP is classed Modern."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L security` passes: every fixture pair has the right class and the row and the verdict show it in words.",
+        "commit": "feature: flag saved networks with old or no security"
+      },
+      {
+        "title": "Forget a Saved Network",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A person removes a saved network from the list through `WlanDeleteProfile`. Before it goes, the profile is saved with the key still protected (never in plain text), so Undo can put it back with `WlanSetProfile`. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Forget confirmation and the Undo button, against `DESIGN.md` section 2.",
+          "job": "a person removes a network they no longer use and can put it back. Consumer: the profile list, compared with the record.",
+          "treatment": "a confirmation naming the network, the profile saved first, and Undo restoring the same profile. Cheaper substitute that fails the checkpoint: a delete with no saved copy, which cannot be put back."
+        },
+        "build": [
+          "Save the profile through the repair contract in `src/core/Forget.cpp` before deleting. Done when: the record is on disk before the delete.",
+          "Wire Forget and Undo in `src/ui/SavedNetworksView.cpp`. Done when: forget then undo leaves the saved list as it was."
+        ],
+        "items": [
+          "Implement `Forget(profileName)` in `src/core/Forget.cpp` that saves the profile XML, read without `WLAN_PROFILE_GET_PLAINTEXT_KEY`, through the repair contract's restore record, then calls `WlanDeleteProfile`. Done when: a test finds the record on disk before the delete and the XML in it holds no plain-text key. Cheaper substitute: keeping the XML in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record with `WlanSetProfile`. Done when: forget then undo leaves the profile list equal to before, asserted.",
+          "If Windows refuses the delete for a lack of rights, report the refusal by name and discard the saved record. Done when: a fixture refusal shows the message and no record is left.",
+          "Show a confirmation naming the network, and disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows Undo disabled and it enables after one forget.",
+          "Cover it in `tests/forget_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L forget` passes, and fails when the restored profile differs from the record."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L forget` passes: forget then undo leaves the saved networks as they were, and the record holds no plain-text key.",
+        "commit": "feature: forget a saved network, with undo"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine the saved list, the current connection and the networks in range match what `netsh wlan show profiles`, `netsh wlan show interfaces` and `netsh wlan show networks mode=bssid` report.",
+      "An unelevated reveal is refused by name with no key read, a driven elevated reveal writes one line naming the network and not the key, and a search of the source finds no export-all path.",
+      "The tool shows the connection, saved networks, nearby networks, forgets and restores one, in light and dark, by keyboard alone."
+    ]
+  }
+}

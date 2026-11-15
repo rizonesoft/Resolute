@@ -1,0 +1,249 @@
+{
+  "name": "USBHistory",
+  "slug": "usbhistory",
+  "display": "USB History",
+  "job": "it lists every USB device this PC has ever seen, with its description, kind, serial number where it has one, and when it was first and last connected, and can remove the record of a device that is no longer connected after saving it.",
+  "tagline": "Every USB device this PC has ever seen, and when",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Lagoon",
+    "light": "#67E8F9",
+    "dark": "#0891B2",
+    "social_ground": "#06242C",
+    "social_muted": "#BFE9F1"
+  },
+  "icon": {
+    "idea": "A USB plug.",
+    "points": [
+      "Free-standing, with no tile: a rounded plug body with a metal end above it.",
+      "The body is Lagoon and the metal end is Lagoon light, with two Lagoon contacts.",
+      "The small drawing, below 40 pixels, drops the contacts."
+    ],
+    "large": "<rect x=\"24\" y=\"36\" width=\"48\" height=\"52\" rx=\"10\" fill=\"#0891B2\"/><rect x=\"32\" y=\"8\" width=\"32\" height=\"30\" rx=\"5\" fill=\"#67E8F9\"/><circle cx=\"42\" cy=\"22\" r=\"3.5\" fill=\"#0891B2\"/><circle cx=\"54\" cy=\"22\" r=\"3.5\" fill=\"#0891B2\"/>",
+    "small": "<rect x=\"22\" y=\"36\" width=\"52\" height=\"52\" rx=\"11\" fill=\"#0891B2\"/><rect x=\"30\" y=\"6\" width=\"36\" height=\"32\" rx=\"6\" fill=\"#67E8F9\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Devices",
+        "One row per recorded USB device: description, kind, serial number or None, first and last connection, and whether it is connected now"
+      ],
+      [
+        "Details",
+        "The selected device's identifiers and where its record lives"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every USB device this PC has ever had connected, and when, without reading the registry.",
+    "primary": "Refresh",
+    "secondary": "Copy list",
+    "rows": [
+      [
+        "SanDisk Ultra USB 3.0",
+        "Storage, serial 4C530001230912110534, connected now"
+      ],
+      [
+        "Logitech USB Receiver",
+        "Keyboard and mouse, serial None, last seen two days ago"
+      ],
+      [
+        "Pixel 7",
+        "Phone, serial 28211FDH2005XY, last seen last month"
+      ],
+      [
+        "USB Composite Device",
+        "Other, serial None, first and last connection shown"
+      ]
+    ],
+    "status": "41 devices recorded, 2 connected now, 17 with no serial",
+    "notes": [
+      "Each row shows the device's description, its kind (storage, keyboard or mouse, phone, other), its serial number or the word None, the date and time it was first and last connected, and whether it is connected now, as an icon and a word, never colour alone.",
+      "A device with no real serial shows the word None, and its Details page says that such a device cannot be told apart from another of the same model.",
+      "Refresh is the primary action: it reads the records again and the rows, the count and the status bar change from that read, not from an assumption.",
+      "Copy list puts the visible rows on the clipboard as text, one device per line.",
+      "The list opens with the most recently connected device first, and a header click sorts by any column.",
+      "The status bar says how many devices are recorded, how many are connected now and how many have no serial, in words.",
+      "Reading needs no elevation and the tool never asks for it to open. Only the optional removal of an old record asks, at that action, and the window says so beside the button."
+    ],
+    "cut": "There is no source window to compare with: nothing is ported. The window has no menu bar, no splash, no animation and no donate strip, because the suite's tool window does not have them, and each is recorded as cut in the plan."
+  },
+  "readme": {
+    "lead": "USB History shows every USB device this PC has ever had connected, and when.",
+    "what": [
+      "Windows keeps a record of each USB device it has met: a flash drive, a phone, a keyboard, a receiver. It shows none of it in a place a person can read. USB History reads those records and lists each device with its description, its kind, its serial number where it has one, and the date and time it was first and last connected.",
+      "It only reads. The one exception is optional: for a device that is no longer connected, it can remove the record, after saving the prior state so it can be put back. Windows then installs that device afresh the next time it is plugged in."
+    ],
+    "new_intro": "USB History is a new tool, written for the suite in C++.",
+    "new": [
+      [
+        "A full history.",
+        "It lists devices that are not connected as well as those that are, each with first and last connection."
+      ],
+      [
+        "Honest about serial numbers.",
+        "A device with no real serial shows None, and the tool says it cannot be told from another of the same model."
+      ],
+      [
+        "Reads without elevation.",
+        "Looking at the history needs no administrator rights."
+      ],
+      [
+        "A reversible removal.",
+        "An old device record can be removed, with the registry record saved first so it can be put back."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "USB History ships as a complete, standalone C++ tool: it lists every USB device this PC has ever recorded, present or not, with its description, kind, vendor and product, serial number where it is real, and its first-install, last-arrival and last-removal dates, each list cross-checked against the registry entries, and it offers one optional write, removing the record of a device that is not connected, with the prior state saved so it can be put back.",
+    "current_state": "Nothing exists yet: this is a new tool and there is no AutoIt original, no code and no baseline to port. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, `docs/origin/resolute-D05-T06-s6.md` (the plan section, which also covers a resource history tool that is not this one), and the kits. What Windows offers is known and is to be measured on a real machine: one registry key per device instance under `HKLM\\SYSTEM\\CurrentControlSet\\Enum\\USB` and `Enum\\USBSTOR`, the device properties `DEVPKEY_Device_FirstInstallDate`, `DEVPKEY_Device_LastArrivalDate` and `DEVPKEY_Device_LastRemovalDate` read through SetupAPI or the configuration manager, and `HKLM\\SYSTEM\\MountedDevices` for the drive letter a storage device had. The SDK's framework, repair contract and chart control, which the tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T06-s6.md`: the plan section the tool comes from; only its USB device history items concern this tool.",
+      "`HKLM\\SYSTEM\\CurrentControlSet\\Enum\\USB` and `HKLM\\SYSTEM\\CurrentControlSet\\Enum\\USBSTOR`: the device records the tool reads, one key per device instance.",
+      "`HKLM\\SYSTEM\\MountedDevices` and the SetupAPI device properties: the drive letters and the first-install, last-arrival and last-removal dates."
+    ],
+    "outcome": [
+      "`USBHistory.exe` lists every recorded USB device, present or not, with description, kind, vendor and product, serial where real, and the three dates, and a test cross-checks that list against the registry entries.",
+      "A device with no real serial shows None and is explained as indistinguishable from another of the same model; the tool has no write path except the one removal action, proven by search.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and removing an old record saves the prior state so it can be put back."
+    ],
+    "adjacency_rationale": "The list is the Devices screen, where a person finds a device by its description, kind or serial. Reporting and audit are the Activity section, which is the trail of what the tool read, copied, exported or removed. Settings are the framework's pages. Permissions do not anchor on the engine, because reading the device records needs no elevation: they anchor on the removal action alone, which is refused by name when the process is not elevated, but the tool itself does not run elevated, so the list as a whole is not marked as needing permissions. Reverse anchors on the removal of an old device record, where the prior registry state is saved first and restoring it puts the record back, so Windows sees the device as known again and does not install it afresh.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Device History Engine",
+      "intro": "The tool's whole read of the system: enumerating every recorded USB device, present or not, with its description, kind, vendor and product, serial where real, and its first-install, last-arrival and last-removal dates, each list cross-checked against the registry entries. Reading needs no elevation, and the engine has no write path.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the record a device has in `src/core/UsbDevice.h`. Done when: description, kind, vendor, product, serial, the three dates, connected-now and the registry path are stated once.",
+        "Implement the enumeration and the cross-check in `src/core/UsbHistory.cpp` against a source the tests can replace. Done when: the unit tests pass against a fixture of device keys."
+      ],
+      "items": [
+        "Implement `EnumerateUsbDevices()` in `src/core/UsbHistory.cpp` listing every device instance under `Enum\\USB` and `Enum\\USBSTOR`, including devices that are not connected, through SetupAPI without the present-only flag. Done when: a fixture with one connected and two absent devices returns three. Cheaper substitute: asking only for present devices, which hides the history the tool exists to show.",
+        "Read the three dates in `src/core/DeviceDates.cpp` with the property keys `DEVPKEY_Device_FirstInstallDate`, `DEVPKEY_Device_LastArrivalDate` and `DEVPKEY_Device_LastRemovalDate`, returning no date when Windows has none. Done when: a fixture with a missing last-removal date reports it as absent and never as zero. Cheaper substitute: the key's last-write time, which is not a connection time.",
+        "Parse vendor, product and serial from the instance path in `src/core/InstanceId.cpp`: `VID_xxxx&PID_xxxx` from the hardware identifier and the serial from the last path segment. Done when: a fixture path with a real serial returns it, and the vendor and product come back as four hexadecimal digits each.",
+        "Mark a serial as not real when the instance identifier is generated: an ampersand in the second position of the last segment. Done when: a test of `5&2a3b4c5d&0&1` returns no serial and a test of a real serial returns it. Cheaper substitute: treating any short string as a serial, which gives two devices of one model the same identity.",
+        "Classify each device as storage, keyboard or mouse, phone or other in `src/core/DeviceKind.cpp` from its service and class. Done when: a fixture of one device per kind classifies all four and an unknown class returns other.",
+        "Cross-check the enumeration against the registry in `src/core/CrossCheck.cpp`: every key under `Enum\\USB` and `Enum\\USBSTOR` must appear in the list and every listed device must have a key. Done when: a fixture with one key removed from the list reports that key by path. Cheaper substitute: comparing only the counts, which hides one missing device and one extra.",
+        "Mark each device connected now or not from its present state, never from the dates. Done when: a fixture where last arrival is later than last removal but the device is absent still reports not connected.",
+        "Prove the engine has no write path in `tests/no_write_test.cpp`: a search of `src/core/` for registry and setup write calls finds none outside `src/core/RemoveRecord.cpp`. Done when: the test passes, and fails when a write call is added to `src/core/UsbHistory.cpp`.",
+        "Cover the engine in `tests/usbhistory_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L usbhistory` passes, and fails when the second-position ampersand rule is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L usbhistory` passes, including the cross-check, the generated-serial and the no-write cases, and fails when the ampersand rule is removed.",
+      "commit": "core: the USB device history, read and cross-checked against the registry"
+    },
+    "enhancements": [
+      {
+        "title": "Remove an Old Device Record",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "The one write the tool offers: removing the record of a device that is no longer connected, so a stale or unwanted history entry is gone. The registry record is saved first through the SDK repair contract, so it can be put back. Removing a record makes Windows install the device afresh the next time it is plugged in, and the confirmation says so. The action is elevated, refused by name when the process is not, and refused for a device that is connected now.",
+        "surface": {
+          "fidelity": "the removal confirmation and the Undo result, against `DESIGN.md` section 2.",
+          "job": "a person removes the record of a device that is gone and can put it back. Consumer: the device's registry key, compared with the saved record.",
+          "treatment": "a confirmation naming the device, its serial and that Windows will install it afresh next time, then a result that says the record is saved. Cheaper substitute that fails the checkpoint: deleting the key without saving it, which has no way back."
+        },
+        "build": [
+          "Save and remove one device record in `src/core/RemoveRecord.cpp` through the repair contract. Done when: the saved record exists on disk before the key is deleted.",
+          "Wire Remove and Undo in `src/ui/DevicesView.cpp`. Done when: remove then undo leaves the device's key as it was."
+        ],
+        "items": [
+          "Implement `RemoveRecord(device)` in `src/core/RemoveRecord.cpp` saving the device's whole key through the repair contract's restore record before any delete. Done when: a test finds the saved record on disk before the first value is deleted. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Refuse a device that is connected now, and refuse any removal by name when the process is not elevated, before any write. Done when: a connected fixture and an unelevated run each report the refusal and the fixture key is unchanged. Cheaper substitute: letting the delete fail with access denied halfway through.",
+          "Implement `RestoreRecord(record)` putting the saved key back value by value. Done when: remove then restore leaves the key equal to before, asserted on every value. Cheaper substitute: recreating an empty key, which is not what was there.",
+          "Show a confirmation in `src/ui/DevicesView.cpp` naming the device and its serial and stating that Windows will install the device afresh next time, through the framework's message surface. Done when: pressing Remove on an absent device shows the confirmation and nothing is deleted until it is accepted. Cheaper substitute: a private dialog.",
+          "Record each removal and each restore in the Activity list with the device and the outcome. Done when: one removal and one restore add two lines in the right order.",
+          "Cover it in `tests/remove_record_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L remove` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L remove` passes: the saved record exists before the delete, a connected or unelevated removal is refused, and remove then restore leaves the key as it was.",
+        "commit": "feature: remove an old device record, saved first so it can be put back"
+      },
+      {
+        "title": "Filter by Kind and Date",
+        "intro": "A machine can hold hundreds of old records, so the list narrows by kind (storage, keyboards and mice, phones, other) and by a date range on the last connection. The filter is on the list the engine returns; it never changes what is read.",
+        "surface": {
+          "fidelity": "the filter controls in the content header, against `sdk/DESIGN.md` section 16.",
+          "job": "a person finds the devices of one kind, or those seen in one period. Consumer: the filtered rows, compared with the engine's list.",
+          "treatment": "the SDK's segmented and date controls above the list, with the count in words. Cheaper substitute that fails the checkpoint: a free-text box that matches only the description."
+        },
+        "build": [
+          "Add the filter over the engine's list in `src/core/DeviceFilter.cpp`. Done when: a fixture filtered by kind and by date range returns exactly the expected devices.",
+          "Add the filter controls in `src/ui/DevicesView.cpp`. Done when: choosing a kind changes the rows and the status bar count."
+        ],
+        "items": [
+          "Implement `FilterDevices(list, kinds, from, to)` in `src/core/DeviceFilter.cpp` over kind and last-connection date. Done when: a fixture of six devices filtered to storage seen this year returns the right two.",
+          "Add the kind and date controls to `src/ui/DevicesView.cpp` from the SDK's controls. Done when: each selection updates the rows and the status bar reads the filtered count in words. Cheaper substitute: a private control, which the contract forbids.",
+          "Keep a device with no date in view under a clear label, never hidden by a date filter. Done when: a fixture device with no last-removal date appears when the range is open and is named when it is excluded.",
+          "Cover it in `tests/filter_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L filter` passes, and fails when the date bound is made exclusive by one day."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L filter` passes for kind, date range and the no-date case.",
+        "commit": "feature: filter the device list by kind and date"
+      },
+      {
+        "title": "Export the List",
+        "intro": "A person who has to show what was plugged in, for an audit, exports the list as a CSV file. It writes a file the person chooses and nothing on the system.",
+        "surface": {
+          "fidelity": "the export action and its save dialog, against `sdk/DESIGN.md` section 16.",
+          "job": "a person hands an auditor the device history as a file. Consumer: the CSV, read back and compared with the rows.",
+          "treatment": "the framework's save dialog, then a line in Activity naming the file and the row count. Cheaper substitute that fails the checkpoint: copying the screen text, which has no stable columns."
+        },
+        "build": [
+          "Write the CSV in `src/core/CsvExport.cpp`. Done when: a fixture list writes a file whose rows equal the list.",
+          "Add the export action in `src/ui/DevicesView.cpp`. Done when: it saves through the framework's dialog and adds an Activity line."
+        ],
+        "items": [
+          "Implement `ExportCsv(list, path)` in `src/core/CsvExport.cpp` with a header row and one row per device: description, kind, vendor, product, serial or empty, the three dates in ISO 8601, connected now. Done when: a test reads the file back and gets the same list. Cheaper substitute: joining fields with commas unquoted, which breaks on a description that contains one.",
+          "Quote and escape fields and write UTF-8 with a byte order mark so a spreadsheet opens it. Done when: a description with a comma, a quote and an accent round-trips through a test.",
+          "Add the Export action to `src/ui/DevicesView.cpp` through the framework's save dialog, exporting the filtered rows when a filter is on. Done when: with one kind chosen the file holds only that kind.",
+          "Cover it in `tests/export_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes, and fails when a field is left unquoted."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes and the exported file reads back as the same list.",
+        "commit": "feature: export the device list as CSV for an audit"
+      },
+      {
+        "title": "Storage Devices and Drive Letters",
+        "intro": "For a storage device, the drive letter it had is shown beside it, read from `HKLM\\SYSTEM\\MountedDevices`, so a person can match a record to the letter they remember. A letter is shown only when Windows still holds it, and the tool says when it has none.",
+        "surface": {
+          "fidelity": "the drive letter line in the Details section, against `DESIGN.md` section 2.",
+          "job": "a person learns which drive letter a storage device had. Consumer: the Details page, compared with the MountedDevices entry.",
+          "treatment": "the letter in words (for example Drive E) or the phrase no letter recorded. Cheaper substitute that fails the checkpoint: guessing a letter from the device's order, which can name the wrong drive."
+        },
+        "build": [
+          "Match mounted-device entries to storage devices in `src/core/DriveLetters.cpp`. Done when: a fixture maps one device to its letter and another to none.",
+          "Show the letter in `src/ui/DetailsView.cpp`. Done when: selecting a storage device shows its letter or says none is recorded."
+        ],
+        "items": [
+          "Implement `DriveLetterFor(device)` in `src/core/DriveLetters.cpp` reading the `\\DosDevices\\X:` values of `HKLM\\SYSTEM\\MountedDevices` and matching them to the device's instance. Done when: a fixture with two devices returns each its own letter. Cheaper substitute: matching on description, which confuses two drives of one model.",
+          "Return no letter when no entry matches, and never carry a letter from another device. Done when: a device with no entry reports none in a test.",
+          "Show the letter, or no letter recorded, on the Details screen in `src/ui/DetailsView.cpp`. Done when: a storage device shows it and a keyboard shows no drive line at all.",
+          "Cover it in `tests/driveletter_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L driveletter` passes, and fails when two devices are matched to one entry."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L driveletter` passes for a matched device, an unmatched device and a non-storage device.",
+        "commit": "feature: the drive letter a storage device had"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine, the list holds every key under `Enum\\USB` and `Enum\\USBSTOR`, present or not, and the cross-check reports zero missing and zero extra.",
+      "A search of `src/` finds no registry or setup write call outside the removal of an old device record, and that removal is refused when connected or unelevated and puts back what it saved.",
+      "On a real machine the tool lists, shows details, filters, exports and removes and restores a record, in light and dark, by keyboard alone."
+    ]
+  }
+}

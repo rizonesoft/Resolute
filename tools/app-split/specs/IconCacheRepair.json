@@ -1,0 +1,245 @@
+{
+  "name": "IconCacheRepair",
+  "slug": "iconcacherepair",
+  "display": "Icon Cache Repair",
+  "job": "it rebuilds the Windows icon and thumbnail caches when icons show blank, wrong or outdated, restarts Explorer as part of the repair, and warns before the user commits that Explorer will restart and what that closes.",
+  "tagline": "Fix blank, wrong and outdated icons",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Honey",
+    "light": "#FDE68A",
+    "dark": "#D97706",
+    "social_ground": "#2B1A05",
+    "social_muted": "#F5E3B5"
+  },
+  "icon": {
+    "idea": "Four icon tiles, one bright and new.",
+    "points": [
+      "Free-standing: no tile behind it, four rounded squares in a grid.",
+      "Three squares are Honey and the fourth is Honey light with a Honey plus.",
+      "The small drawing, used below 40 pixels, drops the plus."
+    ],
+    "large": "<rect x=\"10\" y=\"10\" width=\"34\" height=\"34\" rx=\"8\" fill=\"#D97706\"/><rect x=\"52\" y=\"10\" width=\"34\" height=\"34\" rx=\"8\" fill=\"#D97706\"/><rect x=\"10\" y=\"52\" width=\"34\" height=\"34\" rx=\"8\" fill=\"#D97706\"/><rect x=\"52\" y=\"52\" width=\"34\" height=\"34\" rx=\"8\" fill=\"#FDE68A\"/><path d=\"M69 60 V78 M60 69 H78\" fill=\"none\" stroke=\"#D97706\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<rect x=\"8\" y=\"8\" width=\"37\" height=\"37\" rx=\"9\" fill=\"#D97706\"/><rect x=\"51\" y=\"8\" width=\"37\" height=\"37\" rx=\"9\" fill=\"#D97706\"/><rect x=\"8\" y=\"51\" width=\"37\" height=\"37\" rx=\"9\" fill=\"#D97706\"/><rect x=\"51\" y=\"51\" width=\"37\" height=\"37\" rx=\"9\" fill=\"#FDE68A\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Repair",
+        "One row per cache with what it is, how big it is now and its state, and the warning about Explorer beside the primary action"
+      ],
+      [
+        "Results",
+        "What the last repair removed and rebuilt"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which icon and thumbnail caches exist and how big they are, reads what a repair will close, and rebuilds them with one button.",
+    "primary": "Rebuild",
+    "secondary": "Refresh icons",
+    "rows": [
+      [
+        "Icon cache",
+        "Present, with its size, or Empty"
+      ],
+      [
+        "Thumbnail cache",
+        "Present, with its size, or Empty"
+      ],
+      [
+        "Older icon cache file",
+        "Present, with its size, or Not there"
+      ],
+      [
+        "Explorer",
+        "Running or Stopped"
+      ]
+    ],
+    "status": "2 caches ready to rebuild",
+    "notes": [
+      "Each cache is a row with an icon and a word for its state (Present, Empty, Not there) and its size now, read from the files when the screen opens and again after every action.",
+      "The warning sits beside Rebuild and is always visible: Explorer will restart, open File Explorer windows will close, and the taskbar will blink. It is shown before the user presses the button, not after.",
+      "Rebuild is the accent button and stops Explorer, removes the ticked caches, starts Explorer and confirms it is running. Refresh icons beside it closes nothing.",
+      "The thumbnail cache has its own tick, so a person can rebuild only the icon cache.",
+      "Nothing needs elevation: the tool runs for the signed-in user, and the caches are that user's own files.",
+      "The status bar says in words what is ready or what the last action did, for example \"2 caches ready to rebuild\".",
+      "There is no Undo button: Windows rebuilds a cache by itself, so there is nothing to put back. The Results section says what was removed."
+    ],
+    "cut": "This is a new tool, so there is no earlier window to cut from. It has no menus, splash screen, animations or donate strip: the window is the suite's Sidebar tool window with the sections above, and the plan records the same."
+  },
+  "readme": {
+    "lead": "Fix blank, wrong and outdated icons without reinstalling Windows.",
+    "what": [
+      "When Windows shows blank, wrong or outdated icons or thumbnails, the cause is usually a stale icon or thumbnail cache. Icon Cache Repair lists each cache with its size and state, tries a gentle refresh that closes nothing, and if the icons are still wrong, rebuilds the caches.",
+      "A full rebuild has to restart Explorer, because Explorer holds the cache files open. The tool tells you that before you commit: open File Explorer windows close and the taskbar blinks. It then stops Explorer, removes the caches, starts Explorer again, confirms it is running and shows what it removed. It runs as you, without elevation."
+    ],
+    "new_intro": "Icon Cache Repair is a new tool in the suite, built in C++ from the start.",
+    "new": [
+      [
+        "Gentle refresh first.",
+        "It tries the refresh that closes nothing, and offers the full rebuild only when the icons are still wrong."
+      ],
+      [
+        "A warning before Explorer restarts.",
+        "It says what will close before you press Rebuild."
+      ],
+      [
+        "Thumbnails as their own tick.",
+        "The thumbnail cache can be rebuilt with the icon cache or left alone."
+      ],
+      [
+        "Space freed is reported.",
+        "The Results section says what was removed and how much space it gave back."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Icon Cache Repair ships as a complete, standalone C++ tool: it finds the Windows icon and thumbnail caches and their sizes, refreshes icons gently without closing anything, and rebuilds the caches by stopping Explorer, removing the cache files, starting Explorer and confirming it is running, with a warning of what that closes shown before the user commits and a report of what was removed.",
+    "current_state": "Nothing exists yet. This is a new tool: there is no AutoIt original, no code and no baseline, and `docs/origin/` holds only its plan text, a short entry that also covers a default apps tool, of which only the icon and thumbnail cache lines apply here. The repository holds the framework files from the template, `DESIGN.md` with the Sidebar window and the identity the operator chose, and the kits. What the tool does comes from that plan text and from how Windows works: Explorer keeps `iconcache_*.db` and `thumbcache_*.db` under `%LocalAppData%\\Microsoft\\Windows\\Explorer` open, so it must be stopped before they can be removed, and the older `IconCache.db` sits in `%LocalAppData%`. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T06-s5.md`: the plan text for the icon and thumbnail cache lines, which states the restart and the warning before it.",
+      "`%LocalAppData%\\Microsoft\\Windows\\Explorer` and `%LocalAppData%\\IconCache.db`: where the caches live on a Windows machine, measured in the engine section.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the tool's identity and window sections, and the suite's contract every surface answers to."
+    ],
+    "outcome": [
+      "`IconCacheRepair.exe` lists each cache with its size and state, refreshes icons without a restart, and rebuilds the caches with Explorer stopped and started again, proven on a machine with a corrupted cache.",
+      "The warning of what the restart closes is on screen beside Rebuild before the user presses it, and the result names what was removed and the space freed.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Repair screen, where each cache is a row with its size and state. Reporting is the Results section, which says what the last repair removed and rebuilt, and audit is Activity, the readable trail of each action. Settings are the framework's pages. Permissions do not apply: the caches are the signed-in user's own files and the tool never asks for elevation. Reverse does not apply either: Windows rebuilds a cache by itself and nothing the user owns is changed, so there is nothing to put back.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Cache and Explorer Engine",
+      "intro": "The tool's whole system effect, independent of any window: finding the cache files and their sizes, the gentle refresh that needs no restart, and the full rebuild that stops Explorer, removes the cache files, starts Explorer and confirms it is running. It runs for the signed-in user without elevation, and if Explorer does not come back the tool starts it and says so.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the cache locations and file patterns as data in `src/core/CacheFiles.h`. Done when: the icon, thumbnail and older icon cache locations are stated once, each with the pattern that matches its files.",
+        "Implement find, refresh, rebuild and confirm in `src/core/CacheRepair.cpp` against a cache folder and an Explorer controller the tests can replace. Done when: the unit tests pass against a disposable folder and a fake Explorer."
+      ],
+      "items": [
+        "Implement `FindCaches()` in `src/core/CacheFiles.cpp` returning each cache with its files, total size in bytes and state (present, empty or not there), from `%LocalAppData%\\Microsoft\\Windows\\Explorer` (`iconcache_*.db`, `thumbcache_*.db`) and `%LocalAppData%\\IconCache.db`. Done when: a disposable folder with known file sizes reports exactly those sizes and states. Cheaper substitute: a hardcoded list of file names, which misses the numbered files Windows adds.",
+        "Implement `Refresh()` in `src/core/CacheRepair.cpp`: run `ie4uinit.exe -show` and then call `SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr)`, closing nothing. Done when: a test with a fake runner sees both calls in order and Explorer's process id unchanged. Cheaper substitute: restarting Explorer for every refresh, which defeats the point of the gentle path.",
+        "Implement `StopExplorer()` in `src/core/ExplorerControl.cpp` ending the signed-in user's `explorer.exe` and waiting until the cache files can be opened for delete, with a bounded wait. Done when: a test with a fake holder of the files sees the stop return only after the holder is gone, and a timeout is reported by name. Cheaper substitute: a fixed sleep, which races the file handles.",
+        "Implement `RemoveCaches(selection)` in `src/core/CacheRepair.cpp` deleting only the ticked caches, icon cache first and thumbnail cache only when selected, and recording each file removed with its size. Done when: a disposable folder with both caches loses only the selected ones and the record lists each file. Cheaper substitute: deleting the whole Explorer folder, which removes files that are not caches.",
+        "Implement `StartExplorer()` and `ConfirmRunning()` in `src/core/ExplorerControl.cpp`: wait a bounded time for Windows to bring the shell back, start `explorer.exe` itself if it has not come back, and report that the tool started it. Done when: a fake that never restarts causes one start and a result naming it, and one that restarts by itself causes none.",
+        "Make `Rebuild(selection)` run stop, remove, start and confirm in that order and start Explorer even when the removal failed. Done when: a test where one file cannot be deleted still ends with Explorer running and the failure named. Cheaper substitute: returning at the first error, which can leave the user with no taskbar.",
+        "Refuse a rebuild that would remove a cache while a file handle is still held, naming the file, rather than reporting success. Done when: a test with one held file reports that file as not removed and the rest as removed.",
+        "Cover every path in `tests/cache_repair_test.cpp` with a disposable folder and a fake Explorer. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L cache` passes, and fails when the order of stop and remove is swapped."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L cache` passes, including the Explorer-does-not-return and held-file cases, and fails when stop and remove are swapped.",
+      "commit": "core: find, refresh and rebuild the icon caches around an Explorer restart"
+    },
+    "enhancements": [
+      {
+        "title": "Gentle Refresh First",
+        "intro": "Most blank icons clear with the refresh that closes nothing, so the tool tries that first and offers the full rebuild only when the user says the icons are still wrong. A person who only needed the refresh never loses an open window.",
+        "surface": {
+          "fidelity": "the Refresh icons button and the question after it, against `DESIGN.md` section 2.",
+          "job": "a person tries the cheapest fix first and moves to the rebuild only if it did not work. Consumer: the engine's refresh call and the rows, read back.",
+          "treatment": "Refresh icons runs the gentle refresh, then asks in words whether the icons are now right, with Rebuild offered only on the answer no. Cheaper substitute that fails the checkpoint: running the rebuild whenever the refresh is pressed."
+        },
+        "build": [
+          "Wire Refresh icons in `src/ui/RepairView.cpp` to `Refresh()`. Done when: pressing it runs the refresh and Explorer's process id is unchanged afterwards.",
+          "Add the follow-up question and the offer of Rebuild in `src/ui/RepairView.cpp`. Done when: answering no brings Rebuild forward and answering yes ends the repair with a result line."
+        ],
+        "items": [
+          "Run the gentle refresh from Refresh icons and report in words that nothing was closed. Done when: the Activity line says the refresh ran and no process was stopped. Cheaper substitute: a silent refresh, which leaves the user unsure anything happened.",
+          "Ask after the refresh whether the icons are now right, with two answers, and show Rebuild as the next step only on no. Done when: a driven test sees Rebuild's emphasis change only after the answer no.",
+          "Keep Rebuild always available for a person who already knows the icons are broken. Done when: Rebuild works without Refresh icons having been pressed.",
+          "Cover it in `tests/refresh_first_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L refresh` passes, and fails when the refresh stops Explorer."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L refresh` passes: the refresh closes nothing and the rebuild is offered only after the answer no.",
+        "commit": "feature: try the refresh that closes nothing before the rebuild"
+      },
+      {
+        "title": "Warn Before Explorer Restarts",
+        "intro": "A rebuild restarts Explorer, which closes open File Explorer windows and makes the taskbar blink. The tool says so before the user commits, with what will close listed from the machine and not from a fixed sentence.",
+        "surface": {
+          "fidelity": "the warning beside Rebuild and the confirmation it opens, against `sdk/DESIGN.md` section 11.",
+          "job": "a person knows what the restart will close before they press Rebuild. Consumer: the warning text, read back against the open windows.",
+          "treatment": "a standing line beside Rebuild, and a confirmation that lists the open File Explorer windows found. Cheaper substitute that fails the checkpoint: a warning shown after the rebuild has started."
+        },
+        "build": [
+          "List the open File Explorer windows in `src/core/ExplorerControl.cpp`. Done when: a test with two fake windows returns both with their folder names.",
+          "Show the standing warning and the confirmation in `src/ui/RepairView.cpp`. Done when: the warning is on screen before Rebuild is pressed and the confirmation names each window."
+        ],
+        "items": [
+          "Add `OpenExplorerWindows()` in `src/core/ExplorerControl.cpp` returning the folder each open File Explorer window shows. Done when: a fixture with three windows returns three entries. Cheaper substitute: a count only, which cannot tell the user what they will lose.",
+          "Put the standing warning beside Rebuild in `src/ui/RepairView.cpp`: Explorer will restart, open File Explorer windows will close, the taskbar will blink. Done when: it is visible on first show, before any action.",
+          "Open a confirmation when Rebuild is pressed, through the framework's message surface, listing the windows found and offering Cancel and Rebuild. Done when: Cancel leaves Explorer running and removes nothing. Cheaper substitute: a private dialog.",
+          "Skip the confirmation's window list, not the confirmation, when no File Explorer window is open. Done when: a fixture with none still shows the confirmation and says no windows will close.",
+          "Cover it in `tests/warning_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L warning` passes, and fails when the rebuild starts before the confirmation is answered."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L warning` passes: the warning is shown before the rebuild, Cancel changes nothing, and the open windows are named.",
+        "commit": "feature: warn what the Explorer restart will close, before the user commits"
+      },
+      {
+        "title": "Thumbnails Too",
+        "intro": "Wrong or blank thumbnails come from a different cache than wrong icons, so the thumbnail cache is a separate tick on the Repair screen. A person can rebuild the icon cache alone, or the thumbnails with it.",
+        "surface": {
+          "fidelity": "the tick beside the thumbnail cache row, against `DESIGN.md` section 2.",
+          "job": "a person chooses whether the thumbnail cache is rebuilt as well. Consumer: the engine's selection, read back from the removal record.",
+          "treatment": "a checkbox on its own row, ticked by default, whose state decides what is removed. Cheaper substitute that fails the checkpoint: a tick that is shown but ignored by the engine."
+        },
+        "build": [
+          "Add the thumbnail tick to the row in `src/ui/RepairView.cpp`. Done when: unticking it passes a selection without the thumbnail cache to the engine.",
+          "Carry the selection through `Rebuild(selection)` in `src/core/CacheRepair.cpp`. Done when: the removal record lists only the ticked caches."
+        ],
+        "items": [
+          "Add a checkbox on the thumbnail cache row with the accessible name \"Rebuild the thumbnail cache\". Done when: a UI Automation walk names it and it toggles by keyboard.",
+          "Pass the selection to `Rebuild(selection)` and keep it between runs through the framework's settings. Done when: a second start shows the tick as the user left it, read back from the settings file. Cheaper substitute: a setting written by the tool itself.",
+          "Show in the Results section which caches were rebuilt and which were left. Done when: an icon-only rebuild says the thumbnail cache was left alone.",
+          "Cover it in `tests/thumbnails_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L thumbnails` passes, and fails when an unticked cache is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L thumbnails` passes: an unticked thumbnail cache is never removed and the choice survives a restart of the tool.",
+        "commit": "feature: the thumbnail cache is a separate tick"
+      },
+      {
+        "title": "Space Freed",
+        "intro": "After a rebuild the Results section says what was removed and how much space it gave back, from the sizes read before the removal, so the user can see the repair did something.",
+        "surface": {
+          "fidelity": "the Results section, against `DESIGN.md` section 2.",
+          "job": "a person reads what the last repair removed and rebuilt. Consumer: the list, read back against the removal record.",
+          "treatment": "one line per removed file with its size, a total in words, and the time of the repair. Cheaper substitute that fails the checkpoint: a total computed from the sizes after the removal, which is zero."
+        },
+        "build": [
+          "Total the sizes from the removal record in `src/core/CacheRepair.cpp`. Done when: a record of known files gives their exact sum.",
+          "Show the record in `src/ui/ResultsView.cpp`. Done when: the list matches the record line for line."
+        ],
+        "items": [
+          "Read each file's size before it is removed and keep it in the removal record. Done when: a test shows the record holds sizes from before the removal. Cheaper substitute: measuring afterwards, which finds nothing.",
+          "Show the files, the total freed in words and the time in `src/ui/ResultsView.cpp`. Done when: after a driven rebuild the list shows each removed file and the total equals their sum.",
+          "Show an empty state in one sentence before any repair has run. Done when: a first run shows it and it disappears after the first rebuild.",
+          "Cover it in `tests/results_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L results` passes, and fails when the total is taken after the removal."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L results` passes: the freed space equals the sum of the sizes read before the removal.",
+        "commit": "feature: report what the repair removed and the space it freed"
+      }
+    ],
+    "no_reverse": "a cache is rebuilt by Windows by itself; nothing the user owns is changed, so there is nothing to put back",
+    "verification": [
+      "On a machine with a deliberately corrupted icon cache, the icons are correct after a rebuild, captured before and after, with the Explorer restart warned about beforehand.",
+      "The tool stops Explorer, removes the selected caches, starts Explorer and confirms it is running, and starts it itself and says so when it does not come back.",
+      "On a real machine the tool refreshes, warns, rebuilds and reports, in light and dark, by keyboard alone, without elevation."
+    ]
+  }
+}

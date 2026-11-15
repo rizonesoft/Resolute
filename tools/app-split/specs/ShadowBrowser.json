@@ -1,0 +1,249 @@
+{
+  "name": "ShadowBrowser",
+  "slug": "shadowbrowser",
+  "display": "Shadow Browser",
+  "job": "it lists every Volume Shadow Copy Windows keeps, opens one read-only to browse it, compares a file in it with the live file and retrieves a previous version to a place the user chooses without overwriting anything.",
+  "tagline": "Bring back an earlier version of a file from the copies Windows keeps",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Violet",
+    "light": "#C4B5FD",
+    "dark": "#7C3AED",
+    "social_ground": "#1B0F38",
+    "social_muted": "#DDD4F7"
+  },
+  "icon": {
+    "idea": "A friendly ghost: the shadow of a file as it was.",
+    "points": [
+      "Free-standing with no tile: a rounded ghost with a scalloped hem.",
+      "The ghost is Violet and its eyes are Violet light.",
+      "The small drawing, used below 40 pixels, has three scallops and larger eyes."
+    ],
+    "large": "<path d=\"M20 84 V44 A28 28 0 0 1 76 44 V84 L66 74 L57 84 L48 74 L39 84 L30 74 Z\" fill=\"#7C3AED\" stroke=\"#7C3AED\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"38\" cy=\"44\" r=\"6\" fill=\"#C4B5FD\"/><circle cx=\"58\" cy=\"44\" r=\"6\" fill=\"#C4B5FD\"/>",
+    "small": "<path d=\"M18 84 V44 A30 30 0 0 1 78 44 V84 L63 72 L48 84 L33 72 Z\" fill=\"#7C3AED\" stroke=\"#7C3AED\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"37\" cy=\"44\" r=\"8\" fill=\"#C4B5FD\"/><circle cx=\"59\" cy=\"44\" r=\"8\" fill=\"#C4B5FD\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Snapshots",
+        "Each shadow copy as a row with its drive, its date and what made it"
+      ],
+      [
+        "Browse",
+        "The selected snapshot's folders and files, with whether each differs from the live file"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every shadow copy Windows keeps, opens one and brings back an earlier version of a file.",
+    "primary": "Retrieve",
+    "secondary": "Compare",
+    "rows": [
+      [
+        "C: drive, the newest copy",
+        "Ready, with its date and what made it"
+      ],
+      [
+        "C: drive, an older copy",
+        "Ready"
+      ],
+      [
+        "D: drive",
+        "Ready"
+      ],
+      [
+        "A copy whose volume is gone",
+        "Unavailable, shown but not openable"
+      ]
+    ],
+    "status": "3 snapshots on 2 drives, none selected",
+    "notes": [
+      "Each row is one shadow copy with its drive, its date and what made it (System Restore, a backup or Windows Update), and a state shown with an icon and a word: Ready or Unavailable.",
+      "Selecting a row and pressing Enter opens it in the Browse section. Nothing is mounted or assigned a drive letter: the snapshot is read through its device path.",
+      "Retrieve is the accent button. It asks for a destination folder, writes a new file there, reads it back and compares it byte for byte with the snapshot copy. A file that already exists at the destination is never replaced: the tool offers a new name or stops.",
+      "Compare sits beside it and shows whether the selected snapshot file differs from the live file, with both sizes and dates.",
+      "The status bar says how many snapshots were found and on how many drives, in words.",
+      "When the process is not elevated the tool refuses by name, saying that listing shadow copies needs administrator rights, and offers to restart elevated. It does not show an empty list.",
+      "When there are no snapshots the screen says so plainly, explains that System Protection is off for the drive or that nothing has made a copy yet, and says that without a snapshot nothing can be retrieved."
+    ],
+    "cut": "There is no source window to cut from, because Shadow Browser is new. The window has no menus, no splash, no animations and no donate strip: sections, one list, two actions and a status bar, as the suite's tool window defines them. It has no button that creates, deletes or changes a snapshot, and the plan records that as a rule, proven by search."
+  },
+  "readme": {
+    "lead": "Shadow Browser lists the copies Windows keeps of your drives and brings back an earlier version of a file from one of them.",
+    "what": [
+      "Windows quietly keeps Volume Shadow Copies, snapshots of a drive made by System Restore, by backups and by Windows Update. They hold earlier versions of your files. The built-in Previous Versions tab is unreliable and is often empty on machines where snapshots plainly exist.",
+      "Shadow Browser shows every snapshot with its drive, date and origin, opens one read-only like a folder, tells you whether a file differs from the live one, and copies the version you want to a place you choose. It never changes a snapshot and never overwrites a file without asking. It needs administrator rights, because Windows only lets an administrator list shadow copies."
+    ],
+    "new_intro": "Shadow Browser is a new tool, not a port, so everything in it is new.",
+    "new": [
+      [
+        "Every snapshot, listed.",
+        "Each shadow copy shows its drive, its date and what made it, and a machine with none says so and why."
+      ],
+      [
+        "Browsed without mounting.",
+        "A snapshot opens read-only through its device path, so nothing gets a drive letter and nothing in it can be written."
+      ],
+      [
+        "Retrieval that does not overwrite.",
+        "A file or folder is copied to the place you choose, checked byte for byte, and an existing file is never replaced silently."
+      ],
+      [
+        "Compared with the live file.",
+        "Each file shows whether it differs from the one on disk now, and the Compare action shows how."
+      ],
+      [
+        "No way to delete a snapshot.",
+        "The tool has no write path to a snapshot and no delete path, proven by a search of the source."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Shadow Browser ships as a complete, standalone C++ tool: it lists every shadow copy Windows keeps with its drive, date and origin, opens one read-only through its device path, tells the user whether a snapshot file differs from the live one, and retrieves a file or folder to a destination the user chooses, verified byte for byte and never silently overwriting, with no write path and no delete path to a snapshot, proven by search.",
+    "current_state": "Nothing exists yet. This is a new tool: there is no AutoIt original, no `reference/au3/` folder and nothing to port, so there is no baseline, no inventory and no parity section. The repository holds the chosen identity direction in `DESIGN.md`, the plan section as it stood in the Resolute repository under `docs/origin/` (`resolute-D05-T06-s1.md`, seven items) and the kits. The design rests on how Windows works: snapshots are created by System Restore, by backups and by Windows Update; they can be listed through the Volume Shadow Copy Service (`IVssBackupComponents` with `Query`) or the `Win32_ShadowCopy` WMI class; each has a device object at `\\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopyN` that can be read directly without mounting; enumerating them needs administrator rights; and when System Protection is off for a drive there are none. The original plan also says to read the same store as `D05 T03 section 1` and not to write a second enumerator, which is not in this repository and is recorded as a dependency to settle. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T06-s1.md`: the plan section this tool came from, whose rules (read-only, no overwrite, no delete, honest about disabled protection) this plan follows.",
+      "`DESIGN.md`: the tool's identity and its window's sections, and `sdk/DESIGN.md`, the suite's contract every surface answers to.",
+      "`docs/captures/house-style/`: the suite's captured house style the snapshot list and the file browser are measured against, when it exists."
+    ],
+    "outcome": [
+      "`ShadowBrowser.exe` lists every shadow copy with drive, date and origin, and on a machine with none says so and why, and refuses by name when it is not elevated.",
+      "A snapshot's folders and files browse read-only through its device path, a file compares with its live version, and a retrieved file at its destination matches the snapshot copy byte for byte and is never silently overwritten.",
+      "A search of `src/` finds no write, delete or mount call on a snapshot, and the Sidebar window of `DESIGN.md` works in light and dark at every scale and by keyboard alone."
+    ],
+    "adjacency_rationale": "The list is the Snapshots screen, where a person finds a copy by its drive and date, and the Browse screen is a second list of the selected snapshot's contents. Reporting and audit are the Activity section: each listing, retrieval and refusal is one line there and in the log. Settings are the framework's pages. Permissions anchor on the engine, where a listing without administrator rights is refused by name before any query. Reverse does not apply: the tool only reads snapshots and writes a single new file where the user says, which the user can simply delete.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Snapshot Reading Engine",
+      "intro": "The tool's whole system effect, independent of any window: listing shadow copies with volume, date and origin, reading a snapshot's directory tree and files read-only through its device path, comparing a snapshot file with the live one, and retrieving a file or folder to a chosen destination with a byte-for-byte check. Every action is refused by name when the process is not elevated, and a machine with no snapshots is reported plainly with the reason. There is no function that writes to or deletes a snapshot.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the snapshot record and the read-only snapshot reader in `src/core/Snapshot.h` and `src/core/SnapshotReader.cpp`. Done when: the unit tests list and read a fixture snapshot tree and the header has no write, delete or mount function.",
+        "Implement listing, comparing and retrieving in `src/core/SnapshotList.cpp`, `src/core/Compare.cpp` and `src/core/Retrieve.cpp` against a source the tests can replace. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes against a fixture folder standing in for a snapshot."
+      ],
+      "items": [
+        "Define `SnapshotInfo` in `src/core/Snapshot.h` with the snapshot id, the device path (`\\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopyN`), the volume and its drive letter where one exists, the creation time and the origin. Done when: a test builds one from a recorded `Win32_ShadowCopy` row and every field reads back.",
+        "Implement `ListSnapshots()` in `src/core/SnapshotList.cpp` through the Volume Shadow Copy Service, `IVssBackupComponents` with `Query`, reading every snapshot and mapping its origin to System Restore, backup or Windows Update where the provider attributes say so and to unknown otherwise. Done when: on a machine with snapshots the tool lists the same set as `vssadmin list shadows`, and a test over a recorded result lists each one. Cheaper substitute: shelling out to `vssadmin.exe` and parsing its text, which breaks with the display language.",
+        "Return a named empty result from `ListSnapshots()` and not an empty list: no snapshots because System Protection is off for every drive, or none made yet, or the query failed, each with its own reason. Done when: tests for the three cases return three different reasons and the surface can say each one. Cheaper substitute: an empty list the surface renders as a blank screen.",
+        "Refuse `ListSnapshots()`, `Browse()` and `Retrieve()` by name when the process is not elevated, before any query or open, with one activity record. Done when: an unelevated test run reports the refusal and opens no device path. Cheaper substitute: letting the query fail with access denied and showing an empty list.",
+        "Implement `Browse(snapshot, path)` in `src/core/SnapshotReader.cpp` listing a folder's entries by opening the device path with read-only access and sharing flags that allow others to write, and never creating, writing, renaming or deleting. Done when: a test lists a fixture tree's folders and files with name, size and time, and a search of `src/` for write, delete, rename and mount calls on a snapshot path finds none. Cheaper substitute: mounting the snapshot with a drive letter or a symbolic link, which creates a write-capable path.",
+        "Implement `Compare(snapshotFile, liveFile)` in `src/core/Compare.cpp` returning same, different, missing live or new, by size and modified time first and by content hash where those agree. Done when: a changed file reports different, an unchanged file reports same, and a file deleted since the snapshot reports missing live. Cheaper substitute: comparing the modified time alone, which misses a file restored with its old date.",
+        "Implement `Retrieve(snapshotPath, destinationFolder)` in `src/core/Retrieve.cpp` copying a file or a folder tree to a new path, never replacing an existing one: a name clash gets a new name or stops, and the caller is told which. Done when: a test with an existing destination file leaves it byte-identical and reports the clash. Cheaper substitute: overwriting after a confirmation prompt the engine does not own, which lets a caller skip the check.",
+        "Verify every retrieved file by reading the destination back and comparing it byte for byte with the snapshot copy, and return a mismatch as path, expected size and found size. Done when: a test that corrupts the destination after the write gets the file named, and a retrieved file passes. Cheaper substitute: checking only that the write returned success.",
+        "Write the proof of no write path in `tests/no_write_path_test.cpp`: a test that searches `src/` for write, delete, rename and mount calls reaching a snapshot path or a Volume Shadow Copy delete or create function. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L nowrite` passes, and fails when a `DeleteSnapshots` call is added to a source file."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, including the no-snapshots, unelevated, name-clash and corrupted-write cases, and `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L nowrite` passes.",
+      "commit": "core: list and read snapshots read-only, retrieve without overwriting"
+    },
+    "enhancements": [
+      {
+        "title": "Versions of One File",
+        "intro": "A person usually wants one file, not a snapshot. They pick a live file and see every snapshot that holds a different version of it, with the date of each, and retrieve the one they want. Snapshots whose copy is identical to the live file or to a newer snapshot's copy are collapsed, so the list is the versions, not the snapshots.",
+        "surface": {
+          "fidelity": "the versions list, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person finds the version of one file they want without opening snapshot after snapshot. Consumer: the list, read back against the engine's compare results.",
+          "treatment": "one row per distinct version with its snapshot date, size and whether it differs from the live file, with Retrieve on the selected row. Cheaper substitute that fails the checkpoint: a row for every snapshot that has the file, which repeats the same version many times."
+        },
+        "build": [
+          "Implement `FindVersions(livePath)` in `src/core/Versions.cpp`. Done when: a fixture with three snapshots holding two distinct contents of one file returns two versions.",
+          "Show the versions in `src/ui/VersionsView.cpp`. Done when: choosing a live file lists its versions and Retrieve works on the selected one."
+        ],
+        "items": [
+          "Implement `FindVersions(livePath)` in `src/core/Versions.cpp`: map the live path into each snapshot's device path, compare each copy with the live file and with each other, and return one entry per distinct content with the newest snapshot that holds it. Done when: a three-snapshot fixture with two distinct contents returns two entries. Cheaper substitute: listing every snapshot that has the file.",
+          "Choose the live file through the framework's file chooser in `src/ui/VersionsView.cpp`. Done when: picking a file lists its versions and a file in no snapshot shows a sentence saying so, not an empty list.",
+          "Show each version with its snapshot date, its size and a word saying whether it differs from the live file, and wire the Retrieve button to the engine. Done when: retrieving the selected version writes a new file at the chosen destination, read back byte for byte. Cheaper substitute: a private list control, which the contract forbids.",
+          "Cover it in `tests/versions_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L versions` passes, and fails when two identical copies are listed as two versions."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L versions` passes for the repeated-content and the file-in-no-snapshot fixtures.",
+        "commit": "feature: every distinct version of one file across the snapshots"
+      },
+      {
+        "title": "Compare With the Live File",
+        "intro": "The Browse section marks a file as different or the same. This feature shows how: the sizes and dates of both, and for a text file the lines that changed, so a person can tell whether the old version is the one they want before they retrieve it.",
+        "surface": {
+          "fidelity": "the Compare panel, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person decides whether the snapshot's version is the one they want. Consumer: the panel, read back against the two files.",
+          "treatment": "the snapshot file and the live file side by side with size, modified time and hash, and the changed lines for a text file, in words and not colour alone. Cheaper substitute that fails the checkpoint: a single word saying different, which does not say how."
+        },
+        "build": [
+          "Implement the detail comparison in `src/core/Compare.cpp` beyond same or different. Done when: a fixture text file with one changed line reports that line.",
+          "Show it in `src/ui/CompareView.cpp`. Done when: selecting a file and pressing Compare shows both files' details."
+        ],
+        "items": [
+          "Extend `Compare` in `src/core/Compare.cpp` to return both files' size, modified time and SHA-256, and for a file that decodes as text the changed lines. Done when: a fixture with one changed line returns that line, and a binary fixture returns sizes and hashes only.",
+          "Build `src/ui/CompareView.cpp` showing the two files side by side from the SDK's controls, with the differing lines marked with a word as well as colour. Done when: the panel shows the fixture's changed line labelled as changed. Cheaper substitute: colour alone, which fails the accessibility floor.",
+          "Bind the secondary Compare action in the content header to the panel and enable it only when a file is selected in Browse. Done when: with no file selected it is disabled with a tooltip saying why.",
+          "Cover it in `tests/compare_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L compare` passes, and fails when a changed line is dropped from the result."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L compare` passes for the text, binary and missing-live-file fixtures.",
+        "commit": "feature: show how a snapshot file differs from the live one"
+      },
+      {
+        "title": "Search Inside a Snapshot",
+        "intro": "A person often remembers a name, not where the file was. Search looks through the selected snapshot's folders for names that match and lists the hits, each openable in Browse and retrievable, without ever writing to the snapshot.",
+        "surface": {
+          "fidelity": "the Browse section's search box, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person finds a file in a snapshot by part of its name. Consumer: the hits list, read back against the snapshot's tree.",
+          "treatment": "a search box in the Browse header and a hits list showing each file's path, with a Stop button while it runs. Cheaper substitute that fails the checkpoint: filtering only the folder already open, which misses files in subfolders."
+        },
+        "build": [
+          "Implement `Search(snapshot, pattern)` in `src/core/Search.cpp` as a read-only walk that can be stopped. Done when: a fixture tree returns every name that matches and a stopped search returns promptly.",
+          "Show it in `src/ui/BrowseView.cpp`. Done when: typing a pattern lists the hits and selecting one opens its folder."
+        ],
+        "items": [
+          "Implement `Search(snapshot, pattern)` in `src/core/Search.cpp` walking the snapshot through `Browse()` only, matching names case-insensitively and returning paths as it finds them. Done when: a fixture with two matches in different subfolders returns both. Cheaper substitute: a second directory reader that opens the device path itself, which would bypass the read-only reader.",
+          "Make the walk stoppable and bounded to the selected snapshot. Done when: a Stop during a search of a large fixture ends it within the next entry read and returns what was found so far.",
+          "Add the search box and hits list to `src/ui/BrowseView.cpp` from the SDK's controls, with an empty-result sentence. Done when: a pattern with no match says so and a match can be retrieved from the list. Cheaper substitute: a private list control, which the contract forbids.",
+          "Cover it in `tests/search_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L search` passes, and fails when a subfolder is skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L search` passes for the nested-match, no-match and stopped-search fixtures.",
+        "commit": "feature: search a snapshot's folders by name"
+      },
+      {
+        "title": "Proof a Snapshot Is Never Written",
+        "intro": "The tool promises it cannot write to or delete a snapshot, because deleting the wrong one destroys the only copy of something. This feature makes that promise checkable by a person: a Proof page lists what the tool can do to a snapshot (read) and what it cannot (write, delete, mount, create), and shows the result of the same search the tests run.",
+        "surface": {
+          "fidelity": "the Proof page in the About area, against `sdk/DESIGN.md` section 11.",
+          "job": "a person sees evidence that the tool only reads snapshots. Consumer: the page, read back against the test's search result.",
+          "treatment": "a plain statement of what the tool can and cannot do to a snapshot, and the date and result of the last search of the source. Cheaper substitute that fails the checkpoint: a sentence saying the tool is safe, which proves nothing."
+        },
+        "build": [
+          "Write the search as `scripts/check-no-write.py` and run it from the tests and from the release. Done when: it exits 1 naming the file and line when a snapshot write, delete or mount call exists.",
+          "Show its last result in `src/ui/ProofView.cpp`. Done when: the page states the result and the date it was produced."
+        ],
+        "items": [
+          "Write `scripts/check-no-write.py` searching `src/` for write, delete, rename, mount and Volume Shadow Copy create or delete calls (`DeleteSnapshots`, `DeviceIoControl` write codes, `CreateFile` with write access on a snapshot path). Done when: it exits 0 on the tree and exits 1 naming `file:line` when a `DeleteSnapshots` call is added to a scratch file. Cheaper substitute: a code comment promising it, which a later edit can break unseen.",
+          "Run it at build time and record its result in a generated header `src/core/ProofResult.h`. Done when: a build with a planted write call fails and a clean build records the result and the date.",
+          "Build `src/ui/ProofView.cpp` stating what the tool can and cannot do to a snapshot and showing the recorded result. Done when: the page matches the header's result and shows no claim the search did not make.",
+          "Cover it in `tests/proof_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L proof` passes, and fails when the recorded result is forced to pass over a planted write call."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L proof` passes, the clean tree reports no write path, and a planted write call fails the build.",
+        "commit": "feature: a checkable proof that no snapshot is ever written"
+      }
+    ],
+    "no_reverse": "the tool reads snapshots and writes only the retrieved copy, a new file where the user says, which can simply be deleted",
+    "verification": [
+      "On a machine with shadow copies, the tool lists the same set as `vssadmin list shadows`, opens one read-only, compares a file and retrieves it, and the retrieved file matches the snapshot copy byte for byte.",
+      "On a machine with System Protection off, the tool says there are no snapshots and why, and unelevated it refuses by name; `scripts/check-no-write.py` exits 0 on the tree.",
+      "The tool is operated in light and dark, by keyboard alone, with an existing destination file left untouched when a name clashes."
+    ]
+  }
+}

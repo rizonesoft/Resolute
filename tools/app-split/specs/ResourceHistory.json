@@ -1,0 +1,250 @@
+{
+  "name": "ResourceHistory",
+  "slug": "resourcehistory",
+  "display": "Resource History",
+  "job": "it records processor, disk and memory use per program over time, only when switched on, and names what was using the machine during any time range you select.",
+  "tagline": "What was slowing your PC down an hour ago",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Spring green",
+    "light": "#86EFAC",
+    "dark": "#16A34A",
+    "social_ground": "#0C2A17",
+    "social_muted": "#C4EFD2"
+  },
+  "icon": {
+    "idea": "A filled chart with a bright line along its top: use over time.",
+    "points": [
+      "Free-standing with no tile: a filled area rising to the right.",
+      "The area is Spring green and the line on its edge is Spring green light.",
+      "The small drawing below 40 pixels has fewer points and a thicker line."
+    ],
+    "large": "<path d=\"M10 84 V58 L30 38 L50 54 L86 18 V84 Z\" fill=\"#16A34A\" stroke=\"#16A34A\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M10 58 L30 38 L50 54 L86 18\" fill=\"none\" stroke=\"#86EFAC\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M10 84 V56 L40 34 L56 50 L86 18 V84 Z\" fill=\"#16A34A\" stroke=\"#16A34A\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M10 56 L40 34 L56 50 L86 18\" fill=\"none\" stroke=\"#86EFAC\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "History",
+        "A chart of processor, memory and disk over the chosen period, and each program as a row with its share"
+      ],
+      [
+        "Recorder",
+        "Whether recording is on, its interval, what it has stored and its own measured cost"
+      ],
+      [
+        "Activity",
+        "When recording started and stopped, and what the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person selects a stretch of time and sees which programs were using the processor, memory and disk during it.",
+    "primary": "Start recording",
+    "secondary": "Select range",
+    "rows": [
+      [
+        "Chart",
+        "Processor, memory and disk over the chosen period"
+      ],
+      [
+        "Selected range",
+        "Start and end shown, or Whole period"
+      ],
+      [
+        "Programs",
+        "Each with its share of processor, memory and disk in the range"
+      ],
+      [
+        "Recorder",
+        "On or Off, with the interval when on"
+      ]
+    ],
+    "status": "Recording off, no history yet",
+    "notes": [
+      "The top of the screen is the chart. It draws processor, memory and disk over the chosen period with the suite's chart control, and the range selected on it is the range the list below answers for.",
+      "Below the chart each program is a row with its share of processor, memory and disk during the selected range, ranked, so the first row is what was using the machine most. A row states its program name in words, never by colour alone.",
+      "Start recording is the accent button and is the only way recording begins: the recorder is off at first run and the screen says so in a sentence. When recording is on, the same button reads Stop recording and stopping ends all sampling.",
+      "Select range sets the start and end of the range, with a Whole period choice. With no history yet, the screen shows an empty state that says nothing has been recorded and how to start.",
+      "The status bar says in words whether the recorder is on and how much history is held, and the interval is chosen in the Recorder section.",
+      "No confirmation is needed to start or stop, because neither changes the system. The tool needs no elevation and shows no refusal."
+    ],
+    "cut": "This is a new tool, so there is no earlier window to cut from. It has no menus of its own, no splash, no animations and no donate strip: the suite's sidebar window, settings pages and About page replace them, and the plan records this."
+  },
+  "readme": {
+    "lead": "Resource History records which programs used your processor, memory and disk over time, and tells you what was slowing the machine down when you were not watching.",
+    "what": [
+      "Windows shows what is using the machine right now, but not what was using it an hour ago. Resource History fills that gap. You turn the recorder on, it samples every program at an interval you choose, and later you select a stretch of time and it ranks the programs by their share of processor, memory and disk during it.",
+      "The recorder is off until you turn it on, keeps its history within a size you set with the oldest data dropped first, and stops completely when you turn it off. Its own cost is measured and quoted, so you can see what it asks of the machine."
+    ],
+    "new_intro": "Resource History is a new tool in the suite, so everything in it is new.",
+    "new": [
+      [
+        "Off until you turn it on.",
+        "Nothing is recorded at first run. Recording starts when you press Start recording and stops everything when you stop it."
+      ],
+      [
+        "A range answers the question.",
+        "Select a time range and the programs are ranked by their share of processor, memory and disk during it."
+      ],
+      [
+        "Bounded history.",
+        "Recent data is kept fine and older data is kept coarse, within a size limit, with the oldest dropped first."
+      ],
+      [
+        "Its own cost, measured.",
+        "The recorder's processor and memory use is shown in the tool and quoted here from a measurement."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "Recorder, bounded history, range query, window and features",
+    "goal": "Resource History ships as a complete, standalone C++ tool: an optional recorder, off by default and started and stopped explicitly, samples processor, disk and memory use per program at an interval the user sets; a bounded store keeps recent data fine and older data coarse; selecting a time range names what was using the machine during it; and the recorder's own cost is measured and quoted.",
+    "current_state": "Nothing exists yet. This is a new tool, not a port: there is no AutoIt version and no source material beyond the plan section in `docs/origin/resolute-D05-T06-s6.md`, which also describes a USB device history tool that is not part of this repository. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The method is Windows' own: read per-process processor time, working set and input and output bytes with `NtQuerySystemInformation` (`SystemProcessInformation`) or the PDH counters, take each interval's use as the difference between two readings, and read whole-machine processor time with `GetSystemTimes`. Windows also keeps its own history in the SRUM database, but that database is not documented for reading, so this tool records its own. The SDK's framework and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T06-s6.md`: the plan section this tool comes from, of which only the Resource History items apply.",
+      "`DESIGN.md`: the tool's identity and its window's sections, with `sdk/DESIGN.md` the suite's contract.",
+      "The Windows documentation for `NtQuerySystemInformation`, `GetSystemTimes` and the PDH counters, read on the build machine."
+    ],
+    "outcome": [
+      "A recorded period renders per program, and selecting a range names what was using the machine during it.",
+      "The recorder is off by default, bounded, started and stopped explicitly, and stops all recording when disabled, with its own cost measured and quoted.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the History screen, where each program is a row with its share over the selected range. Reporting and audit are the Activity section, which records when recording started and stopped. Settings are the framework's pages, where the interval and storage size are kept. Permissions do not apply: sampling and the store need no right the user lacks. Reverse is the Start at Sign-In section, which installs a sign-in start and removes it again, so the tool undoes its only change to the system.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Recorder and History Engine",
+      "intro": "The tool's whole core, independent of any window: sampling per-program use at the chosen interval, a bounded store that keeps recent data fine and older data coarse, a query that ranks programs over a time range, and the recorder's lifecycle. The recorder is off by default and nothing is sampled until it is started.",
+      "needs": "windows-host",
+      "build": [
+        "Implement the sampler and the store in `src/core/Sampler.cpp` and `src/core/Store.cpp`. Done when: the unit tests pass against fixed readings and a temporary store file.",
+        "Implement the range query and the recorder lifecycle in `src/core/Query.cpp` and `src/core/Recorder.cpp`. Done when: a recorded fixture period returns a ranked list and stopping ends all sampling."
+      ],
+      "items": [
+        "Implement `ReadProcesses()` in `src/core/Sampler.cpp` returning, for each process, its image name, start time, processor time, working set and input and output bytes from `NtQuerySystemInformation` with `SystemProcessInformation`. Done when: a test reads the running test process and finds its own name with non-zero working set. Cheaper substitute: shelling out to `tasklist`, which costs a process per reading and gives no processor time.",
+        "Implement `Sample(prev, next, interval)` in `src/core/Sampler.cpp` taking each program's use as the difference between two readings, and whole-machine processor time from `GetSystemTimes`. Done when: a test with two fixed readings gives the expected per-program share and a program that exited between them is not counted twice. Cheaper substitute: reading a counter once, which gives a total since start and not use in the interval.",
+        "Key each program by image name and process start time in `src/core/Sampler.cpp`, so a reused process id is not read as the same program. Done when: a test where one id is reused by a different program records two programs.",
+        "Implement the bounded store in `src/core/Store.cpp`: a ring buffer file under the user's local application data folder, holding fine records for recent time and coarser records for older time, with a fixed maximum size. Done when: a test that records past the maximum finds the file size unchanged and the oldest fine data rolled into coarse data. Cheaper substitute: a growing log trimmed by hand, which has no bound until it is trimmed.",
+        "Implement `Rank(from, to)` in `src/core/Query.cpp` returning programs ordered by their share of processor, memory and disk across a range, reading fine and coarse data together. Done when: a recorded fixture period names the program the fixture made heaviest as first, for each of the three measures.",
+        "Implement the recorder lifecycle in `src/core/Recorder.cpp`: off by default, `Start(interval)` and `Stop()` called explicitly, no sampling thread existing while off. Done when: a first run has no thread and no file, and after `Stop()` a test finds no new record written. Cheaper substitute: a recorder that is always running and only hides its output, which still costs the machine.",
+        "Persist the on or off state and the interval through the framework's settings in `src/core/Recorder.cpp`, with off the default. Done when: a restart of a stopped recorder stays stopped and the interval is read back.",
+        "Cover every path in `tests/recorder_test.cpp` with fixed readings. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L recorder` passes, and fails when the difference is replaced by a single reading."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L recorder` passes, including the bounded-store, off-by-default and stop-ends-sampling cases.",
+      "commit": "core: the recorder, its bounded store and the range query"
+    },
+    "enhancements": [
+      {
+        "title": "Start at Sign-In",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "The recorder can start by itself at sign-in, so history has no gaps after a restart. It is off until the user turns it on, and the tool installs the start and removes it again from the same section. Without it the user starts the recorder by hand each session.",
+        "surface": {
+          "fidelity": "the sign-in choice in the Recorder section, against `DESIGN.md` section 2.",
+          "job": "a person has the recorder running after sign-in without opening the tool, and can switch that off. Consumer: the per-user startup entry, read back.",
+          "treatment": "one switch with its state in words, and the entry removed when the switch is turned off. Cheaper substitute that fails the checkpoint: a startup entry written once with no removal, which leaves the system changed."
+        },
+        "build": [
+          "Install and remove the per-user sign-in start in `src/core/Startup.cpp`. Done when: turning it on writes the entry and turning it off deletes it.",
+          "Show the switch in `src/ui/RecorderView.cpp`. Done when: the switch reflects what is read back from the entry."
+        ],
+        "items": [
+          "Implement `InstallStartup()` in `src/core/Startup.cpp` writing a per-user entry that starts the recorder process without opening the window, and `RemoveStartup()` deleting it. Done when: a test under a redirected root finds the entry after install and none after remove.",
+          "Read the entry back after writing and report a mismatch by name. Done when: a test that corrupts the value after the write is told which value differs. Cheaper substitute: checking only the return code of the write.",
+          "Add the switch to `src/ui/RecorderView.cpp` showing on or off from the entry, not from a remembered flag. Done when: deleting the entry by hand shows the switch off at the next read.",
+          "Make the sign-in start honour the recorder's saved on or off state. Done when: with recording off, the sign-in start launches nothing that samples.",
+          "Cover it in `tests/startup_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L startup` passes, and fails when remove leaves the entry."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L startup` passes: install then remove leaves the system as it was.",
+        "commit": "feature: start the recorder at sign-in, and remove it again"
+      },
+      {
+        "title": "Recorder Cost, Measured",
+        "needs": "sdk-framework",
+        "intro": "The recorder must cost less than what it measures. The tool measures its own processor and memory use while recording and shows it in the Recorder section, and the README quotes a measurement taken on a real machine, not an estimate.",
+        "surface": {
+          "fidelity": "the cost readout in the Recorder section, against `DESIGN.md` section 2.",
+          "job": "a person sees what the recorder itself is using. Consumer: the readout, compared with the tool's own process times.",
+          "treatment": "the tool's own processor share and working set in words and numbers, from its own process counters. Cheaper substitute that fails the checkpoint: a fixed figure typed into the screen, which measures nothing."
+        },
+        "build": [
+          "Measure the tool's own use in `src/core/SelfCost.cpp`. Done when: the readout follows the process's own counters.",
+          "Record a real measurement in `docs/measurements/recorder-cost.md`. Done when: the file names the machine, the interval and the figures read."
+        ],
+        "items": [
+          "Implement `SelfCost()` in `src/core/SelfCost.cpp` reading the tool's own processor time with `GetProcessTimes` and working set with `GetProcessMemoryInfo`, sampled by difference like the programs it records. Done when: a test that burns a known amount of processor time sees it in the result.",
+          "Show the cost in `src/ui/RecorderView.cpp` while recording. Done when: the readout updates at the recorder's interval and shows nothing when recording is off.",
+          "Measure the recorder on a real machine at the default interval and write `docs/measurements/recorder-cost.md` with the machine, the Windows build, the interval, the duration and the figures. Done when: the file holds figures read from the run and none typed from memory.",
+          "Quote the measurement in `README.md`, copied from `docs/measurements/recorder-cost.md`. Done when: each figure in the README appears in that file. Cheaper substitute: a round figure written from a guess.",
+          "Cover it in `tests/selfcost_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L selfcost` passes, and fails when the result is a constant."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L selfcost` passes, and every figure quoted in `README.md` appears in `docs/measurements/recorder-cost.md`.",
+        "commit": "feature: the recorder's own cost, measured and quoted"
+      },
+      {
+        "title": "Storage Limit",
+        "needs": "sdk-framework",
+        "intro": "The user sets how much space history may use, and when the store is full the oldest data is dropped first. The engine already holds a fixed bound; this section makes the bound a setting the user controls and shows how much is used.",
+        "surface": {
+          "fidelity": "the storage setting and readout in the Recorder section, against `DESIGN.md` section 2.",
+          "job": "a person decides how much disk history may use and sees how full it is. Consumer: the store file, compared with the setting.",
+          "treatment": "a size setting with the used amount beside it in words. Cheaper substitute that fails the checkpoint: a limit applied only at start, which lets the file grow past it while running."
+        },
+        "build": [
+          "Make the store's maximum a setting in `src/core/Store.cpp`. Done when: changing it changes the bound at the next write.",
+          "Show the setting and the used amount in `src/ui/RecorderView.cpp`. Done when: the readout matches the file on disk."
+        ],
+        "items": [
+          "Read the maximum size from the framework's settings in `src/core/Store.cpp`, with a default set in the descriptor. Done when: a test sets a smaller maximum and the file never exceeds it.",
+          "Drop the oldest data first when the maximum is reached, coarse data before fine recent data. Done when: a test that fills the store keeps the newest records and loses the oldest. Cheaper substitute: refusing new records when full, which stops recording silently.",
+          "Show the used amount and the maximum in `src/ui/RecorderView.cpp`. Done when: the readout equals the size of the file on disk.",
+          "Cover it in `tests/limit_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L limit` passes, and fails when the oldest data is kept instead."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L limit` passes: the file stays within the set size and the oldest data goes first.",
+        "commit": "feature: a storage limit the user sets, oldest data dropped first"
+      },
+      {
+        "title": "Export a Period",
+        "needs": "sdk-framework",
+        "intro": "The selected range can be saved as a CSV, so the answer can be kept, sent or opened in a spreadsheet. The export only reads the store and writes the file the user names.",
+        "surface": {
+          "fidelity": "the Export action on the History screen, against `DESIGN.md` section 2.",
+          "job": "a person saves the programs and their shares for the selected range. Consumer: the CSV file, read back.",
+          "treatment": "one action that writes the ranked list for the range as rows with a header. Cheaper substitute that fails the checkpoint: copying the screen's text, which loses the columns."
+        },
+        "build": [
+          "Write the CSV in `src/core/Export.cpp`. Done when: a fixture range produces the expected file.",
+          "Add the action in `src/ui/HistoryView.cpp`. Done when: the action saves the file the user names."
+        ],
+        "items": [
+          "Implement `ExportCsv(from, to, path)` in `src/core/Export.cpp` writing one row per program with its processor, memory and disk shares for the range, and a header row. Done when: a test reads the file back and finds every program of the fixture range with the same values as `Rank`.",
+          "Quote fields that hold commas or quotes. Done when: a program name containing a comma round-trips through a CSV reader unchanged.",
+          "Add Export to the History screen in `src/ui/HistoryView.cpp` using the framework's save dialog. Done when: it is disabled with a tooltip when no range is selected and writes the chosen file otherwise. Cheaper substitute: a private file dialog.",
+          "Cover it in `tests/export_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes, and fails when a column is dropped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes: the exported rows equal the ranked list for the same range.",
+        "commit": "feature: export the selected period as a CSV"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A recorded period renders per program, the range query names what was using the machine, and the recorder's cost is measured and quoted from `docs/measurements/recorder-cost.md`.",
+      "The recorder is off by default, its storage is bounded, and disabling it stops all recording, shown by a test and by a real run.",
+      "On a real machine the tool records, ranks, exports and starts at sign-in and removes that start, in light and dark, by keyboard alone."
+    ]
+  }
+}

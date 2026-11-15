@@ -1,0 +1,254 @@
+{
+  "name": "DefaultAppsRepair",
+  "slug": "defaultappsrepair",
+  "display": "Default Apps Repair",
+  "job": "it reads what opens each link type and common file type, finds the ones whose chosen program is gone, repairs them by clearing the broken choice so Windows falls back or asks again, and can put each handler back exactly as it was.",
+  "tagline": "When a link or a file opens the wrong thing, or nothing",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Iris",
+    "light": "#A5B4FC",
+    "dark": "#4F46E5",
+    "social_ground": "#13123A",
+    "social_muted": "#CFD3FA"
+  },
+  "icon": {
+    "idea": "An app tile with a pointer clicking out of it: what a click opens.",
+    "points": [
+      "Free-standing with no tile behind it: a rounded square with an arrow pointer overlapping its lower right.",
+      "The square is Iris and the pointer is Iris light.",
+      "The small drawing, below 40 pixels, enlarges the pointer."
+    ],
+    "large": "<rect x=\"8\" y=\"8\" width=\"58\" height=\"58\" rx=\"13\" fill=\"#4F46E5\"/><path d=\"M44 42 L86 58 L68 66 L60 86 Z\" fill=\"#A5B4FC\" stroke=\"#A5B4FC\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<rect x=\"6\" y=\"6\" width=\"56\" height=\"56\" rx=\"13\" fill=\"#4F46E5\"/><path d=\"M36 34 L88 54 L66 64 L56 88 Z\" fill=\"#A5B4FC\" stroke=\"#A5B4FC\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Defaults",
+        "Each link type and common file type: what opens it now, and its state"
+      ],
+      [
+        "Repairs",
+        "What was changed and when, with the handler each repair replaced"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees what opens each link and common file type, which ones are broken, and repairs the broken ones with one button.",
+    "primary": "Repair",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "http",
+        "Working"
+      ],
+      [
+        "https",
+        "Working"
+      ],
+      [
+        "mailto",
+        "Broken: the chosen program is gone"
+      ],
+      [
+        ".pdf",
+        "Broken: the chosen program is gone"
+      ],
+      [
+        ".html",
+        "Not set"
+      ]
+    ],
+    "status": "2 broken, 1 not set, 2 working",
+    "notes": [
+      "Each row is one link type (http, https, mailto) or file type (.html, .pdf and the other common ones) with what opens it now, shown by program name. Its state is Working, Broken or Not set, each with an icon and a word. Colour is never the only sign.",
+      "A broken row says why in one sentence, for example that the chosen program is no longer installed. Broken rows start ticked. Working and Not set rows start unticked, so a handler the person chose on purpose is never one click from being changed.",
+      "Repair clears the broken choice on the ticked rows only, so Windows falls back to its own default or asks the next time. It then re-reads each row from Windows and shows the result in words. It never writes a choice itself.",
+      "A row can also be set by the person in Windows: Choose in Windows opens the Default apps page, and the row is read again when the window is next used.",
+      "Undo puts back what the last repair replaced. It is disabled with a tooltip when there is nothing to undo.",
+      "The status bar counts the rows in words, for example \"2 broken, 1 not set, 2 working\", and changes with the rows.",
+      "The tool never asks for elevation and changes only the signed-in person's own settings. A change Windows refuses is shown on its row as Could not change, with the reason in words."
+    ],
+    "cut": "There is no original window to compare with, so nothing is cut from one. The suite's usual extras are not part of this tool: no splash, no animations, no donate strip and no menu bar. Settings, About and updates come from the framework's pages. Each of these is recorded as a decision in the plan."
+  },
+  "readme": {
+    "lead": "When a link or a file opens the wrong thing, or nothing, find out why and fix it.",
+    "what": [
+      "A program that is uninstalled often leaves Windows still pointing at it. A link in an email, a web address or a PDF then opens nothing, or opens a program you did not choose. Default Apps Repair lists each link type (http, https, mailto) and the common file types, shows what opens each one now, and marks it Working, Broken or Not set.",
+      "For the ones that are broken it clears the broken choice, so Windows falls back to its own default or asks you again. It does not write a choice for you, because Windows protects that choice and a program is not allowed to forge it. It leaves a handler you set on purpose alone unless you select it, and it records what it replaced so the repair can be undone. System file types such as .exe and .lnk belong to the suite's File Association Repair, not here."
+    ],
+    "new_intro": "Default Apps Repair is a new tool of the suite, written in C++ from the start.",
+    "new": [
+      [
+        "Shows before it changes.",
+        "Every link type and common file type is listed with what opens it now and a plain reason when it is broken."
+      ],
+      [
+        "Repairs only what is broken.",
+        "A working handler, even a third-party one you chose, is left alone unless you select it."
+      ],
+      [
+        "Can be undone.",
+        "The handler each repair replaced is recorded, so the last repair can be put back."
+      ],
+      [
+        "Takes you to the right page.",
+        "It opens the Windows Default apps page for you to choose, and can open a harmless test link or file to show what Windows launches."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: engine, window, features, release",
+    "goal": "Default Apps Repair ships as a complete, standalone C++ tool: a person sees what opens each link type and common file type, which of them are broken, repairs only the broken ones by clearing the broken choice with every result read back, never forges the choice Windows protects, and can put the last repair back exactly as it was.",
+    "current_state": "Nothing exists yet: no code, no AutoIt original and no reference folder. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The only source is the plan section in `docs/origin/resolute-D05-T06-s5.md` (section 5), which describes this tool and an icon cache repair tool together; this plan takes only what concerns default apps and protocol handlers. That section says to repair default apps and protocol handlers covering `http`, `https`, `mailto` and the common file types, verified by reading back, to capture each prior handler so undo restores it exactly, and to repair only what is broken: a handler the user deliberately set to a third-party application is left alone unless selected. The rest comes from Windows itself: the per-user choice under `HKCU\\Software\\Microsoft\\Windows\\Shell\\Associations\\UrlAssociations\\<protocol>\\UserChoice` and `HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\<ext>\\UserChoice`, whose `Hash` value Windows protects so a program must not forge a choice, `AssocQueryStringW` and `IApplicationAssociationRegistration` for the effective handler, a choice that names a ProgID that no longer exists (the usual break after an uninstall), `RegisteredApplications` and an application's `Capabilities`, and `ms-settings:defaultapps` for the user to choose. Deleting a broken `UserChoice` key makes Windows ask again or fall back, which is the legitimate repair. The sibling suite tool File Association Repair owns the critical system types (.exe, .lnk and so on). The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T06-s5.md`: the plan section for this tool, with the icon cache lines not used here.",
+      "`DESIGN.md` and `brand/`: the tool's identity and its window's sections.",
+      "`sdk/DESIGN.md`: the suite's contract every surface answers to, from the pinned Resolute-SDK."
+    ],
+    "outcome": [
+      "`DefaultAppsRepair.exe` reads the effective handler of each link type and file type from a data table, and judges each Working, Broken or Not set from what Windows reports.",
+      "Repair clears only the broken per-user choice of the ticked rows, records the prior handler before the change, reads every row back and never writes a choice or a `Hash` value itself.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Defaults screen, where a person finds a handler by the link or file type it serves. Reporting and audit are the Activity section, the trail of every read and every repair, and the Repairs section shows what was replaced and when. Settings are the framework's pages. Permissions do not apply: the tool changes only the signed-in person's own keys, never elevates, and a change Windows refuses is reported by name. Reverse anchors on the undo section, which puts back the exact prior values the tool recorded, and says plainly when Windows does not accept them.",
+    "engine": {
+      "title": "Handler Read and Repair Engine",
+      "intro": "The tool's whole system effect: reading the effective handler of each link type and file type, judging it, and repairing a broken one by clearing the per-user choice so Windows falls back or asks. It is independent of any window, per user, and needs no elevation. It never forges the protected choice.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the link types and file types as data in `src/core/Handlers.h` and implement the read and the judgement in `src/core/Reader.cpp` and `src/core/Judge.cpp`. Done when: a fixture registry returns each entry with a state and a reason.",
+        "Implement the record, the repair and the read-back in `src/core/Repair.cpp`. Done when: the unit tests pass against a registry root the tests redirect to a disposable key."
+      ],
+      "items": [
+        "Declare in `src/core/Handlers.h` the entries as data: the link types `http`, `https` and `mailto`, and the common file types `.htm`, `.html`, `.pdf`, `.txt`, `.jpg`, `.png`, `.mp3` and `.mp4`, each with its kind and its per-user `UserChoice` key path. Done when: a test lists every entry, and finds none of `.exe`, `.lnk`, `.bat`, `.cmd`, `.com`, `.msi`, `.reg`, `.dll` or `.scr`, which belong to File Association Repair.",
+        "Implement `ReadHandler(entry)` in `src/core/Reader.cpp` returning the chosen ProgID from the entry's `UserChoice` key and the effective program from `AssocQueryStringW` with `ASSOCSTR_EXECUTABLE` and `ASSOCSTR_FRIENDLYAPPNAME` (for links also `IApplicationAssociationRegistration::QueryCurrentDefault`), behind an interface a test can fake. Done when: a fake provider and a fixture key return the ProgID, the program name and its path. Cheaper substitute: reading only the `UserChoice` value, which misses the default Windows falls back to when no choice is stored.",
+        "Implement `Judge(read)` in `src/core/Judge.cpp` returning Working, Broken or Not set with a reason sentence. A row is Broken when its chosen ProgID has no class key under `HKCU\\Software\\Classes` or `HKLM\\Software\\Classes`, or its open command names an executable that does not exist; Not set when there is no choice and Windows reports no effective program; Working otherwise. Done when: a fixture with a removed ProgID, one with a deleted executable, one with no choice and one healthy third-party handler returns Broken, Broken, Not set and Working with a reason each. Cheaper substitute: judging only that a `UserChoice` key exists, which calls a broken handler working.",
+        "Implement `Record(entry)` in `src/core/Repair.cpp` that copies the entry's `UserChoice` values (the ProgID and the `Hash` as bytes, never computed) through the repair contract before any change. Done when: a test finds the record on disk, holding the exact prior bytes, before the first key is deleted. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+        "Implement `Repair(entry, explicit)` in `src/core/Repair.cpp` that deletes only that entry's per-user `UserChoice` key (and the `UserChoiceLatest` key beside it where this Windows build has one, found at run time and not assumed), after `Record`, and refuses an entry judged Working unless `explicit` is true. Done when: a fixture with a broken and a working third-party entry repairs the broken one, leaves the working one untouched, and repairs the working one only when asked. Cheaper substitute: writing a new ProgID and `Hash` to set a default, which forges the choice Windows protects and which Windows discards as tampering.",
+        "Read every entry back after `Repair` and report each as Not set, Working or Could not change with the Windows error in words (access denied, in use). Done when: a fixture whose key cannot be deleted reports Could not change with the reason, and the other entries are still repaired. Cheaper substitute: trusting the return code of the delete, which hides a choice that is still there.",
+        "Write only under `HKEY_CURRENT_USER` and never elevate, in `src/core/Repair.cpp`. Done when: a test with a fake registry that fails on any write outside the current user's hive passes a full repair, and a source search of `src/` finds no write to `HKEY_LOCAL_MACHINE` and no write of a `Hash` value.",
+        "Cover the engine in `tests/handlers_test.cpp`, `tests/judge_test.cpp` and `tests/repair_test.cpp` with a disposable registry root. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when a repair is made to touch a working entry."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, including the removed-program, missing-executable, not-set, working-third-party and refused-delete cases, and fails when a repair touches a working entry.",
+      "commit": "core: read each handler, repair only the broken ones by clearing the choice"
+    },
+    "parity_items": [],
+    "baseline_items": [],
+    "inventory_items": [],
+    "enhancements": [
+      {
+        "title": "Undo a Repair",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before a repair, each entry's prior `UserChoice` values are recorded, so Undo puts back what was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists. Windows binds the `Hash` to the key's own last-write time, so a restored choice can be rejected by Windows; Undo reads the entry back and says so in words when that happens.",
+        "surface": {
+          "fidelity": "the Undo action and the Repairs section, against `DESIGN.md` section 2.",
+          "job": "a person puts back what the last repair replaced. Consumer: each entry's keys and its effective handler, compared with the record.",
+          "treatment": "each recorded value restored entry by entry, then the entry read again and shown as restored or as not accepted by Windows, with the reason. Cheaper substitute that fails the checkpoint: reporting restored without reading the effective handler back."
+        },
+        "build": [
+          "Restore the recorded values through the repair contract in `src/core/Repair.cpp`. Done when: repair then undo leaves each fixture entry's `UserChoice` values equal to the record.",
+          "Wire Undo and the Repairs list in `src/ui/RepairsView.cpp`. Done when: the section lists each repair with its time and the replaced handler, and Undo reverses the last one."
+        ],
+        "items": [
+          "Implement `Undo(repair)` in `src/core/Repair.cpp` that recreates each entry's `UserChoice` key from the record, writing the recorded ProgID and the recorded `Hash` bytes exactly and computing nothing. Done when: repair then undo leaves every fixture entry's values byte-equal to before, asserted. Cheaper substitute: writing a fresh ProgID and a computed `Hash`, which is a forged choice.",
+          "Read each entry back after Undo through `src/core/Reader.cpp` and report it as Restored or as Not accepted by Windows, with a sentence saying Windows may ignore a restored choice and that Choose in Windows sets it. Done when: a fake provider that rejects the restored choice produces the Not accepted line and the entry is not shown as Restored.",
+          "Show every repair in `src/ui/RepairsView.cpp` as one line with the time, the entry and the handler it replaced, newest first. Done when: after two repairs the list shows two lines in the right order and matches the records on disk. Cheaper substitute: a private list control.",
+          "Report an entry whose state changed since the repair, for example one the person has since set in Windows, as not restored with the reason, and restore the rest. Done when: a fixture with one entry changed afterwards restores the others and names that one.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one repair.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: repair then undo leaves each fixture entry's values as recorded, and a choice Windows rejects is reported as not accepted.",
+        "commit": "feature: undo puts back the handler each repair replaced"
+      },
+      {
+        "title": "Open Windows Default Apps",
+        "intro": "Clearing a broken choice makes Windows fall back or ask, but only the person can choose a new default. This section takes them to the right Windows page, for the whole list or from a row, and reads the row again when they come back.",
+        "surface": {
+          "fidelity": "the Choose in Windows action, against `sdk/DESIGN.md` section 11.",
+          "job": "a person who has a Not set or just-repaired row reaches the Windows page where the choice is made in one click. Consumer: the row, read again after the person returns.",
+          "treatment": "a Choose in Windows button on each row and in the header, opening the Default apps page, and the row updated from a re-read when the window is next used. Cheaper substitute that fails the checkpoint: a tip telling the person where the page is, which leaves the finding to them."
+        },
+        "build": [
+          "Open the Windows page in `src/core/Settings.cpp`. Done when: a fake launcher receives the `ms-settings:defaultapps` address.",
+          "Add the actions and the re-read in `src/ui/DefaultsView.cpp`. Done when: returning to the window updates the row that was chosen."
+        ],
+        "items": [
+          "Implement `OpenDefaultApps()` in `src/core/Settings.cpp` that opens `ms-settings:defaultapps` with `ShellExecuteExW` behind an interface a test can fake. Done when: a test with a fake launcher records exactly that address, and a failed launch returns the Windows error in words. Cheaper substitute: starting `control.exe` or `cmd /c start`, which opens a different page or a console.",
+          "Add Choose in Windows to each row and to the header in `src/ui/DefaultsView.cpp`, both calling `OpenDefaultApps()`. Done when: pressing it on a Not set row calls the launcher once and leaves the row unchanged.",
+          "Read the rows again when the window becomes active after Choose in Windows, through `src/core/Reader.cpp`. Done when: a driven test that changes the fake provider's handler while the window is in the background shows the new handler and state when the window is activated. Cheaper substitute: a timer that polls, which reads when nothing has changed.",
+          "Cover it in `tests/settings_page_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L settingspage` passes, and fails when the launched address is changed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L settingspage` passes: the Default apps page is opened from a row and the row is read again on return.",
+        "commit": "feature: open the Windows Default apps page and re-read on return"
+      },
+      {
+        "title": "Test a Link",
+        "intro": "A repair is proven only when the link or file really opens. This section opens a harmless test link or a small test file of the row's type and shows what Windows launched, so the person sees the result and not only the registry.",
+        "surface": {
+          "fidelity": "the Test action and its result line, against `sdk/DESIGN.md` section 11.",
+          "job": "a person checks that a repaired handler opens something and sees which program it was. Consumer: the process Windows started, read back.",
+          "treatment": "a Test button on each row that opens the harmless item after a confirmation naming what will open, then one line with the program Windows started, or the reason none could be read. Cheaper substitute that fails the checkpoint: opening it and reporting success without naming the program."
+        },
+        "build": [
+          "Open the test item and read the launched program in `src/core/TestLaunch.cpp`. Done when: a fake launcher returns the program it started.",
+          "Show the confirmation and the result line in `src/ui/DefaultsView.cpp`. Done when: cancelling the confirmation opens nothing."
+        ],
+        "items": [
+          "Declare the test targets as data in `src/core/TestTargets.h`: `https://example.com/` for `http` and `https`, a `mailto:` link to an `example.com` address, and for each file type a small file the tool writes to its own scratch folder. Done when: a test lists one target per entry and every address uses the reserved `example.com` domain.",
+          "Implement `TestOpen(entry)` in `src/core/TestLaunch.cpp` that opens the target with `ShellExecuteExW` and `SEE_MASK_NOCLOSEPROCESS`, then reads the started program with `QueryFullProcessImageNameW`, and reports the predicted program from `AssocQueryStringW` and says it is a prediction when Windows hands back no process. Done when: a fake launcher that returns a process and one that returns none give a started program and a labelled prediction. Cheaper substitute: always showing the prediction, which is what the registry says and not what Windows did.",
+          "Show a confirmation before opening, through the framework's message surface, naming the link or file and the program it is expected to open. Done when: cancelling opens nothing and the scratch file is not written. Cheaper substitute: a private dialog.",
+          "Delete the scratch test file after the test, and refuse a type whose test would run a program rather than a document. Done when: a test finds the scratch folder empty afterwards and the refusal names the type.",
+          "Cover it in `tests/testlaunch_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L testlaunch` passes, and fails when a target outside `example.com` is added."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L testlaunch` passes: a test opens only a harmless target after confirmation and reports the started program or a labelled prediction.",
+        "commit": "feature: test a link or file and show what Windows launched"
+      },
+      {
+        "title": "Leftovers From Removed Programs",
+        "intro": "An uninstalled program often leaves its registration behind: an entry in `RegisteredApplications` whose `Capabilities` key is gone, or a ProgID that nothing installs. This section lists those leftovers for the signed-in person and removes the chosen ones after a confirmation.",
+        "surface": {
+          "fidelity": "the leftovers list and its confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person sees which handler registrations belong to programs that are gone and clears the ones they choose. Consumer: the registry entries, read back.",
+          "treatment": "each leftover shown with the program name it was registered under, where it is registered and why it is judged gone, removal only after a confirmation naming each entry. Cheaper substitute that fails the checkpoint: deleting every unrecognised registration, which removes ones a working program uses."
+        },
+        "build": [
+          "Find the leftovers in `src/core/Leftovers.cpp`. Done when: a fixture registration whose `Capabilities` key is missing is listed.",
+          "Show and confirm removal in `src/ui/LeftoversView.cpp`. Done when: nothing is removed without the confirmation."
+        ],
+        "items": [
+          "Implement `FindLeftovers()` in `src/core/Leftovers.cpp` listing per-user `RegisteredApplications` values whose `Capabilities` path does not exist and per-user ProgIDs under `HKCU\\Software\\Classes` whose open command names a missing executable. Done when: a fixture with one gone registration, one gone ProgID and one healthy program lists exactly the two gone ones. Cheaper substitute: listing every registration without checking its path, which lists working programs.",
+          "List machine-wide leftovers under `HKLM` as read-only rows that say they need an administrator and are never removed by this tool. Done when: a fixture machine-wide leftover is listed and a request to remove it is refused by name.",
+          "Remove the chosen per-user leftovers after a confirmation naming each entry, through the framework's message surface, recording each in the restore record first. Done when: a fixture with two leftovers removes the one confirmed and keeps the other, and the record holds the removed values. Cheaper substitute: a private dialog, or deleting without the record.",
+          "Read each removed entry back and report any that remain with the Windows error in words. Done when: a fixture whose key cannot be deleted is reported by name and the others are removed.",
+          "Cover it in `tests/leftovers_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L leftovers` passes, and fails when a healthy registration is listed or removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L leftovers` passes: only gone registrations are listed, only the confirmed per-user ones are removed, and machine-wide ones are never touched.",
+        "commit": "feature: list and clear handler registrations left by removed programs"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A fixture registry with a removed ProgID, a missing executable, no choice and a healthy third-party handler is read, judged, repaired and read back, with the healthy entry compared equal before and after.",
+      "A repair then Undo leaves each fixture entry's values byte-equal to the record, and the source holds no write of a `Hash` value and no write outside the current user's hive.",
+      "On a real machine the tool lists the handlers, repairs a deliberately broken one, opens the Windows Default apps page, tests a link and undoes, in light and dark, by keyboard alone."
+    ]
+  }
+}
