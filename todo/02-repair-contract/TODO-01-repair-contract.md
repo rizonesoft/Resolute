@@ -18,7 +18,7 @@ track: F2
 
 ## Inputs
 
-- [`resolute_au3/SDK/Concrete/ComIntRep/ComIntRep.au3`](../../resolute_au3/SDK/Concrete/ComIntRep/ComIntRep.au3) -- the reference implementation; the contract is extracted from what this tool does well
+- `resolute_au3/SDK/Concrete/ComIntRep/ComIntRep.au3` (moved 2026-11-15 to the `rizonesoft/ComIntRep` repository, under `reference/au3/`) -- the reference implementation; the contract is extracted from what this tool does well
 - `reference/au3/src/Ownership.au3` in the `rizonesoft/Ownership` repository (moved there 2026-11-15, `docs/plans/2026-11-15-app-split.md`) -- the thinnest consumer, and the vertical slice that proves the contract
 - -> XREF: [`01-framework/TODO-01 §1`](../01-framework/TODO-01-framework-core.md) -- the framework this layer sits on
 - -> XREF: [`04-tools-port/TODO-01 §2`](../04-tools-port/TODO-01-tool-ports.md) -- the six frozen tools that consume this contract

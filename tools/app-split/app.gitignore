@@ -1,0 +1,27 @@
+# The pinned Resolute-SDK: a clone at the commit sdk.json names, or a link to the developer's checkout.
+# No trailing slash: a directory junction is matched as a file by some git versions.
+/sdk
+
+# Derived output
+/build/
+/Bin/
+__pycache__/
+*.pyc
+
+# Local-only reference material: old distribution builds, shipped executables and logs of the AutoIt tool.
+/reference/au3/local/
+/reference/au3/*/local/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*~
+Thumbs.db
+Desktop.ini
+
+# Editors
+.vs/
+.vscode/
+.idea/
+*.user

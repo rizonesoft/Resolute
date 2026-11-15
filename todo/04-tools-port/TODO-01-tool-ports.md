@@ -121,6 +121,8 @@ track: P2
 
 ## 2. The Remaining Frozen Tools: ComIntRep and PixRepair
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ComIntRep` and `rizonesoft/PixRepair` repositories (`D:\Resolute_Bin\ComIntRep`, `D:\Resolute_Bin\PixRepair`), each by its own plan.
+
 > [!IMPORTANT]
 > **Groomed 2026-09-17. This section claimed five tools and owns two, because three of them are ported by its own dependents.**
 >
@@ -152,23 +154,25 @@ track: P2
 **Needs:** Windows host (build/test)
 
 - [x] **Specify** `ComIntRep` in its own TODO file before building it. Required scope: every repair it performs enumerated from `resolute_au3/SDK/Concrete/ComIntRep/ComIntRep.au3` with its source line; which repairs are reversible and which are not; the component and internet repair areas it touches; and the freeze check below, which transfers to that file because that is where the writing happens. Done when: the file exists, validates, and its sections appear in the plan. Done: `D04 T03` authored, validated, and planned; the freeze check transfers to its Outcome and §1 verdicts.
-- [ ] Capture each shipped AutoIt tool first, with its effects on its fixture and its window. Done when: two baselines are committed.
-- [ ] Port `PixRepair` to `extensions/PixRepair/` as framework plus contract plus items. Done when: it builds as its own standalone executable and contains no settings, log, localization, or loop code.
-- [ ] Prove parity per tool, `ComIntRep` through its own spec's sections and `PixRepair` here. Done when: two parity reports each show zero differing fields, both quoted.
-- [ ] Prove the reverse per tool, or state plainly which actions have none and what the user should do instead, on the surface. Done when: each carries one of those two and the checkpoint proves which.
-- [ ] Prove the elevation refusal per tool. Done when: two unelevated assertions each show the action refused by name, nothing changed, one log line.
-- [ ] Account for each surface. Done when: two accounts are written and each deferral resolves.
-- [ ] Port `ComIntRep` to `extensions/ComIntRep/` as framework plus contract plus the items `D04 T03 §1` declares, with the `D04 T03 §2` surface (groom 2026-09-23 gap scan) : `D04 T03` says its build and parity proof stay here, but this section's only port item is `PixRepair`, so nothing builds the 14 repairs, 5 menus, 4 Export commands, the Troubleshoot and Tools launches, or the reboot prompt. Done when: the tool builds as its own executable, the parity driver reports zero differing fields against `resolute_au3/` on the same fixture, and the unelevated refusal leg runs for `ComIntRep` alone (`PixRepair` needs no elevation, `D04 T04 §2`, so its refusal leg reads not-applicable with that reason).
-- [ ] Commit: `"system tools: port comintrep and pixrepair"`
+- [ ] ~~Capture each shipped AutoIt tool first, with its effects on its fixture and its window. Done when: two baselines are committed.~~ -> `rizonesoft/ComIntRep`
+- [ ] ~~Port `PixRepair` to `extensions/PixRepair/` as framework plus contract plus items. Done when: it builds as its own standalone executable and contains no settings, log, localization, or loop code.~~ -> `rizonesoft/ComIntRep`
+- [ ] ~~Prove parity per tool, `ComIntRep` through its own spec's sections and `PixRepair` here. Done when: two parity reports each show zero differing fields, both quoted.~~ -> `rizonesoft/ComIntRep`
+- [ ] ~~Prove the reverse per tool, or state plainly which actions have none and what the user should do instead, on the surface. Done when: each carries one of those two and the checkpoint proves which.~~ -> `rizonesoft/ComIntRep`
+- [ ] ~~Prove the elevation refusal per tool. Done when: two unelevated assertions each show the action refused by name, nothing changed, one log line.~~ -> `rizonesoft/ComIntRep`
+- [ ] ~~Account for each surface. Done when: two accounts are written and each deferral resolves.~~ -> `rizonesoft/ComIntRep`
+- [ ] ~~Port `ComIntRep` to `extensions/ComIntRep/` as framework plus contract plus the items `D04 T03 §1` declares, with the `D04 T03 §2` surface (groom 2026-09-23 gap scan) : `D04 T03` says its build and parity proof stay here, but this section's only port item is `PixRepair`, so nothing builds the 14 repairs, 5 menus, 4 Export commands, the Troubleshoot and Tools launches, or the reboot prompt. Done when: the tool builds as its own executable, the parity driver reports zero differing fields against `resolute_au3/` on the same fixture, and the unelevated refusal leg runs for `ComIntRep` alone (`PixRepair` needs no elevation, `D04 T04 §2`, so its refusal leg reads not-applicable with that reason).~~ -> `rizonesoft/ComIntRep`
+- [ ] Commit: ~~`"system tools: port comintrep and pixrepair"`~~ -> `rizonesoft/ComIntRep`
 
 **Freeze check:** Neither tool's effect changes. Evidence is two parity reports with zero differing fields against the shipped AutoIt builds on their own fixtures. **The `ComIntRep` half transfers to its spec**, which is where its repairs are declared.
 -> XREF: D04 T01 §4 -- ports `USBRepair` and `DVDRepair`, merged, which this section no longer does
 -> XREF: D04 T01 §5 -- ports `BiosCodes`, which this section no longer does
 
-**Test checkpoint:** `ComIntRep` has an authored TODO file that validates and appears in the plan. Two parity reports show zero differing fields, both quoted. Two reverse behaviors are proven or their absence stated on the surface. Two unelevated refusals each produce one log line. Both rendered surfaces compared against their captures.
+**Test checkpoint:** Moved with the section. The `rizonesoft/ComIntRep` repository's plan carries it.
 
 
 ## 3. Browser Optimizer: Four Tools Into One
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/Firemin` repository (`D:\Resolute_Bin\Firemin`) by its own plan.
 
 Four byte-identical 2,389-line scripts become one tool with a browser picker. `Firemin` is the surviving brand and carries its 35 language packs forward.
 
@@ -178,19 +182,21 @@ Four byte-identical 2,389-line scripts become one tool with a browser picker. `F
 **Chrome:** consume the framework. The optimizer is not a repair tool and does not consume the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] **Specify** the merged optimizer in its own TODO file before building it. Required scope: the four tools' shared behavior with its source lines, the browser picker, per-browser memory figures, and what the 35 Firemin packs carry that the others do not. Done when: the file exists, validates, and its sections appear in the plan.
-- [ ] Capture each of the four shipped tools first, against its own running browser, with before and after memory figures. Done when: four baselines are committed.
-- [ ] Declare each browser as data: display name, process name, default install path, settings key. Done when: all four are table entries and the default paths match what each AutoIt script uses today, line for line.
-- [ ] Keep the user override working: the browser path is read from settings with the declared default as fallback. Done when: a fixture override is honored and an absent key falls back.
-- [ ] Treat the settings file as hand-editable: a path that does not exist produces a named message and a log line, not a silent no-op. Done when: a fixture pointing at a nonexistent executable produces both.
-- [ ] Prove the optimization behavior matches per browser, recording before and after figures against each baseline. Done when: four pairs of figures are quoted and this section states what counts as comparable.
-- [ ] Log every optimization, including interval-triggered ones, with trigger, browser, processes, and memory before and after. Done when: one line carries all five, quoted. Cheaper substitute that fails the checkpoint: logging only the button press, which leaves every automatic optimization invisible.
-- [ ] State the reverse honestly: the reverse of trimming a working set is that the browser pages memory back in on its own. Done when: that statement is on the surface, not only in the documentation.
-- [ ] Commit: `"firemin: one optimizer with a browser picker"`
+- [ ] ~~**Specify** the merged optimizer in its own TODO file before building it. Required scope: the four tools' shared behavior with its source lines, the browser picker, per-browser memory figures, and what the 35 Firemin packs carry that the others do not. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/Firemin`
+- [ ] ~~Capture each of the four shipped tools first, against its own running browser, with before and after memory figures. Done when: four baselines are committed.~~ -> `rizonesoft/Firemin`
+- [ ] ~~Declare each browser as data: display name, process name, default install path, settings key. Done when: all four are table entries and the default paths match what each AutoIt script uses today, line for line.~~ -> `rizonesoft/Firemin`
+- [ ] ~~Keep the user override working: the browser path is read from settings with the declared default as fallback. Done when: a fixture override is honored and an absent key falls back.~~ -> `rizonesoft/Firemin`
+- [ ] ~~Treat the settings file as hand-editable: a path that does not exist produces a named message and a log line, not a silent no-op. Done when: a fixture pointing at a nonexistent executable produces both.~~ -> `rizonesoft/Firemin`
+- [ ] ~~Prove the optimization behavior matches per browser, recording before and after figures against each baseline. Done when: four pairs of figures are quoted and this section states what counts as comparable.~~ -> `rizonesoft/Firemin`
+- [ ] ~~Log every optimization, including interval-triggered ones, with trigger, browser, processes, and memory before and after. Done when: one line carries all five, quoted. Cheaper substitute that fails the checkpoint: logging only the button press, which leaves every automatic optimization invisible.~~ -> `rizonesoft/Firemin`
+- [ ] ~~State the reverse honestly: the reverse of trimming a working set is that the browser pages memory back in on its own. Done when: that statement is on the surface, not only in the documentation.~~ -> `rizonesoft/Firemin`
+- [ ] Commit: ~~`"firemin: one optimizer with a browser picker"`~~ -> `rizonesoft/Firemin`
 
-**Test checkpoint:** Four pairs of before and after figures are quoted against their baselines. A fixture override is honored; an absent key falls back; a nonexistent path produces a named message and one log line. An interval-triggered optimization produces a log line carrying all five fields. The reverse statement appears on the surface, captured.
+**Test checkpoint:** Moved with the section. The `rizonesoft/Firemin` repository's plan carries it.
 
 ## 4. Drive Repair: USBRepair and DVDRepair Merged
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DriveRepair` repository (`D:\Resolute_Bin\DriveRepair`) by its own plan.
 
 Two tools with near-identical shape become one. Neither can be fully proven without hardware, which is what the `Needs:` line is for: the row makes progress on the no-device path and parks on the rest.
 
@@ -200,22 +206,24 @@ Two tools with near-identical shape become one. Neither can be fully proven with
 **Chrome:** consume the framework and the repair contract.
 **Needs:** USB device (drive test)
 
-- [ ] **Specify** Drive Repair in its own TODO file before building it. Required scope: every action of both tools with source lines, the no-device path, per-action drive verification, and the hardware-gated proofs with what substitutes where no device exists. Done when: the file exists, validates, and its sections appear in the plan.
-- [ ] Enumerate the actions both AutoIt tools perform and record them here with their source locations. Done when: both lists are complete and each entry names its function.
-- [ ] Handle the no-device case: a named message, a log line, no action attempted. Done when: driven on a host with no removable and no optical drive, it produces the message and changes nothing. This part needs no device and is proven first.
-- [ ] Port both action sets into one tool with the device type as data. Done when: both sets are present and the tool detects which device types are attached.
-- [ ] Confirm before every destructive drive action, naming the drive by letter, label, and size. Done when: the confirmation names all three and declining performs nothing.
-- [ ] Prove parity for the USB actions against the shipped `USBRepair`. Done when: the parity report is quoted.
-- [ ] Prove parity for the optical actions against the shipped `DVDRepair`, or record the leg as not run with its reason. Done when: either the report is quoted or the reason is recorded and this row does not stamp.
-- [ ] State plainly which actions have no reverse, on the surface. Done when: each irreversible action carries that statement where the user sees it.
-- [ ] Cover the registry writes both drive tools actually make (groom 2026-09-23 gap scan) : `USBRepair` deletes the `UpperFilters` and `LowerFilters` values under the HKLM device-class keys (`USBRepair.au3:987-988`), and `DVDRepair` also writes or deletes about twelve autorun policy values, the `IniFileMapping\Autorun.inf` default, and `atapi\Controller0 EnumDevice1` (`DVDRepair.au3:1032-1076`); none acts on a drive letter. Done when: the Drive Repair specification lists every value written and deleted, each is captured in the restore record with undo proven on a `RegistryFixture`, an unelevated HKLM write is refused by name, the freeze check pins the exact value set, and the autorun toggle's enable and disable directions are both specified.
-- [ ] Commit: `"drive repair: merge usbrepair and dvdrepair"`
+- [ ] ~~**Specify** Drive Repair in its own TODO file before building it. Required scope: every action of both tools with source lines, the no-device path, per-action drive verification, and the hardware-gated proofs with what substitutes where no device exists. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/DriveRepair`
+- [ ] ~~Enumerate the actions both AutoIt tools perform and record them here with their source locations. Done when: both lists are complete and each entry names its function.~~ -> `rizonesoft/DriveRepair`
+- [ ] ~~Handle the no-device case: a named message, a log line, no action attempted. Done when: driven on a host with no removable and no optical drive, it produces the message and changes nothing. This part needs no device and is proven first.~~ -> `rizonesoft/DriveRepair`
+- [ ] ~~Port both action sets into one tool with the device type as data. Done when: both sets are present and the tool detects which device types are attached.~~ -> `rizonesoft/DriveRepair`
+- [ ] ~~Confirm before every destructive drive action, naming the drive by letter, label, and size. Done when: the confirmation names all three and declining performs nothing.~~ -> `rizonesoft/DriveRepair`
+- [ ] ~~Prove parity for the USB actions against the shipped `USBRepair`. Done when: the parity report is quoted.~~ -> `rizonesoft/DriveRepair`
+- [ ] ~~Prove parity for the optical actions against the shipped `DVDRepair`, or record the leg as not run with its reason. Done when: either the report is quoted or the reason is recorded and this row does not stamp.~~ -> `rizonesoft/DriveRepair`
+- [ ] ~~State plainly which actions have no reverse, on the surface. Done when: each irreversible action carries that statement where the user sees it.~~ -> `rizonesoft/DriveRepair`
+- [ ] ~~Cover the registry writes both drive tools actually make (groom 2026-09-23 gap scan) : `USBRepair` deletes the `UpperFilters` and `LowerFilters` values under the HKLM device-class keys (`USBRepair.au3:987-988`), and `DVDRepair` also writes or deletes about twelve autorun policy values, the `IniFileMapping\Autorun.inf` default, and `atapi\Controller0 EnumDevice1` (`DVDRepair.au3:1032-1076`); none acts on a drive letter. Done when: the Drive Repair specification lists every value written and deleted, each is captured in the restore record with undo proven on a `RegistryFixture`, an unelevated HKLM write is refused by name, the freeze check pins the exact value set, and the autorun toggle's enable and disable directions are both specified.~~ -> `rizonesoft/DriveRepair`
+- [ ] Commit: ~~`"drive repair: merge usbrepair and dvdrepair"`~~ -> `rizonesoft/DriveRepair`
 
 **Freeze check:** What either tool does to a drive does not change. Evidence is the recorded action lists before and after, plus parity reports per device type.
 
-**Test checkpoint:** On a host with no removable or optical drive, the tool produces the named no-device message, writes one log line, and changes nothing. With a USB device attached, the confirmation names letter, label, and size, and the parity report is quoted. The optical leg is either proven or recorded as not run with its reason, and the row does not stamp until it has been.
+**Test checkpoint:** Moved with the section. The `rizonesoft/DriveRepair` repository's plan carries it.
 
 ## 5. MemBoost and BiosCodes
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` and `rizonesoft/BiosCodes` repositories (`D:\Resolute_Bin\MemBoost`, `D:\Resolute_Bin\BiosCodes`), each by its own plan.
 
 The two tools that consume the framework but not the repair contract: one trims memory, one looks up a code. Both currently write no log at all.
 
@@ -226,14 +234,14 @@ The two tools that consume the framework but not the repair contract: one trims 
 **Needs:** Windows host (build/test)
 
 - [x] **Specify** `MemBoost` in its own TODO file before building it. Required scope: the trim path with its source lines and frozen effect, the trim schedule and its settings, and the no-logging gap this section closes. Done when: the file exists, validates, and its sections appear in the plan. Done: `D04 T06` authored, validated, and planned. (`BiosCodes` already has `D04 T05`.)
-- [ ] Capture both shipped tools first, with their effects and windows. Done when: two baselines are committed.
-- [ ] Port `MemBoost` with its trim path frozen. Done when: the parity report against the shipped build shows zero differing fields on the trim fixture.
-- [ ] Port `BiosCodes`, adding the logging it has never had. Done when: a driven lookup writes a log line naming the code.
-- [ ] Give `BiosCodes` the export its users need: save the looked-up result as a file, written atomically and read back. Done when: the saved content matches the rendered result and a read-only target reports failure.
-- [ ] Make the `BiosCodes` list findable: filter by manufacturer and by code fragment. Done when: a driven filter narrows and clearing restores.
-- [ ] Prove `MemBoost`'s statistics are measured rather than estimated. Done when: the reported figures are compared against an independent measurement and the method is recorded.
-- [ ] Account for both surfaces. Done when: two accounts are written and each deferral resolves.
-- [ ] Commit: `"memboost, bioscodes: port to the framework"`
+- [ ] ~~Capture both shipped tools first, with their effects and windows. Done when: two baselines are committed.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Port `MemBoost` with its trim path frozen. Done when: the parity report against the shipped build shows zero differing fields on the trim fixture.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Port `BiosCodes`, adding the logging it has never had. Done when: a driven lookup writes a log line naming the code.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Give `BiosCodes` the export its users need: save the looked-up result as a file, written atomically and read back. Done when: the saved content matches the rendered result and a read-only target reports failure.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Make the `BiosCodes` list findable: filter by manufacturer and by code fragment. Done when: a driven filter narrows and clearing restores.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Prove `MemBoost`'s statistics are measured rather than estimated. Done when: the reported figures are compared against an independent measurement and the method is recorded.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Account for both surfaces. Done when: two accounts are written and each deferral resolves.~~ -> `rizonesoft/MemBoost`
+- [ ] Commit: ~~`"memboost, bioscodes: port to the framework"`~~ -> `rizonesoft/MemBoost`
 
 > [!IMPORTANT]
 > **Groomed 2026-09-17: a question for the operator about `BiosCodes`, not a change.**
@@ -246,7 +254,7 @@ The two tools that consume the framework but not the repair contract: one trims 
 
 **Freeze check:** `MemBoost`'s trim path does not change. Evidence is the parity report with zero differing fields on the trim fixture. **`BiosCodes` carries no freeze check here**, which is consistent with this section's own reading and inconsistent with `AGENTS.md`'s frozen list; see the note above, which is where that is to be resolved.
 
-**Test checkpoint:** `MemBoost` parity reports zero differing fields. `BiosCodes` writes a log line per lookup, exports a file matching the rendered result, and fails visibly on a read-only target. The filter narrows and restores. `MemBoost` statistics are compared against an independent measurement with the method recorded.
+**Test checkpoint:** Moved with the section. The `rizonesoft/MemBoost` repository's plan carries it.
 
 ## Verification
 

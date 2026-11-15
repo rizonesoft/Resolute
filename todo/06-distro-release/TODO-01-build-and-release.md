@@ -17,7 +17,7 @@ track: R1
 
 ## Inputs
 
-- [`resolute_au3/SDK/Concrete/ComIntRep/ComIntRep.sni`](../../resolute_au3/SDK/Concrete/ComIntRep/ComIntRep.sni) -- the shape of a release descriptor, and the record of what a distributed tool ships with
+- `resolute_au3/SDK/Concrete/ComIntRep/ComIntRep.sni` (moved 2026-11-15 to the `rizonesoft/ComIntRep` repository, under `reference/au3/`) -- the shape of a release descriptor, and the record of what a distributed tool ships with
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the ports this release ships
 - -> XREF: [`08-docs-localization/TODO-01 §1`](../08-docs-localization/TODO-01-docs-and-localization.md) -- the documentation set every release includes
 - -> XREF: [`05-new-tools/TODO-05 §1`](../05-new-tools/TODO-05-recovery-and-imaging.md) -- the two GPL v3 ports whose attribution obligations §7 records

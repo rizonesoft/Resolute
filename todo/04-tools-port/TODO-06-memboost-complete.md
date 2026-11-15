@@ -15,8 +15,6 @@ track: P2
 > [!IMPORTANT]
 > **Current state:** Nothing exists in C++. The AutoIt tool is `resolute_au3/SDK/Concrete/MemBoost/MemBoost.au3` (2,625 lines): EmptyWorkingSet trimming over all processes with three auto modes (off, intelligent at >90% load and rising, timer countdown), an optional ForceBehave priority demote, live memory/CPU stats with peak bars, threshold warnings, a tray icon with Show/Hide/Optimize/Exit, a 4-tab Preferences dialog, and a single `en.lng` pack. The driven run and hands-on competitor use below could not be done from this host and are owed at build, owned by `D04 T01 §5`'s capture item and the enhancement sections' first items respectively.
 
-<!-- claim: lines resolute_au3/SDK/Concrete/MemBoost/MemBoost.au3 = 2625 -->
-<!-- claim: exists resolute_au3/Resolute/Language/MemBoost/en.lng -->
 
 ## Inputs
 
@@ -52,40 +50,46 @@ track: P2
 
 ## 1. Trim Path and Trigger Inventory
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
+
 The pinned behavior, quoted. `_OptimizeMemory` (`MemBoost.au3:1518-1656`): re-entry guard, manual/auto flag, countdown reset in timer mode, button disable, process-list snapshot, double stat refresh, per-process `_WinAPI_EmptyWorkingSet` skipping own PID and substring-matched exclusions, optional ForceBehave demote above Normal to Normal, 1% progress updates, 1ms sleep every 10 processes, completion TrayTip plus sound on manual only, re-enable, double stat refresh. Triggers (`_UpdateTimer`, `:1659-1716`): off, intelligent (load above 90% and `_IsMemoryIncreasing`), timer (countdown seconds then trim). Warnings (`_UpdateMemoryStats`, `:1163-1174`): every N seconds when load meets the threshold. Stats loop (`:1041-1177`): memory load, per-counter labels, CPU usage with peak bars.
 
 **Fidelity:** no surface of its own; this section is the record parity is measured against.
 **Needs:** C++ toolchain (compile)
 
-- [ ] Pin the trim loop: snapshot order, self-PID skip, exclusion substring rule, EmptyWorkingSet call, ForceBehave demote rule (above Normal to Normal by name), progress cadence, sleep cadence, and the processed count. Done when: every step names its lines, and the lying comment (`:1577`, "only idle processes" while trimming all non-excluded) is recorded as corrected, not ported.
-- [ ] Pin the triggers: intelligent mode's exact condition (load threshold plus rising check with `_IsMemoryIncreasing`'s rule quoted), timer mode's countdown and reset rule, and the manual/auto flag handoff including its reset (`:1654`). Done when: each trigger names its condition and the flag lifecycle is exact.
-- [ ] Pin warnings and stats: the warning interval counter, threshold comparison, the completion TrayTip text and icon, the CPU sampling rule, and the peak-bar semantics. Done when: each names its lines; the two `.mp3` sound paths are recorded broken (never shipped per the `.sni`, which carries only `.wav`) and cut, with completion and warnings voiced through notification plus log instead.
-- [ ] Record the dead and debug residue: the always-empty exclusion array (`:469`, populated nowhere), the `ConsoleWrite("DEBUG:` lines, and `build.cmd`/`build.log` (build archaeology, not scope). Done when: each carries cut with reason, except the exclusion wiring, which §4 resurrects as a fenced feature.
-- [ ] Pin MemBoost's two system changes with their reverse or no-reverse verdict (groom 2026-09-23 gap scan) : `StartWithWindows` creates or removes `@StartupDir\<title>.lnk` (`MemBoost.au3:2402-2407`) and `ForceBehave` lowers other processes' priority to Normal during a trim (`:1582-1585`), and the inventory treats both as rows while the reverse reads not-applicable. Done when: the shortcut's reverse (removal on uncheck) is owned and the priority demotion carries an honest no-reverse statement shown on the surface, both recorded in the inventory.
-- [ ] Commit: `"memboost: trim path and trigger inventory"`
+- [ ] ~~Pin the trim loop: snapshot order, self-PID skip, exclusion substring rule, EmptyWorkingSet call, ForceBehave demote rule (above Normal to Normal by name), progress cadence, sleep cadence, and the processed count. Done when: every step names its lines, and the lying comment (`:1577`, "only idle processes" while trimming all non-excluded) is recorded as corrected, not ported.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Pin the triggers: intelligent mode's exact condition (load threshold plus rising check with `_IsMemoryIncreasing`'s rule quoted), timer mode's countdown and reset rule, and the manual/auto flag handoff including its reset (`:1654`). Done when: each trigger names its condition and the flag lifecycle is exact.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Pin warnings and stats: the warning interval counter, threshold comparison, the completion TrayTip text and icon, the CPU sampling rule, and the peak-bar semantics. Done when: each names its lines; the two `.mp3` sound paths are recorded broken (never shipped per the `.sni`, which carries only `.wav`) and cut, with completion and warnings voiced through notification plus log instead.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Record the dead and debug residue: the always-empty exclusion array (`:469`, populated nowhere), the `ConsoleWrite("DEBUG:` lines, and `build.cmd`/`build.log` (build archaeology, not scope). Done when: each carries cut with reason, except the exclusion wiring, which §4 resurrects as a fenced feature.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Pin MemBoost's two system changes with their reverse or no-reverse verdict (groom 2026-09-23 gap scan) : `StartWithWindows` creates or removes `@StartupDir\<title>.lnk` (`MemBoost.au3:2402-2407`) and `ForceBehave` lowers other processes' priority to Normal during a trim (`:1582-1585`), and the inventory treats both as rows while the reverse reads not-applicable. Done when: the shortcut's reverse (removal on uncheck) is owned and the priority demotion carries an honest no-reverse statement shown on the surface, both recorded in the inventory.~~ -> `rizonesoft/MemBoost`
+- [ ] Commit: ~~`"memboost: trim path and trigger inventory"`~~ -> `rizonesoft/MemBoost`
 
-**Test checkpoint:** Every trim step, both triggers, the flag lifecycle, warnings, TrayTip, stats, and CPU rules are quoted with lines; the lying comment, broken sounds, debug lines, and build residue carry recorded verdicts. `D04 T01 §5` can state its trim-fixture comparison from this section alone. Cheaper substitute that fails the checkpoint: the trim loop without the flag lifecycle, which cannot tell manual from automatic in the port.
+**Test checkpoint:** Moved with the section. The `rizonesoft/MemBoost` repository's plan carries it.
 
 -> XREF: D04 T01 §5 -- the build that proves trim parity from this inventory
 
 ## 2. Surface Inventory With Shared-Layer Map
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
 
 Every MemBoost window, control, string, setting, and shipped file, with `file:line`, mapped to framework or tool code. The main window (`:702`, caption-plus-popup with minimize, no maximize): heading, three stat groups with GDI+ bars (42 graphic controls), Optimize/Preferences/Close buttons (`:980-986`, hardcoded English), status icon and label, donate strip, update animation. File/Help menus standard. Tray icon (`:1805-1833`): Show/Hide, Optimize Now, Exit, all hardcoded including the "Memory Booster" misnomer. Preferences (`:1953`, 450x500, topmost, four tabs): the three framework pages plus the tool page with 3 mode radios (`:1966-1971`, hardcoded), interval combo, warning checkboxes and combos, notification/sound/startup checkboxes.
 
 **Fidelity:** no surface of its own; this section is the record the build renders from.
 **Needs:** C++ toolchain (compile)
 
-- [ ] Inventory the main window control by control: every stat label and bar with its update rule, all three buttons with their pack-keyed replacements, the minimize-to-tray behavior, and the restore path. Done when: every control names its strings (pack key or hardcoded-with-replacement) and the GDI+ bars map to shared progress controls.
-- [ ] Inventory the tray icon and menus: the icon states, all three items with corrected pack strings (the "Memory Booster" name dies here), the double-click and hotkey behavior, and the standard File/Help items. Done when: every item names its corrected string and behavior.
-- [ ] Inventory the Preferences tool page control by control: mode radios, interval combo with its values, warning controls with ranges, notification, sound, startup, always-on-top, and start-minimized checkboxes. Done when: every control names its setting key, and the tool-specific settings inventory (AutoOptimize, AutoOptimizeSeconds, ForceBehave, StartWithWindows, AlwaysOnTop, ShowNotifications, PlaySounds, PlayWarnings, WarnEvery, WarnIfLoad, StartMinimized) is complete with defaults.
-- [ ] Inventory distribution inputs and map every piece: the `.sni` ship list (exe pair, ini, three docs, en pack, four `.ani` files cut, two `.wav` files cut with the broken-sound verdict), the framework-only-plus-tool `.ini` sections, and the home of every piece (window, menus, prefs host, log, update, elevation n/a with reason, About, crash, singleton, F1 to the framework; trim engine, stats loop, tray, tool page to the tool; nothing to the repair contract, recorded: trimming is not a repair with a result to undo). Done when: every shipped file carries keep, cut, or remapped, and no shared piece maps to the tool.
-- [ ] Commit: `"memboost: surface inventory with shared-layer map"`
+- [ ] ~~Inventory the main window control by control: every stat label and bar with its update rule, all three buttons with their pack-keyed replacements, the minimize-to-tray behavior, and the restore path. Done when: every control names its strings (pack key or hardcoded-with-replacement) and the GDI+ bars map to shared progress controls.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Inventory the tray icon and menus: the icon states, all three items with corrected pack strings (the "Memory Booster" name dies here), the double-click and hotkey behavior, and the standard File/Help items. Done when: every item names its corrected string and behavior.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Inventory the Preferences tool page control by control: mode radios, interval combo with its values, warning controls with ranges, notification, sound, startup, always-on-top, and start-minimized checkboxes. Done when: every control names its setting key, and the tool-specific settings inventory (AutoOptimize, AutoOptimizeSeconds, ForceBehave, StartWithWindows, AlwaysOnTop, ShowNotifications, PlaySounds, PlayWarnings, WarnEvery, WarnIfLoad, StartMinimized) is complete with defaults.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Inventory distribution inputs and map every piece: the `.sni` ship list (exe pair, ini, three docs, en pack, four `.ani` files cut, two `.wav` files cut with the broken-sound verdict), the framework-only-plus-tool `.ini` sections, and the home of every piece (window, menus, prefs host, log, update, elevation n/a with reason, About, crash, singleton, F1 to the framework; trim engine, stats loop, tray, tool page to the tool; nothing to the repair contract, recorded: trimming is not a repair with a result to undo). Done when: every shipped file carries keep, cut, or remapped, and no shared piece maps to the tool.~~ -> `rizonesoft/MemBoost`
+- [ ] Commit: ~~`"memboost: surface inventory with shared-layer map"`~~ -> `rizonesoft/MemBoost`
 
-**Test checkpoint:** A walk of `MemBoost.au3` finds every control, string, setting, and shipped file recorded with verdict and home; every hardcoded string names its pack replacement; the contract exclusion is stated. Cheaper substitute that fails the checkpoint: controls without the string verdicts, which ports hardcoded English into a localizable suite.
+**Test checkpoint:** Moved with the section. The `rizonesoft/MemBoost` repository's plan carries it.
 
 -> XREF: D04 T01 §5 -- the build that renders from this inventory
 
 ## 3. Distribution Completeness
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
 
 Everything that makes the ported tool shippable: settings migration, packs, docs, icon, installer and update entries, About, F1, guide page, tests, and conformance. Runs after `D04 T01 §5` proves parity on the core.
 
@@ -95,20 +99,22 @@ Everything that makes the ported tool shippable: settings migration, packs, docs
 **Chrome:** consume the framework installer entries, About, and help. No tool-side installer logic.
 **Needs:** Windows host (build/test)
 
-- [ ] Migrate settings and ship the packs: an existing AutoIt `.ini` (framework keys plus the eleven tool keys) migrates with a log line; `en` ships and the pack-hygiene rules from `D08 T01 §3` hold. Done when: a fixture `.ini` migrates and the pack check passes, both quoted.
-- [ ] Ship the docs set from the three templates: every template renders with generated metadata (no typed version or date) and the set matches the `D08 T01 §1` contract. Done when: all three render and the conformance check agrees.
-- [ ] Register installer and update-file entries per `D06 T01 §3` and `D06 T01 §5`: portable and installed modes, the application icon, and the update descriptor. Done when: both modes install and remove cleanly on a fixture machine.
-- [ ] Wire About, F1, and the guide page: About from the registry for the MemBoost descriptor, F1 through the surface map, and the user-guide page in the same commit as the behavior it documents. Done when: all three resolve and the guide page shares its commit.
-- [ ] Prove tests and conformance: unit tests for the tool-specific logic (trigger conditions, exclusion matching, stats formatting) run under the harness, and the `D07 T01 §3` check passes for the tool. Done when: `ctest` names the suites green and the conformance report is quoted.
-- [ ] Prove first-run and upgrade: a clean machine goes from install to working with no manual step, and a machine carrying the AutoIt MemBoost upgrades with settings preserved and one copy left. Done when: both paths are driven and quoted. Cheaper substitute that fails the checkpoint: testing upgrade by reading the code, which is how two copies ship.
-- [ ] Clean the startup shortcut on uninstall and on upgrade from AutoIt (groom 2026-09-23 gap scan) : a stale `.lnk` from the AutoIt build can point at the old executable after the upgrade. Done when: uninstall removes the startup entry, the upgrade path re-points or removes an AutoIt-era shortcut, and both are proven on a fixture profile, quoted.
-- [ ] Commit: `"memboost: distribution completeness"`
+- [ ] ~~Migrate settings and ship the packs: an existing AutoIt `.ini` (framework keys plus the eleven tool keys) migrates with a log line; `en` ships and the pack-hygiene rules from `D08 T01 §3` hold. Done when: a fixture `.ini` migrates and the pack check passes, both quoted.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Ship the docs set from the three templates: every template renders with generated metadata (no typed version or date) and the set matches the `D08 T01 §1` contract. Done when: all three render and the conformance check agrees.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Register installer and update-file entries per `D06 T01 §3` and `D06 T01 §5`: portable and installed modes, the application icon, and the update descriptor. Done when: both modes install and remove cleanly on a fixture machine.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Wire About, F1, and the guide page: About from the registry for the MemBoost descriptor, F1 through the surface map, and the user-guide page in the same commit as the behavior it documents. Done when: all three resolve and the guide page shares its commit.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Prove tests and conformance: unit tests for the tool-specific logic (trigger conditions, exclusion matching, stats formatting) run under the harness, and the `D07 T01 §3` check passes for the tool. Done when: `ctest` names the suites green and the conformance report is quoted.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Prove first-run and upgrade: a clean machine goes from install to working with no manual step, and a machine carrying the AutoIt MemBoost upgrades with settings preserved and one copy left. Done when: both paths are driven and quoted. Cheaper substitute that fails the checkpoint: testing upgrade by reading the code, which is how two copies ship.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Clean the startup shortcut on uninstall and on upgrade from AutoIt (groom 2026-09-23 gap scan) : a stale `.lnk` from the AutoIt build can point at the old executable after the upgrade. Done when: uninstall removes the startup entry, the upgrade path re-points or removes an AutoIt-era shortcut, and both are proven on a fixture profile, quoted.~~ -> `rizonesoft/MemBoost`
+- [ ] Commit: ~~`"memboost: distribution completeness"`~~ -> `rizonesoft/MemBoost`
 
-**Test checkpoint:** Fixture `.ini` migrates; packs pass hygiene; three docs render generated; both install modes round-trip; About, F1, and the guide page resolve; tests and conformance quote green; first-run and upgrade are driven. Cheaper substitute that fails the checkpoint: a checklist ticked from the build tree, which proves the tool compiles rather than ships.
+**Test checkpoint:** Moved with the section. The `rizonesoft/MemBoost` repository's plan carries it.
 
 -> XREF: D04 T01 §5 -- the parity core this section ships
 
 ## 4. Editable Exclusion List
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
 
 **Deliberate new behavior.** The AutoIt exclusion array exists, is honored by the trim loop, and is populated nowhere: a feature wired to nothing. This section resurrects it as an editable list (add, remove, enable per entry, substring matching kept): games, VMs, and DAWs stay untouched while everything else trims. Empty list trims exactly as the original.
 
@@ -120,17 +126,19 @@ Competitor context (source-based, hands-on owed at build): CleanMem ships ignore
 **Chrome:** consume the framework list surface. No new dialog beyond the row editor.
 **Needs:** Windows host (build/test)
 
-- [ ] Confirm the competitor table hands-on: run CleanMem, Wise Memory Optimizer, and Mem Reduct, verify the documented behaviors above against the named versions, and correct the table. Done when: each row names the version used and what was observed, quoted.
-- [ ] Ship the editable list: add, remove, and per-entry enable with the substring rule stated on the surface, persisted atomically, honored by manual and automatic trims alike. Done when: a listed process survives a trim that trims an unlisted one, quoted, and the list survives a restart.
-- [ ] Cover the finer details: empty-list presentation, tooltips, keyboard path with tab order, screen-reader names, both themes and DPI scalings, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.
-- [ ] Prove non-interference: the `D04 T01 §5` trim fixture re-runs identical with this section shipped and the list empty. Done when: the comparison is quoted showing no difference.
-- [ ] Commit: `"memboost: editable exclusion list"`
+- [ ] ~~Confirm the competitor table hands-on: run CleanMem, Wise Memory Optimizer, and Mem Reduct, verify the documented behaviors above against the named versions, and correct the table. Done when: each row names the version used and what was observed, quoted.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Ship the editable list: add, remove, and per-entry enable with the substring rule stated on the surface, persisted atomically, honored by manual and automatic trims alike. Done when: a listed process survives a trim that trims an unlisted one, quoted, and the list survives a restart.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Cover the finer details: empty-list presentation, tooltips, keyboard path with tab order, screen-reader names, both themes and DPI scalings, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Prove non-interference: the `D04 T01 §5` trim fixture re-runs identical with this section shipped and the list empty. Done when: the comparison is quoted showing no difference.~~ -> `rizonesoft/MemBoost`
+- [ ] Commit: ~~`"memboost: editable exclusion list"`~~ -> `rizonesoft/MemBoost`
 
-**Test checkpoint:** Competitor rows name used versions; a listed process survives beside a trimmed one; the list persists; finer details are driven or captured; the empty-list trim fixture re-runs identical. Cheaper substitute that fails the checkpoint: exclusions honored on manual trims only, which is a list the timer ignores.
+**Test checkpoint:** Moved with the section. The `rizonesoft/MemBoost` repository's plan carries it.
 
 -> XREF: D04 T01 §5 -- the trim fixture this section must not disturb
 
 ## 5. Per-Process Trim Report
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
 
 **Deliberate new behavior.** The AutoIt tool reports a processed count and nothing else. This section reports per process: what trimmed, what was skipped and why (self, excluded, only-list), and how much each freed, with totals. Pure reads plus display: the trim is untouched.
 
@@ -140,17 +148,19 @@ Competitor context (source-based, hands-on owed at build): CleanMem ships ignore
 **Chrome:** consume the framework list surface. No new dialog.
 **Needs:** Windows host (build/test)
 
-- [ ] Report per process: each processed process names before/after working set and freed bytes; each skipped one names its reason; totals close against the measured delta. Done when: a fixture trim's report reconciles process by process, quoted.
-- [ ] Log one line per trim with totals and duration, and keep the report reachable after the window that ran it closes. Done when: the log line names totals and the report persists per the stated rule.
-- [ ] Cover the finer details: empty-report presentation, keyboard path, screen-reader names, both themes and DPI scalings, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.
-- [ ] Prove non-interference: the `D04 T01 §5` trim fixture re-runs identical with this section shipped. Done when: the comparison is quoted showing no difference.
-- [ ] Commit: `"memboost: per-process trim report"`
+- [ ] ~~Report per process: each processed process names before/after working set and freed bytes; each skipped one names its reason; totals close against the measured delta. Done when: a fixture trim's report reconciles process by process, quoted.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Log one line per trim with totals and duration, and keep the report reachable after the window that ran it closes. Done when: the log line names totals and the report persists per the stated rule.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Cover the finer details: empty-report presentation, keyboard path, screen-reader names, both themes and DPI scalings, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Prove non-interference: the `D04 T01 §5` trim fixture re-runs identical with this section shipped. Done when: the comparison is quoted showing no difference.~~ -> `rizonesoft/MemBoost`
+- [ ] Commit: ~~`"memboost: per-process trim report"`~~ -> `rizonesoft/MemBoost`
 
-**Test checkpoint:** A fixture report reconciles per process with skip reasons; the log line names totals; the report persists; finer details are driven or captured; the trim fixture re-runs identical. Cheaper substitute that fails the checkpoint: a report without skip reasons, which shows what trimmed and hides what it chose not to touch.
+**Test checkpoint:** Moved with the section. The `rizonesoft/MemBoost` repository's plan carries it.
 
 -> XREF: D04 T01 §5 -- the trim fixture this section must not disturb
 
 ## 6. Only-List Trim Mode
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
 
 **Deliberate new behavior.** The mirror of §4 for locked-down machines: when the only-list is non-empty, trims touch listed processes and nothing else. Default empty (hence off): an empty only-list trims exactly as the original.
 
@@ -160,13 +170,13 @@ Competitor context (source-based, hands-on owed at build): CleanMem ships ignore
 **Chrome:** consume the framework list surface. No new dialog beyond the row editor.
 **Needs:** Windows host (build/test)
 
-- [ ] Ship only-list mode: add, remove, and per-entry enable with the substring rule, persisted atomically, honored by manual and automatic trims. Done when: with two processes listed, exactly those trim and nothing else, quoted, and emptying the list restores full trimming.
-- [ ] State the list interaction on the surface: excluded beats listed, self is never trimmed, and each rule names its reason. Done when: a process on both lists is skipped with the reason shown, quoted.
-- [ ] Cover the finer details: empty-list presentation, tooltips, keyboard path with tab order, screen-reader names, both themes and DPI scalings, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.
-- [ ] Prove non-interference: the `D04 T01 §5` trim fixture re-runs identical with this section shipped and the list empty. Done when: the comparison is quoted showing no difference.
-- [ ] Commit: `"memboost: only-list trim mode"`
+- [ ] ~~Ship only-list mode: add, remove, and per-entry enable with the substring rule, persisted atomically, honored by manual and automatic trims. Done when: with two processes listed, exactly those trim and nothing else, quoted, and emptying the list restores full trimming.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~State the list interaction on the surface: excluded beats listed, self is never trimmed, and each rule names its reason. Done when: a process on both lists is skipped with the reason shown, quoted.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Cover the finer details: empty-list presentation, tooltips, keyboard path with tab order, screen-reader names, both themes and DPI scalings, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Prove non-interference: the `D04 T01 §5` trim fixture re-runs identical with this section shipped and the list empty. Done when: the comparison is quoted showing no difference.~~ -> `rizonesoft/MemBoost`
+- [ ] Commit: ~~`"memboost: only-list trim mode"`~~ -> `rizonesoft/MemBoost`
 
-**Test checkpoint:** Listed-only trimming is exact with restore on empty; the both-lists case skips with reason shown; finer details are driven or captured; the empty-list trim fixture re-runs identical. Cheaper substitute that fails the checkpoint: only-list mode without the interaction rule, which leaves two lists fighting silently.
+**Test checkpoint:** Moved with the section. The `rizonesoft/MemBoost` repository's plan carries it.
 
 -> XREF: D04 T01 §5 -- the trim fixture this section must not disturb
 

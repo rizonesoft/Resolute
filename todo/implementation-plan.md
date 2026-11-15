@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **97 of 244 sections complete (40%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **97 of 215 sections complete (45%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -248,50 +248,51 @@ The framework every tool consumes, the repair contract the destructive half cons
 
 Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt counterpart. The vertical slice through Ownership comes first and is the moment the architecture is either validated or corrected cheaply.
 
-|  ✔  | Section      | Deliverable                                  | Items |
-| :-: | ------------ | -------------------------------------------- | :---: |
-| [ ] | `D03 T02 §1` | Start bar and cascade map                    |   6   |
-| [ ] | `D03 T02 §2` | Main content and repair groups               |   6   |
-| [ ] | `D03 T01 §1` | Launcher on the framework                    |   6   |
-| [ ] | `D03 T02 §3` | Tool list surface                            |   5   |
-| [ ] | `D03 T01 §2` | Tool discovery and the tool list             |   5   |
-| [ ] | `D03 T02 §4` | System locations browser                     |   4   |
-| [ ] | `D03 T01 §4` | Windows system locations                     |   6   |
-| [ ] | `D03 T02 §5` | Suite log viewer surface                     |   5   |
-| [ ] | `D03 T01 §5` | Suite log viewer                             |   5   |
-| [ ] | `D03 T02 §6` | Symptom search surface                       |   5   |
-| [ ] | `D03 T01 §6` | Symptom routing                              |   8   |
-| [ ] | `D03 T02 §7` | Launcher chrome and notices                  |   7   |
-| [ ] | `D03 T01 §3` | Launch, failure reporting, and elevation     |   6   |
-| [ ] | `D04 T03 §1` | ComIntRep repair inventory, reversibility    |   6   |
-| [ ] | `D04 T03 §2` | ComIntRep surface inventory, layer map       |   5   |
-| [ ] | `D04 T04 §1` | PixRepair sequences and timing               |   5   |
-| [ ] | `D04 T04 §2` | PixRepair surface inventory, layer map       |   5   |
-| [ ] | `D04 T05 §1` | BiosCodes beep data and WMI inventory        |   5   |
-| [ ] | `D04 T05 §2` | BiosCodes surface inventory, layer map       |   5   |
-| [ ] | `D04 T06 §1` | MemBoost trim path, triggers                 |   6   |
-| [ ] | `D04 T06 §2` | MemBoost surface inventory, layer map        |   5   |
-| [ ] | `D04 T01 §2` | The five remaining frozen tools              |   9   |
-| [ ] | `D04 T03 §3` | ComIntRep distribution completeness          |   8   |
-| [ ] | `D04 T03 §4` | Per-repair verification and outcome          |   6   |
-| [ ] | `D04 T03 §5` | Pre-repair restore-point offer               |   4   |
-| [ ] | `D04 T03 §6` | Opt-in completion chime                      |   3   |
-| [ ] | `D04 T04 §3` | PixRepair distribution completeness          |   7   |
-| [ ] | `D04 T04 §4` | Display corrections                          |   5   |
-| [ ] | `D04 T04 §5` | Draggable targeted window                    |   5   |
-| [ ] | `D04 T04 §6` | Session timer with auto-stop                 |   4   |
-| [ ] | `D04 T01 §3` | Browser optimizer: four tools into one       |   9   |
-| [ ] | `D04 T01 §4` | Drive Repair: USBRepair and DVDRepair merged |  10   |
-| [ ] | `D04 T01 §5` | MemBoost and BiosCodes                       |   9   |
-| [ ] | `D04 T05 §3` | BiosCodes distribution completeness          |   7   |
-| [ ] | `D04 T05 §6` | Migrate Beep Data to Reference DB            |   5   |
-| [ ] | `D04 T05 §4` | Cross-vendor pattern search                  |   5   |
-| [ ] | `D04 T05 §5` | Vendor auto-detect from WMI                  |   4   |
-| [ ] | `D04 T05 §7` | User-Editable Database (CRUD)                |   7   |
-| [ ] | `D04 T06 §3` | MemBoost distribution completeness           |   8   |
-| [ ] | `D04 T06 §4` | Editable exclusion list                      |   5   |
-| [ ] | `D04 T06 §5` | Per-process trim report                      |   5   |
-| [ ] | `D04 T06 §6` | Only-list trim mode                          |   5   |
+|  ✔  | Section      | Deliverable                              | Items |
+| :-: | ------------ | ---------------------------------------- | :---: |
+| [ ] | `D03 T02 §1` | Start bar and cascade map                |   6   |
+| [ ] | `D03 T02 §2` | Main content and repair groups           |   6   |
+| [ ] | `D03 T01 §1` | Launcher on the framework                |   6   |
+| [ ] | `D03 T02 §3` | Tool list surface                        |   5   |
+| [ ] | `D03 T01 §2` | Tool discovery and the tool list         |   5   |
+| [ ] | `D03 T02 §4` | System locations browser                 |   4   |
+| [ ] | `D03 T01 §4` | Windows system locations                 |   6   |
+| [ ] | `D03 T02 §5` | Suite log viewer surface                 |   5   |
+| [ ] | `D03 T01 §5` | Suite log viewer                         |   5   |
+| [ ] | `D03 T02 §6` | Symptom search surface                   |   5   |
+| [ ] | `D03 T01 §6` | Symptom routing                          |   8   |
+| [ ] | `D03 T02 §7` | Launcher chrome and notices              |   7   |
+| [ ] | `D03 T01 §3` | Launch, failure reporting, and elevation |   6   |
+
+> **Moved:** `D04 T03 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ComIntRep` repository (`D:\Resolute_Bin\ComIntRep`) by its own plan.
+> **Moved:** `D04 T03 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ComIntRep` repository (`D:\Resolute_Bin\ComIntRep`) by its own plan.
+> **Moved:** `D04 T04 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PixRepair` repository (`D:\Resolute_Bin\PixRepair`) by its own plan.
+> **Moved:** `D04 T04 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PixRepair` repository (`D:\Resolute_Bin\PixRepair`) by its own plan.
+> **Moved:** `D04 T05 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** `D04 T05 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** `D04 T06 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
+> **Moved:** `D04 T06 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
+> **Moved:** `D04 T01 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ComIntRep` and `rizonesoft/PixRepair` repositories (`D:\Resolute_Bin\ComIntRep`, `D:\Resolute_Bin\PixRepair`), each by its own plan.
+> **Moved:** `D04 T03 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ComIntRep` repository (`D:\Resolute_Bin\ComIntRep`) by its own plan.
+> **Moved:** `D04 T03 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ComIntRep` repository (`D:\Resolute_Bin\ComIntRep`) by its own plan.
+> **Moved:** `D04 T03 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ComIntRep` repository (`D:\Resolute_Bin\ComIntRep`) by its own plan.
+> **Moved:** `D04 T03 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ComIntRep` repository (`D:\Resolute_Bin\ComIntRep`) by its own plan.
+> **Moved:** `D04 T04 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PixRepair` repository (`D:\Resolute_Bin\PixRepair`) by its own plan.
+> **Moved:** `D04 T04 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PixRepair` repository (`D:\Resolute_Bin\PixRepair`) by its own plan.
+> **Moved:** `D04 T04 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PixRepair` repository (`D:\Resolute_Bin\PixRepair`) by its own plan.
+> **Moved:** `D04 T04 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PixRepair` repository (`D:\Resolute_Bin\PixRepair`) by its own plan.
+> **Moved:** `D04 T01 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/Firemin` repository (`D:\Resolute_Bin\Firemin`) by its own plan.
+> **Moved:** `D04 T01 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DriveRepair` repository (`D:\Resolute_Bin\DriveRepair`) by its own plan.
+> **Moved:** `D04 T01 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` and `rizonesoft/BiosCodes` repositories (`D:\Resolute_Bin\MemBoost`, `D:\Resolute_Bin\BiosCodes`), each by its own plan.
+> **Moved:** `D04 T05 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** `D04 T05 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** `D04 T05 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** `D04 T05 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** `D04 T05 §7` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** `D04 T06 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
+> **Moved:** `D04 T06 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
+> **Moved:** `D04 T06 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
+> **Moved:** `D04 T06 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
 
 > **Moved:** `D04 T02 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/Ownership` repository (`D:\Resolute_Bin\Ownership`) by its own plan.
 > **Moved:** `D04 T01 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/Ownership` repository (`D:\Resolute_Bin\Ownership`) by its own plan.

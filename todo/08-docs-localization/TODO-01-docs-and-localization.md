@@ -30,7 +30,7 @@ track: D1
 
 ## Inputs
 
-- [`resolute_au3/Resolute/Language/Firemin/`](../../resolute_au3/Resolute/Language/Firemin) -- the 35-pack set, the largest translation asset the project has
+- `resolute_au3/Resolute/Language/Firemin/` (moved 2026-11-15 to the `rizonesoft/Firemin` repository, under `reference/au3/`) -- the 35-pack set, the largest translation asset the project has
 - [`resolute_au3/SDK/Concrete/ReBar/Templates/`](../../resolute_au3/SDK/Concrete/ReBar/Templates) -- `Changes.tpl`, `License.tpl`, `Readme.tpl`: the documentation set every tool owes
 - -> XREF: [`01-framework/TODO-01 §4`](../01-framework/TODO-01-framework-core.md) -- the pack loader these files feed
 - -> XREF: [`06-distro-release/TODO-01 §2`](../06-distro-release/TODO-01-build-and-release.md) -- the release that composes and ships these packs
