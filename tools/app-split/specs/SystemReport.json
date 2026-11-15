@@ -1,0 +1,249 @@
+{
+  "name": "SystemReport",
+  "slug": "systemreport",
+  "display": "System Report",
+  "job": "it gathers the machine's facts and the suite's logs into one support file, shows the whole file before anything is saved, and changes nothing on the system.",
+  "tagline": "Everything a helper needs to know about your PC, in one file you have read first",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Slate",
+    "light": "#CBD5E1",
+    "dark": "#64748B",
+    "social_ground": "#161D29",
+    "social_muted": "#D5DCE6"
+  },
+  "icon": {
+    "idea": "A clipboard with a report on it.",
+    "points": [
+      "Free-standing with no tile: a rounded board with a clip.",
+      "The board is Slate, the clip and the lines are Slate light.",
+      "The small drawing below 40 pixels has two thicker lines."
+    ],
+    "large": "<rect x=\"20\" y=\"18\" width=\"56\" height=\"68\" rx=\"9\" fill=\"#64748B\"/><rect x=\"36\" y=\"10\" width=\"24\" height=\"16\" rx=\"5\" fill=\"#CBD5E1\"/><path d=\"M32 42 H64 M32 56 H64 M32 70 H52\" fill=\"none\" stroke=\"#CBD5E1\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<rect x=\"18\" y=\"18\" width=\"60\" height=\"68\" rx=\"10\" fill=\"#64748B\"/><rect x=\"34\" y=\"8\" width=\"28\" height=\"18\" rx=\"6\" fill=\"#CBD5E1\"/><path d=\"M32 46 H64 M32 64 H56\" fill=\"none\" stroke=\"#CBD5E1\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Report",
+        "One row per part of the report: what it holds, whether it is included, and how many lines it has"
+      ],
+      [
+        "Preview",
+        "The whole report as it will be saved"
+      ],
+      [
+        "Activity",
+        "What the tool gathered and saved, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every part of the report, chooses what goes in, reads the whole file and saves it as one file to hand to a helper.",
+    "primary": "Save report",
+    "secondary": "Refresh",
+    "rows": [
+      [
+        "Windows",
+        "Included, with its line count"
+      ],
+      [
+        "Hardware and drives",
+        "Included, with its line count"
+      ],
+      [
+        "Installed software",
+        "Included or left out, with its line count"
+      ],
+      [
+        "Recent errors",
+        "Included, trimmed to the size limit"
+      ],
+      [
+        "Resolute tools and logs",
+        "Included or left out, with its line count"
+      ]
+    ],
+    "status": "5 parts, 4 included, 1,240 lines",
+    "notes": [
+      "Each part of the report is a row with an icon and a word for its state (Included, Left out, Trimmed, Unavailable), the number of lines it holds, and a tick to include or leave it out. State is never shown by colour alone.",
+      "Save report is the accent button. It stays disabled until the Preview section has shown the whole report as it would be saved, and it saves exactly what the preview showed.",
+      "Refresh gathers the facts again without changing anything on the machine, then re-renders the rows and the preview.",
+      "The Preview section shows the full text in a monospace, read-only, selectable view, with the redaction setting applied, so what is read is what is written.",
+      "Saving asks where to put the file, writes it atomically, reads it back and reports the result in words. A read-only target reports failure and never claims success.",
+      "The status bar says how many parts there are, how many are included and the total line count, in words.",
+      "There is no undo: the tool reads the system and writes one file where the user says, so there is nothing on the system to put back. Cancelling at the save dialog leaves nothing written."
+    ],
+    "cut": "There is no earlier window to compare with, because System Report is a new tool and nothing is ported. The window has no menus, no splash, no animations and no donate strip: the suite's sidebar window carries the sections, and the About page is the framework's. Anything a tool of this kind might be expected to show beyond the sections above is recorded in the plan, not drawn."
+  },
+  "readme": {
+    "lead": "System Report gathers your PC's facts and logs into one text file that you read in full before it is saved.",
+    "what": [
+      "A helper in a forum or on a support call usually needs the same twenty answers: the Windows build, the hardware, the drives, what is installed, what has been failing. System Report collects them in one go and shows you the whole file before anything is saved or sent.",
+      "It only reads. It changes nothing on the system, and it never collects product keys, passwords, tokens, browser history or your documents. You choose which parts go in, and you can ask it to remove user names and machine identifiers first."
+    ],
+    "new_intro": "System Report is new in the suite, so there is no earlier version to compare with. What it is built around:",
+    "new": [
+      [
+        "You read it first.",
+        "The full report is on screen as it will be saved, and Save report works only after that."
+      ],
+      [
+        "You choose what goes in.",
+        "Each part is ticked on or off, with its line count beside it."
+      ],
+      [
+        "Personal details can come out.",
+        "User names, machine identifiers and anything on a deny list are removed when you ask."
+      ],
+      [
+        "Plain text and structured.",
+        "One report opens in any text editor and the same facts are written in a structured form."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "System Report ships as a complete, standalone C++ tool that gathers the machine's Windows build, hardware, drives, installed software, recent errors and the suite's own logs into one bounded report, shows the whole report before anything is saved, lets the user choose the parts and remove personal details, writes one plain text file and one structured file atomically, and never reads a secret.",
+    "current_state": "Nothing exists yet: there is no earlier version of this tool and nothing is ported. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan section as it stood in the Resolute repository (`docs/origin/resolute-D05-T03-s6.md`, 20 lines). That plan names an older AutoIt include, `resolute_au3/SDK/Includes/CompInfo.au3`, as a guide to what to collect and not how, because it is a community UDF with no stated licence (`docs/origin/resolute-D05-T03-s6.md:8`); it is not in this repository, was not read for this spec and is never ported. The collection is written from Win32, WMI and CIM, the registry and the event log API. The SDK's framework, repair contract and chart control, which this tool consumes (the framework only), are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T03-s6.md`: the plan section, which fixes what is collected (`:11`), the size bound (`:12`), the preview (`:13`), the exclusion list (`:14`), the atomic write (`:15`) and the plain text rule (`:16`).",
+      "`DESIGN.md`: the tool's identity and the sections of its window, and `sdk/DESIGN.md`, the suite's contract.",
+      "`brand/`: the tool's identity, built by `python brand/build.py`, which the executable embeds as its icon."
+    ],
+    "outcome": [
+      "A generated report carries the Windows build, hardware, drives, installed software, recent errors and the suite's tool versions and logs, each checked against an independent source, and stays a reasonable size on a machine with enormous logs.",
+      "The Preview section shows the whole report as it will be saved, parts can be ticked on and off, personal details can be removed, and nothing is written until the user saves; a read-only target reports failure.",
+      "A test proves the collectors never read a product key, a credential or a browser store, and the Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone."
+    ],
+    "adjacency_rationale": "The list is the Report screen, where each part of the report is a row with its state and line count. The Preview section is the document the tool produces and carries. Reporting is the report itself and its preview, and audit is the Activity section, which records what was gathered and saved. Settings are the framework's pages. Permissions do not apply: every collector reads what a standard user can read and nothing needs elevation. Reverse does not apply: the tool changes nothing on the system, and the one file it writes is where the user says.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Collectors and Report Engine",
+      "intro": "The tool's whole behaviour, independent of any window: collectors declared as data, each naming what it reads and how, a run that gathers them without changing anything, a redaction pass, and one output document in plain text and in a structured form. Nothing in this section writes to the system except the report file the user names.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the collectors as data in `src/core/Collectors.h` and run them in `src/core/Gather.cpp`. Done when: a run returns every part with its lines and its state, and the unit tests pass against fixture sources.",
+        "Build the report in `src/core/Report.cpp` and write it atomically. Done when: the plain text and structured files exist, equal in content, and a read-only target reports failure."
+      ],
+      "items": [
+        "Declare in `src/core/Collectors.h` one record per collector: its part name, what it reads (a CIM class, a registry key, an event log channel or a log folder), how, and its line limit. Done when: the header holds Windows, hardware, drives, installed software, recent errors and suite tools and logs, and a test lists the sources of each.",
+        "Implement the Windows and hardware collectors in `src/core/Gather.cpp` from `Win32_OperatingSystem`, `Win32_ComputerSystem`, `Win32_Processor`, `Win32_PhysicalMemory`, `Win32_VideoController` and `Win32_BIOS` by CIM query, the drives from `Win32_DiskDrive` and `Win32_LogicalDisk`. Done when: each fact is compared with an independent source (`systeminfo`, `Get-PhysicalDisk`) in a test and the two agree.",
+        "Implement the installed software collector over `HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall` and its `WOW6432Node` twin, reading name, version and publisher only. Done when: a fixture hive yields exactly its entries, and the count matches `Get-Package` on the development machine. Cheaper substitute: running `wmic product`, which is slow and triggers a Windows Installer repair of every package.",
+        "Implement the recent errors collector over the System and Application channels with the event log API (`EvtQuery`, `EvtRender` in `src/core/Gather.cpp`), error and critical levels only, newest first, bounded by count and by bytes. Done when: a fixture channel of 100,000 events yields a part within its limit and says it was trimmed.",
+        "Implement the suite collector reading each installed Resolute tool's version and the tail of its log, bounded by bytes. Done when: a fixture folder with a 2 GB log yields a part within its limit and a report of reasonable size, and an absent tool is stated as not installed.",
+        "Make every collector read only: no write, no registry set, no service or process start apart from the read itself, and every failure becomes a part state of Unavailable with a reason, never a crash. Done when: a test with one source denied still produces a report naming that part Unavailable. Cheaper substitute: catching and ignoring the error, which hides a part that is missing.",
+        "Assemble the report in `src/core/Report.cpp` as plain text with headed parts and as a structured document with the same facts, and write both atomically (temporary file, flush, rename) then read them back and compare. Done when: a write to a read-only folder returns a failure by name and leaves no partial file. Cheaper substitute: writing straight to the target, which leaves a half file when the disk fills.",
+        "Cover the engine in `tests/engine_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when a collector is changed to write."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes: every part is gathered and checked against an independent source, enormous logs stay bounded, and a read-only target reports failure.",
+      "commit": "core: collectors as data, a read-only run and one report in two forms"
+    },
+    "enhancements": [
+      {
+        "title": "Preview Before Saving",
+        "needs": "sdk-framework",
+        "intro": "Nothing leaves the machine unseen. The Preview section renders the whole report exactly as it will be saved, and Save report is refused until it has been shown. The plan names a report saved without a preview as the way a tool leaks something the user did not mean to share (`docs/origin/resolute-D05-T03-s6.md:7`).",
+        "surface": {
+          "fidelity": "the Preview section and the Save report action, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person reads everything that would be shared, then saves or cancels. Consumer: the saved file, compared with the preview.",
+          "treatment": "the full text in a read-only monospace view, the primary button enabled only after it is shown, the saved file equal to the previewed text. Cheaper substitute that fails the checkpoint: a summary or a first page of the report, which shows less than is saved."
+        },
+        "build": [
+          "Render the report in `src/ui/PreviewView.cpp` from the same document the save uses. Done when: the view holds every line of the report, to the last.",
+          "Gate Save report in `src/ui/ReportView.cpp` on the preview having been shown for the current content. Done when: any change to the parts or to redaction disables the button until the preview is shown again."
+        ],
+        "items": [
+          "Render the full report in `src/ui/PreviewView.cpp` through the framework's text view, read-only, selectable and copyable, with a line count. Done when: the view's text equals the document the engine would write, byte for byte. Cheaper substitute: rendering a shortened copy, which can differ from the file.",
+          "Disable Save report until the preview has been shown for the current content, and disable it again after any change. Done when: a driven test finds it disabled on start, enabled after the preview and disabled after a part is unticked. Cheaper substitute: a confirmation dialog, which does not show the content.",
+          "Let the user cancel at the save dialog and at the preview with nothing written. Done when: a driven test cancels and finds no file and one Activity line saying so.",
+          "Save exactly the previewed text and read the file back. Done when: a test compares the saved file with the previewed text and they are equal.",
+          "Cover it in `tests/preview_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L preview` passes, and fails when the saved text differs from the preview by one character."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L preview` passes: the preview holds the full content, Save report is refused before it, cancel writes nothing and the saved file equals the preview.",
+        "commit": "feature: the whole report is shown before it can be saved"
+      },
+      {
+        "title": "Choose What Goes In",
+        "needs": "sdk-framework",
+        "intro": "Each part of the report is ticked on and off in the Report section. A part left out is absent from the preview and the saved files, and its row says so, so the user decides what is shared.",
+        "surface": {
+          "fidelity": "the Report rows and their tick boxes, against `DESIGN.md` section 2.",
+          "job": "a person includes or leaves out each part and sees the effect on the size. Consumer: the preview and the saved file.",
+          "treatment": "a tick and a word per row (Included or Left out) with the line count beside it, the total in the status bar. Cheaper substitute that fails the checkpoint: hiding a part in the preview only, which still writes it to the file."
+        },
+        "build": [
+          "Add the include state to each collector record in `src/core/Collectors.h` and honour it in `src/core/Report.cpp`. Done when: a part set to Left out is absent from both output forms.",
+          "Bind the tick boxes in `src/ui/ReportView.cpp`. Done when: ticking a row updates its word, the total and the preview."
+        ],
+        "items": [
+          "Add an include flag per part in `src/core/Collectors.h`, defaulting to on, and skip a left-out part before it is gathered. Done when: a test with a part off shows its collector was never run. Cheaper substitute: gathering it and dropping it afterwards, which reads what the user declined to share.",
+          "Persist the choices through the framework's settings. Done when: a changed choice is read back from the settings file after a restart.",
+          "Show a tick, a word and a line count per row, and the totals in the status bar. Done when: unticking a row changes its word, its count and the total at once.",
+          "Make the ticks reachable by keyboard with an accessible name on each. Done when: a UI Automation walk names every tick box and the space key toggles it.",
+          "Cover it in `tests/select_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L select` passes, and fails when a left-out part appears in the output."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L select` passes: a part left out is never gathered, never previewed and never saved, and the choice survives a restart.",
+        "commit": "feature: parts of the report are ticked on and off"
+      },
+      {
+        "title": "Redact Personal Details",
+        "needs": "sdk-framework",
+        "intro": "When the user asks, the report loses user names, machine identifiers and anything on a deny list. The exclusion list is written down with its reasoning because the file is made to be handed to a stranger (`docs/origin/resolute-D05-T03-s6.md:14`). Redaction runs on the report before the preview, so the preview shows the redacted text.",
+        "surface": {
+          "fidelity": "the redaction option in Settings and its effect in the Preview section, against `sdk/DESIGN.md`.",
+          "job": "a person removes what identifies them before sharing. Consumer: the preview and the saved file, searched for the removed values.",
+          "treatment": "a setting, on by default, whose effect is visible in the preview as a fixed marker in place of each removed value. Cheaper substitute that fails the checkpoint: redacting only the saved file, so the preview shows something different from what is saved."
+        },
+        "build": [
+          "Write the redaction pass in `src/core/Redact.cpp` over the report document, driven by `docs/exclusions.md`. Done when: the user name, machine name, domain, account SIDs, MAC addresses and serial numbers are replaced by a marker.",
+          "Expose the option and the deny list in the framework's settings. Done when: a changed option is read back and changes the preview."
+        ],
+        "items": [
+          "Write `docs/exclusions.md` naming each withheld item (user names, machine name, domain, SIDs, MAC and IP addresses, serial numbers, the Windows product id, `MachineGuid`) with its reasoning. Done when: every redaction rule in `src/core/Redact.cpp` names its line in the file.",
+          "Implement `src/core/Redact.cpp` replacing each value found by the same marker, in every part including paths and log tails. Done when: a fixture report containing the test machine's user name in a path yields a report with none, searched case-insensitively. Cheaper substitute: a regex over the final text for the one user name, which misses the machine name and paths.",
+          "Apply a user's deny list of extra strings from the framework's settings before the preview. Done when: a string added to the list is absent from the preview and the saved file.",
+          "Make the preview and the saved file both come from the redacted document. Done when: a test finds the preview text equal to the saved text with redaction on and with it off.",
+          "Cover it in `tests/redact_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L redact` passes, and fails when one rule is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L redact` passes: no user name, machine identifier or deny list string survives in the preview or the saved files, and the exclusion list names each rule.",
+        "commit": "feature: user names, machine identifiers and a deny list can be removed"
+      },
+      {
+        "title": "Proof Nothing Secret Is Collected",
+        "intro": "A test that the collectors never read a product key, a credential or a browser store, so that a later change cannot add one by accident. The sources are declared as data, so the test reads the declarations and also watches what a run really touches.",
+        "build": [
+          "Write the deny rules as data in `src/core/Never.h`: the paths, keys and classes no collector may read. Done when: the list names product key values, credential stores, browser profile folders and document folders.",
+          "Run the collectors under a recorder in `tests/secrets_test.cpp` that logs every registry key, file and CIM class touched. Done when: the test fails on any touch of a name on the list."
+        ],
+        "items": [
+          "Declare in `src/core/Never.h` what is never read: `DigitalProductId` and `BackupProductKeyDefault`, `SoftwareProtectionPlatform` keys, the Credential Manager and `Vault` folders, `SAM`, `SECURITY` and LSA secrets, browser profile folders (`User Data`, `Profiles`, `places.sqlite`), and the user's Documents, Desktop and Downloads folders. Done when: each entry states why it is on the list.",
+          "Check at run time that every collector's declared source is not under a path on the list, before it runs. Done when: a collector given a source under `Vault` is refused by name and the run reports it.",
+          "Record every key, file and CIM class touched during a full run in a test and assert none is on the list. Done when: the test passes on the real run and fails when a collector is changed to read `DigitalProductId`. Cheaper substitute: grepping the source for the names, which misses a path built at run time.",
+          "Assert the report text of a fixture machine holds none of the planted secrets (a fake product key, a fake password in a registry value, a fake browser history file). Done when: the planted values are absent from both output forms.",
+          "Cover it in `tests/secrets_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L secrets` passes, and fails when one deny rule is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L secrets` passes: a full run touches nothing on the deny list, and planted secrets never reach the report.",
+        "commit": "test: the collectors are proven never to read a secret"
+      }
+    ],
+    "no_reverse": "the tool reads and writes one report file where the user says; it changes nothing on the system",
+    "verification": [
+      "On a real machine a report is gathered, previewed in full, saved, and opened in a plain text editor where it reads cleanly, and each fact matches an independent source.",
+      "A machine with enormous logs still produces a report of reasonable size, and a read-only target reports failure.",
+      "The secrets test passes, and the saved file and the preview are the same text, with redaction on and off, in light and dark, by keyboard alone."
+    ]
+  }
+}

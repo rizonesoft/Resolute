@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **97 of 205 sections complete (47%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **97 of 204 sections complete (48%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -307,7 +307,6 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 
 |  ✔  | Section      | Deliverable                                       | Items |
 | :-: | ------------ | ------------------------------------------------- | :---: |
-| [ ] | `D05 T01 §5` | The four new utilities                            |  11   |
 | [ ] | `D05 T02 §1` | RegStudio on the shared framework                 |   8   |
 | [ ] | `D05 T02 §2` | The registry engine                               |   7   |
 | [ ] | `D05 T02 §3` | Browse, display, and virtualize                   |   6   |
@@ -343,6 +342,8 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T07 §7` | Network Configuration Tools                       |   7   |
 | [ ] | `D05 T07 §8` | Files, Boot, Audio, and Inventory                 |  11   |
 | [ ] | `D05 T07 §9` | Printing, Search, and Scheduled Tasks             |   6   |
+
+> **Moved:** `D05 T01 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/StartupManager` and `rizonesoft/HostsEditor` repositories (`D:\Resolute_Bin\StartupManager`, `D:\Resolute_Bin\HostsEditor`), each by its own plan.
 
 > **Moved:** `D05 T03 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RestorePointManager` repository (`D:\Resolute_Bin\RestorePointManager`) by its own plan.
 > **Moved:** `D05 T03 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DriverManager` repository (`D:\Resolute_Bin\DriverManager`) by its own plan.

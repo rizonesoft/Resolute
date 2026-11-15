@@ -1,0 +1,253 @@
+{
+  "name": "DiskHealth",
+  "slug": "diskhealth",
+  "display": "Disk Health",
+  "job": "it reads each drive's SMART data, gives a verdict in plain words a non-expert can act on, runs a file system check when asked and hands a failing drive to the suite's rescue imaging tool.",
+  "tagline": "Is your drive healthy? A plain answer",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Jade",
+    "light": "#6EE7B7",
+    "dark": "#047857",
+    "social_ground": "#07261C",
+    "social_muted": "#BFEBDA"
+  },
+  "icon": {
+    "idea": "A disc with a heartbeat line across it: a drive's vital signs.",
+    "points": [
+      "Free-standing with no tile: a ring with a pulse line running through it.",
+      "The ring is Jade and the pulse is Jade light.",
+      "The small drawing, below 40 pixels, thickens both."
+    ],
+    "large": "<circle cx=\"48\" cy=\"48\" r=\"30\" fill=\"none\" stroke=\"#047857\" stroke-width=\"14\"/><path d=\"M12 48 H32 L40 32 L52 64 L60 48 H84\" fill=\"none\" stroke=\"#6EE7B7\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<circle cx=\"48\" cy=\"48\" r=\"30\" fill=\"none\" stroke=\"#047857\" stroke-width=\"16\"/><path d=\"M14 48 H34 L42 34 L54 62 L62 48 H82\" fill=\"none\" stroke=\"#6EE7B7\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Drives",
+        "One row per physical drive: model, size, type, temperature, verdict"
+      ],
+      [
+        "Attributes",
+        "The selected drive's SMART attributes, each explained"
+      ],
+      [
+        "Check",
+        "The file system check, scan first and repair only when confirmed"
+      ],
+      [
+        "Activity",
+        "What the tool read and ran, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees at once whether each drive is healthy, and what to do if one is not.",
+    "primary": "Refresh",
+    "secondary": "Check drive",
+    "rows": [
+      [
+        "System SSD (NVMe)",
+        "Healthy, or Warning with the reason"
+      ],
+      [
+        "Data HDD (SATA)",
+        "Warning or Failing, with the reason"
+      ],
+      [
+        "Backup drive (USB)",
+        "Unknown, when the bridge does not pass SMART through"
+      ],
+      [
+        "Old HDD (SATA)",
+        "Failing: replace it, copy your files now"
+      ]
+    ],
+    "status": "4 drives read: 1 healthy, 1 warning, 1 failing, 1 unknown",
+    "notes": [
+      "Each drive is a row with its model, size, type (SSD, HDD or NVMe) and temperature, and a verdict shown with an icon and a word: Healthy, Warning, Failing or Unknown. Colour is never the only signal.",
+      "Under each verdict is one line of reason in plain words, for example the count of sectors the drive could not read, so a person can act without opening the Attributes section.",
+      "Refresh, the accent button, reads every drive again. The rows come from that read, never from the last one.",
+      "Check drive opens the Check section for the selected drive. A scan is read-only. A repair is a separate action, confirmed by drive letter, label and size, and it says a restart may be needed.",
+      "A Failing row says plainly that the drive needs replacing, not repairing, and offers the rescue imaging tool. Unknown is shown for a drive that does not report, never Healthy.",
+      "Not elevated: the window opens, shows what it can and says that reading SMART needs administrator rights, with a button that restarts it elevated. Nothing is read half-way.",
+      "The status bar counts the verdicts in words, and the Activity section records every read and every check."
+    ],
+    "cut": "There is no earlier window to cut from: Disk Health is a new tool and ports nothing. It has no splash, no animations, no donate strip and no menu bar of its own. Settings and About are the framework's pages, and a drive's health is read-only on every screen except the confirmed repair."
+  },
+  "readme": {
+    "lead": "Find out whether your drive is failing, in words you can act on.",
+    "what": [
+      "Disk Health reads the health data each drive keeps about itself (SMART on SATA drives, the health log on NVMe drives) and turns it into one verdict: Healthy, Warning, Failing or Unknown. Under the verdict it says why, in plain words, and the raw values stay one click away for anyone who wants to check.",
+      "It can also run Windows' file system check on a drive. A scan only reads. A repair is confirmed first, names the drive, and may need a restart. When a drive reports that it is failing, Disk Health says so and offers the suite's rescue imaging tool, because no software repairs a dying drive."
+    ],
+    "new_intro": "Disk Health is a new tool of the suite. It has no earlier version.",
+    "new": [
+      [
+        "A verdict that is honest.",
+        "Healthy, Warning, Failing or Unknown. A drive that does not report, such as one behind some USB bridges or a RAID controller, is shown as Unknown and never as Healthy."
+      ],
+      [
+        "Attributes explained.",
+        "Each SMART attribute says in plain words what it measures and whether it predicts failure, with the raw value beside it."
+      ],
+      [
+        "A file system check.",
+        "Run a read-only scan with live progress, or a confirmed repair that names the drive and warns about a restart."
+      ],
+      [
+        "A way out.",
+        "A failing drive is handed to the rescue imaging tool, so the files can be copied before it dies."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Disk Health ships as a complete, standalone C++ tool: it lists every physical drive, reads SMART from SATA drives and health data from NVMe drives, gives one of four verdicts (healthy, warning, failing, unknown) with the reason in plain words and the raw values available, says honestly when a drive does not report, runs a Windows file system check on request with a confirmed repair, and hands a failing drive to the suite's rescue imaging tool.",
+    "current_state": "Nothing exists yet: Disk Health is a new tool with no AutoIt version and no earlier code, so nothing is ported and there is no `reference/` folder. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the plan text it came from in `docs/origin/resolute-D05-T03-s3.md` (18 lines, one section, six items), and the kits. The origin names the job (find out whether a disk is failing, and act before it does), a verdict of four values, a `chkdsk` scan with a confirmed repair, and the rule that a failing disk needs replacing, not repairing. The SDK's framework, repair contract and chart control, which the tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T03-s3.md`: the plan section this tool came from, with its job, treatment and test checkpoint.",
+      "`DESIGN.md`: the tool's identity and its window's sections, and `sdk/DESIGN.md`, the contract every surface answers to.",
+      "Windows' own interfaces, read directly: `IOCTL_STORAGE_QUERY_PROPERTY`, `IOCTL_ATA_PASS_THROUGH`, `SMART_RCV_DRIVE_DATA` and `chkdsk`. Disk Management is the check the drive list is compared with."
+    ],
+    "outcome": [
+      "The drive list matches Disk Management, and each drive shows a verdict of healthy, warning, failing or unknown, with the reason in plain words and the raw values available.",
+      "A drive that does not report is shown as unknown, never healthy; a failing drive says it needs replacing and offers the rescue imaging tool.",
+      "A read-only file system check runs with the window responsive, a repair is confirmed by letter, label and size, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Drives screen, where a person finds the drive that worries them by its verdict. Reporting and audit are the Activity section, the record of every read and every check. Settings are the framework's pages. Permissions anchor on the engine, because opening a physical drive needs administrator rights and the tool says so by name instead of showing empty results. Reverse does not apply: reading changes nothing, and the one write, a chkdsk repair, is Windows' own and is confirmed first.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Drive Health Engine",
+      "intro": "The tool's whole system effect, which is reading: enumerating physical drives, reading SMART from SATA drives and health data from NVMe drives, turning the raw values into one of four verdicts with the reason in plain words, and saying honestly when a drive does not report. The engine writes nothing and is independent of any window.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the drive model and the verdict rules as data in `src/core/Drive.h` and `src/core/Verdict.h`. Done when: the attributes that predict failure and the rule for each verdict are stated once, with the reason text beside each.",
+        "Implement enumeration and the two readers in `src/core/Drives.cpp`, `src/core/Ata.cpp` and `src/core/Nvme.cpp` behind one interface the tests can replace. Done when: the unit tests pass against recorded raw buffers."
+      ],
+      "items": [
+        "Enumerate physical drives in `src/core/Drives.cpp` with `IOCTL_STORAGE_QUERY_PROPERTY` (device descriptor, bus type) and `IOCTL_DISK_GET_LENGTH_INFO`, returning model, size, bus, and type (SSD, HDD or NVMe). Done when: the list on a real machine matches Disk Management by model and size. Cheaper substitute: reading WMI `Win32_DiskDrive` only, which hides the bus type and misreports some bridges.",
+        "Read ATA SMART in `src/core/Ata.cpp` with `IOCTL_ATA_PASS_THROUGH` (`SMART_RCV_DRIVE_DATA` as the fallback) and parse the attribute table into id, name, current, worst, threshold and raw. Done when: a recorded 512-byte buffer from a SATA drive parses to the expected attributes in `tests/ata_test.cpp`. Cheaper substitute: WMI `MSStorageDriver_FailurePredictStatus`, which returns one boolean and no attributes.",
+        "Read NVMe health in `src/core/Nvme.cpp` with `IOCTL_STORAGE_QUERY_PROPERTY` and the NVMe protocol data (the SMART and health log): critical warning, temperature, available spare, percentage used, media errors, power-on hours. Done when: a recorded log page parses to the expected fields in `tests/nvme_test.cpp`.",
+        "Turn attributes into a verdict in `src/core/Verdict.cpp`: Failing when the drive's own failure flag is set or a threshold is crossed, Warning when reallocated, pending or uncorrectable sectors (ids 5, 197, 198) are above zero or NVMe percentage used, available spare or critical warning say so, Healthy only when a read succeeded and none apply. Done when: a table of fixtures gives each of the three verdicts and the reason text names the attribute. Cheaper substitute: a pass or fail on one attribute, which misses the others.",
+        "Return Unknown with the reason when a drive does not report: no pass-through (a USB bridge, a RAID controller), access refused, or an unparsable buffer. Done when: a fixture where the read fails gives Unknown with a reason and never Healthy. Cheaper substitute: treating a failed read as no problems found, which is the worst possible answer.",
+        "Refuse every read by name when the process is not elevated, before any device is opened, with one activity record. Done when: an unelevated test run reports the refusal and opens no handle. Cheaper substitute: letting `CreateFile` fail with access denied on each drive and showing empty rows.",
+        "Keep the engine read-only: every device handle is opened with read access only and no write, set or format control code appears in `src/core/`. Done when: a test asserts the access mask of every handle the fakes see and a search of `src/core/` finds no write control code.",
+        "Cover every path in `tests/` with recorded buffers for ATA and NVMe and a failing fake. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when one verdict rule is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, including the unknown and the unelevated cases, and fails when one verdict rule is changed.",
+      "commit": "core: drive enumeration, SMART and NVMe reads, and an honest verdict"
+    },
+    "enhancements": [
+      {
+        "title": "File System Check",
+        "intro": "Run `chkdsk` in scan mode on a volume of the selected drive and show its progress and result while the window stays responsive. The repair mode is offered separately, confirmed by drive letter, label and size, and says a restart may be needed.",
+        "surface": {
+          "fidelity": "the Check section and the repair confirmation, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 11.",
+          "job": "a person checks a volume for file system errors without a console window, and repairs only knowingly. Consumer: the `chkdsk` output and exit code, read back.",
+          "treatment": "a progress bar and the result in words, with the full output available; the repair behind a confirmation naming letter, label and size. Cheaper substitute that fails the checkpoint: opening a console window, which shows nothing in the tool and cannot be confirmed."
+        },
+        "build": [
+          "Run `chkdsk` as a child process in `src/core/Chkdsk.cpp` with its output piped back. Done when: a scan of a test volume returns its lines and exit code without blocking the window.",
+          "Build the Check section in `src/ui/CheckView.cpp`. Done when: the scan shows progress and a result, and a repair asks first."
+        ],
+        "items": [
+          "Run `chkdsk X: /scan` in `src/core/Chkdsk.cpp` on a worker thread, reading its output as it arrives and reporting percent complete. Done when: a scan of a real volume completes with its output rendered and the window answering input throughout. Cheaper substitute: waiting for the process on the UI thread, which freezes the window.",
+          "Map the exit code and output to a result in words (no errors, errors found, could not run) and keep the raw output one click away. Done when: a fixture for each exit code shows its sentence in `tests/chkdsk_test.cpp`.",
+          "Offer the repair separately in `src/ui/CheckView.cpp`, through the framework's confirmation, naming the drive by letter, label and size and stating that a restart may be required. Done when: the confirmation names all three and declining runs nothing. Cheaper substitute: a generic \"are you sure\" box, which does not say what will be changed.",
+          "Run the repair as Windows' own `chkdsk X: /f` (or `/spotfix` where it applies), and report honestly when the volume is in use and the check is scheduled for the next restart. Done when: a repair on a test volume reports done or scheduled, in words.",
+          "Cover the scan, the confirmation and the decline in `tests/chkdsk_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L chkdsk` passes, and fails when a decline still starts the repair."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L chkdsk` passes: a scan completes with the window responsive, and a declined repair performs nothing.",
+        "commit": "feature: file system check, scan first and repair confirmed"
+      },
+      {
+        "title": "Attribute Explanations",
+        "intro": "The Attributes section shows each SMART attribute of the selected drive with what it measures in plain words and whether it is one of the few that predict failure, with the raw value still available. Reallocated sectors, pending sectors and power-on hours each render with an explanation.",
+        "surface": {
+          "fidelity": "the Attributes section, against `DESIGN.md` section 2.",
+          "job": "a person understands what a number means and whether to worry. Consumer: the attribute list, compared with the engine's read.",
+          "treatment": "one row per attribute with its name, a sentence, a mark for the ones that matter and the raw value. Cheaper substitute that fails the checkpoint: a green or red light with no attributes, which a user cannot act on or verify."
+        },
+        "build": [
+          "Write the explanations as data in `src/core/Explain.cpp`, keyed by ATA id and NVMe field. Done when: every attribute the engine parses has a sentence or is marked unexplained.",
+          "Build `src/ui/AttributesView.cpp`. Done when: the selected drive's attributes show with their sentences."
+        ],
+        "items": [
+          "Write `src/core/Explain.cpp` with one plain sentence per attribute and a flag for the ones that predict failure (5 reallocated sectors, 187 reported uncorrectable errors, 197 current pending sectors, 198 offline uncorrectable sectors, and for NVMe the critical warning, available spare and percentage used). Done when: reallocated sectors, pending sectors and power-on hours each return a sentence in a test.",
+          "Show an attribute the table does not know as its id, its raw value and the words \"not explained\", never hidden. Done when: a fixture with an unknown id still lists it.",
+          "Build `src/ui/AttributesView.cpp` with the explanation, the mark for the ones that matter, and the raw value in monospace beside it. Done when: the section shows all three for the fixture drive. Cheaper substitute: a private list control, which the contract forbids.",
+          "Order the attributes that matter first, and say in one line when none of them is in a bad state. Done when: a fixture with pending sectors shows that attribute at the top.",
+          "Cover it in `tests/explain_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes, and fails when an explanation is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes: three failure-predicting attributes render with plain-words explanations and the raw values stay available.",
+        "commit": "feature: every attribute explained in plain words"
+      },
+      {
+        "title": "Hand Off to Rescue Imaging",
+        "intro": "When a drive is Failing, the tool says plainly that a failing disk needs replacing, not repairing, and offers the suite's rescue imaging tool to copy what can still be read. The tool never depends on it at runtime: it launches it if installed and says where to get it if not.",
+        "surface": {
+          "fidelity": "the Failing row and its call to action, against `DESIGN.md` section 2.",
+          "job": "a person with a dying drive knows what to do next and gets to the imaging tool in one step. Consumer: the launch, read back from the started process.",
+          "treatment": "a sentence on the row and a button that opens the imaging tool on that drive. Cheaper substitute that fails the checkpoint: a red light with no next step, which leaves the person to guess."
+        },
+        "build": [
+          "Write the hand-off in `src/core/Handoff.cpp`. Done when: it finds the imaging tool or reports it missing, and passes the drive.",
+          "Show the message and the button in `src/ui/DrivesView.cpp`. Done when: a Failing row carries both."
+        ],
+        "items": [
+          "Add the plain statement to a Failing verdict in `src/core/Verdict.cpp`: the drive needs replacing, not repairing, and the files should be copied now. Done when: a Failing fixture's reason contains the statement and a Warning fixture's does not.",
+          "Locate the rescue imaging tool in `src/core/Handoff.cpp` by its registered launch name or its path beside this executable, and start it with the drive's identity. Done when: with a fake tool present the launch carries the drive, and with none present the result says it is not installed. Cheaper substitute: linking the imaging code into this tool, which the suite's rule forbids.",
+          "Show the button on a Failing row only, in `src/ui/DrivesView.cpp`, through the framework's button. Done when: a Healthy, Warning and Unknown fixture show none and a Failing one shows it.",
+          "Record the hand-off in the Activity section. Done when: a launch adds one line naming the drive and the outcome.",
+          "Cover it in `tests/handoff_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes, and fails when the button appears on a Healthy row."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes: a failing verdict states that replacement is the answer and offers the imaging tool, and no other verdict does.",
+        "commit": "feature: a failing drive is handed to rescue imaging"
+      },
+      {
+        "title": "Health History",
+        "needs": "sdk-framework",
+        "intro": "Each reading is recorded with its time so a trend shows: a reallocated sector count that is climbing matters more than one that has sat still. The trend is drawn with the SDK's chart control, which is planned in Resolute-SDK and not built.",
+        "surface": {
+          "fidelity": "the history view in the Attributes section, against `sdk/DESIGN.md` for the chart control.",
+          "job": "a person sees whether a drive is getting worse over time. Consumer: the stored readings, compared with the drawn series.",
+          "treatment": "a line per important attribute over time, with the verdict changes marked. Cheaper substitute that fails the checkpoint: a table of dates and numbers, which does not show a trend."
+        },
+        "build": [
+          "Store each reading through the framework in `src/core/History.cpp`. Done when: a reading survives a restart.",
+          "Draw the series in `src/ui/HistoryView.cpp` with the SDK's chart control. Done when: two readings draw as two points on a line."
+        ],
+        "items": [
+          "Record each successful read in `src/core/History.cpp`: drive identity (model and serial), time, verdict and the attributes that matter, in the framework's data folder. Done when: a test finds the reading after a restart. Cheaper substitute: keeping it in memory, which loses the trend.",
+          "Identify a drive by serial number, not by its number in the list, so a trend follows the drive across restarts and ports. Done when: two fixtures with swapped drive numbers keep their own histories.",
+          "Cap the history per drive and drop the oldest first, and say so in the view. Done when: a test with more readings than the cap keeps the newest and the view states the cap.",
+          "Draw the series in `src/ui/HistoryView.cpp` with the SDK's chart control. Done when: the chart shows the fixture's readings in order with a mark where the verdict changed. Cheaper substitute: a private chart, which the contract forbids.",
+          "Cover it in `tests/history_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L history` passes, and fails when two drives share a history."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L history` passes: readings persist per drive, and the chart draws them in order.",
+        "commit": "feature: health history, a trend per drive"
+      }
+    ],
+    "no_reverse": "reading a drive's health changes nothing; the one write, a chkdsk repair, is Windows' own and is confirmed first",
+    "verification": [
+      "On a real machine the drive list matches Disk Management, and each drive shows a verdict of healthy, warning, failing or unknown with its reason.",
+      "A fixture where SMART is unavailable shows unknown and never healthy; a failing fixture states that replacement is the answer and offers the imaging tool.",
+      "A read-only scan completes with the window responsive, a repair confirms by letter, label and size, and the tool is operated by keyboard alone in light and dark."
+    ]
+  }
+}

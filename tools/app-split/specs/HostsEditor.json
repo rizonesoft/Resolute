@@ -1,0 +1,246 @@
+{
+  "name": "HostsEditor",
+  "slug": "hostseditor",
+  "display": "Hosts Editor",
+  "job": "it shows the Windows hosts file as rows, saves changes to it atomically, keeps the previous file and can put any earlier version back.",
+  "tagline": "Edit the hosts file without breaking it",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Royal blue",
+    "light": "#93C5FD",
+    "dark": "#1D4ED8",
+    "social_ground": "#0E1A3D",
+    "social_muted": "#C9DAF8"
+  },
+  "icon": {
+    "idea": "A signpost with two signs pointing different ways: names sent to addresses.",
+    "points": [
+      "Free-standing with no tile: a post with two pointed signs.",
+      "The upper sign is Royal blue light, and the post and the lower sign are Royal blue.",
+      "The small drawing below 40 pixels thickens the post."
+    ],
+    "large": "<path d=\"M48 14 V84\" fill=\"none\" stroke=\"#1D4ED8\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M48 20 H72 L84 31 L72 42 H48 Z\" fill=\"#93C5FD\" stroke=\"#93C5FD\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M48 50 H24 L12 61 L24 72 H48 Z\" fill=\"#1D4ED8\" stroke=\"#1D4ED8\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<path d=\"M48 12 V86\" fill=\"none\" stroke=\"#1D4ED8\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M48 18 H70 L84 31 L70 44 H48 Z\" fill=\"#93C5FD\" stroke=\"#93C5FD\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M48 50 H26 L12 63 L26 76 H48 Z\" fill=\"#1D4ED8\" stroke=\"#1D4ED8\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Entries",
+        "Each hosts entry as a row with its address, its host names, whether it is switched on, and its comment"
+      ],
+      [
+        "Backups",
+        "The previous files kept by each save, newest first, each one restorable"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every hosts entry as a row, edits them and saves the file without risking a broken one.",
+    "primary": "Save",
+    "secondary": "Add entry",
+    "rows": [
+      [
+        "127.0.0.1 localhost",
+        "On"
+      ],
+      [
+        "203.0.113.10 staging.example.test",
+        "On, with a comment"
+      ],
+      [
+        "203.0.113.20 old.example.test",
+        "Off, commented out"
+      ],
+      [
+        "999.1.1.1 broken.example.test",
+        "Invalid address"
+      ]
+    ],
+    "status": "3 entries, 1 off, 1 invalid",
+    "notes": [
+      "Each row shows its state with an icon and a word: On, Off or Invalid. Comments and blank lines the person wrote stay in place and are not rows that can be lost.",
+      "Save is the primary action. It is disabled while any row is invalid, and the invalid row says why in words.",
+      "Add entry opens a new row for an address, one or more host names and an optional comment, checked as it is typed.",
+      "Every save keeps the previous file, and the Backups section lists those files so any one can be put back.",
+      "When the tool is not run as administrator, or the hosts file is locked by another program, Save is refused by name before anything is written and the reason is shown.",
+      "The status bar counts the entries, the ones switched off and the invalid ones, and shows the hosts file path."
+    ],
+    "cut": "There is no earlier window to compare: this is a new tool, so nothing has been cut from a previous version. The suite's usual extras (a splash, animations, a donate strip and File and Help menus) are not built, and the plan records that they stay out."
+  },
+  "readme": {
+    "lead": "Hosts Editor shows the Windows hosts file as a list of entries and saves your changes without risking a broken file.",
+    "what": [
+      "The hosts file maps names to addresses and is read before DNS. A mistake in it can make a site unreachable, and some security software locks it. Hosts Editor shows each entry as a row, checks addresses and host names before saving, and writes the file in one atomic step.",
+      "Saving the hosts file needs administrator rights, so the tool asks for them. Each save keeps the previous file, so a change can be put back from the Backups section."
+    ],
+    "new_intro": "This is a new tool of the Resolute suite, so everything in it is new. What it does:",
+    "new": [
+      [
+        "Entries as rows.",
+        "Each entry shows its address, host names, state and comment, and comments and blank lines in the file keep their place."
+      ],
+      [
+        "Atomic saves.",
+        "The file is written beside the original, flushed and then swapped in, so a failed save never leaves half a file."
+      ],
+      [
+        "Backups you can restore.",
+        "Every save keeps the previous file, and any one can be put back from the Backups section."
+      ],
+      [
+        "Switch entries off.",
+        "An entry can be commented out and back on without being deleted."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Hosts Editor ships as a complete, standalone C++ tool: it reads the Windows hosts file into entries without losing comments, blank lines or order, checks addresses and host names, writes the file atomically with the previous file kept, refuses by name when not elevated or when the file is locked, and can put any kept file back.",
+    "current_state": "Nothing exists yet, and there is no earlier version to port. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T01-s5.md`, the plan section that placed this tool. That section covers a four-tab startup manager as well; only its hosts editor line applies here: an entry is added, name resolution reflects it, the file is written atomically, and the prior file is recoverable through the contract. The file this tool edits is `%SystemRoot%\\System32\\drivers\\etc\\hosts`: plain text, one entry per line as an address followed by host names and an optional `#` comment, writable only with administrator rights, and sometimes locked by security software. The DNS client cache should be flushed after a change. The SDK's framework and repair contract, which the tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T01-s5.md`: the plan section that places the hosts editor as its own tool; the startup manager in it is not part of this tool.",
+      "`%SystemRoot%\\System32\\drivers\\etc\\hosts`: the file the tool edits, read as the live fixture on a disposable machine.",
+      "`DESIGN.md` and `brand/`: the Sidebar window and the chosen identity."
+    ],
+    "outcome": [
+      "`HostsEditor.exe` reads the hosts file into rows and writes it back byte-for-byte when nothing changed, keeping every comment, blank line and the order.",
+      "Every save is atomic and keeps the previous file; an unelevated run or a locked file is refused by name before any write.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Entries screen, where a person finds a host name or an address and changes its row. Reporting and audit are the Activity section, which records each save and each refusal. Settings are the framework's pages. Permissions anchor on the engine, where a save without administrator rights is refused by name before anything is written. Reverse means putting back a previous hosts file from the kept copies, which the Backups section lists.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Hosts File Engine",
+      "intro": "The tool's whole system effect: parsing the hosts file into entries, checking them and writing the file atomically, with the previous file kept and every action refused by name when the process is not elevated or the file is locked. The engine has no window and works on a path passed in, so tests use a disposable file.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the entry model and the parser in `src/core/HostsFile.h` and `src/core/HostsFile.cpp`. Done when: the unit tests parse and re-serialise a fixture file to identical bytes.",
+        "Implement validation and the atomic writer in `src/core/Validate.cpp` and `src/core/AtomicWrite.cpp`. Done when: the unit tests pass against a disposable directory."
+      ],
+      "items": [
+        "Implement `ParseHosts(text)` in `src/core/HostsFile.cpp` returning entries (address, host names, comment, on or off) plus the untouched comment and blank lines in their order. Done when: a fixture with comments, blank lines, tabs and an entry commented out parses and `Serialise` returns the same bytes. Cheaper substitute: splitting lines and dropping the ones that are not entries, which loses comments and order.",
+        "Implement `ValidateAddress` and `ValidateHostName` in `src/core/Validate.cpp` for IPv4, IPv6 and host names (label length, characters, total length). Done when: a table test accepts the valid forms and rejects `999.1.1.1`, an empty label and a name with a space, each by named reason.",
+        "Implement `WriteAtomic(path, text)` in `src/core/AtomicWrite.cpp`: write a temporary file beside the target, flush it to disk, then replace the target with it. Done when: a test that fails the replace step leaves the original file unchanged and removes the temporary file. Cheaper substitute: writing the target in place, which leaves half a file when the write stops.",
+        "Keep the previous file on every save through `WriteAtomic` in `src/core/AtomicWrite.cpp`, as a dated copy beside the backups folder named by the settings. Done when: a test saves twice and finds both the new content in the target and the first content in a kept copy.",
+        "Refuse `Save` by name when the process is not elevated, before any file is touched, with one activity record, using `src/core/Elevation.cpp`. Done when: an unelevated test run reports the refusal and the fixture is byte-identical. Cheaper substitute: letting the write fail with access denied, which names no cause.",
+        "Refuse `Save` by name when the hosts file is locked by another program, before the replace step, in `src/core/AtomicWrite.cpp`. Done when: a test that holds the target open exclusively gets a refusal that says the file is locked and leaves the target and the kept copies unchanged. Cheaper substitute: retrying silently until the call times out.",
+        "Refuse a `Save` that contains an invalid entry, naming the line and the reason, in `src/core/Validate.cpp`. Done when: a test with one bad address gets the line number and reason and the file is not written.",
+        "Cover every path in `tests/hosts_test.cpp` with a disposable file. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L hosts` passes, and fails when `Serialise` drops a comment."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L hosts` passes, including the round trip, the failed replace, the unelevated and the locked-file cases.",
+      "commit": "core: parse, validate and atomically write the hosts file"
+    },
+    "enhancements": [
+      {
+        "title": "Backups and Restore",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Every save keeps the previous file, the Backups section lists those files, and any one can be put back. The record and the restore are the SDK repair contract's, which this section consumes once it exists. Restoring is itself a save, so it keeps the file it replaces.",
+        "surface": {
+          "fidelity": "the Backups section and its Restore button, against `DESIGN.md` section 2.",
+          "job": "a person puts back the hosts file as it was before a chosen save. Consumer: the hosts file, compared with the kept copy.",
+          "treatment": "a list of kept files with date and size, a Restore button on the selected one, and the result stated in words. Cheaper substitute that fails the checkpoint: a restore that overwrites the file without keeping the current one, which makes the restore itself irreversible."
+        },
+        "build": [
+          "List the kept files in `src/ui/BackupsView.cpp`. Done when: the section shows each kept file with its date and size, newest first.",
+          "Implement restore in `src/core/Restore.cpp`. Done when: restoring a kept file leaves the hosts file equal to it and keeps the file it replaced."
+        ],
+        "items": [
+          "Record each save's previous file through the repair contract's restore record in `src/core/Restore.cpp`. Done when: a test finds the record on disk before the target is replaced. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement `Restore(backup)` using `WriteAtomic`, keeping the current file as a new backup first. Done when: save, restore and restore again each leave the hosts file equal to the chosen copy, asserted.",
+          "Show the kept files in `src/ui/BackupsView.cpp` with date, size and a Restore button, through the framework's list control. Done when: after two saves the list shows two files and the button restores the selected one. Cheaper substitute: a private list control.",
+          "Disable Restore with a tooltip when no file is selected or none exists. Done when: a first run shows an empty list with the button disabled.",
+          "Cover it in `tests/restore_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restore` passes, and fails when one byte of the restored file differs."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restore` passes: save then restore, and restore then restore again, each leave the hosts file equal to the chosen copy.",
+        "commit": "feature: backups listed and any one restorable"
+      },
+      {
+        "title": "Switch Entries On and Off",
+        "intro": "An entry can be commented out and back on without being deleted, so a person tests a change by turning a line off and later on again. The parser already reads an entry that is commented out as an off row, so turning a row off only adds the comment mark and turning it on removes it, with the rest of the line kept.",
+        "surface": {
+          "fidelity": "the On and Off state in each row, against `DESIGN.md` section 2.",
+          "job": "a person turns an entry off and on without losing it. Consumer: the hosts file text, read back.",
+          "treatment": "a switch on each row with the state also written as a word. Cheaper substitute that fails the checkpoint: deleting the row on Off and asking the person to retype it."
+        },
+        "build": [
+          "Add the toggle to the entry model in `src/core/HostsFile.cpp`. Done when: toggling a row twice returns the file to identical bytes.",
+          "Add the row switch in `src/ui/EntriesView.cpp`. Done when: the switch changes the row's icon and word at once."
+        ],
+        "items": [
+          "Implement `SetEnabled(entry, bool)` in `src/core/HostsFile.cpp` adding or removing the leading `#` and keeping the comment and spacing. Done when: a test turns a row off and on and the serialised file equals the original.",
+          "Tell a switched-off entry from an ordinary comment in `ParseHosts`: a commented line counts as an off entry only when it holds a valid address and host names. Done when: a fixture with a prose comment and an off entry shows one row, not two.",
+          "Add the On and Off switch to each row in `src/ui/EntriesView.cpp` with the state also as a word, through the framework's switch control. Done when: the switch works by keyboard and a screen reader reads the word. Cheaper substitute: colour alone for the state.",
+          "Cover it in `tests/toggle_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L toggle` passes, and fails when the toggle drops the entry's comment."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L toggle` passes: off then on returns the file to identical bytes, and prose comments never become rows.",
+        "commit": "feature: switch entries on and off without deleting them"
+      },
+      {
+        "title": "Flush DNS After Saving",
+        "intro": "Windows keeps resolved names in the DNS client cache, so a saved hosts change may not take effect until the cache is flushed. After a successful save the tool flushes it and says so, and a failed flush is reported without undoing the save.",
+        "surface": {
+          "fidelity": "the Save result in the status bar, against `DESIGN.md` section 2.",
+          "job": "a person saves and the new entry is used at once. Consumer: name resolution for the saved host name.",
+          "treatment": "the status bar says saved and flushed, or saved and flush failed with the reason. Cheaper substitute that fails the checkpoint: telling the person to run `ipconfig /flushdns` themselves."
+        },
+        "build": [
+          "Implement the flush in `src/core/DnsFlush.cpp`. Done when: the flush call returns a result the engine can report.",
+          "Report the result in `src/ui/EntriesView.cpp`. Done when: the status bar shows the flush outcome after each save."
+        ],
+        "items": [
+          "Implement `FlushDns()` in `src/core/DnsFlush.cpp` through the system's DNS cache flush call, not a spawned `ipconfig` window. Done when: on a disposable machine a cached negative answer for a test name is gone after the call.",
+          "Run `FlushDns()` after every successful save and after every restore, and not after a refused one. Done when: a test with a fake flusher counts one call per successful save and none after a refusal.",
+          "Report a failed flush as its own message and keep the saved file. Done when: a fake flusher that fails leaves the saved content in place and the status bar names the failure.",
+          "Add a setting to switch the flush off, through the framework's settings page. Done when: with it off the save makes no flush call. Cheaper substitute: a private settings file."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L flush` passes: one flush per successful save, none after a refusal, and a failed flush keeps the save.",
+        "commit": "feature: flush the DNS cache after saving"
+      },
+      {
+        "title": "Find Duplicates and Conflicts",
+        "intro": "The same host name listed twice, or pointed at two different addresses, is easy to miss in a long file, and only one of them is used. The tool marks these rows and says why, without changing the file.",
+        "surface": {
+          "fidelity": "the marked rows on the Entries screen, against `DESIGN.md` section 2.",
+          "job": "a person finds names that are listed twice or sent to different addresses. Consumer: the entry list, read back.",
+          "treatment": "each affected row carries a word, Duplicate or Conflict, and a tooltip naming the other row. Cheaper substitute that fails the checkpoint: a search box that the person has to use name by name."
+        },
+        "build": [
+          "Implement the check in `src/core/Conflicts.cpp`. Done when: the unit tests find the duplicate and the conflict in a fixture.",
+          "Show the marks in `src/ui/EntriesView.cpp`. Done when: affected rows carry the word and the tooltip."
+        ],
+        "items": [
+          "Implement `FindConflicts(entries)` in `src/core/Conflicts.cpp` that returns a Duplicate for the same name and address twice and a Conflict for the same name with different addresses, ignoring switched-off entries. Done when: a fixture with one of each, plus a switched-off entry that would clash, returns exactly two findings.",
+          "Compare host names without regard to letter case, as name lookup does. Done when: `Example.test` and `example.test` are reported together.",
+          "Show Duplicate and Conflict as a word and an icon on each affected row, with a tooltip naming the other row, in `src/ui/EntriesView.cpp`. Done when: the marks appear without a click and the file is unchanged. Cheaper substitute: colour alone.",
+          "Cover it in `tests/conflicts_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L conflicts` passes, and fails when the case-insensitive comparison is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L conflicts` passes: duplicates and conflicts are found, case is ignored and switched-off entries are skipped.",
+        "commit": "feature: mark duplicate and conflicting entries"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A save on a real machine writes the hosts file atomically, keeps the previous file, flushes the DNS cache and the new name resolves.",
+      "A restore from the Backups section returns the hosts file to the chosen earlier content, and an unelevated run and a locked file are each refused by name.",
+      "The window works in light and dark at every scale, by keyboard alone, and a file with comments and blank lines comes back unchanged when nothing is edited."
+    ]
+  }
+}

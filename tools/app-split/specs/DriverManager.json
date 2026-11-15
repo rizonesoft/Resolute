@@ -1,0 +1,244 @@
+{
+  "name": "DriverManager",
+  "slug": "drivermanager",
+  "display": "Driver Manager",
+  "job": "it lists the installed third-party drivers, backs the ones you choose up to a folder with a manifest, verifies the backup and puts a driver back, and it never updates, checks for or downloads a driver.",
+  "tagline": "Back up your drivers and roll one back. It never updates them",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Purple",
+    "light": "#C4B5FD",
+    "dark": "#6D28D9",
+    "social_ground": "#1D1238",
+    "social_muted": "#DDD4F7"
+  },
+  "icon": {
+    "idea": "An arrow going into a box: drivers kept safe.",
+    "points": [
+      "Free-standing, with no tile: a rounded box with an arrow above it, pointing down into it.",
+      "The box is Purple. The arrow and the line on the box are Purple light.",
+      "The small drawing, used below 40 pixels, thickens the arrow and drops the line."
+    ],
+    "large": "<rect x=\"14\" y=\"50\" width=\"68\" height=\"32\" rx=\"8\" fill=\"#6D28D9\"/><path d=\"M48 12 V40 M34 28 L48 42 L62 28\" fill=\"none\" stroke=\"#C4B5FD\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M30 66 H66\" fill=\"none\" stroke=\"#C4B5FD\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<rect x=\"12\" y=\"52\" width=\"72\" height=\"32\" rx=\"9\" fill=\"#6D28D9\"/><path d=\"M48 10 V38 M32 26 L48 42 L64 26\" fill=\"none\" stroke=\"#C4B5FD\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Drivers",
+        "One row per third-party driver: device, provider, version, date and backup state"
+      ],
+      [
+        "Backups",
+        "The backup folders the tool made, each with its manifest and its verification result"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which third-party drivers are installed and which are backed up, backs the working ones up and rolls a broken one back.",
+    "primary": "Back up",
+    "secondary": "Roll back",
+    "rows": [
+      [
+        "Intel Wi-Fi adapter",
+        "Backed up, or Not backed up"
+      ],
+      [
+        "NVIDIA display adapter",
+        "Backed up, or Backup out of date when the installed version is newer"
+      ],
+      [
+        "Realtek audio device",
+        "Not backed up"
+      ],
+      [
+        "USB controller",
+        "Problem, with its Device Manager error code"
+      ]
+    ],
+    "status": "12 drivers, 9 backed up, 1 device with a problem",
+    "notes": [
+      "Each row shows its device, provider, version, date and signing state, and its backup state with an icon and a word: Backed up, Not backed up, Backup out of date, or Problem with its error code.",
+      "Back up is the accent button. It exports the selected drivers, or every driver when none is selected, to the chosen backup folder and reads each copy back before it reports Backed up.",
+      "Roll back is beside it and acts on the selected device. Before the user commits, a plain sentence says the rollback may need a restart, and a confirmation names the device, the version now installed and the version it goes back to.",
+      "There is no Update button, no update check and no download link anywhere in the window. The About page says so in one sentence.",
+      "The status bar counts drivers, backed up drivers and devices with a problem, in words.",
+      "Without elevation the tool opens and lists, and Back up and Roll back refuse by name with one sentence naming the device or driver, before anything is written.",
+      "Undo is the Restore a Driver From a Backup section: a roll back records what was installed first, so the driver that was replaced can be put back."
+    ],
+    "cut": "This is a new tool, so there is no earlier window to cut from. It also leaves out, by decision, every control a driver updater has: a scan for newer drivers, a download page, a driver finder and any call to the network. The recorded product decision of 2026-09-16 is in the plan, and the plan proves the absence with a search of the source and of the binary's imports. It has no menus, splash, animations or donate strip."
+  },
+  "readme": {
+    "lead": "Back up your drivers and put one back, and it never updates them.",
+    "what": [
+      "Driver Manager lists the third-party drivers installed on this PC, with the device each one serves, its provider, version, date and whether you have a backup of it. You pick the ones to keep, and it exports them to a folder with a manifest and checks the copy.",
+      "When an update breaks a device, you roll that device back to the driver that worked, or restore one from a backup. It reads the device back afterwards and tells you what it found. It never looks for a newer driver, never downloads one and never installs one it did not capture."
+    ],
+    "new_intro": "Driver Manager is a new tool in the suite. These are the ideas it is built on.",
+    "new": [
+      [
+        "It never updates.",
+        "Driver updaters sit next to scareware, so this tool has no update check, no download and no network code, and a test proves it by searching the source and the binary's imports."
+      ],
+      [
+        "It keeps the exact driver that worked.",
+        "A backup is the package itself with a manifest of hashes, so a restore installs the same files and not a newer guess."
+      ],
+      [
+        "It reads back, never trusts the install call.",
+        "After a restore or rollback it asks the device which driver it now has, and reports a failed install as failed."
+      ],
+      [
+        "It says when a restart is needed.",
+        "The statement appears before you commit, not after."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new tool: build, engine, window, features, release",
+    "goal": "Driver Manager ships as a complete, standalone C++ tool that lists the installed third-party drivers, backs chosen drivers up to a folder with a hashed manifest, verifies the backup, rolls a device back to a recorded package and restores a driver from a backup, reads the device back after every change, refuses by name when not elevated, and contains no code path that updates, looks for or downloads a driver, proven by a test.",
+    "current_state": "Nothing exists yet, in C++ or in any earlier version: this is a new tool and nothing is ported. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and one origin file, `docs/origin/resolute-D05-T03-s2.md`, which is the plan section as it stood in the Resolute repository (27 lines). That section records the product decision of 2026-09-16 that the tool backs up and rolls back and never updates, and lists the work: enumerate drivers with version, date, provider and signing state, back a package up, roll back as a repair-contract item, verify by reading the device back, surface devices with their error code, refuse without the privilege and say a restart may be needed. The tool is built on what Windows provides: the driver store read with `pnputil /enum-drivers`, packages exported with `pnputil /export-driver` and reinstalled with `pnputil /add-driver`, devices enumerated through SetupAPI and the configuration manager, whose problem codes are the Device Manager error codes. There is no `reference/au3/` folder. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T03-s2.md`: the plan section, with the no-update decision and the seven items.",
+      "`DESIGN.md`: the tool's identity and its window's sections, with `sdk/DESIGN.md`, the suite's contract.",
+      "The Windows driver store on a real machine, read with `pnputil /enum-drivers`, plus a fixture driver package kept under `tests/fixtures/`."
+    ],
+    "outcome": [
+      "`DriverManager.exe` lists every third-party driver the same as `pnputil /enum-drivers`, backs chosen ones up with a hashed manifest, verifies the copy and rolls a device back or restores it, reading the device back each time.",
+      "The tool refuses by name when not elevated, shows devices with a problem and their error code in plain words, states that a restart may be needed before the user commits, and contains no update, check or download path, proven by a test.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Drivers screen, where a person finds a driver by its device and sees its backup state. Reporting and audit are the Activity section, the trail of every backup and rollback and the report a support reader checks. Settings are the framework's pages, including the default backup folder. Permissions anchor on the engine, where an unelevated backup, rollback or restore is refused by name before any change. Reverse means putting back the driver that a rollback or restore replaced, which anchors on the restore section, using the repair contract's record of the prior state.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Driver Backup and Rollback Engine",
+      "intro": "The tool's whole system effect, independent of any window: reading the installed third-party drivers and their devices, exporting chosen packages with a manifest, verifying them, and rolling a device back or restoring a package, with every result read back from the device and every action refused by name when the process is not elevated. Nothing in the engine reaches the network.",
+      "needs": "windows-host",
+      "build": [
+        "Implement enumeration and export in `src/core/DriverStore.cpp` behind an interface the tests can replace. Done when: the unit tests pass against a fixture store and a real run lists the machine's drivers.",
+        "Implement backup, verification, rollback and restore in `src/core/Backup.cpp` and `src/core/Rollback.cpp`. Done when: a backup and restore cycle of the fixture driver produces an identical package hash."
+      ],
+      "items": [
+        "Implement `EnumerateDrivers()` in `src/core/DriverStore.cpp` returning each third-party package with its published name, original INF, provider, class, version, date and signer, read from `pnputil /enum-drivers` output parsed into fields. Done when: a test compares the list with `pnputil /enum-drivers` on the same machine entry by entry and finds no difference. Cheaper substitute: reading only the registry's driver keys, which misses packages with no device installed.",
+        "Implement `DevicesForDriver()` in `src/core/Devices.cpp` using SetupAPI and the configuration manager (`SetupDiGetClassDevs`, `CM_Get_DevNode_Status`) to link each package to the devices that use it, with each device's problem code. Done when: a driver with two devices lists both, and a device with a problem carries its code. Cheaper substitute: matching by device name text, which collides on identical names.",
+        "Implement `BackupDrivers(selection, folder)` in `src/core/Backup.cpp` exporting each package with `pnputil /export-driver` into its own subfolder and writing `manifest.json` with the package name, version, date, provider, device hardware IDs and a SHA-256 of every file. Done when: a backup of the fixture driver leaves one subfolder and a manifest whose hashes match the files. Cheaper substitute: copying `.inf` files out of `C:\\Windows\\INF`, which leaves out the binaries the package needs.",
+        "Implement `VerifyBackup(folder)` in `src/core/Backup.cpp` re-reading every file and comparing it with the manifest, returning the failing file by name. Done when: a test that alters one byte of one copied file gets that file named, and an untouched backup verifies clean. Cheaper substitute: checking that the files exist, which passes a corrupted copy.",
+        "Implement `RollBack(device)` in `src/core/Rollback.cpp` installing the recorded or previous package for a device with `pnputil /add-driver <inf> /install`, then reading the device's installed driver version back with the configuration manager. Done when: after a rollback of the fixture device the engine reports the restored version read from the device, and a deliberately suppressed install reports failed. Cheaper substitute: trusting the install call's exit code, which reports success for an install that did nothing.",
+        "Implement `RestoreFromBackup(folder, package)` in `src/core/Rollback.cpp`, verifying the backup first and refusing an unverified one by name. Done when: a backed-up driver reinstalls on the same machine, the device reports the restored version and the package hash equals the manifest's. Cheaper substitute: installing without verifying the backup, which installs a damaged package.",
+        "Record the prior state before any change in `src/core/Rollback.cpp`: the package and version installed for the device, kept on disk so a rollback can be reversed. Done when: a test finds the record on disk before the first install call. Cheaper substitute: holding it in memory, which is lost if the tool closes.",
+        "Refuse `BackupDrivers`, `RollBack` and `RestoreFromBackup` by name when the process is not elevated, before any change, and write one line to the activity record for each action. Done when: an unelevated test run reports the refusal naming the device or driver, nothing changed, and each action leaves exactly one record. Cheaper substitute: letting `pnputil` fail with access denied partway through.",
+        "Cover every path in `tests/driver_test.cpp` with a fixture store and the fixture driver. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L driver` passes, and fails when the verification is skipped."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L driver` passes, including enumeration matching `pnputil /enum-drivers`, the corrupted-backup case, the suppressed-install case and the unelevated refusal.",
+      "commit": "core: back up, verify and roll back drivers, read back from the device, refused when unelevated"
+    },
+    "enhancements": [
+      {
+        "title": "Restore a Driver From a Backup",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A bad driver change needs a way back that does not depend on what Windows kept. This section lets a person restore any backed-up driver, or undo the last rollback, using the prior-state record the engine wrote. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Backups section, the restore confirmation and the result, against `DESIGN.md` section 2.",
+          "job": "a person puts back a driver that worked, or the driver a rollback replaced. Consumer: the device's installed driver, read back after the action.",
+          "treatment": "the confirmation names the device, the version now installed and the version it goes back to, and says before the user commits that a restart may be needed. Cheaper substitute that fails the checkpoint: a restore button that installs and reports success without reading the device."
+        },
+        "build": [
+          "List the backups with their manifests in `src/ui/BackupsView.cpp`. Done when: each backup shows its drivers, its date and its verification result.",
+          "Wire Restore and Undo in `src/ui/BackupsView.cpp` through the repair contract. Done when: a restore then undo leaves the device on the driver it started with."
+        ],
+        "items": [
+          "Build `src/ui/BackupsView.cpp` listing each backup folder with its manifest and its verification result, through the framework's list control. Done when: a fixture backup shows its drivers and a damaged one shows the failing file. Cheaper substitute: a private list control.",
+          "Show the restore confirmation naming the device, the installed version, the version it returns to and the restart statement, through the framework's message surface. Done when: the statement is on the surface before the confirm button is enabled. Cheaper substitute: a restart notice after the install, which is too late to choose.",
+          "Implement Undo in `src/core/Rollback.cpp` reinstalling the package the prior-state record names. Done when: restore then undo, and roll back then undo, each leave the device on its starting version, asserted by reading the device.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one change.",
+          "Cover it in `tests/restore_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restore` passes, and fails when the record is not read."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restore` passes: restore then undo and roll back then undo both leave the fixture device on its starting version.",
+        "commit": "feature: restore from a backup, and undo the last change"
+      },
+      {
+        "title": "Back Up Everything for a Reinstall",
+        "intro": "Before reinstalling Windows, a person wants every third-party driver kept in one place. This section backs up all of them in one action, with progress, a manifest for the whole set and a report of anything that could not be exported.",
+        "surface": {
+          "fidelity": "the Back up action with no selection, against `DESIGN.md` section 2.",
+          "job": "a person keeps every installed third-party driver before a reinstall. Consumer: the backup folder, verified against its manifest.",
+          "treatment": "one folder, one manifest, one verification and a list of what failed, by name. Cheaper substitute that fails the checkpoint: a single export of the whole store that gives no per-driver result."
+        },
+        "build": [
+          "Add `BackupAll(folder)` in `src/core/Backup.cpp`. Done when: it backs up every package and continues past one that fails.",
+          "Add a progress and result view in `src/ui/DriversView.cpp`. Done when: the result lists each failure by driver name."
+        ],
+        "items": [
+          "Implement `BackupAll(folder)` in `src/core/Backup.cpp` exporting every third-party package, continuing after a failure and recording it. Done when: a fixture store with one unexportable package yields every other package and names the failing one. Cheaper substitute: stopping at the first failure, which hides every driver after it.",
+          "Write one set manifest `set.json` in the backup folder listing every package, the computer name and the Windows build, with a SHA-256 of each package manifest. Done when: a test verifies the whole set from `set.json` alone.",
+          "Show progress and the final result in `src/ui/DriversView.cpp` through the framework's progress control, with a count of backed up and failed. Done when: a run over the fixture store shows counts that equal the engine's. Cheaper substitute: a private progress bar.",
+          "Refuse with a plain sentence when the target folder is on the system drive being reinstalled or has too little free space, before copying. Done when: a test with a full target refuses and leaves the folder empty.",
+          "Cover it in `tests/backup_all_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L backupall` passes, and fails when a failed package is dropped from the report."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L backupall` passes: a set backup verifies from `set.json`, and a failing package is named in the result.",
+        "commit": "feature: back up every driver in one action, with a set manifest"
+      },
+      {
+        "title": "Proof There Is No Update Path",
+        "intro": "The product decision of 2026-09-16 says the tool never updates, and the plan requires the absence of any update path to be proven. This section makes that a test that runs on every build: it searches the source and the finished binary for any network or update call and fails when it finds one.",
+        "build": [
+          "Write `tests/no_update_test.cpp` and `scripts/check-no-update.ps1`. Done when: the test searches `src/` and the script lists the binary's imports.",
+          "Run both in `scripts/check-all.ps1`. Done when: a planted call makes the gate fail."
+        ],
+        "items": [
+          "Write `tests/no_update_test.cpp` searching every file under `src/` for network and update calls: `WinHttp`, `WinINet`, `URLDownloadToFile`, `InternetOpen`, `Winsock`, `UpdateDriverForPlugAndPlayDevices`, `DiInstallDriver` against a downloaded file, and the words `update`, `download` and `check for` in user-facing strings. Done when: the test passes on the tree and fails when `#include <winhttp.h>` is added to a source file. Cheaper substitute: a text search that skips a directory, which leaves a path unchecked.",
+          "Write `scripts/check-no-update.ps1` listing the built executable's imports with `llvm-readobj --coff-imports` and failing on `winhttp.dll`, `wininet.dll`, `ws2_32.dll` and `urlmon.dll`. Done when: the script passes on `Bin\\Release\\DriverManager.exe` and fails on a build that links one of them. Cheaper substitute: checking the source only, which misses a call that arrives through a library.",
+          "Add both to `scripts/check-all.ps1` so every release gate runs them. Done when: `pwsh scripts/check-all.ps1` lists the check and a planted import turns the run red.",
+          "State the decision in the About page text and in `docs/guide.md` in one sentence each: the tool never updates, checks for or downloads a driver. Done when: both files contain the sentence and the test above reads it."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L noupdate` passes on the tree and on the release binary, and fails when a network include or import is planted.",
+        "commit": "test: prove the tool has no update, check or download path"
+      },
+      {
+        "title": "Problem Devices First",
+        "intro": "A device that reports an error is the one a person came to fix. This section lists devices with a Device Manager problem at the top of the Drivers screen, each with its code and an explanation in plain words, so a failing device is never buried in a long list.",
+        "surface": {
+          "fidelity": "the Drivers screen with problem devices at the top, against `DESIGN.md` section 2.",
+          "job": "a person finds the device that is failing and understands why in plain words. Consumer: the list, compared with the configuration manager's status for each device.",
+          "treatment": "problem rows grouped first, each with an icon, the word Problem, the code and one sentence. Cheaper substitute that fails the checkpoint: a red row with no code, which says something is wrong and nothing else."
+        },
+        "build": [
+          "Map problem codes to plain words in `src/core/ProblemCodes.cpp`. Done when: every code the configuration manager defines has a sentence.",
+          "Sort and mark them in `src/ui/DriversView.cpp`. Done when: a fixture with two problem devices lists both first."
+        ],
+        "items": [
+          "Add `src/core/ProblemCodes.cpp` mapping each configuration manager problem code (for example 10, 28, 43) to a short sentence saying what it means and what the person can do. Done when: a test finds a sentence for every defined code and none longer than 120 characters. Cheaper substitute: showing the bare number, which is not explained.",
+          "Sort problem devices first in `src/ui/DriversView.cpp`, stable within each group by device name. Done when: a fixture with problem devices in the middle shows them at the top in order.",
+          "Show the code and sentence in the row and in the status bar count, with an icon and a word. Done when: the status bar's count equals the engine's problem count. Cheaper substitute: colour alone.",
+          "Cover it in `tests/problem_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L problem` passes, and fails when the sort is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L problem` passes: problem devices list first with their code and sentence.",
+        "commit": "feature: devices with a problem first, with their code explained"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A search of `src/` and of the release binary's imports finds no network, update or download call, and the test that does this fails when one is planted.",
+      "On a real machine the tool lists drivers equal to `pnputil /enum-drivers`, backs one up, verifies it, rolls a device back and restores it, reading the device each time.",
+      "The window works in light and dark, by keyboard alone, and an unelevated rollback is refused naming the device."
+    ]
+  }
+}

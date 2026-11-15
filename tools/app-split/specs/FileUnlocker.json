@@ -1,0 +1,250 @@
+{
+  "name": "FileUnlocker",
+  "slug": "fileunlocker",
+  "display": "File Unlocker",
+  "job": "it shows which programs are holding a file or folder open, lets the user close that handle or end that process after a confirmation naming the program, and deletes or renames paths Explorer cannot.",
+  "tagline": "See what is holding a file open, then let it go",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Burnt orange",
+    "light": "#FDBA74",
+    "dark": "#C2410C",
+    "social_ground": "#2E1408",
+    "social_muted": "#F8D9BF"
+  },
+  "icon": {
+    "idea": "A padlock with its shackle lifted.",
+    "points": [
+      "Free-standing with no tile: a rounded lock body with an open shackle.",
+      "The body is Burnt orange; the shackle and the keyhole are Burnt orange light.",
+      "The small drawing below 40 pixels thickens the shackle and enlarges the keyhole."
+    ],
+    "large": "<path d=\"M32 44 V30 A16 16 0 0 1 64 30 V34\" fill=\"none\" stroke=\"#FDBA74\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"20\" y=\"44\" width=\"56\" height=\"40\" rx=\"9\" fill=\"#C2410C\"/><circle cx=\"48\" cy=\"62\" r=\"6\" fill=\"#FDBA74\"/><path d=\"M48 62 V72\" fill=\"none\" stroke=\"#FDBA74\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M32 44 V30 A16 16 0 0 1 64 30 V34\" fill=\"none\" stroke=\"#FDBA74\" stroke-width=\"13\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"18\" y=\"44\" width=\"60\" height=\"40\" rx=\"10\" fill=\"#C2410C\"/><circle cx=\"48\" cy=\"64\" r=\"8\" fill=\"#FDBA74\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Locked item",
+        "The file or folder chosen, and each process holding it as a row"
+      ],
+      [
+        "Stubborn paths",
+        "Paths that are too long or use names Windows reserves, with what can be done to them"
+      ],
+      [
+        "Activity",
+        "What the tool closed or ended, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees exactly which programs hold a file or folder open and frees it with one deliberate action.",
+    "primary": "Release",
+    "secondary": "Choose a file",
+    "rows": [
+      [
+        "Notepad, process 4120",
+        "Holds the file open for editing"
+      ],
+      [
+        "Backup service, process 2216",
+        "Holds a handle, no window"
+      ],
+      [
+        "Explorer, process 8804",
+        "Folder is its current location"
+      ],
+      [
+        "System, process 4",
+        "Protected, refused by name"
+      ]
+    ],
+    "status": "3 programs hold this file, 1 protected",
+    "notes": [
+      "Each holder is a row with the program's name, its process id and the kind of hold, shown with an icon and a word: Open file, Folder in use, Service, Protected.",
+      "Release is the accent button and acts on the selected rows. It first asks the program to close politely, and offers closing the handle or ending the process only as separate named choices.",
+      "Every confirmation names the program and states the risk of that choice in one sentence. Declining does nothing.",
+      "Choose a file opens the file or folder picker, and a path dropped on the window is taken the same way.",
+      "The status bar says in words how many programs hold the item and how many are protected.",
+      "Without elevation the list still shows what Restart Manager reports, and any action on a protected process is refused by the program's name before anything is touched."
+    ],
+    "cut": "The tool has no earlier window, so nothing was cut from one. It has no menus, splash, animations or donate strip: the Sidebar window, the framework's pages and the suite's controls replace them, and the plan records this in the window section."
+  },
+  "readme": {
+    "lead": "Find out what is holding a file open, then free it without guessing.",
+    "what": [
+      "Windows says a file is in use by another program and often does not say which. File Unlocker lists every program holding the file or folder, with its name, its process id and the kind of hold, and lets you ask it to close, close one handle, or end it.",
+      "It also deals with paths Explorer cannot delete: names that are too long, and names Windows reserves such as CON and NUL, or ones ending in a dot or a space. Nothing is done without a confirmation naming the program and its risk."
+    ],
+    "new_intro": "File Unlocker is a new tool, written in C++ for the suite, and nothing is ported from an earlier version.",
+    "new": [
+      [
+        "Names the holder.",
+        "Every program holding the item is shown by name and process id before anything is done."
+      ],
+      [
+        "Separate actions with stated risks.",
+        "Asking a program to close, closing one handle and ending a process are different choices, each with its risk written out."
+      ],
+      [
+        "Reaches paths Explorer cannot.",
+        "Long and reserved names are handled through the extended path prefix, with delete at next restart as the last resort."
+      ],
+      [
+        "Explorer right-click entry.",
+        "An entry that opens the tool on a file, installed and removed by the tool itself."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "New tool: build, engine, window, features, release",
+    "goal": "File Unlocker ships as a complete, standalone C++ tool: it shows which processes hold a file or folder open, closes a handle or ends a process only as a separate named action with its risk stated and only after a confirmation naming the program, deletes or renames too-long and reserved-name paths, refuses protected processes by name, and removes its own Explorer entry as cleanly as it adds it.",
+    "current_state": "Nothing exists yet: this is a new tool, with no AutoIt version and no reference folder, so nothing is ported and there is no parity check. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan section as it stood in Resolute at `docs/origin/resolute-D05-T03-s5.md` (6 items and a checkpoint). The design rests on Windows facts: the Restart Manager API (`RmStartSession`, `RmRegisterResources`, `RmGetList`) is the supported way to find which processes hold a file; handle enumeration through `NtQuerySystemInformation` with `DuplicateHandle` and `DUPLICATE_CLOSE_SOURCE` can close a single handle of another process but can corrupt the holding program's data; the `\\\\?\\` prefix reaches long and reserved paths; and `MoveFileEx` with `MOVEFILE_DELAY_UNTIL_REBOOT` deletes at next restart. The SDK's framework and repair contract, which the tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T03-s5.md`: the plan section for this tool, with its checkpoint.",
+      "`DESIGN.md`: the tool's identity and its window's sections, and `sdk/DESIGN.md`, the suite's contract.",
+      "`brand/`: the chosen identity, built by `python brand/build.py`."
+    ],
+    "outcome": [
+      "`FileUnlocker.exe` lists every process holding a chosen file or folder with name, process id and kind of hold, and releases it only through a named action after a confirmation naming the program.",
+      "Too-long and reserved-name paths are deleted or renamed, every action writes one log line naming the item and the process, and a protected process is refused by name.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Locked item screen, where a person sees each holder as a row. Reporting and audit are the Activity section, one line per handle closed or process ended. Settings are the framework's pages. Permissions anchor on the engine, where an action on a protected process is refused by name, and where handle enumeration needs elevation. Reverse here means the Explorer entry the tool installs: the same section removes it and verifies it is gone. Closing a handle or ending a process cannot be undone, and the plan says so in the confirmation instead of pretending otherwise.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Holder and Release Engine",
+      "intro": "The tool's whole system effect: finding which processes hold a path, and releasing it by one of four separate actions, each with its risk stated and none run without a confirmation naming the program. It is independent of any window. Restart Manager is tried first because it is the supported route; handle enumeration is the fallback when Restart Manager finds nothing and the user is elevated.",
+      "needs": "windows-host",
+      "build": [
+        "Implement holder finding in `src/core/Holders.cpp` with Restart Manager first and handle enumeration second. Done when: a fixture file held open by a known process lists that process with name, process id and path.",
+        "Implement the four release actions in `src/core/Release.cpp`, each behind a confirmation callback. Done when: the unit tests pass against fixture holder processes."
+      ],
+      "items": [
+        "Implement `FindHolders(path)` in `src/core/Holders.cpp` using `RmStartSession`, `RmRegisterResources` and `RmGetList`, returning name, process id, executable path and the kind of hold. Done when: a fixture file held open by a test child process lists that process with all four fields. Cheaper substitute: parsing the output of a command line tool, which loses the process id and breaks on other languages.",
+        "Fall back to handle enumeration with `NtQuerySystemInformation` when Restart Manager returns nothing and the process is elevated, matching handles to the path. Done when: a fixture handle Restart Manager cannot see is found when elevated and not searched for when not. Cheaper substitute: always enumerating every handle, which is slow and needs elevation for no reason.",
+        "Implement `AskToClose(holder)` in `src/core/Release.cpp`, which sends a polite close to the program's windows and waits. Done when: a test program with a window exits on it and the file is free. Cheaper substitute: ending the process first, which can lose unsaved work.",
+        "Implement `CloseHandle(holder, handle)` using `DuplicateHandle` with `DUPLICATE_CLOSE_SOURCE`, stating in its result that the holding program may now fail or corrupt data. Done when: a test child that holds a file loses that one handle and keeps running. Cheaper substitute: closing handles without naming whose they are.",
+        "Implement `EndProcess(holder)` with `TerminateProcess`, after a confirmation that names the program and says unsaved work in it is lost. Done when: a test child is ended only after the callback returns true, and declining performs nothing, asserted.",
+        "Refuse an action on a protected process by name before any call is made, and refuse every action when the handle enumeration would need elevation the process lacks. Done when: an unelevated run against a protected process reports the refusal naming it and the fixture is unchanged. Cheaper substitute: letting the call fail with access denied.",
+        "Write one line per handle closed and per process ended, naming the item and the process, through the Activity record in `src/core/Activity.cpp`. Done when: a driven run of each action produces exactly one line each.",
+        "Cover every path in `tests/holders_test.cpp` and `tests/release_test.cpp`, with each fixture holder process bound to a job object that ends its whole tree on teardown or timeout. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L holders` passes, and fails when the confirmation check is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L holders` passes: a held fixture lists its holder, each of the four actions is separate with its risk, declining does nothing, and a protected process is refused by name.",
+      "commit": "core: find what holds a file, release it by named actions"
+    },
+    "enhancements": [
+      {
+        "title": "Delete or Rename Stubborn Paths",
+        "intro": "Explorer cannot delete a path longer than its limit, or one whose name Windows reserves (CON, NUL, a trailing dot or space). The tool reaches them by passing the full path with the `\\\\?\\` prefix, which skips the name normalisation that makes those paths unreachable, and records the mechanism it used.",
+        "surface": {
+          "fidelity": "the Stubborn paths section and its confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person deletes or renames a path Explorer refuses. Consumer: the file system, read back after the action.",
+          "treatment": "the path shown in full, the action chosen as Delete or Rename, and a confirmation naming the exact path. Cheaper substitute that fails the checkpoint: running the delete from a command line shell, which hits the same name rules."
+        },
+        "build": [
+          "Add the extended path handling in `src/core/StubbornPath.cpp`. Done when: an over-long fixture and a reserved-name fixture are both deleted.",
+          "Build the section in `src/ui/StubbornpathsView.cpp`. Done when: a chosen path shows its problem in words and offers Delete or Rename."
+        ],
+        "items": [
+          "Add `src/core/StubbornPath.cpp` with `Classify(path)` returning too long, reserved name, trailing dot or space, or ordinary. Done when: a test names each class for its fixture and reports ordinary for a normal file.",
+          "Implement `DeleteStubborn(path)` and `RenameStubborn(path, name)` passing the `\\\\?\\` prefixed full path to `DeleteFileW`, `RemoveDirectoryW` and `MoveFileExW`. Done when: a fixture path over the length limit and a fixture named `NUL` are both deleted and no longer exist, read back. Cheaper substitute: shortening the name first, which changes what the user asked to delete.",
+          "Build `src/ui/StubbornpathsView.cpp` through the SDK's controls, with the confirmation naming the exact path. Done when: declining leaves the fixture in place and accepting removes it. Cheaper substitute: a private dialog.",
+          "Record the mechanism used for each case in this section's notes in `docs/guide.md`. Done when: the file names the prefix and the calls for each class.",
+          "Cover it in `tests/stubborn_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L stubborn` passes, and fails when the prefix is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L stubborn` passes: an over-long path and a reserved name are both deleted, and a normal file is classed ordinary.",
+        "commit": "feature: delete or rename long and reserved-name paths"
+      },
+      {
+        "title": "Delete at Next Restart",
+        "intro": "When a file is held by something that cannot be asked or ended, such as the system, the tool can schedule the delete for the next restart with `MoveFileEx` and `MOVEFILE_DELAY_UNTIL_REBOOT`. It is the last resort and is offered only after the other actions are shown to fail or are refused.",
+        "surface": {
+          "fidelity": "the delete-at-restart confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person gets a file removed that nothing else can release. Consumer: the pending-rename entry, read back.",
+          "treatment": "a confirmation saying the file stays until the next restart and that the tool cannot cancel it once set. Cheaper substitute that fails the checkpoint: scheduling it without saying so, which leaves a user wondering why the file is still there."
+        },
+        "build": [
+          "Implement the scheduling in `src/core/Release.cpp`. Done when: a fixture file has a pending delete recorded.",
+          "Offer it from the Locked item screen in `src/ui/LockeditemView.cpp`. Done when: it appears only after the other actions are unavailable."
+        ],
+        "items": [
+          "Implement `DeleteAtRestart(path)` in `src/core/Release.cpp` calling `MoveFileExW` with `MOVEFILE_DELAY_UNTIL_REBOOT`. Done when: the pending-rename value under `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager` lists the path, read back. Cheaper substitute: writing that registry value directly, which skips the checks the call makes.",
+          "Require elevation and refuse by name when it is missing, before the call. Done when: an unelevated run reports the refusal and writes nothing.",
+          "Offer the action in `src/ui/LockeditemView.cpp` only after Release was refused or failed, with a confirmation naming the file and stating it stays until restart. Done when: a first screen does not show it and a refused release does. Cheaper substitute: always showing it beside Release.",
+          "Log the scheduled delete as one line naming the file. Done when: the Activity list shows it.",
+          "Cover it in `tests/restart_test.cpp` against a disposable path. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restart` passes, and fails when the pending entry is not read back."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restart` passes: the pending delete is recorded and read back, refused by name when unelevated, and offered only after other actions fail.",
+        "commit": "feature: delete at next restart as the last resort"
+      },
+      {
+        "title": "Explorer Right-Click Entry",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A user opens the tool on a file straight from Explorer. The tool installs the entry itself, verifies what it wrote, and removes it again: that removal is the reverse this tool offers for its one system change. The record of what was there before is the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the entry's switch and its state, against `DESIGN.md` section 2.",
+          "job": "a person adds or removes the Explorer entry and sees which it is. Consumer: the shell key, read back.",
+          "treatment": "one switch labelled with what it does, its state in words, and the registry key it wrote shown in the Activity line. Cheaper substitute that fails the checkpoint: a remove that deletes the whole shell key, which can take another program's entry with it."
+        },
+        "build": [
+          "Write and remove the entry in `src/core/ShellEntry.cpp`. Done when: install then remove leaves the registry as it was.",
+          "Add the switch in `src/ui/LockeditemView.cpp`. Done when: its state is read from the registry, not remembered."
+        ],
+        "items": [
+          "Record the prior state of the key through the repair contract's restore record before writing, in `src/core/ShellEntry.cpp`. Done when: a test finds the record on disk before the first value is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement `InstallEntry()` writing the `shell` verb under `HKCU\\Software\\Classes\\*\\shell\\FileUnlocker` and `Directory`, reading every value back. Done when: a test under a disposable root finds the command line equal to the one declared, and a corrupted value is named. Cheaper substitute: writing through `reg.exe`.",
+          "Implement `RemoveEntry()` restoring the record and deleting only the tool's own keys. Done when: install then remove leaves the root equal to before, asserted, and an unrelated sibling key is untouched.",
+          "Pass the clicked path to the tool and open it on the Locked item screen. Done when: launching with a path argument shows that path and its holders. Cheaper substitute: opening the tool empty and making the user choose again.",
+          "Add the switch to `src/ui/LockeditemView.cpp` with its state read back from the registry. Done when: toggling it changes the key and the label, and a first run shows Not installed.",
+          "Cover it in `tests/shell_entry_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L shell` passes, and fails when one value is left behind."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L shell` passes: install then remove leaves the registry as it was, and the clicked path opens on the Locked item screen.",
+        "commit": "feature: an Explorer entry the tool installs and removes"
+      },
+      {
+        "title": "Explain the Risk",
+        "intro": "Closing a handle or ending a process can lose a user's unsaved work or corrupt the data the holding program was writing. Before any such action the tool says, in words, what that can do to that program, so the user chooses knowing it. The text depends on the kind of holder and is written once.",
+        "surface": {
+          "fidelity": "the risk text inside the confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person understands what an action can do before choosing it. Consumer: the confirmation, read back.",
+          "treatment": "one plain sentence per action and holder kind, naming the program. Cheaper substitute that fails the checkpoint: one generic warning for every action, which people stop reading."
+        },
+        "build": [
+          "Write the risk texts as data in `src/core/Risk.cpp`. Done when: each action and holder kind has one text.",
+          "Show them in the confirmation from `src/ui/LockeditemView.cpp`. Done when: each confirmation shows its own text with the program's name."
+        ],
+        "items": [
+          "Declare in `src/core/Risk.cpp` one risk text for each of ask to close, close handle and end process, varied by holder kind (open file, folder in use, service). Done when: a test finds a non-empty text for every combination. Cheaper substitute: one text for all, which fails to separate the choices.",
+          "Insert the program's name and the action into the text at confirmation time. Done when: a driven test finds the name of the fixture holder in the confirmation.",
+          "Show a stronger text when the holder is a service or looks like it is writing the file. Done when: a fixture service holder shows the stronger text and an idle one the plain text.",
+          "Put every text through the framework's localisation, with no literal in `src/`. Done when: a search of `src/` finds none and the English pack holds each key.",
+          "Cover it in `tests/risk_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L risk` passes, and fails when a combination has no text."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L risk` passes: every action and holder kind has its own text and each confirmation names the program.",
+        "commit": "feature: each action states its own risk"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A held fixture file lists its holder with name, process id and path, and each action is separate, confirmed by name and logged once.",
+      "An over-long path and a reserved name are both deleted, and an unelevated attempt on a protected process is refused by its name.",
+      "On a real machine the tool finds, releases, logs and installs and removes its Explorer entry, in light and dark, by keyboard alone."
+    ]
+  }
+}

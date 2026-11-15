@@ -1,0 +1,244 @@
+{
+  "name": "CrashDecoder",
+  "slug": "crashdecoder",
+  "display": "Crash Decoder",
+  "job": "it reads the crash dumps Windows leaves after a blue screen and names the driver or module most likely at fault, in plain words, without ever writing to the system.",
+  "tagline": "Find out what crashed your PC",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Azure",
+    "light": "#7DD3FC",
+    "dark": "#0369A1",
+    "social_ground": "#07202F",
+    "social_muted": "#C4E4F5"
+  },
+  "icon": {
+    "idea": "A screen with the sad face of a blue screen crash.",
+    "points": [
+      "Free-standing with no tile: a rounded screen on a stand.",
+      "The screen and stand are Azure, the face is Azure light.",
+      "The small drawing, used below 40 pixels, drops the stand and enlarges the face."
+    ],
+    "large": "<path d=\"M48 68 V80 M34 82 H62\" fill=\"none\" stroke=\"#0369A1\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"10\" y=\"14\" width=\"76\" height=\"54\" rx=\"9\" fill=\"#0369A1\"/><circle cx=\"36\" cy=\"32\" r=\"5\" fill=\"#7DD3FC\"/><circle cx=\"36\" cy=\"50\" r=\"5\" fill=\"#7DD3FC\"/><path d=\"M60 28 A14 14 0 0 0 60 54\" fill=\"none\" stroke=\"#7DD3FC\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<rect x=\"8\" y=\"12\" width=\"80\" height=\"62\" rx=\"10\" fill=\"#0369A1\"/><circle cx=\"36\" cy=\"32\" r=\"7\" fill=\"#7DD3FC\"/><circle cx=\"36\" cy=\"54\" r=\"7\" fill=\"#7DD3FC\"/><path d=\"M62 28 A15 15 0 0 0 62 58\" fill=\"none\" stroke=\"#7DD3FC\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Crashes",
+        "One row per crash dump, with its date, its stop code in words and the module blamed"
+      ],
+      [
+        "Details",
+        "The selected crash explained: what the stop code usually means, the module, its vendor and version, what to try"
+      ],
+      [
+        "Activity",
+        "What the tool read, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every crash their machine has left a dump for, and what most likely caused each one, in words they can pass on to somebody who can help.",
+    "primary": "Open dump",
+    "secondary": "Copy summary",
+    "rows": [
+      [
+        "A crash with a module named",
+        "Shown with the date, the stop code in words and the module blamed"
+      ],
+      [
+        "A crash with no module named",
+        "Cause could not be determined"
+      ],
+      [
+        "A stop code not in the table",
+        "Unknown code, said so and not guessed"
+      ],
+      [
+        "A truncated or damaged dump",
+        "Unreadable"
+      ],
+      [
+        "A folder with no dumps",
+        "No crashes found, shown as an empty state and not as an error"
+      ]
+    ],
+    "status": "3 crashes, 1 unreadable",
+    "notes": [
+      "Each row is one crash dump with an icon and a word for its state: module named, cause not determined, unknown code or unreadable. The stop code is shown in words (for example, a driver used a bad memory address) and never only as a hexadecimal number.",
+      "The newest crash is selected at start, and the Details section opens on the selected row with the explanation, the blamed module with its vendor and version, and what to try next.",
+      "Open dump is the primary action: it picks a dump file from anywhere and adds it to the list. Copy summary puts a plain-text summary of the selected crash on the clipboard for support.",
+      "The tool is read-only. It has no undo because it has nothing to undo: it never writes a dump, a setting of Windows or a file beside the dump.",
+      "The status bar says how many crashes were read and how many were unreadable, in words.",
+      "Nothing needs confirming and nothing needs elevation to start. When a dump folder cannot be read without elevation, the row says access was refused for that folder by name and the tool does not ask to elevate."
+    ],
+    "cut": "There is no earlier window to cut from, because this tool is new. The window does not have menus, a splash, animations or a donate strip: the suite's sidebar window has none of them for any tool, and the plan records that the first screen is only the list of crashes. The original plan's file export is also left out on purpose: the tool has no write path, so the result leaves as text on the clipboard."
+  },
+  "readme": {
+    "lead": "Find out what crashed your PC: Crash Decoder reads the dumps a blue screen leaves behind and names the driver most likely at fault.",
+    "what": [
+      "When Windows crashes with a blue screen, it saves a small dump file of what was running. Crash Decoder finds those dumps, reads the stop code and the list of loaded modules, and says in plain words what the stop code usually means and which module or driver is most likely to blame.",
+      "It only reads. It never writes to the system, never changes a setting and never needs to run elevated. When a dump does not say enough, it says the cause could not be determined and does not guess."
+    ],
+    "new_intro": "Crash Decoder is a new tool of the suite, written in C++ from the start.",
+    "new": [
+      [
+        "Plain words for the stop code.",
+        "Each common stop code has a short explanation and a suggestion of what to try, taken from a data table the tool ships with."
+      ],
+      [
+        "The module is named.",
+        "The faulting address is mapped to a loaded module, and the module's vendor and version are shown beside it."
+      ],
+      [
+        "Patterns across crashes.",
+        "When the same module is blamed again and again, the tool says so."
+      ],
+      [
+        "A summary for support.",
+        "One button copies a plain-text summary of a crash that can be pasted into an email or a ticket."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Crash Decoder ships as a complete, standalone C++ tool that finds crash dumps, reads each one's header and module list, names the module most likely at fault with its vendor and version, explains the stop code in plain words from a data table, spots a module blamed again and again, and copies a summary for support, while writing nothing to the system, proven by a test.",
+    "current_state": "Nothing exists yet. This tool is new: no earlier version exists and nothing is ported, so there is no `reference/au3/` folder and no baseline to measure. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, `docs/origin/resolute-D05-T03-s4.md` (the plan section as it stood in the Resolute repository, five items and one checkpoint, no line counts) and the kits. The origin section describes a tool that lists dumps with date, stop code and dump type, decodes the stop code, names the implicated driver, handles a truncated dump, and exports the result to a file; this plan keeps all of that except the export, which becomes copying to the clipboard because the tool has no write path. The facts the engine is built on come from Windows itself and are not read from any source file here: kernel minidumps are kept under `%SystemRoot%\\Minidump` and a full dump at `%SystemRoot%\\MEMORY.DMP`, the dump header carries the bug check code and its four parameters, the loaded module list names each driver with its address range, and the symbol files that would name functions are normally not available offline. The SDK's framework is planned in Resolute-SDK and not built; the tool does not consume the repair contract, and no chart control is needed.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T03-s4.md`: the plan section this tool starts from, including its fixture-driven checkpoints.",
+      "`%SystemRoot%\\Minidump\\*.dmp` and `%SystemRoot%\\MEMORY.DMP` on a Windows machine: the real dumps the tool reads, and the source for the small fixture dumps committed under `tests/fixtures/`.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the identity, the window's sections and the suite's contract."
+    ],
+    "outcome": [
+      "`CrashDecoder.exe` lists every dump it finds with its date, stop code in words and the module blamed, and says plainly when there is none, when the code is unknown or when the dump is unreadable.",
+      "The selected crash is explained in plain words with the module's vendor and version, a module blamed repeatedly is called out, and a summary copies to the clipboard.",
+      "A test proves the source contains no write to the system, and the Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and ships with its settings, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Crashes screen, where a person finds a crash by its date and what it was. Reporting and audit are the Activity section, which lists which dumps were read and with what outcome. Settings are the framework's pages. Permissions do not apply: the tool needs no right the user lacks, and a folder it cannot read is reported by name. The document family does not apply because nothing the tool makes is saved as a file. Reverse does not apply: the tool changes nothing, so there is nothing to put back, and a test proves it.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Dump Reading Engine",
+      "intro": "The tool's core, independent of any window: finding dump files, reading each header and module list without loading the dump into a debugger session when that is not needed, mapping the faulting address to a module, naming the module's vendor and version, and explaining the stop code from a data table. It only reads. The header is read directly from the file (the kernel dump signature `PAGE` with `DU64` for 64-bit, and the `MDMP` stream format), which keeps the tool standalone and offline; a debugger engine such as `dbghelp` or `DbgEng` is used only where the header and module list cannot answer.",
+      "needs": "windows-host",
+      "build": [
+        "Write the dump reader and the stop code table in `src/core/DumpReader.cpp` and `src/core/StopCodes.h`. Done when: the unit tests read every fixture under `tests/fixtures/dumps/` without a debugger session.",
+        "Write the finder, the module mapping and the vendor lookup in `src/core/DumpFinder.cpp` and `src/core/Modules.cpp`. Done when: a fixture folder is listed completely and an empty one reports no crashes."
+      ],
+      "items": [
+        "Implement `FindDumps(root)` in `src/core/DumpFinder.cpp` listing `*.dmp` files in a folder and the full dump `MEMORY.DMP` when present, each with its file time and size. Done when: a fixture folder with three dumps lists three, and an empty folder returns an empty list and no error.",
+        "Implement `ReadHeader(path)` in `src/core/DumpReader.cpp` returning the dump type, the bug check code and its four parameters from the file header, and an unreadable result for a bad signature or a short file. Done when: a fixture of each kind returns its known code and parameters, and a deliberately truncated fixture returns unreadable without a crash.",
+        "Implement `ReadModules(path)` in `src/core/DumpReader.cpp` returning each loaded module's name, base address and size from the module list. Done when: a fixture's list equals the module names and bases recorded beside it in `tests/fixtures/dumps/`.",
+        "Implement `BlameModule(header, modules)` in `src/core/Modules.cpp` choosing the module whose range holds the faulting address, and returning nothing when the address is in no module or in the operating system's own kernel image. Done when: a fixture naming a driver returns it, and a fixture that does not returns the result for \"cause could not be determined\". Cheaper substitute: always blaming the last module loaded, which names a driver that did nothing.",
+        "Implement `DescribeModule(name)` in `src/core/Modules.cpp` returning the module's vendor and version from its file's version resource when the file is on this machine, and saying the file was not found when it is not. Done when: a test against a system driver returns a vendor and a version, and a name with no file says so and does not invent either.",
+        "Declare the stop code table as data in `src/core/StopCodes.h`: for each common code its name, its plain-words meaning and what to try, with the code as the key. Done when: every code in the table renders all three, and a code not in the table returns the result for \"unknown code\" and not a guess. Cheaper substitute: showing the hexadecimal code, which the user could already read off the blue screen.",
+        "Open every file read-only in `src/core/DumpReader.cpp` and bound every read by the file size. Done when: a test that opens a fixture marked read-only succeeds and a header claiming a module list past the end of the file returns unreadable.",
+        "Cover every path in `tests/dump_test.cpp` against the committed fixtures. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L dump` passes, and fails when one code's meaning in `StopCodes.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L dump` passes for the full fixture folder, the empty folder, a known and an unknown stop code, a dump naming a driver and one that does not, and the truncated dump.",
+      "commit": "core: read dumps, name the module, explain the stop code"
+    },
+    "enhancements": [
+      {
+        "title": "Plain-Words Explanation",
+        "intro": "Each stop code is explained in words a person can act on: what it usually means, how likely a driver is to be the cause, and what to try first. The text comes from the data table of the engine, so it is added to by adding a row and never by changing code. The wording is checked by a person against what the code is documented to mean.",
+        "surface": {
+          "fidelity": "the Details section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person reads why the machine crashed and what to try, in words. Consumer: the rendered Details text, compared with the table.",
+          "treatment": "the stop code in words first, then what it usually means, then what to try, with the module and its vendor named when known. Cheaper substitute that fails the checkpoint: the hexadecimal code with a link to a web page."
+        },
+        "build": [
+          "Build the Details screen in `src/ui/DetailsView.cpp` from the SDK's controls. Done when: selecting a crash on the Crashes screen shows its explanation.",
+          "Fill the stop code table in `src/core/StopCodes.h` with the common codes. Done when: every row has a meaning and a suggestion."
+        ],
+        "items": [
+          "Add the common stop codes to `src/core/StopCodes.h`, each with a plain-words name, a short meaning and one thing to try, and the four parameters' meaning where the code defines them. Done when: a test renders each row and finds all three texts non-empty.",
+          "Show the explanation in `src/ui/DetailsView.cpp`: the stop code in words as the heading, then what it usually means, then what to try. Done when: the selected crash's Details section matches the table row for its code. Cheaper substitute: a page of free text typed into the view, which cannot be tested against the table.",
+          "Say when the code is unknown or the cause could not be determined, in the same place, in the same words as the row on the Crashes screen. Done when: an unknown-code fixture and a no-module fixture each show that sentence and no guess.",
+          "Show the module's vendor and version beside its name. Done when: a fixture naming a system driver shows both, and a module whose file is missing shows that the file was not found.",
+          "Cover it in `tests/explain_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes, and fails when a table row's suggestion is emptied."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes: every table row renders in words, an unknown code says so, and the module's vendor and version show beside its name.",
+        "commit": "feature: plain-words explanation of the stop code"
+      },
+      {
+        "title": "Patterns Across Crashes",
+        "intro": "One crash is a clue; the same module blamed in several is a finding. The tool counts how often each module is blamed across the dumps it has read and says so in words when one repeats, so a person can tell a one-off from a failing driver.",
+        "surface": {
+          "fidelity": "the Crashes and Details sections, against `DESIGN.md` section 2.",
+          "job": "a person sees that the same module keeps being blamed. Consumer: the rendered sentence, compared with the counts.",
+          "treatment": "one sentence in Details and one word on the row, such as the module's name blamed in 4 of 6 crashes, with the counts read from the dumps. Cheaper substitute that fails the checkpoint: a count shown with no sentence, which leaves the person to work out what it means."
+        },
+        "build": [
+          "Count blamed modules across a set of read dumps in `src/core/Patterns.cpp`. Done when: a fixture set with one repeated module reports it with its count.",
+          "Show the finding in `src/ui/DetailsView.cpp` and on the row in `src/ui/CrashesView.cpp`. Done when: the repeated module's rows carry the word and Details carries the sentence."
+        ],
+        "items": [
+          "Implement `CountBlamed(crashes)` in `src/core/Patterns.cpp` returning each module with the number of crashes that blamed it and the number of crashes that named any module. Done when: a fixture of six crashes with one module blamed in four returns four of six for it.",
+          "Report a module only when it was blamed in at least two crashes, and never report a module blamed once as a pattern. Done when: a fixture where every crash names a different module reports no pattern.",
+          "Show the pattern as a sentence in `src/ui/DetailsView.cpp` and a short word on each affected row in `src/ui/CrashesView.cpp`. Done when: the fixture shows both, and a fixture with no repeat shows neither. Cheaper substitute: colouring the row, which says nothing to a person who cannot see the colour.",
+          "Cover it in `tests/patterns_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L patterns` passes, and fails when the threshold is changed from two."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L patterns` passes: a repeated module is named with its count in a sentence and on its rows, and a set with no repeat reports none.",
+        "commit": "feature: say when the same module is blamed again and again"
+      },
+      {
+        "title": "Copy a Summary for Support",
+        "intro": "The original plan exported the result as a file. This tool has no write path, so the result leaves as text on the clipboard: the person pastes it into an email or a ticket for somebody who can help. The text is built from the same data the screen shows.",
+        "surface": {
+          "fidelity": "the Copy summary button and its confirmation, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 11.",
+          "job": "a person carries the answer to somebody who can help. Consumer: the clipboard text, compared with the rendered Details.",
+          "treatment": "plain text with the date, the stop code and its words, the four parameters, the module with its vendor and version, and the pattern sentence when there is one, then a one-line confirmation that it was copied. Cheaper substitute that fails the checkpoint: copying only the hexadecimal stop code, which the person could already read off the blue screen."
+        },
+        "build": [
+          "Build the summary text in `src/core/Summary.cpp` from the engine's result. Done when: the text for a fixture equals the committed expected text.",
+          "Wire Copy summary in `src/ui/CrashesView.cpp`. Done when: pressing it puts the selected crash's summary on the clipboard."
+        ],
+        "items": [
+          "Implement `BuildSummary(crash)` in `src/core/Summary.cpp` returning plain text with the date, stop code in words, the four parameters, the module with vendor and version, and the pattern sentence when there is one. Done when: a fixture's text equals `tests/fixtures/summary-expected.txt`.",
+          "Put the text on the clipboard from `src/ui/CrashesView.cpp` through the framework, and show a one-line confirmation. Done when: after the button the clipboard holds the text and the confirmation shows. Cheaper substitute: writing the text to a temporary file, which is a write the tool must never make.",
+          "State the unknown-code and cause-not-determined cases in the summary in the same words as the screen. Done when: those two fixtures produce text with the sentence and no guessed module.",
+          "Disable Copy summary with a tooltip when no crash is selected. Done when: an empty list shows it disabled with the reason.",
+          "Cover it in `tests/summary_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes, and fails when a field is dropped from the text."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes: the summary equals the expected text for a known, an unknown and a no-module fixture, and the button is disabled when nothing is selected.",
+        "commit": "feature: copy a summary of a crash for support"
+      },
+      {
+        "title": "Proof It Never Writes",
+        "intro": "The plan promises the tool has no write path at all. This section turns the promise into a test that fails the build when the promise is broken, so it stays true as the tool grows.",
+        "build": [
+          "Write `tests/read_only_test.cpp` searching the tool's own source for any call that writes to the system. Done when: the test lists the calls it searches for and fails naming the file and line when one is added.",
+          "Write the allowed list in `tests/read_only_allowed.txt`. Done when: it names each reviewed exception with its reason, or is empty."
+        ],
+        "items": [
+          "Search every file under `src/` in `tests/read_only_test.cpp` for the file, registry, service and process calls that write or change state (for example `CreateFile` with a write access flag, `WriteFile`, `DeleteFile`, `MoveFile`, `RegSetValue`, `RegCreateKey`, `RegDeleteKey`, `CreateService`, `TerminateProcess`). Done when: the test passes on the tree and fails naming the file and line when one such call is added to a scratch copy of `src/core/DumpReader.cpp`. Cheaper substitute: reading the code once by eye, which proves nothing after the next commit.",
+          "Open every dump with read-only access and no sharing that would block Windows, checked by the same test. Done when: the test finds every open of a dump in `src/core/` and each passes only a read access flag.",
+          "Run the tool against a fixture folder marked read-only and compare the folder's file times and sizes before and after. Done when: they are identical after a full read, a pattern count and a summary.",
+          "Make the test part of the default checks. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L readonly` runs in `scripts/check-all.ps1` and passes."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L readonly` passes on the tree, and fails naming the file and line when a write call is added to a scratch copy of the source.",
+        "commit": "test: prove the tool never writes to the system"
+      }
+    ],
+    "no_reverse": "the tool reads crash dumps and writes nothing to the system",
+    "verification": [
+      "A fixture folder renders completely, an empty one reports no crashes, an unknown stop code says so, a dump naming a driver names it, one that does not says the cause could not be determined, and a truncated dump is reported unreadable.",
+      "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L readonly` passes: the source holds no write to the system, and a read-only fixture folder is unchanged after a full run.",
+      "On a real machine with real dumps the tool lists them, explains the selected crash, names the module with its vendor and version, and copies a summary, in light and dark, by keyboard alone."
+    ]
+  }
+}

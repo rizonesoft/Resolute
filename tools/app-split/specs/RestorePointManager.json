@@ -1,0 +1,248 @@
+{
+  "name": "RestorePointManager",
+  "slug": "restorepointmanager",
+  "display": "Restore Point Manager",
+  "job": "it creates, lists and starts Windows restore points, says what each one covers, and explains why System Protection is off when it is.",
+  "tagline": "Make a restore point, and know what it covers",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Green",
+    "light": "#86EFAC",
+    "dark": "#16A34A",
+    "social_ground": "#0C2A17",
+    "social_muted": "#C4EFD2"
+  },
+  "icon": {
+    "idea": "A clock with an arrow running backwards: go back to an earlier time.",
+    "points": [
+      "Free-standing with no tile: an open ring ending in an arrowhead.",
+      "The ring and the arrowhead are Green and the clock hands are Green light.",
+      "The small drawing below 40 pixels thickens the ring and the hands."
+    ],
+    "large": "<path d=\"M20 50 A28 28 0 1 0 30 28\" fill=\"none\" stroke=\"#16A34A\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M14 14 L18 36 L38 28 Z\" fill=\"#16A34A\" stroke=\"#16A34A\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M48 34 V50 L60 58\" fill=\"none\" stroke=\"#86EFAC\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M20 50 A28 28 0 1 0 30 28\" fill=\"none\" stroke=\"#16A34A\" stroke-width=\"13\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M12 12 L17 38 L40 28 Z\" fill=\"#16A34A\" stroke=\"#16A34A\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M48 36 V50 L58 57\" fill=\"none\" stroke=\"#86EFAC\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Restore points",
+        "One row per restore point: its date, what made it, and which drives it covers"
+      ],
+      [
+        "Protection",
+        "System Protection per drive, with the storage it uses"
+      ],
+      [
+        "Activity",
+        "Every point created, deleted or restored, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person takes a restore point before a risky change, finds the right one afterwards by what it covers, and starts Windows' own restore from it.",
+    "primary": "Create",
+    "secondary": "Restore",
+    "rows": [
+      [
+        "Before installing a driver",
+        "Manual, covers C:"
+      ],
+      [
+        "Windows Update",
+        "Automatic, covers C:"
+      ],
+      [
+        "Installed Visual C++ runtime",
+        "Application install, covers C: and D:"
+      ],
+      [
+        "Before a repair",
+        "Made by a Resolute repair, covers C:"
+      ]
+    ],
+    "status": "4 restore points, System Protection on for C:, off for D:",
+    "notes": [
+      "Each restore point is a row with an icon and a word for what made it (Manual, Automatic, Application install, Made by a repair), its date and time, its description and the drives it covers.",
+      "Create is the primary action. It asks for a name, defaulting to a description of what is about to happen, and the new row appears only after the list is read back from Windows.",
+      "When Windows declines a new point because one was made too recently, the tool says so in words and names the point that already exists. It does not report a point that was not made.",
+      "Restore is enabled for a selected row. Its confirmation states what a restore changes (system files, drivers, installed programs, registry) and what it leaves alone (personal documents), then hands over to Windows' own restore. Declining starts nothing.",
+      "The status bar counts the points and says which drives have System Protection on, in words.",
+      "When System Protection is off for every drive the screen says so at the top, explains that no point can be made, and offers to turn it on. It is never a greyed-out button with no reason.",
+      "Create, Restore and the deletion of a point are refused by name when the tool is not elevated, before anything is attempted."
+    ],
+    "cut": "There is no earlier window: this is a new tool, so nothing is cut. It has no menu bar, splash, animation or donate strip, because the suite's tool window does not carry them, and it never shows Windows' own plain list of dates as the whole answer."
+  },
+  "readme": {
+    "lead": "Make a Windows restore point before a risky change, and know what it covers.",
+    "what": [
+      "Restore Point Manager creates, lists and starts Windows restore points. Each point is shown with its date, what made it and which drives it covers, so one can be chosen without guessing from a list of dates.",
+      "When System Protection is off, it says so, explains what that means for you and offers to turn it on. It also shows the storage System Protection uses on each drive. Starting a restore hands over to Windows' own restore, and the tool states what that will and will not undo."
+    ],
+    "new_intro": "This is a new tool with no AutoIt version, and it is also the standalone face of a path the other Resolute repair tools share.",
+    "new": [
+      [
+        "Points with their meaning.",
+        "Each restore point shows what made it and which drives it covers."
+      ],
+      [
+        "Protection explained.",
+        "When System Protection is off, the tool says why that matters and offers to turn it on."
+      ],
+      [
+        "Honest limits.",
+        "A restore confirmation says what is undone and what is not, and a point refused for being too recent is reported as refused."
+      ],
+      [
+        "Shared with the repair tools.",
+        "Every Resolute repair tool can offer a restore point first through the SDK's repair contract, using the same creation path."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Restore Point Manager ships as a complete, standalone C++ tool: it lists restore points with what made each and which drives it covers, creates one named for what is about to happen and reports the frequency limit honestly, reads and changes System Protection per drive, explains why Protection is off, and starts Windows' own restore for a chosen point with a plain statement of what it will and will not undo. Its creation path is also the one the SDK's repair contract offers to every repair tool.",
+    "current_state": "Nothing exists yet. This is a new tool of the suite with no earlier version and nothing to port: there is no AutoIt original and no `reference/au3/` folder. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan section as it stood in the Resolute repository under `docs/origin/resolute-D05-T03-s1.md`. The Windows facts the plan rests on come from Windows' own interfaces, not from source here: the `SystemRestore` WMI class and `SRSetRestorePoint` for creating a point, a creation frequency limit that makes Windows skip a point asked for too soon after the last, System Protection switched on or off per volume, shadow storage sized per volume (`vssadmin`), and `rstrui.exe` to start a restore. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T03-s1.md`: the plan section this tool comes from, including the freeze check that the tool must never promise more than a restore does.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the tool's identity and window sections, and the suite's contract every surface answers to.",
+      "Windows itself on a real machine: the `SystemRestore` WMI class, `SRSetRestorePoint`, `vssadmin list shadowstorage` and `rstrui.exe`, which the engine's tests are written against."
+    ],
+    "outcome": [
+      "`RestorePointManager.exe` lists every restore point with its date, what made it and the drives it covers, creates one named for what is about to happen, and reads it back before saying it exists.",
+      "System Protection is shown per drive with its storage, an off drive is explained and can be turned on, and a point refused for being too recent is reported as refused.",
+      "Restore starts Windows' own restore after a confirmation that states what it will and will not undo, and the Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone."
+    ],
+    "adjacency_rationale": "The list is the Restore points screen, where a person finds a point by what made it and what it covers, and Protection is the second list. Reporting and audit are the Activity section: one line per point created, deleted or restored. Settings are the framework's pages. Permissions anchor on the engine, where every create, restore, delete and protection change is refused by name when the process is not elevated. Reverse does not apply as an undo: restoring is Windows' own act and has its own undo, creating a point changes nothing that needs putting back, and deleting one cannot be undone and says so.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Restore Point Engine",
+      "intro": "The tool's whole system effect: listing restore points with what created each, creating one and handling the frequency limit honestly, reading and changing System Protection per volume, and starting Windows' own restore for a chosen point. It is independent of any window, and the SDK's repair contract calls its creation path. Every action is refused by name when the process is not elevated.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the restore point kinds and the System Protection model as data in `src/core/RestorePoint.h`. Done when: each kind Windows reports has a name and a plain description stated once.",
+        "Implement list, create, protection and restore start in `src/core/Restore.cpp` behind an interface the tests can replace. Done when: the unit tests pass against a fake Windows backend."
+      ],
+      "items": [
+        "Implement `ListPoints()` in `src/core/Restore.cpp` reading the `SystemRestore` WMI class: sequence number, description, creation time and the type Windows records. Done when: a fixture backend with a manual, an automatic and an application-install point returns three rows with the right kinds. Cheaper substitute: listing dates only, which is what Windows' own interface offers.",
+        "Resolve the drives each point covers in `src/core/Restore.cpp` from the volumes that had System Protection on, with the shadow copies read for each point. Done when: a fixture with a point covering C: and D: lists both and one covering only C: lists one.",
+        "Implement `CreatePoint(name)` calling `SRSetRestorePoint` with a begin and an end of the system change, then re-read the list. Done when: a test shows the new point present under the given name, and a call that created none returns not created. Cheaper substitute: trusting the return code of `SRSetRestorePoint`, which reports success even when Windows skipped the point.",
+        "Handle the creation frequency limit in `src/core/Restore.cpp`: when the re-read finds no new point, return `TooSoon` naming the most recent point and when it was made. Done when: a test with a point made a minute before gets `TooSoon` with that point, and the registry value that sets the interval is never changed by the tool. Cheaper substitute: lowering the limit in the registry to force a point, which changes a Windows setting the user did not ask about.",
+        "Implement `Protection()` and `SetProtection(drive, on)` per volume, with `SetProtection` through the `SystemRestore` class's enable and disable, and read the result back. Done when: a test turns a fixture drive on, reads it as on, and a corrupted write is returned by drive, expected and found. Cheaper substitute: checking only the return code.",
+        "Implement `StorageUse(drive)` reading shadow storage used, allocated and maximum from `vssadmin list shadowstorage` for the drive. Done when: a fixture output parses to three numbers for C: and a drive with no shadow storage returns none, not zero.",
+        "Implement `StartRestore(point)` launching `rstrui.exe` for the chosen point and returning after the launch, with nothing performed by this tool itself. Done when: a test with a fake launcher sees one launch naming the point, and a declined confirmation sees none. Cheaper substitute: restoring through a private routine, which would let the tool promise more than Windows does.",
+        "Refuse `CreatePoint`, `SetProtection`, `DeletePoint` and `StartRestore` by name when the process is not elevated, before any call to Windows, with one activity record. Done when: an unelevated test run reports the refusal and the fake backend saw no call. Cheaper substitute: letting the call fail with access denied halfway through.",
+        "Cover every path in `tests/restore_test.cpp` against the fake backend. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restore` passes, and fails when the frequency-limit case is removed from the engine."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restore` passes, including the frequency-limit, corrupted-write and unelevated cases.",
+      "commit": "core: list, create and restore points, refused when unelevated"
+    },
+    "enhancements": [
+      {
+        "title": "Why Protection Is Off",
+        "intro": "The most common complaint about Windows' own interface is a greyed-out button with no reason. When System Protection is off for a drive, the Protection screen says so, explains the consequence in plain words (no point can be made for that drive and a restore cannot reach it) and offers to turn it on with a storage size, instead of failing silently.",
+        "surface": {
+          "fidelity": "the Protection screen and its explanation, against `DESIGN.md` section 2 and `sdk/DESIGN.md`.",
+          "job": "a person who finds no restore points learns why, and can turn Protection on without leaving the tool. Consumer: the volume's System Protection state, read back.",
+          "treatment": "a named reason per drive with the action beside it. Cheaper substitute that fails the checkpoint: a disabled Create button with no explanation."
+        },
+        "build": [
+          "Build the Protection screen in `src/ui/ProtectionView.cpp` from the SDK's list control. Done when: each drive shows on or off, in words.",
+          "Add the explanation and the turn-on action in `src/ui/ProtectionView.cpp`. Done when: an off drive shows its reason and turning it on is read back."
+        ],
+        "items": [
+          "Show each drive in `src/ui/ProtectionView.cpp` with its state as an icon and the word On or Off, and its storage in words. Done when: a fixture with C: on and D: off shows both. Cheaper substitute: colour alone for the state.",
+          "Show, for an off drive, a sentence stating that no restore point can be made for it and a restore cannot reach it, with a Turn on button. Done when: the sentence and the button are present for D: and absent for C:. Cheaper substitute: a greyed-out button with no text.",
+          "Turn Protection on through `SetProtection` after a confirmation that names the drive and the storage that will be set aside, and read the state back. Done when: a driven test turns D: on and the row shows On.",
+          "Show the same explanation at the top of the Restore points screen when Protection is off for every drive. Done when: with all drives off the Restore points screen says so and Create is explained, not hidden.",
+          "Cover it in `tests/protection_view_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L protection` passes, and fails when the explanation is removed for an off drive."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L protection` passes: an off drive shows its reason and a Turn on action, and turning it on is read back.",
+        "commit": "feature: say why System Protection is off and offer to turn it on"
+      },
+      {
+        "title": "What a Point Covers",
+        "intro": "A restore point is chosen by what it covers. Each point shows the drives it covers, and the restore confirmation states what a restore changes and what it does not, so the tool never appears to promise more than Windows does. A restore returns system files, drivers, installed programs and registry settings to their state at that time. It does not touch personal documents, and it cannot undo a change on a drive the point does not cover. This is the freeze check of the plan section: the text is checked against what a restore genuinely does.",
+        "surface": {
+          "fidelity": "the point detail and the restore confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person chooses a point and knows what restoring it will and will not undo. Consumer: the confirmation text, read against Windows' documented behaviour.",
+          "treatment": "the drives covered and two short lists, what a restore changes and what it leaves, in the confirmation. Cheaper substitute that fails the checkpoint: a bare date and a Restore button."
+        },
+        "build": [
+          "Show the drives covered on each row in `src/ui/RestorePointsView.cpp`. Done when: a point covering two drives shows both.",
+          "Write the restore confirmation in `src/ui/RestorePointsView.cpp` through the framework's message surface. Done when: it states what is changed and what is not."
+        ],
+        "items": [
+          "Show on each row of `src/ui/RestorePointsView.cpp` an icon and a word for what made the point, and the drives it covers. Done when: a fixture with a manual and an automatic point shows two different words. Cheaper substitute: a list of dates.",
+          "Write the restore confirmation through the framework's message surface: it states that personal files are untouched, that installed programs, drivers and settings since the point may be changed, that only the covered drives are affected, and that Windows' own restore can be undone from its own screen. Done when: the text is in the dialog for a selected point and a reviewer has checked each claim against Windows' documented behaviour. Cheaper substitute: a generic \"are you sure\".",
+          "Start Windows' own restore only after the confirmation is accepted, and log one line naming the point. Done when: declining performs nothing and starts no process, asserted with the fake launcher.",
+          "Cover it in `tests/coverage_view_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L coverage` passes, and fails when the confirmation text is replaced by a bare prompt."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L coverage` passes: each row shows its kind and covered drives, and declining the restore confirmation starts nothing.",
+        "commit": "feature: show what a point covers and what a restore will not undo"
+      },
+      {
+        "title": "Delete Old Points",
+        "intro": "Restore points use shadow storage, and old ones can be deleted to free it. Deleting a point cannot be undone and the tool says so before it acts. Deletion is for chosen points only, never a bulk wipe, and the oldest point of a drive is never removed without it being named.",
+        "surface": {
+          "fidelity": "the delete confirmation and the freed-space result, against `sdk/DESIGN.md` section 11.",
+          "job": "a person frees shadow storage by removing points they chose, knowing it cannot be reversed. Consumer: the list and the storage figures, read back.",
+          "treatment": "a confirmation naming each point and stating it cannot be undone, then the storage figures re-read. Cheaper substitute that fails the checkpoint: deleting through `vssadmin delete shadows /all`, which removes every point and the user's only way back."
+        },
+        "build": [
+          "Implement `DeletePoint(seq)` in `src/core/Restore.cpp`. Done when: the point is gone from a re-read list.",
+          "Add the confirmation and the Delete action in `src/ui/RestorePointsView.cpp`. Done when: the confirmation names each point and says it cannot be undone."
+        ],
+        "items": [
+          "Implement `DeletePoint(seq)` in `src/core/Restore.cpp` with `SRRemoveRestorePoint`, then re-read the list. Done when: a test shows the chosen point absent and the others present. Cheaper substitute: `vssadmin delete shadows /all`, which removes every point.",
+          "Show a confirmation before deleting, naming each selected point and stating that deletion cannot be undone, through the framework's message surface. Done when: declining deletes nothing, asserted with the fake backend.",
+          "Refuse to delete the only remaining point of a drive without saying so in the confirmation. Done when: a fixture with one point shows the extra sentence.",
+          "Log one line per point deleted and show the storage freed from `StorageUse`. Done when: after a delete the Activity list and the storage figure change.",
+          "Cover it in `tests/delete_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L delete` passes, and fails when the confirmation is skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L delete` passes: only chosen points go, after a confirmation that says it cannot be undone.",
+        "commit": "feature: delete chosen restore points to free storage, confirmed"
+      },
+      {
+        "title": "Storage Use per Drive",
+        "intro": "Shadow storage is shared by restore points and other shadow copies, and a full allocation silently drops the oldest points. The Protection screen shows used, allocated and maximum storage per drive, and lets the maximum be changed, so a person sees why points disappear.",
+        "needs": "sdk-framework",
+        "surface": {
+          "fidelity": "the storage figures and the size control on the Protection screen, against `sdk/DESIGN.md`.",
+          "job": "a person sees how much storage each drive's points use and sets its maximum. Consumer: the drive's shadow storage, read back.",
+          "treatment": "used, allocated and maximum in words and a bar from the SDK's chart control, with the size change read back. Cheaper substitute that fails the checkpoint: a number with no unit and no way to change it."
+        },
+        "build": [
+          "Show the storage per drive in `src/ui/ProtectionView.cpp` with the SDK's chart control. Done when: each drive shows its three figures.",
+          "Implement the size change in `src/core/Restore.cpp` through `vssadmin resize shadowstorage`. Done when: the new maximum is read back."
+        ],
+        "items": [
+          "Show used, allocated and maximum storage per drive in `src/ui/ProtectionView.cpp`, in words and with the SDK's chart control. Done when: a fixture shows three figures for C: and none for a drive without shadow storage. Cheaper substitute: a private bar drawn in the tool.",
+          "Implement `SetMaxStorage(drive, size)` in `src/core/Restore.cpp` through `vssadmin resize shadowstorage` and read the maximum back. Done when: a test sets a size and reads it as set, and refuses it unelevated by name. Cheaper substitute: writing the shadow storage registry values directly.",
+          "Warn in words when used storage is near the maximum, naming that the oldest points may be dropped. Done when: a fixture near its maximum shows the warning and one far from it does not.",
+          "Cover it in `tests/storage_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L storage` passes, and fails when the read-back is skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L storage` passes: the three figures show per drive and a changed maximum is read back.",
+        "commit": "feature: show shadow storage per drive and set its maximum"
+      }
+    ],
+    "no_reverse": "restoring is done by Windows itself and has its own undo; creating a point changes nothing that needs putting back, and deleting one cannot be undone and says so",
+    "verification": [
+      "A walk of `docs/origin/resolute-D05-T03-s1.md` finds every item of the plan section with a home in a section of the plan.",
+      "On a real machine the tool lists points, creates one and reads it back, reports a point refused for being too recent, explains an off drive and turns it on, and starts Windows' own restore after the confirmation.",
+      "Every create, restore, delete and protection change is refused by name when not elevated, and each produces one Activity line, in light and dark, by keyboard alone."
+    ]
+  }
+}

@@ -1,0 +1,252 @@
+{
+  "name": "BatteryHealth",
+  "slug": "batteryhealth",
+  "display": "Battery Health",
+  "job": "it reads each battery in a laptop, works out how worn it is from its full-charge capacity against its design capacity, and says so in plain words, changing nothing on the system.",
+  "tagline": "How worn is your battery? A plain answer",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Leaf",
+    "light": "#A3E635",
+    "dark": "#4D7C0F",
+    "social_ground": "#16230A",
+    "social_muted": "#D6ECAE"
+  },
+  "icon": {
+    "idea": "A battery with a heart in it: health, not charge.",
+    "points": [
+      "Free-standing, with no tile: a rounded battery with its terminal.",
+      "The battery is Leaf and the heart is Leaf light.",
+      "The small drawing, used below 40 pixels, enlarges the heart."
+    ],
+    "large": "<rect x=\"10\" y=\"28\" width=\"68\" height=\"40\" rx=\"10\" fill=\"#4D7C0F\"/><path d=\"M84 42 V54\" fill=\"none\" stroke=\"#4D7C0F\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M44 60 C31 52 31 42 37 40 C40 39 43 41 44 44 C45 41 48 39 51 40 C57 42 57 52 44 60 Z\" fill=\"#A3E635\" stroke=\"#A3E635\" stroke-width=\"2\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<rect x=\"8\" y=\"26\" width=\"72\" height=\"44\" rx=\"11\" fill=\"#4D7C0F\"/><path d=\"M86 42 V54\" fill=\"none\" stroke=\"#4D7C0F\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M44 62 C28 52 28 40 35 38 C39 36 43 39 44 43 C45 39 49 36 53 38 C60 40 60 52 44 62 Z\" fill=\"#A3E635\" stroke=\"#A3E635\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Battery",
+        "Each battery as a row or card: its wear in words, design and full-charge capacity, cycle count and charge now"
+      ],
+      [
+        "History",
+        "Capacity and charge over time, as a chart"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees in plain words how worn each battery is, with the numbers behind the verdict.",
+    "primary": "Refresh",
+    "secondary": "Copy summary",
+    "rows": [
+      [
+        "Wear",
+        "A verdict in words, with the percentage lost"
+      ],
+      [
+        "Design capacity",
+        "What the battery held when new, in milliwatt hours, or Not reported"
+      ],
+      [
+        "Full-charge capacity",
+        "What it holds fully charged now, in milliwatt hours, or Not reported"
+      ],
+      [
+        "Cycle count",
+        "A number, or Not reported"
+      ],
+      [
+        "Charge now",
+        "Percent charged, and Charging, On battery or Full"
+      ]
+    ],
+    "status": "1 battery, worn a little",
+    "notes": [
+      "Each battery is one card or row. Its wear verdict is shown with an icon and a word (for example Like new, Worn a little, Worn, Replace soon), never by colour alone.",
+      "The card shows the design capacity, the full-charge capacity, the cycle count and the charge now, each labelled, and the wear as a percentage beside the verdict.",
+      "Refresh is the accent button. It reads every battery again and updates the cards from that read, not from an assumption.",
+      "Copy summary puts a short plain-text report of every battery on the clipboard, for a message or a support request.",
+      "A machine with no battery shows one sentence saying so, and nothing else. A battery that reports no capacity shows Not reported on that field and says the battery gives Windows no figure, never zero.",
+      "A machine with two batteries shows two cards, each with its own verdict, and the status bar counts them.",
+      "The tool reads and changes nothing, so there is no undo, no confirmation and no elevation. The status bar states the count and the worst verdict in words."
+    ],
+    "cut": "There is no earlier window: the tool is new. The suite's usual extras are not part of it: no menus, no splash, no animations and no donate strip. The window is the Sidebar tool window and its first screen, and what it leaves out is recorded in the plan."
+  },
+  "readme": {
+    "lead": "Battery Health tells you how worn your laptop battery is, in plain words.",
+    "what": [
+      "It reads each battery in the machine: the capacity it was designed to hold, the capacity it holds fully charged today, how many charge cycles it has been through and how full it is now. From the first two it works out the wear and gives a short verdict you can act on.",
+      "It only reads. It changes no setting, writes nothing to the system and needs no administrator rights. On a desktop with no battery it says so plainly, and on a laptop with two batteries it shows both."
+    ],
+    "new_intro": "Battery Health is a new tool of the suite, with no earlier version.",
+    "new": [
+      [
+        "A verdict, not a table.",
+        "The wear is turned into one of a few plain verdicts, with the numbers shown beside it."
+      ],
+      [
+        "Honest about missing data.",
+        "A battery that reports nothing is shown as Not reported, and a machine with no battery is told so."
+      ],
+      [
+        "Capacity history.",
+        "Each reading can be recorded, and the trend is shown as a chart."
+      ],
+      [
+        "Windows' own report beside ours.",
+        "The tool can open the report Windows builds with `powercfg /batteryreport`."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Battery Health ships as a complete, standalone C++ tool: it finds every battery in the machine, reads its design capacity, full-charge capacity, cycle count and charge, works out the wear, states it as one of a few plain verdicts, says clearly when there is no battery or a battery reports nothing, and records readings so the trend can be shown, all without changing anything on the system.",
+    "current_state": "Nothing exists yet. This is a new tool: there is no AutoIt version, no source to port and no earlier behaviour to match. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T03-s7.md`, 22 lines, whose section 7 covers three tools, of which only the first concerns this one: four values (design capacity, full-charge capacity, cycle count, wear percentage) rendered on a laptop, and a plain report of no battery on a desktop. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built. This tool consumes the framework and the chart control and uses no repair contract.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T03-s7.md`: the plan section as it stood in the Resolute repository, of which only its Battery Health item and its test checkpoint apply here.",
+      "The Windows battery interface, read through `IOCTL_BATTERY_QUERY_TAG`, `IOCTL_BATTERY_QUERY_INFORMATION` and `IOCTL_BATTERY_QUERY_STATUS` on the battery device interface, and `GetSystemPowerStatus` for the charge now.",
+      "`powercfg /batteryreport`: Windows' own report, used to cross-check this tool's figures on a real laptop and offered to the user as an enhancement."
+    ],
+    "outcome": [
+      "`BatteryHealth.exe` shows, for every battery, its design capacity, full-charge capacity, cycle count, wear and charge now, with a plain verdict, and says plainly when there is no battery or a field is not reported.",
+      "The figures match what Windows' own battery report states for the same laptop, and the tool changes nothing on the system.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Battery screen, where a person reads one card per battery. Reporting is the Copy summary action and the History section, and audit is the Activity section, which records each reading the tool took. Settings are the framework's pages. Permissions do not apply: reading the battery needs no right the user lacks. Reverse does not apply either: the tool reads and changes nothing, so there is nothing to put back.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Battery Reading Engine",
+      "intro": "The tool's whole system contact: finding each battery, reading its static information and its status, working out wear, choosing a verdict and describing the cases where there is nothing to show. It only reads and has no window. Battery access sits behind one small interface so the tests can supply fake batteries.",
+      "needs": "windows-host",
+      "build": [
+        "Write the data model and the wear and verdict rules in `src/core/Battery.h` and `src/core/Verdict.cpp`. Done when: the unit tests pass with fixed numbers and no device.",
+        "Write the Windows reader in `src/core/BatteryReader.cpp` behind a source interface the tests replace. Done when: on a laptop the reader returns the same capacities as `powercfg /batteryreport`."
+      ],
+      "items": [
+        "Declare in `src/core/Battery.h` one `BatteryInfo` per battery with design capacity, full-charge capacity, cycle count, charge in milliwatt hours, charge percent, power state and name, each optional so that Not reported is representable. Done when: a header test builds one value with every field absent and reads each back as absent, not zero. Cheaper substitute: plain integers where zero means unknown, which turns an unreported field into a false wear of 100 percent.",
+        "Find every battery in `src/core/BatteryReader.cpp` with `SetupDiGetClassDevs` on the battery device class and `SetupDiEnumDeviceInterfaces`, opening each path read-only in effect (no write, no control request that changes state). Done when: on a laptop with one battery it returns one entry, and a fake source with two returns two. Cheaper substitute: reading only the first battery, which loses the second on a machine that has two.",
+        "Read each battery's tag with `IOCTL_BATTERY_QUERY_TAG`, then its static information with `IOCTL_BATTERY_QUERY_INFORMATION` (`BatteryInformation`: `DesignedCapacity`, `FullChargedCapacity`, `CycleCount`; and the battery's name). Done when: the three fields equal the values in `powercfg /batteryreport` for the same laptop, and a value Windows marks unknown comes back absent.",
+        "Read each battery's live status with `IOCTL_BATTERY_QUERY_STATUS` (capacity now, rate, power state) and the machine's charge percent and mains state with `GetSystemPowerStatus`. Done when: charge now and Charging, On battery or Full agree with the Windows taskbar on a real laptop, and a battery that gives no status returns absent fields.",
+        "Implement `Wear()` in `src/core/Verdict.cpp` as full-charge capacity against design capacity: the share of the design capacity that has been lost. Done when: a fixture gives the exact expected value, a full-charge capacity above the design capacity gives no wear rather than a negative number, and a missing or zero design capacity gives no wear at all.",
+        "Implement `Verdict()` turning wear into one of a small set of plain verdicts (Like new, Worn a little, Worn, Replace soon, Not enough information), with the thresholds declared once in a table in `src/core/Verdict.cpp` and recorded in `docs/verdicts.md`. Done when: a test walks both sides of every threshold and a battery with no wear figure gets Not enough information. Cheaper substitute: thresholds typed into the view, which lets two screens disagree.",
+        "Return a clear state for the cases with nothing to show: `NoBattery` for a machine whose battery class has no device, and `NotReported` for a battery that answers with no capacities. Done when: a fake source with no device gives `NoBattery` with one plain sentence, and a fake battery that reports nothing gives `NotReported`, never a verdict of Worn.",
+        "Keep the engine reading only: the reader opens devices and calls the IOCTLs above and nothing else. Done when: a test over `src/core/` finds no registry write, file write outside the tool's own data folder, process start or service control in the reader. Cheaper substitute: a code comment saying it only reads.",
+        "Cover every path in `tests/battery_test.cpp` with a fake source: one battery, two, none, one that reports nothing and one that is full. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L battery` passes, and fails when a threshold in the table is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L battery` passes for one, two, none and not-reported batteries, and on a real laptop the three capacities match `powercfg /batteryreport`.",
+      "commit": "core: read each battery and state its wear in plain words"
+    },
+    "enhancements": [
+      {
+        "title": "Capacity History",
+        "needs": "sdk-framework",
+        "intro": "One reading says how worn a battery is today. A recorded series says how fast it is wearing. Each reading is stored in the tool's own data folder, and the History section shows the trend with the SDK's chart control. The record is the tool's own file: nothing on the system changes.",
+        "surface": {
+          "fidelity": "the History section, against `DESIGN.md` section 2 and `sdk/DESIGN.md`, in light and dark.",
+          "job": "a person sees whether the battery is wearing slowly or fast. Consumer: the chart, read back against the recorded file.",
+          "treatment": "the SDK's chart control showing full-charge capacity over time, with charge over time beside it and a sentence stating the direction in words. Cheaper substitute that fails the checkpoint: a table of numbers, which hides the trend."
+        },
+        "build": [
+          "Record each reading in `src/core/History.cpp`, written once per reading and atomically. Done when: after three refreshes the file holds three records.",
+          "Show the series in `src/ui/HistoryView.cpp` with the SDK's chart control. Done when: the chart's points equal the recorded file."
+        ],
+        "items": [
+          "Add `src/core/History.cpp`: append one record (time, battery name, full-charge capacity, charge) per reading to the tool's own data folder, with a write to a temporary file then a rename. Done when: a test that stops the writer midway leaves the old file readable. Cheaper substitute: appending in place, which can leave a half record.",
+          "Skip a reading in `src/core/History.cpp` when it equals the last recorded one for that battery in all but the time, so a page left open does not fill the file. Done when: ten identical refreshes add one record.",
+          "Build `src/ui/HistoryView.cpp` with the SDK's chart control, one series per battery. Done when: the chart shows the recorded points and nothing else. Cheaper substitute: a private chart drawn in the tool, which the contract forbids.",
+          "Show an empty state in one sentence when fewer than two readings exist. Done when: a first run shows it and the chart replaces it after the second reading.",
+          "Cover it in `tests/history_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L history` passes, and fails when a record is dropped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L history` passes and the chart's points equal the recorded file after a driven run.",
+        "commit": "feature: capacity history recorded and charted"
+      },
+      {
+        "title": "Estimated Time on a Full Charge",
+        "intro": "From the battery's recent discharge rate and its full-charge capacity, the tool says roughly how long a full charge would last at the pace of the last few readings. It is stated as an estimate, because the rate changes with what the laptop is doing, and it is not shown when the battery has not been discharging.",
+        "surface": {
+          "fidelity": "the estimate line on the Battery screen, against `DESIGN.md` section 2.",
+          "job": "a person knows roughly how long this battery lasts now. Consumer: the line, compared with the engine's rate and capacity.",
+          "treatment": "one plain sentence beginning with About, saying it is an estimate and what it is based on. Cheaper substitute that fails the checkpoint: a precise-looking time with no word of its being a guess."
+        },
+        "build": [
+          "Compute the estimate in `src/core/Estimate.cpp` from `IOCTL_BATTERY_QUERY_STATUS` rate and the full-charge capacity. Done when: fixtures give the expected hours and minutes.",
+          "Show it on the Battery card in `src/ui/BatteryView.cpp`. Done when: the line appears only while the battery is discharging."
+        ],
+        "items": [
+          "Add `src/core/Estimate.cpp` dividing the full-charge capacity by the average discharge rate of the last few readings taken while on battery. Done when: a fixture with a steady rate gives the exact expected duration, and a fixture with no discharge gives no estimate.",
+          "Return no estimate, never a number, when the rate is unknown, zero or the machine is on mains. Done when: tests for each case return absent.",
+          "Show the estimate in `src/ui/BatteryView.cpp` as a rounded sentence that says it is an estimate. Done when: the card shows the sentence while discharging and hides it otherwise. Cheaper substitute: showing minutes to the second.",
+          "Cover it in `tests/estimate_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L estimate` passes, and fails when the rate is ignored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L estimate` passes for steady, absent and on-mains fixtures, and the estimate is hidden while charging.",
+        "commit": "feature: an estimated time on a full charge, stated as an estimate"
+      },
+      {
+        "title": "Windows Battery Report",
+        "intro": "Windows builds its own battery report with `powercfg /batteryreport`. The tool offers to produce it and open it beside its own view, so a person can compare. The report is written to a file in the tool's own data folder, and nothing else on the system is touched.",
+        "surface": {
+          "fidelity": "the Open Windows report action, against `DESIGN.md` section 2.",
+          "job": "a person checks the tool's figures against Windows' own. Consumer: the report file opened in the browser.",
+          "treatment": "a secondary action that says what it will do, then opens the file. Cheaper substitute that fails the checkpoint: running the command with its window showing, which flashes a console."
+        },
+        "build": [
+          "Run `powercfg /batteryreport /output` in `src/core/WindowsReport.cpp` with no console window and a time limit. Done when: the report file exists in the data folder afterwards.",
+          "Wire the action in `src/ui/BatteryView.cpp`. Done when: the report opens and a failure shows one plain sentence."
+        ],
+        "items": [
+          "Add `src/core/WindowsReport.cpp` starting `powercfg /batteryreport /output <file>` with no window, killing the whole process tree on timeout. Done when: a test with a fake command that never ends is stopped at the limit and leaves no child. Cheaper substitute: a call that waits forever.",
+          "Write the report to the tool's own data folder and never to the system folder. Done when: a test asserts the output path is under the data folder.",
+          "Open the finished file with the shell in `src/ui/BatteryView.cpp`. Done when: the report appears in the browser, and a failed run shows one sentence saying so and why.",
+          "Say plainly on a machine with no battery that Windows has no report to give. Done when: the action is disabled there with a tooltip.",
+          "Cover it in `tests/report_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L report` passes, and fails when the path leaves the data folder."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L report` passes, and on a laptop the Windows report opens and shows the same capacities as the Battery screen.",
+        "commit": "feature: open Windows' own battery report beside ours"
+      },
+      {
+        "title": "Plain-Words Advice",
+        "intro": "A verdict says how worn the battery is. The advice says what that means for this battery in a sentence or two: whether to carry on, to keep a charger near, or to think about a replacement. It is written from the verdict and the cycle count, and it does not promise what no figure supports.",
+        "surface": {
+          "fidelity": "the advice line on the Battery screen, against `DESIGN.md` section 2.",
+          "job": "a person knows what to do about the wear. Consumer: the sentence, compared with the verdict.",
+          "treatment": "one or two plain sentences under the verdict, chosen from a fixed set by verdict. Cheaper substitute that fails the checkpoint: the same sentence for every battery."
+        },
+        "build": [
+          "Write the advice set in `src/core/Advice.cpp`, one entry per verdict. Done when: every verdict has an entry and a test finds no verdict without one.",
+          "Show the advice in `src/ui/BatteryView.cpp`. Done when: the sentence changes when the verdict changes."
+        ],
+        "items": [
+          "Add `src/core/Advice.cpp` mapping each verdict, and the cycle count where it is reported, to a plain sentence kept in the language pack. Done when: a test over every verdict returns a non-empty sentence and a search of `src/` finds no advice literal. Cheaper substitute: sentences typed in the view.",
+          "Give Not enough information its own advice, saying the battery does not report enough for a verdict. Done when: a not-reported fixture shows that sentence and no wear advice.",
+          "Show the advice under the verdict in `src/ui/BatteryView.cpp` and include it in Copy summary. Done when: the copied text contains the verdict and its advice.",
+          "Cover it in `tests/advice_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L advice` passes, and fails when a verdict has no entry."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L advice` passes and the advice changes with the verdict in a driven run.",
+        "commit": "feature: plain-words advice for each verdict"
+      }
+    ],
+    "no_reverse": "the tool reads the battery and changes nothing",
+    "verification": [
+      "On a real laptop the design capacity, full-charge capacity and cycle count equal what `powercfg /batteryreport` states for the same battery.",
+      "On a desktop, on a fake machine with two batteries and on a fake battery that reports nothing, the window says what is true in each case, and never shows a made-up zero.",
+      "The tool is driven in light and dark, by keyboard alone, and a search of `src/core/` finds no write to the system."
+    ]
+  }
+}

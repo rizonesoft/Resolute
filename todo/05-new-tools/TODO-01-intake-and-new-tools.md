@@ -162,6 +162,8 @@ One small port and one genuinely new build. SaveDesk is the only candidate in th
 
 ## 5. The Autoruns Manager and the Hosts Editor
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/StartupManager` and `rizonesoft/HostsEditor` repositories (`D:\Resolute_Bin\StartupManager`, `D:\Resolute_Bin\HostsEditor`), each by its own plan.
+
 Startup entries, services, scheduled tasks, and shell context menu entries are the same tool four times: enumerate what the system runs, show what is enabled, toggle it, undo it. They ship as **one tool with four tabs**, because the question a user actually has is "what runs on my machine", and answering it across four separate downloads is worse rather than better.
 
 The Hosts editor stays separate: it edits one file rather than enumerating system state, and grouping it here would be filing by convenience.
@@ -172,19 +174,19 @@ The Hosts editor stays separate: it edits one file rather than enumerating syste
 **Chrome:** consume the framework, the repair contract, and the service primitives from §3.
 **Needs:** Windows host (build/test)
 
-- [ ] Define one entry model covering all four sources: a name, a source, a command, an enabled state, and a publisher where one exists. Done when: all four sources populate the same model and the surface has no per-source branch.
-- [ ] Build the startup tab. Done when: an entry is disabled, the machine is restarted, the entry did not run, and undo restores it.
-- [ ] Build the services tab on the promoted service primitives. Done when: start, stop, and start-mode changes each verify by reading the service state back, and each is undoable.
-- [ ] Build the scheduled tasks tab, which nothing in the suite covers today and where bloat and malware hide. Done when: a task is disabled and re-enabled, verified by reading the task state back.
-- [ ] Build the context menu tab. Done when: an entry is removed, Explorer no longer offers it, and undo restores it exactly.
-- [ ] Make every change a repair-contract item so the undo is the contract's. Done when: no tab writes outside the contract's loop, proven by search.
-- [ ] Let a user find an entry across all four sources at once. Done when: one search narrows every tab and the result says which source each hit came from.
-- [ ] Build the Hosts File Editor separately. Done when: an entry is added, name resolution reflects it, the file is written atomically, and the prior file is recoverable through the contract.
-- [ ] Account for both surfaces. Done when: two accounts are written and each deferral resolves.
-- [ ] Promote the entry model and the four enumerators (startup, services, tasks, context menu) into a declared shared library, as `§3` promotes services (groom 2026-09-23 gap scan) : `D05 T04 §1` and `§4`, `D05 T06 §7`, and `D05 T07 §2` and `§9` consume enumerators this section builds inside one tool, and `AGENTS.md` forbids a runtime tool-to-tool dependency or a shared file without a section that says so. Done when: the library lives in a shared-layer directory the section names (recorded as a layout decision in `AGENTS.md`), every consumer links it, and no tool reads another tool's code.
-- [ ] Commit: `"autoruns manager and hosts editor"`
+- [ ] ~~Define one entry model covering all four sources: a name, a source, a command, an enabled state, and a publisher where one exists. Done when: all four sources populate the same model and the surface has no per-source branch.~~ -> `rizonesoft/StartupManager`
+- [ ] ~~Build the startup tab. Done when: an entry is disabled, the machine is restarted, the entry did not run, and undo restores it.~~ -> `rizonesoft/StartupManager`
+- [ ] ~~Build the services tab on the promoted service primitives. Done when: start, stop, and start-mode changes each verify by reading the service state back, and each is undoable.~~ -> `rizonesoft/StartupManager`
+- [ ] ~~Build the scheduled tasks tab, which nothing in the suite covers today and where bloat and malware hide. Done when: a task is disabled and re-enabled, verified by reading the task state back.~~ -> `rizonesoft/StartupManager`
+- [ ] ~~Build the context menu tab. Done when: an entry is removed, Explorer no longer offers it, and undo restores it exactly.~~ -> `rizonesoft/StartupManager`
+- [ ] ~~Make every change a repair-contract item so the undo is the contract's. Done when: no tab writes outside the contract's loop, proven by search.~~ -> `rizonesoft/StartupManager`
+- [ ] ~~Let a user find an entry across all four sources at once. Done when: one search narrows every tab and the result says which source each hit came from.~~ -> `rizonesoft/StartupManager`
+- [ ] ~~Build the Hosts File Editor separately. Done when: an entry is added, name resolution reflects it, the file is written atomically, and the prior file is recoverable through the contract.~~ -> `rizonesoft/StartupManager`
+- [ ] ~~Account for both surfaces. Done when: two accounts are written and each deferral resolves.~~ -> `rizonesoft/StartupManager`
+- [ ] ~~Promote the entry model and the four enumerators (startup, services, tasks, context menu) into a declared shared library, as `§3` promotes services (groom 2026-09-23 gap scan) : `D05 T04 §1` and `§4`, `D05 T06 §7`, and `D05 T07 §2` and `§9` consume enumerators this section builds inside one tool, and `AGENTS.md` forbids a runtime tool-to-tool dependency or a shared file without a section that says so. Done when: the library lives in a shared-layer directory the section names (recorded as a layout decision in `AGENTS.md`), every consumer links it, and no tool reads another tool's code.~~ -> `rizonesoft/StartupManager`
+- [ ] Commit: ~~`"autoruns manager and hosts editor"`~~ -> `rizonesoft/StartupManager`
 
-**Test checkpoint:** All four sources populate one entry model with no per-source branch in the surface, proven by search. Each tab performs a change, verifies by reading system state back, and restores through the contract's undo, all four asserted. One search narrows every tab and names each hit's source. The hosts editor writes atomically and its prior file is recoverable. Both surfaces captured under `docs/captures/runs/`.
+**Test checkpoint:** Moved with the section. The `rizonesoft/StartupManager` repository's plan carries it.
 
 ## Verification
 
