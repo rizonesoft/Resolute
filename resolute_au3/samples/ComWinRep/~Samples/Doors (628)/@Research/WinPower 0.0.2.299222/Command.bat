@@ -1,6 +1,0 @@
-@ECHO OFF
-COLOR 7
-TITLE Rizone Command
-CLS
-VER
-CD\

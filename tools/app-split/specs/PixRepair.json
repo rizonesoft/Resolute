@@ -1,0 +1,259 @@
+{
+  "name": "PixRepair",
+  "slug": "pixrepair",
+  "display": "PixRepair",
+  "job": "it exercises a stuck LCD pixel with rapidly changing colour patterns, in a window the user places over the stuck pixel, and changes nothing else on the machine.",
+  "tagline": "Wake up a stuck pixel with fast colour patterns",
+  "frozen": true,
+  "elevated": false,
+  "au3": [
+    "PixRepair"
+  ],
+  "hue": {
+    "name": "Magenta",
+    "light": "#F472B6",
+    "dark": "#DB2777",
+    "extra": [
+      [
+        "Cyan",
+        "#22D3EE",
+        "One pixel of the grid"
+      ],
+      [
+        "Yellow",
+        "#FACC15",
+        "The centre pixel"
+      ]
+    ],
+    "social_ground": "#2A1020",
+    "social_muted": "#F5CFE3"
+  },
+  "icon": {
+    "idea": "A grid of nine pixels, one of them lit differently.",
+    "points": [
+      "The icon is free-standing with no tile behind it, and each pixel is a rounded square.",
+      "The corner pixels are Magenta, the edge pixels Magenta light, the centre Yellow, and one corner is Cyan.",
+      "The small drawing, used below 40 pixels, is a grid of four larger pixels."
+    ],
+    "large": "<rect x=\"10\" y=\"10\" width=\"22\" height=\"22\" rx=\"5\" fill=\"#DB2777\"/><rect x=\"37\" y=\"10\" width=\"22\" height=\"22\" rx=\"5\" fill=\"#F472B6\"/><rect x=\"64\" y=\"10\" width=\"22\" height=\"22\" rx=\"5\" fill=\"#DB2777\"/><rect x=\"10\" y=\"37\" width=\"22\" height=\"22\" rx=\"5\" fill=\"#F472B6\"/><rect x=\"37\" y=\"37\" width=\"22\" height=\"22\" rx=\"5\" fill=\"#FACC15\"/><rect x=\"64\" y=\"37\" width=\"22\" height=\"22\" rx=\"5\" fill=\"#F472B6\"/><rect x=\"10\" y=\"64\" width=\"22\" height=\"22\" rx=\"5\" fill=\"#DB2777\"/><rect x=\"37\" y=\"64\" width=\"22\" height=\"22\" rx=\"5\" fill=\"#F472B6\"/><rect x=\"64\" y=\"64\" width=\"22\" height=\"22\" rx=\"5\" fill=\"#22D3EE\"/>",
+    "small": "<rect x=\"10\" y=\"10\" width=\"35\" height=\"35\" rx=\"7\" fill=\"#DB2777\"/><rect x=\"51\" y=\"10\" width=\"35\" height=\"35\" rx=\"7\" fill=\"#F472B6\"/><rect x=\"10\" y=\"51\" width=\"35\" height=\"35\" rx=\"7\" fill=\"#FACC15\"/><rect x=\"51\" y=\"51\" width=\"35\" height=\"35\" rx=\"7\" fill=\"#22D3EE\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Repair",
+        "The pattern, speed, window size, timer and display, with Start and Stop"
+      ],
+      [
+        "Patterns",
+        "The seven exercise sequences and the eight-colour locator, each shown as swatches"
+      ],
+      [
+        "Displays",
+        "The connected monitors, with the one the window or the locator will use"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person starts a colour pattern, drags the small window over the stuck pixel and stops it when done.",
+    "primary": "Start",
+    "secondary": "Stop",
+    "rows": [
+      [
+        "Pattern",
+        "One of seven, with its swatches shown"
+      ],
+      [
+        "Speed",
+        "One colour change every 100 to 1000 ms"
+      ],
+      [
+        "Window size",
+        "Small by default, 100 by 100 pixels"
+      ],
+      [
+        "Stop after",
+        "A number of minutes, or off"
+      ],
+      [
+        "Display",
+        "Which monitor the window starts on"
+      ]
+    ],
+    "status": "Pattern 1, 200 ms, 8 minutes left",
+    "notes": [
+      "The screen opens on pattern 1 (red, green, blue) at 200 ms, as the original does (`PixRepair.au3:635`, `:647`); the original saved neither choice.",
+      "Each pattern row shows its colours as swatches in cycle order, so the picture always matches what the window will cycle. The original showed five swatches for the six-colour mode (`PixRepair.au3:620` against `:838`).",
+      "Start opens the small exercise window and the screen keeps its other controls usable, where the original disabled them and dimmed itself (`PixRepair.au3:773`).",
+      "Speed is a slider from 1 to 10 steps of 100 ms with its value shown in words, for example 200 ms (`PixRepair.au3:646`, `:799`).",
+      "The epilepsy caution (`PixRepair.au3:654`) stays on this screen as a plain warning with the same link, reworded to be plain and serious.",
+      "Stop closes the exercise window, and closing that window does the same. Nothing is left running and nothing was changed."
+    ],
+    "cut": "The AutoIt window had a File menu and a Help menu (`PixRepair.au3:534-556`), a splash (`:501-505`, `:670`), an update animation and a processing animation (`:577`, the two `.ani` files in `PixRepair.sni`), a hover icon swap (`:978`), a Preferences dialog of its own (`:1347`), a video link strip with the YouTube icon (`:659-668`), a donate menu item (`:554`) and the dimming of the main window during a run (`:773`). None of them is in this window: menus become sections of the sidebar, settings and About come from the framework, and each cut is recorded with its reason in the plan."
+  },
+  "readme": {
+    "lead": "PixRepair flashes fast colour patterns in a small window that you place over a stuck pixel, to try to wake it up.",
+    "what": [
+      "It has seven exercise patterns, from red, green and blue to all eight colours, and a speed from 100 to 1000 ms per colour. It also has a locator that fills the screen with one colour at a time, so a dead or stuck pixel is easy to see.",
+      "It does not touch the system. It only draws in its own window, and closing the window ends it. It cannot bring back a pixel that is truly dead."
+    ],
+    "new_intro": "The C++ version keeps the original's colours and timing exactly, and adds what the AutoIt tool lacked.",
+    "new": [
+      [
+        "A window you can place.",
+        "Drag the exercise window over the stuck pixel and resize it, without the colours pausing."
+      ],
+      [
+        "A timer that stops the session.",
+        "Set how long a run lasts, see the time left, and be told when it stops."
+      ],
+      [
+        "Correct on every monitor.",
+        "The locator covers the monitor you pick at its real size, and F11 only works while the tool is in front."
+      ],
+      [
+        "One standalone file.",
+        "A single statically linked executable with no installer needed."
+      ]
+    ]
+  },
+  "reference": {
+    "note": "Two language packs are in `shipped/Language/PixRepair/`: `en.lng` and `ko.lng` (both UTF-16), although `src/PixRepair.sni` lists only `en.lng` to ship. The only distribution zip is `dist/PixRepair_1008.zip`, while the build descriptor names version 1011."
+  },
+  "plan": {
+    "scope": "The whole port: build, baseline, engine, parity, window, features, release",
+    "goal": "PixRepair ships as a complete, standalone C++ tool: the seven exercise sequences, the eight-colour locator and the timing rule reproduce the AutoIt original exactly, proven by a parity check, in a Sidebar window the user can place over a stuck pixel, with a session timer and correct behaviour on every monitor.",
+    "current_state": "Nothing exists in C++. The repository holds the AutoIt original under `reference/au3/` (`src/PixRepair.au3`, 1,897 lines and 58 functions, 61 lines in `src/PixRepair.sni`), the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The original writes no registry value and no file of its own: its frozen effect is what it shows. It has an eight-colour full-screen locator (`PixRepair.au3:879-976`), a seven-mode exercise engine on a 100 by 100 topmost window at 100,100 (`:822-875`) with a speed slider from 1 to 10 steps of 100 ms (`:646`, `:856`), an F11 full-screen toggle (`:515`, `:807-820`), a warning label linking to the epilepsy page (`:654`, `:744`) and a YouTube link (`:659`, `:687`). It needs no elevation, has a File and Help menu, a splash and a Preferences dialog (`:1347`), and ships two language packs (`en`, `ko`). The SDK's framework, which the port consumes, is planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`reference/au3/src/PixRepair.au3`: the tool being ported, and `reference/au3/src/PixRepair.sni`, which lists what ships with it.",
+      "`reference/au3/shipped/Language/PixRepair/en.lng`: the English pack (UTF-16); its `[Custom]` section carries the tool's own strings. `ko.lng` is the second pack.",
+      "`reference/au3/dist/PixRepair_1008.zip`: the shipped build the baseline and the parity check run."
+    ],
+    "outcome": [
+      "The seven exercise sequences, the eight-colour locator cycle and the timing rule produce the same colours at the same intervals as the AutoIt original, proven by the parity check.",
+      "The exercise window can be dragged and resized over a stuck pixel without the cycle pausing, runs for a set time and stops with a notice, and the locator and F11 behave correctly on every monitor.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Repair screen, where a person picks a pattern, a speed, a size and a time and starts it. Reporting and audit are the Activity section: what ran, for how long and how it ended. Settings are the framework's pages. Permissions do not apply, because the tool only draws pixels and needs no right the user lacks. There is nothing to reverse: nothing is changed on the system, and closing the window is the whole reverse.",
+    "baseline_items": [
+      "Run `PixRepair_X64.exe` from `reference/au3/dist/PixRepair_1008.zip` for each of the seven modes at slider 2 and sample the exercise window's colour on a timer. Done when: `docs/baseline/modes.json` lists the colours seen per mode in order with their timestamps, covering at least two full cycles of each.",
+      "Repeat mode 7 at slider positions 1, 2 and 10 and measure the interval between colour changes. Done when: `docs/baseline/timing.json` holds the measured intervals against the 100, 200 and 1000 ms the rule predicts (`PixRepair.au3:856`).",
+      "Open the locator from each of the eight colour buttons, press Right and Left through a full turn, then press Esc. Done when: `docs/baseline/locator.json` lists the order of colours in both directions and records whether Esc closed the locator (`GUICloseOnESC` is set at `PixRepair.au3:210`, and `:904-970` handles only close, Next and Back)."
+    ],
+    "inventory_items": [
+      "Record the windows and controls in `docs/inventory.md`: the main window (`PixRepair.au3:525`), the eight colour buttons with swatches (`:591-598`), the three step labels (`:605-613`), the seven radios with swatches (`:627-633`), Go (`:637`), the speed group and slider (`:643-651`), the status label (`:641`), the warning label (`:654`), the YouTube icon and label (`:659-668`), the exercise window (`:826`), the locator window (`:885`), the Preferences dialog (`:1347`) and the File and Help menus (`:534-556`). Done when: every control-creation call in the file is listed with its window and purpose.",
+      "Record the strings: each `[Custom]` key of `reference/au3/shipped/Language/PixRepair/en.lng` and its use, the hardcoded \"Back\" and \"Next\" button names (`PixRepair.au3:888`, `:890`) and the two URLs (`:688`, `:745`), with a keep or reword verdict for the playful texts. Done when: every string names its pack key or says why it is hardcoded.",
+      "Record the behaviours: the seven colour lists (`PixRepair.au3:836-848`), the eight-colour cycle in both directions (`:915-968`), the interval rule (`:856`), the first frame showing only after one interval (`:832`, `:856-857`), the F11 toggle and its global hotkey (`:515`, `:807-820`), the main window dimming and control lock during a run (`:773`, `:781-794`), the single-instance guard (`:441`) and the absent elevation request. Done when: every behaviour in the file is listed and the sequences and timing are stated as the freeze scope.",
+      "Record settings, logging, update and the `.sni` ship list: the framework keys in `reference/au3/src/PixRepair.ini`, the log lines, the update check (`PixRepair.au3:1229`) and the files named in `reference/au3/src/PixRepair.sni`, including that `ko.lng` ships in the folder but is not listed. Done when: every `.ini` key, log line and shipped file is marked keep, cut or remapped."
+    ],
+    "engine": {
+      "title": "Colour Sequences and Timing",
+      "intro": "The tool's core: the exercise sequences, the locator cycle and the timing rule declared as data, and a generator that produces each frame, independent of any window, so it can be compared with the original. This is the frozen part: the colours, their order and the interval are the AutoIt original's, exactly.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the sequences, the locator cycle and the timing rule as data in `src/core/Sequences.h`. Done when: the seven lists, the eight-colour cycle and the rule are stated once, each with the line of `PixRepair.au3` it comes from.",
+        "Implement the frame generator in `src/core/Frames.cpp` with no window and no clock of its own. Done when: the unit tests pass and the generator's output equals the baseline for every mode."
+      ],
+      "items": [
+        "Declare in `src/core/Sequences.h` the seven exercise lists (`PixRepair.au3:836-848`): mode 1 red, green, blue; 2 red, green, blue, yellow, magenta, cyan; 3 yellow, magenta, cyan; 4 white, black; 5 white, black, red, green, blue; 6 white, black, yellow, magenta, cyan; 7 white, black, red, green, blue, yellow, magenta, cyan. Done when: a test compares every list with `docs/baseline/modes.json`.",
+        "Declare in `src/core/Sequences.h` the locator cycle white, black, red, green, blue, yellow, magenta, cyan, with `Next` and `Back` as pure functions that wrap around (`PixRepair.au3:915-968`). Done when: a test steps eight times in each direction from every colour and returns to the start.",
+        "Declare in `src/core/Timing.h` the interval rule: a step from 1 to 10, default 2, and an interval of step times 100 ms (`PixRepair.au3:646-647`, `:856`). Done when: a test returns 100 ms, 200 ms and 1000 ms for steps 1, 2 and 10 and rejects 0 and 11.",
+        "Implement `FrameAt(mode, step, elapsedMs)` in `src/core/Frames.cpp` returning the colour a window shows at that elapsed time: no colour change before the first interval, then the list in order, wrapping (`PixRepair.au3:832`, `:856-861`). Done when: a test over two full cycles of each mode matches `docs/baseline/modes.json`.",
+        "Make the generator take its time as an argument and never call a clock, so the tests run without sleeping. Done when: `src/core/Frames.cpp` includes no timer header and a test runs two cycles of mode 7 in under a second.",
+        "Compare the intervals against the measurement. Done when: a test confirms the generator's change times at steps 1, 2 and 10 equal the `docs/baseline/timing.json` rule.",
+        "Cover every path in `tests/sequence_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L sequences` passes, and fails when one colour in `Sequences.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L sequences` passes for all seven modes, the locator cycle and the timing rule, and fails when one declared colour or interval is changed.",
+      "commit": "core: the seven sequences, the locator cycle and the timing rule as data"
+    },
+    "parity_items": [
+      "Add `tests/fixtures/baseline/` as a copy step from `docs/baseline/` at configure time. Done when: the parity test reads the committed baseline and no path is typed into a tracked build file.",
+      "Compare all ten slider positions as well as the three measured. Done when: the test covers `modes.json`, `timing.json` and `locator.json`, and the interval at every step from 1 to 10 equals step times 100 ms."
+    ],
+    "enhancements": [
+      {
+        "title": "Display Corrections",
+        "intro": "The original sizes its locator from the desktop width and height (`PixRepair.au3:885`), which describe the primary screen only, shows five swatches for the six-colour mode (`PixRepair.au3:620` against `:838`), and registers F11 as a hotkey for the whole process (`:515`). This section makes the locator cover the chosen monitor at its real size, the preview match the sequence, Esc exit from every colour and F11 work only while the tool is in front. No colour and no interval changes.",
+        "surface": {
+          "fidelity": "the Displays section and the locator, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16, in light and dark at 100 and 150 percent.",
+          "job": "what the tool shows matches what it does, on every monitor, and its keys stay inside it. Consumer: each connected monitor, and every other program on the machine.",
+          "treatment": "a list of monitors with their size and scale, a locator that fills the one chosen. Cheaper substitute that fails the checkpoint: changing the cycle to five colours to match the preview, which changes the frozen effect to fit a wrong picture."
+        },
+        "build": [
+          "List the monitors in `src/core/Displays.cpp` and show them in `src/ui/DisplaysView.cpp`. Done when: each connected monitor appears with its size and scale.",
+          "Prove non-interference. Done when: the parity check re-runs with zero differing fields."
+        ],
+        "items": [
+          "Enumerate the monitors in `src/core/Displays.cpp` with position, pixel size and scale. Done when: a test with a fake two-monitor layout returns both, and a real run lists every connected monitor.",
+          "Build the Displays screen in `src/ui/DisplaysView.cpp` and open the locator on the chosen monitor at its physical pixel size. Done when: on a 150 percent monitor the locator window equals the monitor's pixel size, with no gap and no overhang. Cheaper substitute: scaling by the primary monitor's scale, which is wrong on the second monitor.",
+          "Show the pattern swatches in cycle order from the same `src/core/Sequences.h` data the engine uses. Done when: the mode 2 row shows six swatches, red to cyan, and a test fails if a row and its sequence differ. Cheaper substitute: typing the swatches into the view, which is how the original drifted.",
+          "Close the locator on Esc from every colour, as the label promises (`reference/au3/shipped/Language/PixRepair/en.lng:70`). Done when: a driven run presses Esc on each of the eight colours and the locator closes each time.",
+          "Make F11 toggle full screen only while the tool's own window has focus. Done when: F11 sent to another program does nothing and F11 in the tool toggles, both driven. Cheaper substitute: keeping the process-wide hotkey and ignoring it when unfocused, which still takes the key from other programs.",
+          "Re-run the parity check and cover this in `tests/display_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L displays` passes and the parity check reports zero differing fields, quoted."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L displays` passes: six swatches in cycle order, Esc closes from every colour, F11 is inert outside the tool, and the parity check still reports zero.",
+        "commit": "feature: display corrections for monitors, swatches, Esc and F11"
+      },
+      {
+        "title": "Draggable Targeted Window",
+        "intro": "The AutoIt exercise window sits fixed at 100,100 and 100 by 100 pixels (`PixRepair.au3:826`), and the stuck pixel is rarely there. This section lets the user drag and resize that window over the pixel, on any monitor, with the same sequences and timing. Position and size are display geometry, not effect, so the cycle never pauses for a move.",
+        "surface": {
+          "fidelity": "the exercise window, against `DESIGN.md` section 2, in light and dark at 100 and 150 percent.",
+          "job": "a person parks the pattern over the stuck pixel instead of beside it. Consumer: the positioned window, and the pixel beneath it.",
+          "treatment": "drag by the window, resize by the edge, full screen still available from any position. Cheaper substitute that fails the checkpoint: preset positions, which land near the pixel on exactly one monitor layout."
+        },
+        "build": [
+          "Make the window movable and resizable in `src/ui/ExerciseWindow.cpp`. Done when: it can be dragged across two monitors while cycling.",
+          "Prove non-interference. Done when: the parity check re-runs with zero differing fields."
+        ],
+        "items": [
+          "Make the exercise window draggable by its body, using the framework's window dragging in `src/ui/ExerciseWindow.cpp`, starting at 100,100 and 100 by 100 as the original does. Done when: dragging across two monitors shows no pause in the colour changes, measured against `FrameAt`. Cheaper substitute: custom mouse-capture code, which the framework already provides.",
+          "Allow resizing by the edge down to a stated minimum size and keep the window topmost. Done when: a driven resize to the minimum and to the largest size keeps the cycle running, and the minimum is stated in `docs/inventory.md`.",
+          "Add a keyboard path to move and resize the window. Done when: arrow keys with a modifier move it and resize it with no mouse, and the position change is announced to a screen reader.",
+          "Keep the full-screen toggle working from any position and restore the previous position and size (`PixRepair.au3:807-820`). Done when: toggle on and off returns the window to where it was.",
+          "Cover it in `tests/window_move_test.cpp` and re-run the parity check. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L placement` passes and the parity check reports zero differing fields."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L placement` passes: a move and a resize across two monitors cycle without a pause, full screen restores the position, and the parity check still reports zero.",
+        "commit": "feature: a draggable, resizable exercise window"
+      },
+      {
+        "title": "Session Timer with Auto-Stop",
+        "intro": "The AutoIt exercise runs until its window is closed (`PixRepair.au3:851-871`), and nothing suggests or ends a duration. This section adds a session timer, 10 minutes by default as the origin plan sets, adjustable or off, shown as time left, with an automatic stop and a notice. The cycle's timing is untouched: only the session ends.",
+        "surface": {
+          "fidelity": "the Stop after row, the time left in the status bar and the completion notice, against `DESIGN.md` section 2.",
+          "job": "a person runs a bounded session and learns when it finished. Consumer: the time-left display and the notice.",
+          "treatment": "the default is shown, the user can change or turn it off, and an automatic stop always announces itself. Cheaper substitute that fails the checkpoint: a timer without an automatic stop, which shows elapsed time the user must still watch."
+        },
+        "build": [
+          "Add the session timer to `src/core/Session.cpp` and the Stop after row to `src/ui/RepairView.cpp`. Done when: a short session stops by itself.",
+          "Announce the stop through the framework's message surface. Done when: the notice and one Activity record appear."
+        ],
+        "items": [
+          "Implement `Session` in `src/core/Session.cpp` with a duration in minutes, default 10, and an off value, taking its time as an argument like the generator. Done when: a test with a fake clock stops the session at the duration and never stops it when off.",
+          "Add the Stop after row to `src/ui/RepairView.cpp` and show the time left in the status bar, in words. Done when: the status bar counts down during a run, and the row can be reached and changed by keyboard.",
+          "On auto-stop, close the exercise window, show a notice through the framework's message surface and write one Activity record, offering a restart. Done when: a short fixture session ends with the notice and exactly one record. Cheaper substitute: stopping silently, which leaves a user who looked away without an answer.",
+          "Keep the cycle's colours and interval identical while a session runs. Done when: the parity check re-runs with a session active and reports zero differing fields.",
+          "Cover it in `tests/session_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L session` passes, and fails when the auto-stop is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L session` passes: a short session stops with a notice and one record, off runs past the default, and the parity check still reports zero.",
+        "commit": "feature: a session timer that stops the run and says so"
+      }
+    ],
+    "no_reverse": "the tool changes nothing on the system: it only draws in its own window, and closing the window is the whole reverse",
+    "verification": [
+      "A walk of `reference/au3/src/PixRepair.au3` finds every piece in `docs/inventory.md` with its home.",
+      "The parity check reports zero differing fields for the seven sequences, the locator cycle and the timing, with each enhancement on.",
+      "On a real machine the tool starts, cycles, stops, is placed over a pixel and stops on its timer, on two monitors, in light and dark, by keyboard alone."
+    ]
+  }
+}

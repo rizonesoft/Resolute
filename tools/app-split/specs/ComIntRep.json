@@ -1,0 +1,269 @@
+{
+  "name": "ComIntRep",
+  "slug": "comintrep",
+  "display": "ComIntRep",
+  "job": "it repairs Windows internet and network connectivity in one pass (Winsock, TCP/IP, DNS, proxy, firewall, hosts, Windows Update and more), checks that each repair worked and can put back what it can.",
+  "tagline": "Repair your internet connection in one pass, and put it back",
+  "frozen": true,
+  "elevated": true,
+  "au3": [
+    "ComIntRep"
+  ],
+  "hue": {
+    "name": "Blue",
+    "light": "#60A5FA",
+    "dark": "#2563EB",
+    "social_ground": "#0F1B33",
+    "social_muted": "#C7D7F5"
+  },
+  "icon": {
+    "idea": "Signal arcs rising over a dot: a connection that is back.",
+    "points": [
+      "Free-standing, with no tile behind it, and every end of every arc rounded.",
+      "The outer arc is Blue light; the inner arc and the dot are Blue.",
+      "Below 40 pixels the drawing drops to one arc and a larger dot."
+    ],
+    "large": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M15 46 A36 36 0 0 1 81 46\" stroke=\"#60A5FA\" stroke-width=\"11\"/><path d=\"M29 60 A21 21 0 0 1 67 60\" stroke=\"#2563EB\" stroke-width=\"11\"/></g><circle cx=\"48\" cy=\"76\" r=\"8\" fill=\"#2563EB\"/>",
+    "small": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M17 50 A34 34 0 0 1 79 50\" stroke=\"#2563EB\" stroke-width=\"14\"/></g><circle cx=\"48\" cy=\"72\" r=\"11\" fill=\"#60A5FA\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Repairs",
+        "The fourteen repairs, each with a checkbox, its state and what it will do"
+      ],
+      [
+        "Diagnose",
+        "The Windows troubleshooters, the four exports and the Event Viewer, launched from one place"
+      ],
+      [
+        "History",
+        "Past runs with each repair's outcome, and the one restorable run"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person selects the repairs a connection problem needs, runs them in one pass and sees which ones worked.",
+    "primary": "Repair selected, which becomes Stop while it runs",
+    "secondary": "Undo last run",
+    "rows": [
+      [
+        "Reset Internet Protocols (TCP/IP)",
+        "Ready, Running, Verified or Failed"
+      ],
+      [
+        "Repair Winsock (Reset Catalog)",
+        "Ready, Running, Verified, or Restart needed"
+      ],
+      [
+        "Flush DNS Resolver Cache",
+        "Ready, Running, Verified or Failed"
+      ],
+      [
+        "Reset Proxy Server Configuration",
+        "Ready, Running, Already correct or Failed"
+      ],
+      [
+        "Restore the default hosts file",
+        "Ready, Running, Verified or Failed"
+      ]
+    ],
+    "status": "14 of 14 selected, restart needed for Winsock",
+    "notes": [
+      "Each repair is one row with a checkbox, its name from the English pack and a state shown as an icon and a word (Ready, Running, Verified, Already correct, Skipped, Refused, Failed, Restart needed), never by colour alone.",
+      "The primary action in the header reads Repair selected and turns into Stop while a run is in progress; with nothing selected it is disabled and its tooltip says why.",
+      "Selecting a row shows its explanation (the `Info_02` to `Info_15` texts) beside the list, and the selection is remembered between runs as `[Selection]` was.",
+      "Undo last run sits beside the primary action; it is disabled with a tooltip until a run has recorded something it can put back.",
+      "Options that the AutoIt window kept in its Preferences dialog (export the IP configuration before a TCP/IP reset, restore-point offer, completion chime) are the tool's own page inside Settings.",
+      "The status bar says in words how many repairs are selected and what the last run found, and it is announced to screen readers when it changes.",
+      "A restart is never forced: when Winsock was reset the tool asks once, the choice is yes or no, and the answer is logged.",
+      "When the process is not elevated the primary action refuses by name before any command runs, and the list stays as it was."
+    ],
+    "cut": "The AutoIt window had five menus (File, Maintenance, Troubleshoot, Tools, Help), a splash image, a spinning Process animation and a Globe update animation, a bar of per-repair progress strips, a log pane under the list with a show and hide toggle, an extender button, a Donate dialog and strip with a Help menu item, a Welcome sound on start, and three Tools items whose functions are never called. This window has none of them: the menu items that did something useful moved into Diagnose and Settings, progress is a state word on each row, the log is the Activity section, and the donate strip, splash and animations are cut. Each cut is recorded with its reason in `docs/inventory.md`."
+  },
+  "readme": {
+    "lead": "ComIntRep repairs Windows internet and network connectivity in one pass, then checks that each repair worked.",
+    "what": [
+      "It runs the repairs that fix most connection trouble: it resets TCP/IP and the Winsock catalog, renews the IP lease, flushes the DNS and ARP caches, resets the proxy and the firewall, restores the default hosts file, repairs Windows Update and the cryptography services, and makes network computers visible again. You tick the ones you need and press one button.",
+      "It also launches the Windows network troubleshooters, exports the IP, Winsock, ARP and NetBIOS state to files, and keeps a readable record of every run."
+    ],
+    "new_intro": "The C++ version runs the same fourteen repairs with the same commands, and adds what the AutoIt version could not do.",
+    "new": [
+      [
+        "It checks each repair.",
+        "After a repair runs, the tool reads the repaired state back and reports verified, already correct or failed, instead of trusting that a command ran."
+      ],
+      [
+        "It offers a restore point first.",
+        "Before the first repair of a run it offers to create a System Restore point, and you can decline for good."
+      ],
+      [
+        "It can undo.",
+        "The hosts file, the service start modes and the moved Windows Update folders are recorded before a run, and Undo last run puts them back."
+      ],
+      [
+        "It is one small executable.",
+        "It is a single statically linked program with the suite's window, themes and settings, and no runtime to install."
+      ]
+    ]
+  },
+  "reference": {
+    "note": "`src/ComIntRep.au3` is 3,459 lines and dispatches 14 repairs (`_ProcessSelectedOption`, `ComIntRep.au3:1636-1665`) through hidden `cmd.exe` commands. `shipped/Language/ComIntRep/` holds 16 packs: af, ar, de, el, en, es, fr, hu, it, ko, pt-BR, ru, sl, tr, zh-CN and zh-TW. `dist/ComIntRep_6508.zip` is build 6508."
+  },
+  "plan": {
+    "scope": "The whole port: build, baseline, engine, parity, window, features, release",
+    "goal": "ComIntRep ships as a complete, standalone C++ tool: it runs the same 14 repairs with exactly the commands, writes and service changes the AutoIt version has, proven by a parity check, verifies each repair by reading the repaired state, offers a restore point before repairing, and can put back what a run changed where that is possible.",
+    "current_state": "Nothing exists in C++. The repository holds the AutoIt original under `reference/au3/` (`src/ComIntRep.au3`, 3,459 lines, with its `.sni` and a two-section `.ini`), the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The original dispatches 14 repairs (`ComIntRep.au3:1636-1665`) by running hidden `cmd.exe` commands through one wrapper (`_RunCommand`, `:2801`) and streaming their output to a log. It has five menus (`:618-623`), a four-tab Preferences dialog (`:2881`), a Singleton guard (`:510`), splash and animations, two sounds, a donate strip, 16 language packs and doc templates. It has no `#RequireAdmin` and no admin check: a non-elevated run fails inside the commands. Nothing checks that a repair worked, and only some repairs keep a backup. The SDK's framework and repair contract, which the port consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`reference/au3/src/ComIntRep.au3`: the tool being ported, and `reference/au3/src/ComIntRep.sni`, which lists what ships with it.",
+      "`reference/au3/shipped/Language/ComIntRep/en.lng`: the English pack (UTF-16); its `[Custom]` section names the 14 repairs and holds `Info_01` to `Info_15`, and `[Messages2]` narrates each repair.",
+      "`reference/au3/dist/ComIntRep_6508.zip`: the shipped build 6508 the baseline and the parity check run."
+    ],
+    "outcome": [
+      "`ComIntRep.exe` runs the 14 repairs with commands, writes and service changes identical to the AutoIt original's, including both `sc sdset` strings and the hosts file bytes, proven by the parity check.",
+      "Every repair reads back its result and reports verified, already correct or failed by name; a restore point is offered before repairing; hosts, service modes and moved folders can be put back, and the repairs with no reverse say so.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, 16 packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Repairs screen, where a person selects what the connection needs. Reporting and audit are the Activity section, which is the record of every command a run issued and each outcome. Settings are the framework's pages plus the tool's own options page. Permissions anchor on the engine, where an unelevated run is refused by name before any command. Reverse anchors on the undo enhancement, which the original never had.",
+    "baseline_items": [
+      "On a disposable virtual machine, snapshot the registry keys, the three service configurations (`wuauserv`, `bits`, `CryptSvc`, `FDResPub`), the hosts file and the Windows Update folders, run `ComIntRep.exe` from `reference/au3/dist/ComIntRep_6508.zip` elevated with all 14 repairs selected, and snapshot again. Done when: `docs/baseline/all-repairs.json` lists every value, file and service setting that differs, and `docs/baseline/commands.txt` lists every command line the run issued, in order, captured with a process monitor.",
+      "Run each repair alone from a fresh snapshot, so its own effect is separable. Done when: `docs/baseline/repair-01.json` to `docs/baseline/repair-14.json` exist, one per repair, each naming the dispatch index (`ComIntRep.au3:1640-1665`) it came from.",
+      "Repeat the TCP/IP repair with the IP export setting off. Done when: `docs/baseline/repair-01-noexport.json` shows that `BackupIPData` (`ComIntRep.au3:1680-1682`) only gates the export file and changes no repair command."
+    ],
+    "inventory_items": [
+      "Record the windows and controls in `docs/inventory.md`: the main window (`ComIntRep.au3:613`), Select All (`:775`), the 14 checkboxes built in a loop (`:784`), the extender (`:811`), the Go button (`:814`), the info pane (`:838`), the five menus (`:618-623`) with every item, the donate strip and animations, and the Preferences dialog (`:2881`) with its four tabs. Done when: every control-creation call in the file is listed with its window and purpose, and each is marked kept in a named section or cut.",
+      "Record the strings: the `[Custom]` keys for the 14 repair names and `Info_01` to `Info_15` (with the typos `becuase` in `Info_03` and the `Info_06` prose quoted for correction), `[Messages2]`, the menu and Preferences strings, and the hardcoded SDDL and hosts text. Done when: every string names its pack key or says why it is hardcoded.",
+      "Record the behaviours: each of the 14 repairs with its command lines, areas touched and reversibility (`_ResetTCPIP` `:1676`, `_RepairWinsock` `:1705`, `_ReleaseRenewIP` `:1740`, `_FlushReDNS` `:1766`, `_FlushARPCache` `:1782`, `_RepairInternetExplorer` `:1794`, `_ClearUpdateHistory` `:2119`, `_RepairWindowsUpdate` `:2150`, `_RepairCryptography` `:2336`, `_ResetProxyServer` `:2402`, `_ResetFirewall` `:2433`, `_RestoreWindowsHosts` `:2463`, `_RenewWinsClient` `:2530`, `_MakeNetComputersVisible` `:2545`), the wrapper `_RunCommand` (`:2801`), the reboot prompts (`:2703`, `:2727`) and the missing elevation request. Done when: every `_RunCommand` call and file or registry write in the file is listed and the command sequence is stated as the freeze scope.",
+      "Record settings, logging, update, sounds and the `.sni` ship list, and the dead code to cut (`_RepairNeroUpdate` `:2287`, `_RepairWorkGroups` `:1482`, `_InstallIP6` `:1464`, `_UnInstallIP6` `:1473`, and the Windows XP and 2003 branches). Done when: every `.ini` key (`PortableEdition`, `Selection` 0 to 13, `BackupIPData`, `BackupData`), log line, sound (`Welcome.wav` `:855`, `Complete.wav` `:2640`) and shipped file is marked keep, cut or remapped."
+    ],
+    "engine": {
+      "title": "Repair Engine",
+      "intro": "The tool's core: the 14 repairs declared as data, each with how it is diagnosed, what it runs, how its result is verified and whether it can be reversed, and a run loop that executes the selected ones through the SDK's repair contract. The commands, their order, the two Windows Update `sc sdset` strings and the hosts file text are the AutoIt original's, exactly. The repair contract is planned in Resolute-SDK and not built, so the loop is written against its interface and tested with a fake runner.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the 14 repairs as data in `src/core/Repairs.h`. Done when: each repair states its commands, verification read and reversibility once, with the line of `ComIntRep.au3` each comes from.",
+        "Implement the command runner and the run loop in `src/core/Engine.cpp` against a runner the tests can replace. Done when: the unit tests pass with a recording fake that checks the issued command order."
+      ],
+      "items": [
+        "Declare in `src/core/Repairs.h` the 14 repairs in dispatch order (`ComIntRep.au3:1640-1665`), each with its ordered command lines, a diagnose read, a verify read and a reversible flag. Done when: a test compares every command line with `docs/baseline/commands.txt`. Cheaper substitute: declaring names without commands, which plans fourteen titles instead of fourteen behaviours.",
+        "Implement `RunCommand` in `src/core/CommandRunner.cpp`: hidden `cmd.exe /c`, merged output streamed line by line to the activity record, working directory the system directory, as `_RunCommand` does (`ComIntRep.au3:2801`). Done when: a test runs `cmd /c echo` and sees the line recorded. Cheaper substitute: `system()`, which opens a console window and returns no output.",
+        "Implement the Windows Update repair as data in `src/core/Repairs.h`: the service stops, both `sc sdset` strings verbatim (`ComIntRep.au3:2175`, `:2179`), the service configs, the DLL registrations, `fsutil`, `bitsadmin` and `wuauclt /detectnow` (`:2150-2278`). Done when: a test compares the sequence and both SDDL strings byte for byte with the baseline. Cheaper substitute: retyping the SDDL strings from memory or normalising them.",
+        "Implement the hosts file repair in `src/core/Repairs.cpp`: clear attributes, copy to `hosts.bak`, rewrite the default text exactly as written (`ComIntRep.au3:2463-2528`), and fix the open check that tests the path instead of the handle (`:2480`). Done when: a test against a temporary directory produces a file identical to the baseline's, and a failed open is reported as a failure. Cheaper substitute: shelling out to `copy`, which cannot be pointed at a temporary directory for a test.",
+        "Implement `RunSelected` in `src/core/Engine.cpp`: run the selected repairs in order, record one activity entry per command and per repair, report a restart need after Winsock (`ComIntRep.au3:1705-1737`) and honour Stop between repairs. Done when: a test with the fake runner issues the selected repairs' commands in dispatch order and none for unselected ones.",
+        "Refuse `RunSelected` by name when the process is not elevated, before any command, with one activity record. Done when: an unelevated test run reports the refusal and the fake runner saw no command. Cheaper substitute: letting the commands fail with access denied halfway through, which is what the original does.",
+        "Persist the selection of repairs 0 to 13 and the IP export option (`BackupIPData`, `ComIntRep.au3:1214-1215`, `:1680-1682`) through the framework's settings, and carry the `[Selection]` keys of an existing `.ini`. Done when: a fixture `.ini` loads the same selection and the export runs before the TCP/IP reset only when the option is on.",
+        "Cover every path in `tests/engine_test.cpp` with the fake runner and a temporary directory. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when one command in `Repairs.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, including the command order, the SDDL strings, the hosts bytes and the unelevated refusal, and fails when one declared command is changed.",
+      "commit": "core: the 14 repairs as data, run through one engine, refused when unelevated"
+    },
+    "parity_items": [
+      "Add `tests/fixtures/baseline/` as a copy step from `docs/baseline/` at configure time. Done when: the parity test reads the committed baseline and no path is typed into a tracked build file.",
+      "Compare the command log and the end state for all 14 repairs. Done when: the test covers `all-repairs.json`, `commands.txt` and each `repair-NN.json`, and lists the difference by repair and field."
+    ],
+    "enhancements": [
+      {
+        "title": "Verified Repair Outcomes",
+        "intro": "The AutoIt tool runs each command and logs what it printed; nothing checks that the repair worked. After each repair the tool now reads the repaired state (a service query, a registry value, a file, a command probe) and reports verified, already correct or failed with the reason. These are reads and a display, so the repairs' effect is unchanged.",
+        "surface": {
+          "fidelity": "the per-repair outcome on each row and in the History section, against `sdk/DESIGN.md` section 11.",
+          "job": "a person knows which repairs worked, not only which ran. Consumer: the row state and the activity record.",
+          "treatment": "an outcome word with an icon on each row and its reason in History. Cheaper substitute that fails the checkpoint: marking success from exit code zero, which proves the command ran and not that the repair worked."
+        },
+        "build": [
+          "Declare each repair's verification read in `src/core/Repairs.h` and run it in `src/core/Verify.cpp`. Done when: all 14 repairs name a read and a pass rule.",
+          "Show the outcome on each row in `src/ui/RepairsView.cpp`. Done when: a fixture exercising every outcome renders each correctly."
+        ],
+        "items": [
+          "Implement `Verify` for each of the 14 repairs in `src/core/Verify.cpp`, reading state: a service start mode for `wuauserv`, `bits`, `CryptSvc` and `FDResPub`, the hosts file's content, the proxy setting, the firewall profile state, and a command probe for the cache flushes. Done when: each read fails on a fixture where its repair was reverted, asserted per repair. Cheaper substitute: re-reading the command's output.",
+          "Report the outcomes verified, already correct, skipped, refused and failed with a reason, each with its text and pack key. Done when: a fixture exercising all five renders each outcome on its row and in `src/ui/HistoryView.cpp`.",
+          "Treat the Winsock repair as verified only for its catalog reset and report Restart needed separately (`ComIntRep.au3:1705-1737`). Done when: a fixture shows Restart needed beside the verified result, not instead of it.",
+          "Cover it in `tests/verify_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L verify` passes, and fails when a repair's read is replaced by an exit code check."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L verify` passes: all 14 reads fail on a reverted fixture and the five outcomes render, and the parity check re-runs with zero differing fields.",
+        "commit": "feature: each repair verified by reading its result"
+      },
+      {
+        "title": "Restore Point Before Repairing",
+        "intro": "The AutoIt text `Info_01` recommends a System Restore point but offers nothing: the Maintenance menu only opens the System Protection dialog (`ComIntRep.au3:1396-1398`). The tool now offers to create one before the first repair of a run, with a do-not-ask-again choice, and never blocks the repairs on the answer.",
+        "surface": {
+          "fidelity": "the offer shown before a run, through the framework's message surface, against `sdk/DESIGN.md` section 11.",
+          "job": "a person is one click from a rollback before any repair runs. Consumer: the restore point, read back to confirm it exists.",
+          "treatment": "a message naming what it will create and how to stop being asked, with the outcome reported by name. Cheaper substitute that fails the checkpoint: creating the point silently, which spends minutes and disk on a choice the person never made."
+        },
+        "build": [
+          "Create and confirm a restore point in `src/core/RestorePoint.cpp`. Done when: a created point is listed afterwards by name.",
+          "Offer it before a run in `src/ui/RepairsView.cpp`. Done when: accept creates it, decline runs the repairs, and the choice persists."
+        ],
+        "items": [
+          "Implement `CreateRestorePoint` in `src/core/RestorePoint.cpp` and confirm by listing the points afterwards. Done when: a test on a disposable machine finds the new point by its description. Cheaper substitute: opening `systempropertiesprotection` as the original does, which creates nothing.",
+          "Show the offer once per run through the framework message surface with Create, Skip and Do not ask again. Done when: Create makes a verified point, Skip runs the repairs, and Do not ask again is read back from the settings file.",
+          "Report a failed or throttled creation by name and run the repairs anyway. Done when: a fixture where creation fails shows one activity entry and the run proceeds.",
+          "Cover it in `tests/restorepoint_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restorepoint` passes, and fails when the confirmation read is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restorepoint` passes for accept, decline, do-not-ask-again and failed creation, and the parity check re-runs with the offer declined and zero differing fields.",
+        "commit": "feature: offer a restore point before the first repair"
+      },
+      {
+        "title": "Undo the Last Run",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "The original keeps a backup for only some repairs: the hosts file as `hosts.bak` (`ComIntRep.au3:2463-2528`), the Windows Update folders through `BackupRemoveDirectory` (`:2119-2147`, `:2336-2400`) and the IP export (`:1680-1682`). Before a run the tool now records the prior state of the hosts file, the service start modes it changes and the folders it moves, and Undo last run restores what was there. The record and the undo are the SDK repair contract's, which this section consumes once it exists. The netsh resets, the cache flushes and the DLL registrations have no reverse, and the History section says so for each.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back what the last run changed where that can be done. Consumer: the hosts file, the services and the folders, compared with the record.",
+          "treatment": "the recorded state restored item by item, with each repair that has no reverse named as such. Cheaper substitute that fails the checkpoint: an undo that reruns the repairs or deletes the backups, which is not what was there before."
+        },
+        "build": [
+          "Record the prior state through the repair contract in `src/core/Engine.cpp`. Done when: a record exists on disk before the first command of a run.",
+          "Wire Undo in `src/ui/HistoryView.cpp` and `src/ui/RepairsView.cpp`. Done when: run then undo leaves the hosts file, the service modes and the folders as they were."
+        ],
+        "items": [
+          "Record before any command the hosts file content and attributes, the start mode and state of `wuauserv`, `bits`, `CryptSvc` and `FDResPub`, and the existence of the folders `BackupRemoveDirectory` moves, through the repair contract's restore record. Done when: a test finds the record on disk before the first command runs. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record item by item. Done when: a fixture run of the hosts, Windows Update and cryptography repairs followed by Undo leaves the three items equal to before, asserted.",
+          "Mark each of the other repairs (TCP/IP, Winsock, firewall, proxy, WINS, ARP, DNS, Internet Explorer) as having no reverse in History with a one-line reason. Done when: History shows the statement for each after a run.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after a run that recorded something.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one item is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: run then undo leaves the hosts file, the service modes and the moved folders as they were.",
+        "commit": "feature: undo puts back the hosts file, services and folders"
+      },
+      {
+        "title": "Opt-In Completion Chime",
+        "intro": "The AutoIt tool plays `Welcome.wav` on start (`ComIntRep.au3:855`) and `Complete.wav` on finish (`:2640`) with no way to turn either off. The start sound is cut. The finish sound returns as an option that is off by default, played only after a run, with the status announced either way.",
+        "surface": {
+          "fidelity": "the option on the tool's Settings page and the played chime, against `sdk/DESIGN.md`.",
+          "job": "a person running a long repair hears it finish without watching. Consumer: the played sound and the announced status.",
+          "treatment": "off by default, chosen in Settings, never played on first run unasked. Cheaper substitute that fails the checkpoint: on by default with a mute, which is autoplay with an extra step."
+        },
+        "build": [
+          "Declare the option in `src/ui/SettingsView.cpp` and play the shipped sound in `src/core/Chime.cpp`. Done when: the option defaults off and survives a restart.",
+          "Call it once at the end of a run. Done when: off plays nothing and on plays once."
+        ],
+        "items": [
+          "Embed `Complete.wav` from `reference/au3/shipped/` as a resource and play it from `src/core/Chime.cpp`. Done when: a test with a recording player sees one play at the end of a run with the option on and none with it off.",
+          "Announce the run's status to screen readers whether or not the chime is on. Done when: a driven test reads the announcement in both cases.",
+          "Cover it in `tests/chime_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L chime` passes, and fails when the chime plays at start."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L chime` passes: off plays nothing, on plays once at the end, and the announcement fires both ways.",
+        "commit": "feature: opt-in completion chime, off by default"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A walk of `reference/au3/src/ComIntRep.au3` finds every piece in `docs/inventory.md` with its home, and every `_RunCommand` call in a declared repair.",
+      "The parity check reports zero differing fields against the shipped AutoIt build 6508 for all 14 repairs, including both SDDL strings and the hosts file bytes.",
+      "On a real machine the tool repairs, verifies, offers a restore point, undoes what can be undone and refuses when unelevated, in light and dark, by keyboard alone."
+    ]
+  }
+}

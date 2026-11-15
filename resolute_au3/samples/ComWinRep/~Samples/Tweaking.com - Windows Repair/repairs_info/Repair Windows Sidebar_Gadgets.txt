@@ -1,4 +1,0 @@
-Repair Windows Sidebar/Gadgets:
-
-This will help get the sidebar working again if it fails to run, or if some gadgets that once worked no longer work. (Such as gadgets with just a white background)
-

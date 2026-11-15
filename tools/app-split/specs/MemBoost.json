@@ -1,0 +1,280 @@
+{
+  "name": "MemBoost",
+  "slug": "memboost",
+  "display": "MemBoost",
+  "job": "it frees physical memory by trimming the working sets of running processes, on demand or on a schedule, and reports what each trim gave back.",
+  "tagline": "Free up memory, and see what each trim gave back",
+  "frozen": false,
+  "elevated": false,
+  "au3": [
+    "MemBoost"
+  ],
+  "hue": {
+    "name": "Sky",
+    "light": "#38BDF8",
+    "dark": "#0284C7",
+    "extra": [
+      [
+        "Lime",
+        "#A3E635",
+        "The needle"
+      ]
+    ],
+    "social_ground": "#0C2233",
+    "social_muted": "#C2E3F5"
+  },
+  "icon": {
+    "idea": "A gauge with its needle brought down.",
+    "points": [
+      "Free-standing, with no tile: a half-round dial with rounded ends.",
+      "The dial is Sky, with its first part in Sky light; the needle and its hub are Lime.",
+      "The small drawing, used below 40 pixels, has a thicker dial and needle and no second tone."
+    ],
+    "large": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M14 66 A34 34 0 0 1 82 66\" stroke=\"#0284C7\" stroke-width=\"14\"/><path d=\"M14 66 A34 34 0 0 1 31 36.6\" stroke=\"#38BDF8\" stroke-width=\"14\"/></g><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M48 66 L67 41\" stroke=\"#A3E635\" stroke-width=\"8\"/></g><circle cx=\"48\" cy=\"66\" r=\"8\" fill=\"#A3E635\"/>",
+    "small": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M16 68 A32 32 0 0 1 80 68\" stroke=\"#0284C7\" stroke-width=\"17\"/></g><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M48 68 L64 46\" stroke=\"#A3E635\" stroke-width=\"11\"/></g><circle cx=\"48\" cy=\"68\" r=\"10\" fill=\"#A3E635\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Overview",
+        "Memory in use, its graph, Trim now and the last trim's result"
+      ],
+      [
+        "Processes",
+        "Each process the last trim touched, what it gave back, what was skipped"
+      ],
+      [
+        "Exclusions",
+        "The processes never trimmed, and the optional only-list"
+      ],
+      [
+        "Schedule",
+        "How trims start: on demand, on an interval, or when memory runs high"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees how much memory is in use, trims it with one button and reads what the trim gave back.",
+    "primary": "Trim now",
+    "secondary": "Exclusions",
+    "rows": [
+      [
+        "Memory in use",
+        "Percent and gigabytes of physical memory in use"
+      ],
+      [
+        "Last trim",
+        "When it ran, what started it, how many processes and how much memory came back, or Not run yet"
+      ],
+      [
+        "Next scheduled trim",
+        "Seconds left, Waiting for high load, or Off"
+      ],
+      [
+        "Processes excluded",
+        "A count, or None"
+      ]
+    ],
+    "status": "Last trim freed memory, next trim due",
+    "notes": [
+      "The top of the screen shows physical memory in use, as a percentage and in gigabytes, read from the system once a second.",
+      "Under it, a graph of memory in use over time. Each trim is marked on the graph at the moment it ran. The graph is the SDK's chart control, fed from a bounded series the tool keeps in memory.",
+      "Trim now is the accent button. While a trim runs it is disabled and the status bar says a trim is running; a second press cannot start a second trim.",
+      "The last trim's result sits under the graph: what started it (Trim now, the interval or the threshold), how many processes were trimmed, how many were skipped, and how much memory came back, measured before and after.",
+      "Next scheduled trim reads from the Schedule setting: the seconds left in interval mode, a plain statement in threshold mode, Off when the tool only trims on demand.",
+      "Processes excluded shows the count from the Exclusions list and opens it from the Exclusions button."
+    ],
+    "cut": "The AutoIt window had File and Help menus (`MemBoost.au3:708-742`), three stat groups with drawn progress bars and peak bars for committed memory and CPU (`:1148`, `:1160`), cached and kernel pool labels (`:1132-1144`), a status icon swapped with the load (`:1089`), a donate strip with hover icons and a donate dialog on exit (`:543-544`, `:1232-1245`, `:1770-1774`), a splash (`:664-683`), update and processing animations (`:416-417`), a minimise-to-tray flow with a tray menu (`:1805-1830`, `:1878`), an Escape hotkey that minimises (`:692`) and a topmost Preferences dialog of four tabs (`:1953`). None of these is in this window. The menus, splash, animations, donate strip, drawn bars and the committed, CPU and pool panels are cut; settings and About are the framework's pages. The tray icon is not part of the window and is decided in `docs/inventory.md`. Every cut is recorded in the plan with its reason."
+  },
+  "readme": {
+    "lead": "MemBoost frees physical memory by trimming the working sets of running processes, and tells you what each trim gave back.",
+    "what": [
+      "A trim asks Windows to shrink the working set of each running process, so pages a program is not using go back to the system. You can trim on demand, on a timer, or when memory use is high and still rising.",
+      "Windows refills working sets as programs run, so a trim is a one-off relief, not a permanent change. That is why MemBoost shows the result of every trim next to a graph of memory in use, and why there is nothing to undo."
+    ],
+    "new_intro": "The C++ version keeps what the AutoIt tool did and adds four things.",
+    "new": [
+      [
+        "A memory graph.",
+        "The Overview screen draws memory in use over time and marks every trim on it, so you can see whether a trim helped and for how long."
+      ],
+      [
+        "A report for each trim.",
+        "Every trim lists each process it trimmed or skipped, with the memory each one gave back, instead of a single count."
+      ],
+      [
+        "An exclusion list you can edit.",
+        "Games, virtual machines and audio tools can be left alone; the AutoIt tool had an exclusion list in its code that nothing could fill."
+      ],
+      [
+        "An only-list mode.",
+        "On a shared or locked-down machine you can limit trimming to the processes you name."
+      ]
+    ]
+  },
+  "reference": {
+    "note": "The AutoIt tool is one 2,625-line script, `src/MemBoost.au3`, with its build descriptor `src/MemBoost.sni`. Its `local/` folder holds loose executables and logs, not a distribution zip; the two sound files it plays are `.mp3` paths that the `.sni` ship list (which names `.wav` files) never delivers."
+  },
+  "plan": {
+    "scope": "The whole port: baseline, trim engine, window, graph, release",
+    "goal": "MemBoost ships as a complete, standalone C++ tool: it trims the working sets of running processes on demand, on an interval and on a high-and-rising memory threshold, skipping the same processes the AutoIt original skips, and reports for every trim what was trimmed, what was skipped and how much memory came back, with a graph of memory in use over time, an editable exclusion list and an only-list mode.",
+    "current_state": "Nothing exists in C++. The repository holds the AutoIt original under `reference/au3/` (`src/MemBoost.au3`, 2,625 lines; `src/MemBoost.ini`, 36 lines; `src/MemBoost.sni`, 65 lines, whose ship list names 13 files), the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The original trims every process except its own and any matching an exclusion array that nothing fills (`MemBoost.au3:469`, `:1563-1606`), by calling `_WinAPI_EmptyWorkingSet` and ignoring its result (`:1578`), reports only a processed count (`:1613`), starts a trim from a button or tray item, from a countdown (`:1682-1702`) or when load is above 90 and rising (`:1670`, `:1717-1731`), and already draws a memory graph that marks no trims (`:763`, `:1151`). It writes no log line for a trim. The SDK's framework and its chart control are planned in Resolute-SDK and not built; the plan sections that consume them wait on `sdk-framework`.",
+    "inputs": [
+      "`reference/au3/src/MemBoost.au3`: the tool being ported, and `reference/au3/src/MemBoost.sni`, which lists what ships with it.",
+      "`reference/au3/shipped/Language/MemBoost/en.lng` and `reference/au3/shipped/MemBoost.ini`: the only language pack (UTF-16) and the settings file an installed copy carries.",
+      "`reference/au3/local/MemBoost_X64.exe`: the shipped build the baseline and the parity check run (untracked; there is no `dist/` folder)."
+    ],
+    "outcome": [
+      "`MemBoost.exe` trims with the same skip rules and the same three triggers as the AutoIt original, proven by the parity check, and every trim returns a measured result.",
+      "The Overview screen shows memory in use, its graph with each trim marked, Trim now and the last trim's result; the Processes, Exclusions and Schedule screens work behind it.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Processes screen, reached from the first screen, where a person sees what a trim touched and skipped. Reporting and audit are the Activity section, one line per trim. Settings are the framework's pages. Permissions do not apply: a process the tool may not open is skipped and reported by name, so no action needs a right the user lacks. Reverse does not apply: a trim asks Windows to shrink working sets, which refill by themselves, so there is nothing to put back.",
+    "baseline_items": [
+      "Start a fixture of helper processes that each hold a known amount of memory, run `reference/au3/local/MemBoost_X64.exe`, press Optimize Memory once, and record each helper's working set before and after, plus the processed count shown in the status line (`MemBoost.au3:1613`). Done when: `docs/baseline/trim-manual.json` lists every helper with its before and after working set and the count shown.",
+      "Set `AutoOptimize=2` with `AutoOptimizeSeconds=5` and then `AutoOptimize=1` in a copy of `reference/au3/shipped/MemBoost.ini`, run each mode against the fixture, and record when trims fired and what started them (`MemBoost.au3:1659-1714`). Done when: `docs/baseline/trim-timer.json` and `docs/baseline/trim-intelligent.json` record the trim times against the clock and the memory load that preceded each.",
+      "Repeat the manual trim with `ForceBehave=1` and a helper started above Normal priority. Done when: `docs/baseline/trim-forcebehave.json` shows the helper's priority before and after (`MemBoost.au3:1582-1587`)."
+    ],
+    "inventory_items": [
+      "Record the windows and controls in `docs/inventory.md`: the main window (`MemBoost.au3:702`), its menus (`:708-742`), the three buttons (`:980-986`), the stat groups and bars (`:1060-1160`), the graph (`:763`), the donate strip (`:543-544`), the splash (`:664-683`), the tray menu (`:1805-1830`) and the Preferences dialog (`:1953`) with its mode radios and interval list (`:1964-1971`). Done when: every control-creation call in the file is listed with its window and its verdict (a section of the new window, the framework, or cut).",
+      "Record the strings: the pack sections read, the English text hardcoded in the buttons (`:980-986`), the tray items (`:1811-1817`, including the name \"Memory Booster\"), the completion notification (`:1619`) and the mode radios (`:1966-1971`). Done when: every string names its pack key or says why it is hardcoded and what replaces it.",
+      "Record the behaviours: the trim loop (`:1518-1656`), the manual and automatic flag and its reset (`:1527-1532`, `:1654`), the three triggers, the warning counter (`:1163-1173`), the CPU sampling (`:1178`), the `ForceBehave` demotion (`:1582-1587`), the startup shortcut (`:2402-2410`), the own-process trim (`:1735-1741`), the `.mp3` sound paths (`:1169`, `:1624`) that the `.sni` never ships, the `ConsoleWrite(\"DEBUG:` lines and the comment at `:1577` that says idle processes while all are trimmed. Done when: every system call in the file is listed, and the two system changes (the startup shortcut and the priority demotion) each carry a reverse or an honest no-reverse statement.",
+      "Record settings, logging, update and the ship list: the eleven tool keys of `reference/au3/src/MemBoost.ini` (`AutoOptimize` to `StartMinimized`) with their defaults, the `.sni` `[Distribute]` list (the four `.ani` files and two `.wav` files among them) and the absence of any trim log. Done when: every `.ini` key and every shipped file is marked keep, cut or remapped."
+    ],
+    "engine": {
+      "title": "Working-Set Trim and Triggers",
+      "intro": "The tool's core: which processes are trimmed, the Windows call that trims them, what is skipped, the three ways a trim starts and the measurement that makes every trim report what it returned. The skip rules and the triggers are the AutoIt original's; the measurement is new, because the original reported only a count.",
+      "needs": "windows-host",
+      "build": [
+        "Write the trim, its skip rules and its result record in `src/core/Trim.cpp`. Done when: a trim of a helper process lowers its working set and returns a result naming it.",
+        "Write the three triggers and the memory measurement in `src/core/Triggers.cpp` and `src/core/Memory.cpp`. Done when: each trigger starts a trim under test and the result states the memory before and after."
+      ],
+      "items": [
+        "Implement `TrimProcess` in `src/core/Trim.cpp`: open the process for quota and query rights, call `EmptyWorkingSet` (the call behind `_WinAPI_EmptyWorkingSet`, `MemBoost.au3:1578`) and return trimmed, or skipped with the reason when it cannot be opened. Done when: a test trims a helper process and its working set drops, and a protected process is returned as skipped by name. Cheaper substitute: ignoring the call's result as `MemBoost.au3:1578` does, which counts a process as trimmed that was never touched.",
+        "Implement `TrimAll` in `src/core/Trim.cpp`: take a snapshot of running processes, skip the tool's own process id (`MemBoost.au3:1565`) and any process whose name contains an entry of the exclusion list, case-insensitively (`:1569-1575`), and trim the rest. Done when: a test with three helpers and one excluded name leaves the excluded one untouched and reports the other two trimmed. Cheaper substitute: exact-name matching, which misses the versioned names the substring rule catches.",
+        "Measure each trim in `src/core/Memory.cpp` with `GetPerformanceInfo` (the source of `MemBoost.au3:1063`): physical memory in use is total minus available (`:1071`), read before the first process and after the last, with the duration. Done when: a test returns a `TrimResult` whose `freed` equals the difference of the two readings and whose duration is non-zero. Cheaper substitute: reading the free figure from an earlier sample, which credits the trim with whatever else moved.",
+        "Implement the manual trigger `TrimNow` in `src/core/Triggers.cpp` with the original's re-entry guard (`MemBoost.au3:1520`) and a record of what started the trim (manual or automatic, `:1527-1532`). Done when: two calls made while a trim runs start one trim, and the result names its trigger.",
+        "Implement the interval trigger in `src/core/Triggers.cpp`: a countdown that ticks once a second, pauses while a trim runs, trims at zero and restarts from the interval (`MemBoost.au3:1535-1537`, `:1682-1702`), with the interval choices `5` to `120` seconds of the Preferences list (`:1964`). Done when: a test on a fake clock with a 5 second interval fires at 5 and again at 10, and the countdown holds while a trim runs.",
+        "Implement the threshold trigger in `src/core/Triggers.cpp`: keep the last 10 load readings, and trim when the load is above 90 and the readings rose in at least 6 of the last 9 steps (`MemBoost.au3:1670`, `:1717-1731`). Done when: a test with a rising series above 90 trims once, and a flat series at 95 or a rising series at 85 does not.",
+        "Hold the trigger mode and the interval as settings in `src/core/Schedule.cpp` (off, interval or threshold; `AutoOptimize` and `AutoOptimizeSeconds` of `reference/au3/src/MemBoost.ini`, default interval 60 seconds) for the Schedule screen to read and write. Done when: a test sets each mode, restarts the engine and reads it back. Cheaper substitute: keeping the mode in a window control, which is lost when the window closes.",
+        "Implement the optional `ForceBehave` demotion in `src/core/Trim.cpp`: when set, lower a process above Normal priority to Normal (`MemBoost.au3:1582-1587`); it is off by default (`ForceBehave=0`) and the Schedule screen states that it is not undone. Done when: a test with a helper at above-normal priority sees it at Normal after a trim with the option on and unchanged with it off. Cheaper substitute: leaving the option out, which drops a documented behaviour of the original.",
+        "Cover the engine in `tests/trim_test.cpp` with helper processes the test starts and stops with their whole process tree on teardown and on timeout. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L trim` passes, and fails when the own-process skip or the exclusion rule is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L trim` passes for the skip rules, the three triggers and the measured result, and fails when the own-process skip or the exclusion rule is removed.",
+      "commit": "core: working-set trim, three triggers, measured result"
+    },
+    "parity_items": [
+      "Add `tests/fixtures/baseline/` as a copy step from `docs/baseline/` at configure time. Done when: the parity test reads the committed baseline and no path is typed into a tracked build file.",
+      "Compare which processes the engine trims, skips and demotes with the committed trim baselines, including the interval and threshold runs. Done when: the test covers `trim-manual.json`, `trim-timer.json`, `trim-intelligent.json` and `trim-forcebehave.json`, and the set of trimmed processes and the trigger times match."
+    ],
+    "enhancements": [
+      {
+        "title": "Editable Exclusion List",
+        "needs": "sdk-framework",
+        "intro": "The AutoIt exclusion array exists and the trim loop honours it (`MemBoost.au3:469`, `:1569-1575`), but nothing ever fills it. This section makes it a list a person edits: add, remove and switch an entry on or off, with the substring rule kept. With an empty list a trim does exactly what the original does.",
+        "surface": {
+          "fidelity": "the Exclusions screen, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person protects games, virtual machines and audio tools from trimming once and trusts it afterwards. Consumer: the stored list and the skipped processes.",
+          "treatment": "the substring rule stated on the screen, each entry with an on and off switch, the list kept with the settings. Cheaper substitute that fails the checkpoint: exact-name matching, or a list the interval trigger ignores."
+        },
+        "build": [
+          "Write the list model in `src/core/ExclusionList.cpp`. Done when: add, remove and switch are tested and the list survives a restart.",
+          "Build the Exclusions screen in `src/ui/ExclusionsView.cpp`. Done when: an entry added there keeps a matching helper untouched in the next trim."
+        ],
+        "items": [
+          "Implement the list in `src/core/ExclusionList.cpp` with entries of text and an enabled flag, matched as a case-insensitive substring of the process name as `MemBoost.au3:1570` does, stored through the framework's settings. Done when: a test adds two entries, switches one off, restarts and reads both back. Cheaper substitute: a private settings file written by the tool.",
+          "Pass the list into `TrimAll` for every trigger. Done when: a helper whose name matches an enabled entry survives a manual, an interval and a threshold trim untouched, and an unlisted helper is trimmed beside it.",
+          "Build `src/ui/ExclusionsView.cpp` from the SDK's list and toolbar controls: add, remove, a switch per row, and the rule written above the list. Done when: each row shows its entry and state in words, and the screen is operated by keyboard alone. Cheaper substitute: a text box holding a delimited string.",
+          "Show the empty state with one sentence, and update `Processes excluded` on the Overview screen. Done when: an empty list shows the sentence and None, and one entry changes the row to a count.",
+          "Prove non-interference. Done when: the parity check re-runs with the list empty and reports zero differing fields, and `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L exclusions` passes."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L exclusions` passes: a listed helper survives all three triggers beside a trimmed one, the list persists, and the empty-list parity run reports zero differences.",
+        "commit": "feature: an exclusion list a person can edit"
+      },
+      {
+        "title": "Per-Process Trim Report",
+        "intro": "The AutoIt tool reports a processed count and nothing else (`MemBoost.au3:1613`). This section reports each process: what was trimmed and how much it gave back, what was skipped and why (the tool itself, excluded, not on the only-list, could not be opened). Reads and display only: the trim is untouched.",
+        "surface": {
+          "fidelity": "the Processes screen, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person sees what a trim did instead of trusting a count. Consumer: the report and one Activity line per trim.",
+          "treatment": "one row per process with its working set before and after, the memory given back and, for a skipped one, the reason in words; totals under the list. Cheaper substitute that fails the checkpoint: totals taken from the system counter, which credits the trim with whatever else moved."
+        },
+        "build": [
+          "Measure each process before and after in `src/core/Trim.cpp`. Done when: a `TrimResult` carries one row per process with its figures or skip reason.",
+          "Show the rows in `src/ui/ProcessesView.cpp`. Done when: the screen after a trim lists every processed and skipped process."
+        ],
+        "items": [
+          "Record in `src/core/Trim.cpp`, for each process, its working set before and after through `GetProcessMemoryInfo`, and its freed bytes; a skipped process records its reason. Done when: a test with a helper, an excluded helper and the tool's own process returns three rows, with the reasons named. Cheaper substitute: a single processed count.",
+          "Reconcile the rows with the total in `tests/report_test.cpp`: the freed bytes of the rows add up to the figure shown, and a process that grew is shown with its negative figure, not as zero. Done when: the test passes on a helper that allocates during the trim.",
+          "Write one Activity line per trim with its trigger, totals and duration, and keep the last report after the window closes. Done when: after a driven trim the Activity list shows the line and a restart shows the last report.",
+          "Build `src/ui/ProcessesView.cpp` from the SDK's list control, sortable by memory given back, with the totals beneath and an empty state before the first trim. Done when: the rows are read back through UI Automation and equal the `TrimResult`. Cheaper substitute: rows typed into the view, which show nothing real.",
+          "Prove non-interference. Done when: the parity check re-runs with zero differing fields and `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L report` passes."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L report` passes: the rows reconcile with the total, every skip has its reason, and the parity check still reports zero differences.",
+        "commit": "feature: a report of what each trim did to each process"
+      },
+      {
+        "title": "Only-List Trim Mode",
+        "needs": "sdk-framework",
+        "intro": "The mirror of the exclusion list, for locked-down machines: when the only-list has entries, a trim touches the processes on it and nothing else. It is empty by default, so by default a trim does what the original does.",
+        "surface": {
+          "fidelity": "the only-list part of the Exclusions screen, against `DESIGN.md` section 2.",
+          "job": "an administrator confines trimming to approved processes on a shared or sensitive machine. Consumer: the stored list and the confined trim.",
+          "treatment": "a non-empty only-list wins over everything except the tool's own process, and the rule that an excluded process beats a listed one is written on the screen with the reason. Cheaper substitute that fails the checkpoint: an only-list that also trims unlisted processes sometimes, which makes the mode lie about its name."
+        },
+        "build": [
+          "Add the only-list to `src/core/ExclusionList.cpp` and to `TrimAll`. Done when: with two names on it a trim touches those two and no other.",
+          "Add its controls to `src/ui/ExclusionsView.cpp`. Done when: the list, its rule text and its empty state show on the screen."
+        ],
+        "items": [
+          "Implement the only-list in `src/core/ExclusionList.cpp` with the same entry shape and substring rule, stored through the framework's settings. Done when: a test adds two entries and reads them back after a restart.",
+          "Make `TrimAll` trim a process only when the only-list is empty or matches it, with the tool's own process and exclusions still skipped first. Done when: a test with five helpers and two on the only-list trims exactly those two, and emptying the list trims all five again.",
+          "Report the skip reason `not on the only-list` through the trim report, and `excluded` for a process on both lists. Done when: a test with one helper on both lists returns it as skipped with the reason `excluded`.",
+          "Add the only-list to `src/ui/ExclusionsView.cpp` with the interaction rule written beside it. Done when: the rule text, the empty state and the list are reachable by keyboard and named to UI Automation. Cheaper substitute: a second text box with no rule shown, which leaves two lists fighting silently.",
+          "Cover it in `tests/onlylist_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L onlylist` passes, and the parity check with the list empty reports zero differing fields."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L onlylist` passes: only listed processes trim, an empty list restores full trimming, and an excluded process on both lists is skipped with its reason shown.",
+        "commit": "feature: trim only the processes on an only-list"
+      },
+      {
+        "title": "Memory Graph",
+        "needs": "sdk-framework",
+        "intro": "Asked for by the owner on 2026-11-15. The Overview screen draws physical memory in use over time and marks each trim on it. The graph is the SDK's chart control (planned in Resolute-SDK as `D01 T01 §5`, `shared/resolute-ui`), which is not built yet; the tool never draws its own graph. The tool samples memory into a bounded series held in memory and hands it to the control.",
+        "surface": {
+          "fidelity": "the graph on the Overview screen, against `DESIGN.md` section 2 and the chart control of `sdk/DESIGN.md`, in light and dark at 100 and 150 percent.",
+          "job": "a person sees whether memory use is climbing, whether a trim helped and how long the relief lasted. Consumer: the chart, read back against the series.",
+          "treatment": "a line of memory in use with a marker at each trim, labelled in words and readable without colour. Cheaper substitute that fails the checkpoint: a graph drawn by the tool itself, or one that shows no trim markers."
+        },
+        "build": [
+          "Write the bounded series in `src/core/MemorySeries.cpp`. Done when: a test adds more samples than its capacity and the oldest are dropped.",
+          "Bind the series and its trim markers to the SDK's chart control in `src/ui/OverviewView.cpp`. Done when: the Overview shows the graph with a marker for each trim."
+        ],
+        "items": [
+          "Implement `MemorySeries` in `src/core/MemorySeries.cpp`: a ring of samples (time and memory in use) with a capacity declared once in `src/core/MemorySeries.h`, and a list of trim markers that drop out with the samples they point at. Done when: a test adds more samples than the capacity and the series holds only the newest, with no marker for a dropped sample.",
+          "Sample memory in use once a second through the measurement of `src/core/Memory.cpp`, as the original refreshes its stats (`MemBoost.au3:1018`, `:1151`), and add a marker when a trim ends, carrying its trigger and freed bytes. Done when: a driven trim leaves a marker at the sample taken after it. Cheaper substitute: sampling inside the window's paint, which stops when the window is hidden.",
+          "Bind the series to the SDK's chart control in `src/ui/OverviewView.cpp`, with the axis in percent of physical memory and a label on each marker. Done when: the control receives the series and the markers and the tool contains no graph-drawing code. Cheaper substitute: drawing the line with the tool's own paint code.",
+          "Make the graph readable without colour and by keyboard: the markers carry a shape and a text, and a focused marker announces its trigger and the memory it gave back. Done when: a UI Automation walk reads each marker's text and a keyboard path reaches them.",
+          "Capture the Overview in light and dark at 100 and 150 percent to `docs/captures/`, and cover the series in `tests/series_test.cpp`. Done when: four captures are committed, and `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L series` passes and fails when a trim marker is dropped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L series` passes: the series stays within its capacity, each trim leaves a marker, and the Overview shows them through the SDK's chart control.",
+        "commit": "feature: a memory graph with each trim marked"
+      }
+    ],
+    "no_reverse": "a trim asks Windows to shrink working sets, which refill by themselves as programs run; there is nothing to put back",
+    "verification": [
+      "A walk of `reference/au3/src/MemBoost.au3` finds every piece in `docs/inventory.md` with its home.",
+      "The parity check reports zero differing fields against the shipped AutoIt build on the trim fixture, for the manual, interval and threshold runs.",
+      "On a real machine the tool trims on demand, on an interval and on the threshold, reports each trim and graphs memory in use, in light and dark, by keyboard alone."
+    ]
+  }
+}

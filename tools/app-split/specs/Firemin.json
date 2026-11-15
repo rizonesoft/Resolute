@@ -1,0 +1,280 @@
+{
+  "name": "Firemin",
+  "slug": "firemin",
+  "display": "Firemin",
+  "job": "it keeps a browser's memory use small while the browser runs, by trimming the working set of the browser's processes at an interval and showing what that saved.",
+  "tagline": "Keep your browser's memory use small while it runs",
+  "frozen": false,
+  "elevated": false,
+  "au3": [
+    "Firemin",
+    "Chromin",
+    "Edgemin",
+    "Watermin"
+  ],
+  "hue": {
+    "name": "Orange",
+    "light": "#FB923C",
+    "dark": "#EA580C",
+    "extra": [
+      [
+        "Yellow",
+        "#FDE047",
+        "The flame's core"
+      ]
+    ],
+    "social_ground": "#2B1508",
+    "social_muted": "#F7D5BD"
+  },
+  "icon": {
+    "idea": "A flame kept small, with a bright core.",
+    "points": [
+      "Free-standing with no tile: a flame with rounded tips.",
+      "The flame is Orange with a Yellow core.",
+      "Below 40 pixels the drawing is a simpler flame outline with a larger core."
+    ],
+    "large": "<path d=\"M48 12 C56 27 73 37 73 58 C73 74 62 84 48 84 C34 84 23 74 23 58 C23 47 30 41 34 32 C38 39 42 41 44 35 C46 27 46 19 48 12 Z\" fill=\"#EA580C\" stroke=\"#EA580C\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M48 52 C54 59 59 63 59 70 C59 77 54 82 48 82 C42 82 37 77 37 70 C37 63 44 59 48 52 Z\" fill=\"#FDE047\" stroke=\"#FDE047\" stroke-width=\"2\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M48 12 C58 28 74 38 74 58 C74 74 62 84 48 84 C34 84 22 74 22 58 C22 44 34 36 48 12 Z\" fill=\"#EA580C\" stroke=\"#EA580C\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M48 46 C56 55 62 60 62 69 C62 77 56 82 48 82 C40 82 34 77 34 69 C34 60 40 55 48 46 Z\" fill=\"#FDE047\" stroke=\"#FDE047\" stroke-width=\"2\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Browsers",
+        "Each browser with its memory now and whether it is being trimmed, and a graph of memory over time"
+      ],
+      [
+        "Trim speed",
+        "How often a trim runs and the limits that decide when it does"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees how much memory each browser holds, whether it is being trimmed, and turns a browser's trimming on or off.",
+    "primary": "Pause",
+    "secondary": "Add a browser",
+    "rows": [
+      [
+        "Firefox",
+        "Trimming"
+      ],
+      [
+        "Chrome",
+        "Waiting when not running"
+      ],
+      [
+        "Microsoft Edge",
+        "Waiting when not running"
+      ],
+      [
+        "Waterfox",
+        "Off"
+      ],
+      [
+        "A browser the person added",
+        "Trimming, Waiting or Off"
+      ]
+    ],
+    "status": "Trimming 2 browsers, 1.4 GB held",
+    "notes": [
+      "One row per browser, in a fixed order: the four built in, then any the person added. Each row shows the browser's icon and name, its memory now, its process count and its state in words.",
+      "A state is Trimming when the browser is running and switched on, Waiting when it is switched on but not running, and Off when it is switched off. The row also says when a process was skipped because Windows would not let the tool open it.",
+      "Each row has an on and off switch. Switching a browser off stops its trimming and leaves its row in place.",
+      "Under the rows is a graph of each switched-on browser's memory over time, drawn by the SDK's chart control (planned in Resolute-SDK as `D01 T01 §5`), one line per browser, from a bounded series kept in memory.",
+      "Pause stops every trim at once and becomes Resume. Add a browser opens a file picker for a program file and adds a row for it.",
+      "The status bar says in words how many browsers are being trimmed and how much memory they hold now.",
+      "A line under the list states that a trim only shrinks what the browser has loaded, and that the browser fills it again by itself as it runs."
+    ],
+    "cut": "The AutoIt window had a File menu and a Help menu, a splash, a spinning update animation, a donate strip and a donate dialog shown once per build (`Firemin.au3:1225-1229`), a three-line browser profile box, and a separate three-tab Preferences dialog. None of them is in this window. The donate strip and dialog, the splash and the animations are cut. The menus are replaced by the sidebar sections, and the Preferences tabs by the framework's settings pages. Each cut is recorded with its reason in `docs/inventory.md`."
+  },
+  "readme": {
+    "lead": "Firemin keeps your browser's memory use small while it runs, and shows you how much it holds.",
+    "what": [
+      "Firemin watches your browsers and, at a regular interval, asks Windows to shrink the memory each browser's processes hold. The browser gives back what it is not using and takes it again by itself when it needs it. You choose which browsers are trimmed, how often, and the limits that decide when a trim runs.",
+      "Firemin replaces Firemin, Chromin, Edgemin and Watermin with one tool. Those four were the same program pointed at Firefox, Chrome, Microsoft Edge and Waterfox. Firemin now carries all four browsers in one window, and you can add any other browser by its program file."
+    ],
+    "new_intro": "The C++ version is one program for every browser, with a view of what it does.",
+    "new": [
+      [
+        "One tool for every browser.",
+        "Firefox, Chrome, Microsoft Edge and Waterfox are built in, each switched on or off, and you can add another browser by its program file."
+      ],
+      [
+        "A memory graph.",
+        "The Browsers screen draws each switched-on browser's memory over time, so you can see a trim take effect."
+      ],
+      [
+        "Before and after figures.",
+        "Each trim reports the memory a browser held before and after, in the Activity section."
+      ],
+      [
+        "Quiet in the notification area.",
+        "Firemin runs from the notification area, with a menu to pause, open and exit."
+      ]
+    ]
+  },
+  "reference": {
+    "note": "The four scripts are the same 2,389-line program: they differ only in the file version, the update address in two lines, and the default browser path in three lines (`src/<tool>.au3` lines 34, 38, 288, 289, 311, 988 and 1295). Firemin is the only one that ships language packs (35 under `shipped/Language/Firemin/`) and the only one with a `local/Distribution/` build. Chromin has one loose `local/Chromin_X64.exe`, and Edgemin and Watermin have no executable and no `shipped/` folder."
+  },
+  "plan": {
+    "scope": "The whole port: baseline, trim engine, window, graph, release",
+    "goal": "Firemin ships as one complete, standalone C++ tool that keeps every enabled browser's memory small: it trims the working set of each browser's running processes at an interval, as the AutoIt original does, reports the memory before and after, shows each browser and its memory over time in the Sidebar window, and lets a person switch the four built-in browsers or any browser they add on or off.",
+    "current_state": "Nothing exists in C++. The repository holds the four AutoIt originals under `reference/au3/` (`Firemin`, `Chromin`, `Edgemin`, `Watermin`), the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. Each original is a 2,389-line script (`Firemin.au3`) and the four differ only in the file version, the update address and the default browser path (`Firemin.au3:311`, `Chromin.au3:311`, `Edgemin.au3:311`, `Watermin.au3:311`). The tool trims by calling `_WinAPI_EmptyWorkingSet` on each process id from `ProcessList` for the browser's program name (`Firemin.au3:1378-1414`), every `Boost` milliseconds (`:562`), only when trimming is on and system free memory is at or under the limit (`:2341-2361`), and only when the browser's total working set is over `ReduceLimit` megabytes if the limit is on (`:1402-1410`). It then does the same for a list of extra processes, `plugin-container.exe` by default (`:1513-1591`). It reads memory with `_WinAPI_GetProcessMemoryInfo` (`:1496`) but never measures after a trim. It runs from the notification area (`:531-553`) and has one main window, a three-tab Preferences dialog, menus, a splash, animations and a donate strip. Only Firemin ships language packs. The SDK's framework and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`reference/au3/Firemin/src/Firemin.au3`: the tool being ported, with `reference/au3/Chromin/src/Chromin.au3`, `reference/au3/Edgemin/src/Edgemin.au3` and `reference/au3/Watermin/src/Watermin.au3`, which differ from it in a few lines, and the `.sni` beside each, which lists what ships.",
+      "`reference/au3/Firemin/shipped/Language/Firemin/en.lng`: one of 35 language packs, all Firemin's; the other three tools have none. `reference/au3/Firemin/src/Firemin.ini` holds the settings and the `[Safemode]` and `[Incognito]` tables.",
+      "`reference/au3/Firemin/local/Distribution/9558/Firemin_9558/Firemin_X64.exe`: the shipped build the baseline runs. It is untracked, and there is no `dist/` folder."
+    ],
+    "outcome": [
+      "`Firemin.exe` trims the working set of every running process of every enabled browser at the chosen interval, with the same gates as the AutoIt original, and reports memory before and after each trim.",
+      "The four built-in browsers and any browser added by its program file are declared as data and each switches on or off; a process the tool cannot open is skipped and reported by name.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, shows a memory graph per browser, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Browsers screen, where a person finds a browser and its state. Reporting and audit are the Activity section, which holds each trim's before and after figures and the processes it skipped. Settings are the framework's pages. Permissions do not apply as a gate: a process the tool may not open is skipped and reported, and nothing needs elevation. There is nothing to reverse, because a trimmed working set refills by itself.",
+    "baseline_items": [
+      "Run `reference/au3/Firemin/local/Distribution/9558/Firemin_9558/Firemin_X64.exe` against a running Firefox with `LimitEnabled=0` and `Boost=1000`, and record each browser process's working set from `Get-Process` before the first trim and after each of the next three. Done when: `docs/baseline/firefox-trim.json` lists every process id with its working set before and after.",
+      "Repeat for Chrome, Microsoft Edge and Waterfox using the `Chromin`, `Edgemin` and `Watermin` builds under `reference/au3/<tool>/local/`. Done when: `docs/baseline/chrome-trim.json`, `edge-trim.json` and `waterfox-trim.json` exist, or each missing build is named in `docs/baseline/README.md`.",
+      "Record the gates: set `LimitEnabled=1` with `ReduceLimit` above the browser's total, then `SystemMemoryEnabled=1` with `SystemMemoryLimit` below free memory, and watch whether a trim happens. Done when: `docs/baseline/gates.json` states for each setting whether the original trimmed, matching `Firemin.au3:1402-1410` and `:2358`."
+    ],
+    "inventory_items": [
+      "Record the windows and controls in `docs/inventory.md`: the main window (`Firemin.au3:598`), its menus (`:604-632`), the browser profile box (`:650-677`), the trim settings group (`:681-710`), the Preferences dialog (`:1769`) with its three tabs, the tray menu (`:531-539`) and the donate dialog (`:1225-1229`). Done when: every control-creation call in the file is listed with its window and purpose.",
+      "Record the strings: each pack section read by `Includes/Localization.au3`, the hardcoded strings such as \"Extended Usage:\" (`:671`) and the system memory text (`:701`), and the shift-alt-F4 hotkey (`:524`), each with its pack key or the reason it is hardcoded. Done when: every string names its key or says why it is not one.",
+      "Record the behaviours: the trim loop (`:1359-1422`), the extra process list (`:1513-1591`), the three gates (`:2341-2361`, `:1402-1410`), the browser start options and the `[Safemode]` and `[Incognito]` tables, the tray menu and tip (`:531-553`, `:773-775`), and the startup shortcut (`:1043-1048`). Done when: every call to `ProcessList`, `_WinAPI_EmptyWorkingSet`, `Run` and `ShellExecute` is listed with its verdict.",
+      "Record settings, the four-script differences and the ship list. Done when: every `.ini` key (with its three conflicting defaults, for example `Boost` 1000 at `:308`, 500 at `:990` and 1000 in the shipped file) is marked keep, cut or remapped, each of the lines that differ between the four scripts is listed, and each file in the `.sni` `[Distribute]` list is marked."
+    ],
+    "engine": {
+      "title": "Browser List and Trim Loop",
+      "intro": "The tool's core: browsers declared as data, and a loop that at each interval trims the working set of every running process of every enabled browser and measures it, so each trim reports memory before and after. The AutoIt original trims by program name with no measure after, and the C++ tool keeps its gates and adds the measure.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the browsers as data in `src/core/Browsers.h` and enumerate their processes in `src/core/Processes.cpp`. Done when: a test lists the running processes of a named program from a fixture process.",
+        "Implement the trim loop in `src/core/Trimmer.cpp` with the original's gates. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L trim` passes against a spawned test process."
+      ],
+      "items": [
+        "Declare in `src/core/Browsers.h` each browser as data: display name, process names, default program path and settings key, for Firefox (`firefox.exe`), Chrome (`chrome.exe`), Microsoft Edge (`msedge.exe`) and Waterfox (`waterfox.exe`), citing `Firemin.au3:311` and the same line in the other three scripts. Done when: the header holds four entries and a test compares each default path with line 311 of its script. Cheaper substitute: a branch per browser in the loop, which is four copies with extra steps.",
+        "Implement `FindProcesses(name)` in `src/core/Processes.cpp` returning every running process id for a program name, as `ProcessList` does (`Firemin.au3:1378`). Done when: a test that spawns three copies of a fixture program gets three ids and a test with none gets an empty list.",
+        "Implement `MeasureWorkingSet(pid)` in `src/core/Processes.cpp` returning the current and peak working set as `_GetProcessUsage` does (`Firemin.au3:1493-1509`), and an error for a process it cannot open. Done when: a test reads the fixture process's working set and a test on a protected process returns the named error.",
+        "Implement `TrimProcess(pid)` in `src/core/Trimmer.cpp` calling the Windows working set trim on one process (`Firemin.au3:1414`) and returning memory before and after, each read with `MeasureWorkingSet`. Done when: a test that first touches 50 MB in a fixture process sees its working set fall after the trim. Cheaper substitute: reporting the pre-trim figure twice, which shows no change.",
+        "Implement `TrimBrowser(browser)` trimming every process of one browser and its extra processes, skipping a process it cannot open and recording that skip with the program name and id (`Firemin.au3:1513-1591`). Done when: a test with one openable and one protected process trims the first and reports the second by name.",
+        "Apply the gates before a trim: skip when trimming is paused, when system free memory is above `SystemMemoryLimit` and that gate is on (`Firemin.au3:2349-2361`), and when the browser's total working set is not over `ReduceLimit` and the limit is on (`:1402-1410`). Done when: a test covers all three gates, each both ways.",
+        "Run the loop in `src/core/Trimmer.cpp` on a timer at the chosen interval, defaulting to 1000 ms and accepting 500 to 10000 as the original's choices do (`Firemin.au3:562`, `:2378`), trimming each enabled browser that is running. Done when: a test with an interval of 500 ms sees two trims of a fixture process in just over a second.",
+        "Return one result per browser per trim holding the browser, the process count, the total before and the total after, the skipped processes and the trigger (interval or manual), for the log and the Activity section to read. Done when: a test reads all five fields from one trim result.",
+        "Cover every path in `tests/trim_test.cpp` with a spawned fixture process that is stopped on teardown with its whole tree. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L trim` passes, and fails when a gate is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L trim` passes, including the three gates, the skipped process and the before and after figures, and fails when one gate is removed.",
+      "commit": "core: browsers as data and a measured trim loop"
+    },
+    "parity_items": [
+      "Add `tests/fixtures/baseline/` as a copy step from `docs/baseline/` at configure time. Done when: the parity test reads the committed baseline and no path is typed into a tracked build file.",
+      "Compare each browser's baseline and the gates. Done when: the test covers `firefox-trim.json`, the other three trim records and `gates.json`, with every difference recorded in `docs/parity.md`."
+    ],
+    "enhancements": [
+      {
+        "title": "Browser Picker",
+        "needs": "sdk-framework",
+        "intro": "The four AutoIt tools were one script pointed at one browser each, so a person ran up to four tools. Here the four browsers are built in and each is switched on or off, and a person adds any other browser by choosing its program file. A path that does not exist gives a named message and a log line, not a silent no-op. This is what the merge needs.",
+        "surface": {
+          "fidelity": "the Browsers screen rows and the Add a browser picker, against `DESIGN.md` section 2.",
+          "job": "a person chooses which browsers are trimmed, including one the tool did not know. Consumer: the rows, and the engine's list of enabled browsers, read back.",
+          "treatment": "one row per browser with an on and off switch, state shown with an icon and a word. Cheaper substitute that fails the checkpoint: a text box where a person types a process name, which hides the program file from them."
+        },
+        "build": [
+          "Add the on and off state and the user's own browsers to `src/core/Browsers.h`, persisted through the framework. Done when: a test restarts the settings and reads the same list back.",
+          "Build the rows and the picker in `src/ui/BrowsersView.cpp`. Done when: switching a row changes whether the engine trims it."
+        ],
+        "items": [
+          "Read each browser's enabled state and path from the framework's settings, with the declared default as the fallback, as `BrowserPath` is read (`Firemin.au3:988`). Done when: a fixture override is honoured and an absent key falls back to the default.",
+          "Add a browser by program file in `src/ui/BrowsersView.cpp` through the framework's file picker, storing its name, program name and path as a data entry. Done when: choosing `C:\\fixture\\brave.exe` adds a row that the engine trims. Cheaper substitute: accepting a typed path unchecked.",
+          "Show a named message and write one log line when a stored path does not exist, and leave that browser's row at Waiting. Done when: a fixture settings file that points at a missing program produces both and the other rows work (`Firemin.au3:1279-1298` did neither).",
+          "Switch a browser off and on from its row. Done when: an off browser is not trimmed on the next interval and an on browser is, asserted against a fixture process.",
+          "Cover it in `tests/browsers_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L browsers` passes, and fails when the override is ignored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L browsers` passes: a fixture override is honoured, an absent key falls back, a missing path gives one message and one log line, and an added browser is trimmed.",
+        "commit": "feature: a picker for the four browsers and any the person adds"
+      },
+      {
+        "title": "Memory Graph",
+        "needs": "sdk-framework",
+        "intro": "New, asked for by the owner on 2026-11-15: a graph of each enabled browser's memory over time on the Browsers screen. The AutoIt window showed two numbers and a colour (`Firemin.au3:1593-1622`). The graph is drawn by the SDK's chart control, planned in Resolute-SDK as `D01 T01 §5`, and never by the tool, from a bounded series kept in memory.",
+        "surface": {
+          "fidelity": "the graph under the browser rows, against `sdk/DESIGN.md` and the chart control's own rules, in light and dark.",
+          "job": "a person sees how each browser's memory moves and that a trim lowers it. Consumer: the chart control, read back against the series.",
+          "treatment": "one line per switched-on browser with a legend, the trims marked on the time axis, drawn by the SDK's chart control. Cheaper substitute that fails the checkpoint: drawing the lines in the tool with its own painting code, which the contract forbids."
+        },
+        "build": [
+          "Keep a bounded series per browser in `src/core/MemorySeries.cpp`. Done when: a test pushes past the bound and the oldest points are dropped.",
+          "Hand the series to the SDK's chart control in `src/ui/BrowsersView.cpp`. Done when: the graph shows one line per switched-on browser and updates at each sample."
+        ],
+        "items": [
+          "Implement `MemorySeries` in `src/core/MemorySeries.cpp`: a fixed-capacity ring of time and bytes per browser, filled from the engine's sample. Done when: a test fills it past its capacity and finds exactly the newest capacity points in order. Cheaper substitute: an unbounded vector, which grows for as long as the tool runs.",
+          "Sample each switched-on browser's total working set once a second, apart from the trim interval, as the original refreshed its figures every second (`Firemin.au3:1597`). Done when: with a trim interval of 5000 ms a test still gets five points in five seconds.",
+          "Show the graph under the rows in `src/ui/BrowsersView.cpp` using the SDK's chart control, with one line per switched-on browser and a mark at each trim. Done when: switching a browser off removes its line and a trim shows as a mark.",
+          "Give the graph a text equivalent: the latest value of each line is in its row and the chart control's accessible description names the span. Done when: a UI Automation walk reads each browser's latest figure and the graph's name.",
+          "Cover it in `tests/graph_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L graph` passes, and fails when the bound is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L graph` passes: the series is bounded, sampled apart from the trim interval, and the graph shows a line per switched-on browser.",
+        "commit": "feature: a memory graph per browser on the Browsers screen"
+      },
+      {
+        "title": "Notification Area Presence",
+        "needs": "sdk-framework",
+        "intro": "The original already lives in the notification area: it shows an icon, a menu and a click that opens the window (`Firemin.au3:531-555`), and shows a tip when the window is closed if notifications are on (`:773-775`). The C++ tool runs quietly there too, with a menu to pause, open and exit, so trimming goes on with the window closed.",
+        "surface": {
+          "fidelity": "the notification area icon and its menu, against `sdk/DESIGN.md`.",
+          "job": "a person leaves trimming running with the window closed and still pauses, opens or exits. Consumer: the menu, and the engine's paused state, read back.",
+          "treatment": "an icon with a tooltip naming the state and a menu of Open, Pause or Resume, and Exit, taken from the framework. Cheaper substitute that fails the checkpoint: closing the window ends the tool, which stops trimming."
+        },
+        "build": [
+          "Add the notification area icon and menu through the framework in `src/ui/TrayIcon.cpp`. Done when: the icon shows with the tool's icon and the three menu items.",
+          "Keep the tool running when the window closes. Done when: closing the window leaves the process trimming and the icon present."
+        ],
+        "items": [
+          "Create the icon in `src/ui/TrayIcon.cpp` through the framework with a tooltip that names the state, as `TraySetToolTip` does (`Firemin.au3:554`). Done when: the tooltip reads Trimming or Paused to match the engine.",
+          "Add the menu with Open, Pause or Resume, and Exit, with Open as the default for a click, as the original's click opens the window (`Firemin.au3:541`, `:544`). Done when: each item calls the engine or the window and the Pause label changes with the state.",
+          "Keep trimming when the window is closed and exit only from the menu. Done when: a test closes the window and sees the next trim happen, and Exit stops the process.",
+          "Show a notification when the window closes if the setting is on, as `TrayTip` does (`Firemin.au3:773-775`). Done when: a closed window with the setting on shows one message and with it off shows none.",
+          "Cover it in `tests/tray_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L tray` passes, and fails when closing the window stops the engine."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L tray` passes: the menu pauses, opens and exits, and trimming continues with the window closed.",
+        "commit": "feature: runs quietly in the notification area with a menu"
+      },
+      {
+        "title": "Start With Windows",
+        "needs": "sdk-framework",
+        "intro": "The original offers to start with Windows by writing a shortcut named `Firemin.lnk` into the user's Startup folder, and deletes it when the box is cleared (`Firemin.au3:1043-1048`). The C++ tool offers the same choice as a setting, so a person's trimming begins at sign-in.",
+        "surface": {
+          "fidelity": "the start-with-Windows switch on the framework's settings page, against `sdk/DESIGN.md`.",
+          "job": "a person has Firemin start at sign-in without opening a menu. Consumer: the user's Startup folder, read back.",
+          "treatment": "a single labelled switch whose state is read from the Startup folder, not remembered. Cheaper substitute that fails the checkpoint: a stored flag that does not look at the folder, which shows the wrong state after a person deletes the shortcut."
+        },
+        "build": [
+          "Write and remove the shortcut in `src/core/Startup.cpp`. Done when: a test with a redirected Startup folder creates and deletes `Firemin.lnk`.",
+          "Declare the switch to the framework in `src/ui/SettingsView.cpp`. Done when: the switch state is read from the folder each time the page opens."
+        ],
+        "items": [
+          "Implement `SetStartWithWindows(bool)` in `src/core/Startup.cpp` creating or deleting `Firemin.lnk` in a Startup folder passed in, pointing at the running executable (`Firemin.au3:1043-1048`). Done when: a test with a temporary folder finds the shortcut after on and none after off. Cheaper substitute: a Run registry value, which is not what the original wrote.",
+          "Read the state back from the folder in `IsStartWithWindows()` and read that the shortcut's target is this executable. Done when: a shortcut that points elsewhere reads as off.",
+          "Declare the switch to the framework as a settings page entry. Done when: the page shows the state read from the folder and a change is read back after a restart.",
+          "Cover it in `tests/startup_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L startup` passes, and fails when the shortcut is left after off."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L startup` passes: the shortcut is created, read back and removed in a redirected Startup folder.",
+        "commit": "feature: start with Windows from a setting read back from the folder"
+      }
+    ],
+    "no_reverse": "a trim asks Windows to shrink a browser's working set, which refills by itself as the browser runs; there is nothing to put back",
+    "verification": [
+      "A walk of `reference/au3/Firemin/src/Firemin.au3` finds every piece in `docs/inventory.md` with its home, and the three other scripts add only the differences it lists.",
+      "The parity check reports every difference from the shipped AutoIt build's baseline for each browser, each fixed or recorded with its reason.",
+      "On a real machine with Firefox, Chrome, Microsoft Edge and Waterfox running, the tool trims each, shows before and after figures and the graph, adds a fifth browser, and pauses, in light and dark, by keyboard alone."
+    ]
+  }
+}

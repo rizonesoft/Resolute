@@ -1,0 +1,118 @@
+{
+  "name": "Ownership",
+  "slug": "ownership",
+  "display": "Ownership",
+  "job": "it adds and removes the Take Ownership entry in the Windows right-click menu, verifies what it wrote and can put it back.",
+  "tagline": "Take ownership from the right-click menu, and put it back",
+  "frozen": true,
+  "elevated": true,
+  "au3": ["Ownership"],
+  "hue": {"name": "Emerald", "light": "#34D399", "dark": "#059669", "social_ground": "#10231C", "social_muted": "#BFE8D6"},
+  "icon": {"idea": "A shield with a keyhole cut through it.", "points": [], "large": "", "small": ""},
+  "window": {
+    "sections": [
+      ["Menu entries", "One row per right-click entry the tool knows, each with its state"],
+      ["Activity", "What the tool did, newest first"],
+      ["Settings", "The suite's settings pages from the framework"],
+      ["About", "The framework's About page for this tool"]
+    ],
+    "job": "a person sees exactly which right-click entries are installed and adds or removes them with one button.",
+    "primary": "Install or Remove, whichever changes the state",
+    "secondary": "Undo",
+    "rows": [["Folders", "Installed or Missing"], ["Drives", "Installed or Missing"], ["All files", "Left over, when an older version wrote it"], ["DLL files", "Left over, when an older version wrote it"]],
+    "status": "2 installed, 2 left over",
+    "notes": [],
+    "cut": ""
+  },
+  "readme": {"lead": "", "what": [], "new_intro": "", "new": []},
+  "reference": {"note": ""},
+  "plan": {
+    "scope": "The whole port: build, baseline, engine, parity, window, features, release",
+    "goal": "Ownership ships as a complete, standalone C++ tool: it adds and removes the Take Ownership right-click entry with exactly the registry effect the AutoIt version has, proven by a parity check, verifies every value it writes, shows each entry's state, removes what older versions left behind, and can put back what it changed.",
+    "current_state": "Nothing exists in C++. The repository holds the AutoIt original under `reference/au3/` (`src/Ownership.au3`, 1,633 lines, about 77 of them its own logic), the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The original is a context-menu installer: it writes `runas` shell entries under `HKCR\\Directory` and `HKCR\\Drive` (10 values, `Ownership.au3:681-696`) and deletes those two trees on removal (`:704-705`), while its status check reads four trees (`:644-647`), adding `*` and `dllfile`, which no line in the file writes. It never calls `takeown` or `icacls` itself: the command it installs does, later, when a user clicks the entry. It requests no elevation, has one main window with a pause checkbox and one toggle button, the suite's three-tab Preferences dialog, File and Help menus, a splash, two animations and a donate strip. The SDK's framework and repair contract, which the port consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`reference/au3/src/Ownership.au3`: the tool being ported, and `reference/au3/src/Ownership.sni`, which lists what ships with it.",
+      "`reference/au3/shipped/Language/Ownership/en.lng`: the only language pack (UTF-16); its `[Custom]` and `[Messages2]` sections carry the tool's own strings.",
+      "`reference/au3/dist/Ownership_869.zip`: the shipped build the baseline and the parity check run."
+    ],
+    "outcome": [
+      "`Ownership.exe` installs and removes the two written trees with values byte-identical to the AutoIt original's, including both command strings, proven by the parity check.",
+      "Every write is read back and a mismatch is refused by name; each of the four trees shows as installed, missing or left over; removal clears residue after naming it; the last change can be undone.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Menu entries screen, where a person finds an entry by what it applies to. Reporting and audit are the Activity section, which is the report of what an install did and the trail a support reader checks. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated write is refused by name. Reverse anchors on the undo section, which the original never had.",
+    "baseline_items": [
+      "Snapshot `HKCR\\*\\shell\\runas`, `HKCR\\Directory\\shell\\runas`, `HKCR\\dllfile\\shell\\runas` and `HKCR\\Drive\\shell\\runas` on a disposable machine or virtual machine, run `Ownership.exe` from `reference/au3/dist/Ownership_869.zip` elevated, press Install, and snapshot again. Done when: `docs/baseline/install.json` lists every key and value that differs, with its type and data.",
+      "Repeat with the pause checkbox ticked. Done when: `docs/baseline/install-pause.json` shows the `&& Pause` command variant (`Ownership.au3:672-678`).",
+      "Press Uninstall and snapshot. Done when: `docs/baseline/remove.json` shows which trees were deleted and that `*` and `dllfile` were not touched."
+    ],
+    "inventory_items": [
+      "Record the windows and controls in `docs/inventory.md`: the main window (`Ownership.au3:518`), heading, subheading, pause checkbox (`:581`), Install and Uninstall toggle (`:583`), status list (`:588`), donate strip (`:605-613`), the Preferences dialog (`:1082`) with its three tabs, and every File and Help menu item (`:527-552`). Done when: every control-creation call in the file is listed with its window and purpose.",
+      "Record the strings: each pack section read, the hardcoded \"Take Ownership\" label (`:277`, `:682`, `:690`, frozen and kept exact) and the ESC-minimise hotkey (`:507-511`) with its verdict. Done when: every string names its pack key or says why it is hardcoded.",
+      "Record the behaviours: the two written trees with their five values each (default label, `HasLUAShield`, `NoWorkingDirectory`, `command` default and `IsolatedCommand`), the pause variant, the OR-of-four status rule (`:644-647`), the single-instance guard (`:435`) and the absent elevation request. Done when: every registry read and write in the file is listed and the two-tree effect is stated as the freeze scope.",
+      "Record settings, logging, update and the `.sni` ship list. Done when: every `.ini` key, log line and shipped file is marked keep, cut or remapped."
+    ],
+    "engine": {
+      "title": "Registry Effect Engine",
+      "intro": "The tool's whole system effect: writing and deleting the Take Ownership entries under `HKEY_CLASSES_ROOT`, with every value read back and every action refused by name when the process is not elevated. This is the frozen part: the values and both command strings are the AutoIt original's, exactly.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the entries as data in `src/core/Entries.h`. Done when: the two written trees and their ten values are stated once, with the line of `Ownership.au3` each comes from.",
+        "Implement install, remove, status and verify in `src/core/Registry.cpp` against a registry root the tests can redirect. Done when: the unit tests pass against a disposable key."
+      ],
+      "items": [
+        "Declare in `src/core/Entries.h` the two trees the tool writes (`Directory\\shell\\runas`, `Drive\\shell\\runas`) with their five values each and the two trees it only reads (`*`, `dllfile`), citing `Ownership.au3:681-696` and `:644-647`. Done when: the header holds all ten values and a test compares them with `docs/baseline/install.json`.",
+        "Implement `Install(bool pause)` in `src/core/Registry.cpp` writing the ten values under a root passed in, the `&& Pause` variant when `pause` is true. Done when: a test under a disposable root produces keys equal to the baseline's. Cheaper substitute: writing through `reg.exe`, which cannot be redirected for a test.",
+        "Read back every value after writing and return a mismatch as tree, value, expected and found. Done when: a test that corrupts one value after the write gets all four named. Cheaper substitute: checking only the return code of the write.",
+        "Implement `Status()` returning each of the four trees as installed, missing or left over (present and not written by this tool's two trees). Done when: a fixture with one written tree removed and `*` present reports exactly that.",
+        "Implement `Remove(bool includeLeftOver)` deleting the two written trees, and the two read-only ones when asked. Done when: a fixture with all four leaves none, and without the flag leaves `*` and `dllfile` as the original does.",
+        "Refuse `Install` and `Remove` by name when the process is not elevated, before any write, with one activity record. Done when: an unelevated test run reports the refusal and the fixture is unchanged. Cheaper substitute: letting the write fail with access denied halfway through.",
+        "Cover every path in `tests/registry_test.cpp` with a disposable root. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L registry` passes, and fails when one value in `Entries.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L registry` passes, including the corrupted-write and unelevated cases, and fails when one declared value is changed.",
+      "commit": "core: the registry effect, verified after every write and refused when unelevated"
+    },
+    "parity_items": [
+      "Add `tests/fixtures/baseline/` as a copy step from `docs/baseline/` at configure time. Done when: the parity test reads the committed baseline and no path is typed into a tracked build file.",
+      "Compare the pause variant too. Done when: the test covers `install.json`, `install-pause.json` and `remove.json`."
+    ],
+    "enhancements": [
+      {
+        "title": "Removal of Left-Over Entries",
+        "intro": "The AutoIt remove path deletes two trees while its status reads four, so residue in `*` or `dllfile` from an older version leaves the tool permanently showing as installed with an Uninstall button that changes nothing. Removal here clears all four after naming them, and that stuck state becomes unreachable. On a machine with no residue the outcome is identical to the original's.",
+        "surface": {"fidelity": "the removal confirmation, against `sdk/DESIGN.md` section 11.", "job": "uninstall means uninstalled, even with residue from an older version. Consumer: the four trees, read back.", "treatment": "a confirmation naming each entry found and whether this tool wrote it. Cheaper substitute that fails the checkpoint: deleting all four silently, which hides that residue existed."},
+        "build": ["Ask before removing left-over entries, in `src/ui/MenuEntriesView.cpp`. Done when: the confirmation names each entry.", "Prove non-interference. Done when: the parity check re-runs with zero differing fields."],
+        "items": [
+          "Show a confirmation before a removal that includes left-over entries, naming each entry and whether this tool wrote it, through the framework's message surface. Done when: a fixture with all four names four and removes four. Cheaper substitute: a private dialog.",
+          "Make the primary button always the action that changes the state: Install when a written tree is missing, Remove when anything is present. Done when: a residue-only fixture shows Remove and one press clears it.",
+          "Re-run the parity check on a residue-free fixture. Done when: it reports zero differing fields, quoted.",
+          "Cover it in `tests/remove_all_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L remove` passes, and fails when the left-over trees are skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L remove` passes for the four-tree and the residue-only fixtures, and the parity check still reports zero.",
+        "commit": "feature: removal clears what older versions left, after naming it"
+      },
+      {
+        "title": "Undo the Last Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "The original had no way back. Before an install or a removal, the prior state of the four trees is recorded, so Undo restores what was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {"fidelity": "the Undo button and its result, against `DESIGN.md` section 2.", "job": "a person puts back what the last action changed. Consumer: the four trees, compared with the record.", "treatment": "the recorded prior state restored key by key and value by value. Cheaper substitute that fails the checkpoint: an undo that removes the entries, which is not what was there before."},
+        "build": ["Record the prior state through the repair contract in `src/core/Registry.cpp`. Done when: a record exists before the first write.", "Wire Undo in `src/ui/MenuEntriesView.cpp`. Done when: install then undo leaves the four trees as they were."],
+        "items": [
+          "Record the four trees' prior state through the repair contract's restore record before any write. Done when: a test finds the record on disk before the first value is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record key by key and value by value. Done when: install then undo, and remove then undo, each leave the four trees equal to before, asserted.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one action.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: install then undo and remove then undo both leave the four trees as they were.",
+        "commit": "feature: undo puts back what was there before"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A walk of `reference/au3/src/Ownership.au3` finds every piece in `docs/inventory.md` with its home.",
+      "The parity check reports zero differing fields against the shipped AutoIt build, including both command strings.",
+      "On a real machine the tool installs, verifies, shows, removes and undoes, in light and dark, by keyboard alone."
+    ]
+  }
+}

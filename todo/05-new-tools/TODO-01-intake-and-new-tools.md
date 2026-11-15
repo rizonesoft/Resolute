@@ -53,6 +53,8 @@ track: P3
 
 ## 1. The Intake Contract, Proven on UUIDGen
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/UUIDGen` repository (`D:\Resolute_Bin\UUIDGen`) by its own plan.
+
 The whole point of doing the framework first is that a new tool should be cheap and correct from its first commit. This section writes that procedure down and proves it on the smallest possible candidate.
 
 **Fidelity:** the UUIDGen main window; new build against the framework's standard window, no AutoIt baseline required beyond its sample.
@@ -61,17 +63,19 @@ The whole point of doing the framework first is that a new tool should be cheap 
 **Chrome:** consume the framework. UUIDGen changes nothing on a system and does not consume the repair contract.
 **Needs:** C++ toolchain (compile)
 
-- [ ] Write the intake contract as a document: what a candidate must have before it starts, what the framework supplies, what the tool must supply, and what it owes before it can ship. Done when: the document exists and names the conformance profile as its acceptance test.
-- [ ] **Require a per-tool TODO file before any tool larger than a single surface is built.** Done when: the contract states that a tool is specified in `TODO-NN-<Tool>.md` enumerating its features as micro-steps, that the file is authored through `create-todo` into the domain that owns the tool, that the file meets the `plan-new-tool` standard (competitor survey with versions used, finer-details pass on the owning sections, distribution checklist), that the skill is routed by source (`plan-tool-port` for AutoIt tools in single or multi-source merge form and in C++ form for C++ samples, `plan-new-tool` for new tools, both in sequence with one file for incomplete samples), and that building from a single checklist item is not permitted. Cheaper substitute that fails the checkpoint: building from a one-line description, which freezes a guess at the tool instead of the tool. **Groomed 2026-09-19:** the `plan-new-tool` standard is now named explicitly, so intake requires competitor parity and distribution proof rather than implying them.
-- [ ] State when a tool is small enough to skip that. Done when: the rule is written, naming a genuinely single-surface utility as the exception and stating that the default is to specify first, because a short spec costs an hour and a tool built from one line costs a rewrite.
-- [ ] Require the tool descriptor, a documentation set, an update short name, and an English language pack as intake minimums. Done when: a candidate missing any of them fails the contract by name.
-- [ ] Prove it on UUIDGen, at 209 lines the cheapest candidate in the set. Done when: UUIDGen ships conformant and the elapsed effort is recorded here as the intake baseline.
-- [ ] Record what the contract missed. Done when: anything UUIDGen needed that the contract did not anticipate is added to the contract in the same commit.
-- [ ] Commit: `"intake: the intake contract, proven on uuidgen"`
+- [ ] ~~Write the intake contract as a document: what a candidate must have before it starts, what the framework supplies, what the tool must supply, and what it owes before it can ship. Done when: the document exists and names the conformance profile as its acceptance test.~~ -> `rizonesoft/UUIDGen`
+- [ ] ~~**Require a per-tool TODO file before any tool larger than a single surface is built.** Done when: the contract states that a tool is specified in `TODO-NN-<Tool>.md` enumerating its features as micro-steps, that the file is authored through `create-todo` into the domain that owns the tool, that the file meets the `plan-new-tool` standard (competitor survey with versions used, finer-details pass on the owning sections, distribution checklist), that the skill is routed by source (`plan-tool-port` for AutoIt tools in single or multi-source merge form and in C++ form for C++ samples, `plan-new-tool` for new tools, both in sequence with one file for incomplete samples), and that building from a single checklist item is not permitted. Cheaper substitute that fails the checkpoint: building from a one-line description, which freezes a guess at the tool instead of the tool. **Groomed 2026-09-19:** the `plan-new-tool` standard is now named explicitly, so intake requires competitor parity and distribution proof rather than implying them.~~ -> `rizonesoft/UUIDGen`
+- [ ] ~~State when a tool is small enough to skip that. Done when: the rule is written, naming a genuinely single-surface utility as the exception and stating that the default is to specify first, because a short spec costs an hour and a tool built from one line costs a rewrite.~~ -> `rizonesoft/UUIDGen`
+- [ ] ~~Require the tool descriptor, a documentation set, an update short name, and an English language pack as intake minimums. Done when: a candidate missing any of them fails the contract by name.~~ -> `rizonesoft/UUIDGen`
+- [ ] ~~Prove it on UUIDGen, at 209 lines the cheapest candidate in the set. Done when: UUIDGen ships conformant and the elapsed effort is recorded here as the intake baseline.~~ -> `rizonesoft/UUIDGen`
+- [ ] ~~Record what the contract missed. Done when: anything UUIDGen needed that the contract did not anticipate is added to the contract in the same commit.~~ -> `rizonesoft/UUIDGen`
+- [ ] Commit: ~~`"intake: the intake contract, proven on uuidgen"`~~ -> `rizonesoft/UUIDGen`
 
-**Test checkpoint:** UUIDGen builds for both architectures, runs standalone in an empty folder, passes the conformance check, and renders localized. A candidate missing a documentation set fails the contract by name. The intake effort baseline is recorded.
+**Test checkpoint:** Moved with the section. The `rizonesoft/UUIDGen` repository's plan carries it.
 
 ## 2. Complete Windows Repair
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/CompleteWindowsRepair` repository (`D:\Resolute_Bin\CompleteWindowsRepair`) by its own plan.
 
 The flagship intake, and the largest. It arrives with its own documentation set and a `Doors/` runtime layout that is arguably better than the shipped suite's, which makes it the right place to settle the standalone layout question.
 
@@ -81,21 +85,23 @@ The flagship intake, and the largest. It arrives with its own documentation set 
 **Chrome:** consume the framework and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Enumerate what the sample repairs and record the list here with its source locations. Done when: the list is complete and each entry names the function that performs it.
-- [ ] Reconcile the `Doors/` layout against the framework's standalone layout. Done when: one layout is chosen, recorded with its cost, and `D01 T01 §9` is named as the owner of the decision.
-- [ ] Import the repairs from `WinPower.au3` that belong here: `_RepairFontRegistrations`, `_ResetTcpipAll`, `_RebuildWMI`. Done when: all three are declared items and `_ResetTcpipAll` reuses the ComIntRep implementation rather than becoming a second one.
-- [ ] Restore the Windows Update reset scripts from git history at `8d7469a^` and evaluate them as repair items. Done when: each is either a declared item or explicitly rejected with a reason.
-- [ ] Add the repairs that have **no topical tool**, as declared items: Store and UWP app re-registration, and font registration. Done when: both are contract items with a diagnose, a verify, and an honest reversibility answer. Source for font registration: `_RepairFontRegistrations` in `resolute_au3/samples/WinPower 0.0.3.325922/WinPower.au3:229`.
-- [ ] **Do not add a repair that a topical tool owns.** Done when: this section records that Windows Search and indexing belongs to `D05 T07 §9`, audio to `D05 T07 §8`, print spooler to `D05 T07 §9`, and WinSxS component cleanup to `D05 T06 §2`, and that none of the four appears here. Cheaper substitute that fails the checkpoint: adding them here as well "for discoverability", which puts one repair in two places and guarantees they diverge.
-- [ ] Record the routing rule this file operates by. Done when: this section states that a Windows repair goes to the tool whose subject it is, and lands here only when no such tool exists, so CWR is the fallback rather than the default. Currently assigned elsewhere: network to `ComIntRep`, drives to Drive Repair, search and printing to `D05 T07 §9`, audio to `D05 T07 §8`, component store to `D05 T06 §2`.
-- [ ] Re-check the rule whenever a tool is added. Done when: this section states that adding a topical tool **moves** its repair out of CWR rather than duplicating it, and names `D07 T01 §3` as the check that catches a repair with two homes.
-- [ ] Prove every repair has a reverse, or states on the surface that it does not and what to do instead. Done when: each item carries one of those two.
-- [ ] Account for the surface. Done when: the account covers the whole window and each deferral resolves.
-- [ ] Commit: `"comwinrep: complete windows repair on the repair contract"`
+- [ ] ~~Enumerate what the sample repairs and record the list here with its source locations. Done when: the list is complete and each entry names the function that performs it.~~ -> `rizonesoft/CompleteWindowsRepair`
+- [ ] ~~Reconcile the `Doors/` layout against the framework's standalone layout. Done when: one layout is chosen, recorded with its cost, and `D01 T01 §9` is named as the owner of the decision.~~ -> `rizonesoft/CompleteWindowsRepair`
+- [ ] ~~Import the repairs from `WinPower.au3` that belong here: `_RepairFontRegistrations`, `_ResetTcpipAll`, `_RebuildWMI`. Done when: all three are declared items and `_ResetTcpipAll` reuses the ComIntRep implementation rather than becoming a second one.~~ -> `rizonesoft/CompleteWindowsRepair`
+- [ ] ~~Restore the Windows Update reset scripts from git history at `8d7469a^` and evaluate them as repair items. Done when: each is either a declared item or explicitly rejected with a reason.~~ -> `rizonesoft/CompleteWindowsRepair`
+- [ ] ~~Add the repairs that have **no topical tool**, as declared items: Store and UWP app re-registration, and font registration. Done when: both are contract items with a diagnose, a verify, and an honest reversibility answer. Source for font registration: `_RepairFontRegistrations` in `resolute_au3/samples/WinPower 0.0.3.325922/WinPower.au3:229`.~~ -> `rizonesoft/CompleteWindowsRepair`
+- [ ] ~~**Do not add a repair that a topical tool owns.** Done when: this section records that Windows Search and indexing belongs to `D05 T07 §9`, audio to `D05 T07 §8`, print spooler to `D05 T07 §9`, and WinSxS component cleanup to `D05 T06 §2`, and that none of the four appears here. Cheaper substitute that fails the checkpoint: adding them here as well "for discoverability", which puts one repair in two places and guarantees they diverge.~~ -> `rizonesoft/CompleteWindowsRepair`
+- [ ] ~~Record the routing rule this file operates by. Done when: this section states that a Windows repair goes to the tool whose subject it is, and lands here only when no such tool exists, so CWR is the fallback rather than the default. Currently assigned elsewhere: network to `ComIntRep`, drives to Drive Repair, search and printing to `D05 T07 §9`, audio to `D05 T07 §8`, component store to `D05 T06 §2`.~~ -> `rizonesoft/CompleteWindowsRepair`
+- [ ] ~~Re-check the rule whenever a tool is added. Done when: this section states that adding a topical tool **moves** its repair out of CWR rather than duplicating it, and names `D07 T01 §3` as the check that catches a repair with two homes.~~ -> `rizonesoft/CompleteWindowsRepair`
+- [ ] ~~Prove every repair has a reverse, or states on the surface that it does not and what to do instead. Done when: each item carries one of those two.~~ -> `rizonesoft/CompleteWindowsRepair`
+- [ ] ~~Account for the surface. Done when: the account covers the whole window and each deferral resolves.~~ -> `rizonesoft/CompleteWindowsRepair`
+- [ ] Commit: ~~`"comwinrep: complete windows repair on the repair contract"`~~ -> `rizonesoft/CompleteWindowsRepair`
 
-**Test checkpoint:** Every repair is a declared contract item, with the enumeration quoted. A fixture run followed by undo restores the pre-run state. `_ResetTcpipAll` resolves to one implementation shared with ComIntRep, proven by reference. The rendered surface is captured and compared.
+**Test checkpoint:** Moved with the section. The `rizonesoft/CompleteWindowsRepair` repository's plan carries it.
 
 ## 3. QuickErase and WinClean
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/QuickErase` and `rizonesoft/WinClean` repositories (`D:\Resolute_Bin\QuickErase`, `D:\Resolute_Bin\WinClean`), each by its own plan.
 
 The two destructive intakes. A secure delete is the one tool in this suite with no undo by definition, which raises the bar on confirmation and on saying so plainly.
 
@@ -116,24 +122,26 @@ The two destructive intakes. A secure delete is the one tool in this suite with 
 6. **Add confirmation and the no-reverse statement** before wiring any action to a button. Done when: the confirmation names count, size, and paths, and declining performs nothing.
 7. **Port WinClean's cleanups** as repair-contract items, each declaring its reversibility honestly. Done when: each is a declared item and none writes outside the contract's loop.
 
-- [ ] Promote `samples/WinClean/UDF/Services.au3` into the framework as service-control primitives. Done when: the framework exposes start, stop, pause, resume, and start-mode operations, and no tool implements them privately.
-- [ ] Port QuickErase, correcting the misspelled source filename on intake. Done when: it builds, and the file is named for the product.
-- [ ] Detect the media type of the target: magnetic, SATA solid state, or NVMe. Done when: each is correctly identified on a driven run and an indeterminate result is reported as unknown rather than assumed.
-- [ ] **Choose the erase method by media type.** On magnetic media, overwrite. On solid state, use the drive's own firmware erase, ATA Secure Erase or NVMe Format and Sanitize, because wear levelling means an overwrite lands in a different physical block and leaves the original where no read can reach it. Done when: each path is exercised and the surface states which method was used and why.
-- [ ] Refuse to run a multi-pass overwrite on solid state without an explicit override. Done when: the refusal explains that additional passes add wear without adding erasure, and the override is recorded in the log and the transcript. Cheaper substitute that fails the checkpoint: running the requested passes silently, which costs the drive real life and achieves nothing.
-- [ ] Record what the shipped AutoIt passes actually are, and keep them. Done when: `DoD-5220-22-M`, its `-E` and `-ECE` variants, Schneier, German, Canadian, Russian, and `AR380` are all preserved for magnetic media, with their patterns unchanged from `QuickErace.au3`.
-- [ ] State what single-file erasure cannot guarantee on any media. Done when: the surface names copies the file system may hold elsewhere, such as shadow copies, journals, and previously allocated blocks, before the user commits.
-- [ ] Handle the case where firmware erase is unavailable or refused by the drive. Done when: it is reported as a named outcome rather than silently falling back to overwriting.
-- [ ] Confirm every destructive action by naming what will be destroyed: count, total size, and the paths. Done when: the confirmation names all three and declining performs nothing, asserted.
-- [ ] State on the surface that a secure erase has no reverse, before the user commits. Done when: the statement appears where the user sees it, captured.
-- [ ] Prove the erase against a fixture tree rather than a real user path. Done when: the assertion runs entirely inside the fixture root and a path outside it is refused.
-- [ ] Port WinClean, with each cleanup declared as a repair-contract item so it inherits diagnose and undo where an undo exists. Done when: each item declares its reversibility honestly.
-- [ ] Decide and record whether QuickErase and WinClean stay separate products given their overlapping secure-delete capability. Done when: the decision is dated with its cost of changing.
-- [ ] Commit: `"quickerase, winclean: the destructive intakes"`
+- [ ] ~~Promote `samples/WinClean/UDF/Services.au3` into the framework as service-control primitives. Done when: the framework exposes start, stop, pause, resume, and start-mode operations, and no tool implements them privately.~~ -> `rizonesoft/QuickErase`
+- [ ] ~~Port QuickErase, correcting the misspelled source filename on intake. Done when: it builds, and the file is named for the product.~~ -> `rizonesoft/QuickErase`
+- [ ] ~~Detect the media type of the target: magnetic, SATA solid state, or NVMe. Done when: each is correctly identified on a driven run and an indeterminate result is reported as unknown rather than assumed.~~ -> `rizonesoft/QuickErase`
+- [ ] ~~**Choose the erase method by media type.** On magnetic media, overwrite. On solid state, use the drive's own firmware erase, ATA Secure Erase or NVMe Format and Sanitize, because wear levelling means an overwrite lands in a different physical block and leaves the original where no read can reach it. Done when: each path is exercised and the surface states which method was used and why.~~ -> `rizonesoft/QuickErase`
+- [ ] ~~Refuse to run a multi-pass overwrite on solid state without an explicit override. Done when: the refusal explains that additional passes add wear without adding erasure, and the override is recorded in the log and the transcript. Cheaper substitute that fails the checkpoint: running the requested passes silently, which costs the drive real life and achieves nothing.~~ -> `rizonesoft/QuickErase`
+- [ ] ~~Record what the shipped AutoIt passes actually are, and keep them. Done when: `DoD-5220-22-M`, its `-E` and `-ECE` variants, Schneier, German, Canadian, Russian, and `AR380` are all preserved for magnetic media, with their patterns unchanged from `QuickErace.au3`.~~ -> `rizonesoft/QuickErase`
+- [ ] ~~State what single-file erasure cannot guarantee on any media. Done when: the surface names copies the file system may hold elsewhere, such as shadow copies, journals, and previously allocated blocks, before the user commits.~~ -> `rizonesoft/QuickErase`
+- [ ] ~~Handle the case where firmware erase is unavailable or refused by the drive. Done when: it is reported as a named outcome rather than silently falling back to overwriting.~~ -> `rizonesoft/QuickErase`
+- [ ] ~~Confirm every destructive action by naming what will be destroyed: count, total size, and the paths. Done when: the confirmation names all three and declining performs nothing, asserted.~~ -> `rizonesoft/QuickErase`
+- [ ] ~~State on the surface that a secure erase has no reverse, before the user commits. Done when: the statement appears where the user sees it, captured.~~ -> `rizonesoft/QuickErase`
+- [ ] ~~Prove the erase against a fixture tree rather than a real user path. Done when: the assertion runs entirely inside the fixture root and a path outside it is refused.~~ -> `rizonesoft/QuickErase`
+- [ ] ~~Port WinClean, with each cleanup declared as a repair-contract item so it inherits diagnose and undo where an undo exists. Done when: each item declares its reversibility honestly.~~ -> `rizonesoft/QuickErase`
+- [ ] ~~Decide and record whether QuickErase and WinClean stay separate products given their overlapping secure-delete capability. Done when: the decision is dated with its cost of changing.~~ -> `rizonesoft/QuickErase`
+- [ ] Commit: ~~`"quickerase, winclean: the destructive intakes"`~~ -> `rizonesoft/QuickErase`
 
-**Test checkpoint:** Service primitives live in the framework and no tool implements them privately, proven by search. A destructive confirmation names count, size, and paths; declining performs nothing. The no-reverse statement is captured on the surface. The erase assertion runs inside the fixture root and refuses a path outside it. Each media type is detected on a driven run and the surface states the method used; a multi-pass request on solid state is refused with its explanation, and the override is logged. The eight preserved overwrite patterns are compared against `QuickErace.au3` and match.
+**Test checkpoint:** Moved with the section. The `rizonesoft/QuickErase` repository's plan carries it.
 
 ## 4. Indicators and SaveDesk
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/Indicators` and `rizonesoft/SaveDesk` repositories (`D:\Resolute_Bin\Indicators`, `D:\Resolute_Bin\SaveDesk`), each by its own plan.
 
 One small port and one genuinely new build. SaveDesk is the only candidate in this plan with no Rizonesoft source behind it, and saying so keeps it from being estimated like a port.
 
@@ -143,14 +151,14 @@ One small port and one genuinely new build. SaveDesk is the only candidate in th
 **Chrome:** consume the framework. SaveDesk consumes the repair contract for its restore record.
 **Needs:** Windows host (build/test)
 
-- [ ] Port Indicators through the intake contract. Done when: it ships conformant.
-- [ ] Record that SaveDesk is new development, not a port, with what the `[Research]/` material does and does not provide. Done when: the statement is here and the estimate reflects it.
-- [ ] Build SaveDesk: save and restore desktop icon layout, per resolution. Done when: a layout is saved, the resolution is changed, the layout is restored, and the icons return to their recorded positions.
-- [ ] Make saved layouts findable and identifiable. Done when: a user with several can pick one without opening it, captured.
-- [ ] Prove the restore is genuinely a reverse. Done when: save, disturb, restore returns every icon to its recorded position, asserted.
-- [ ] Commit: `"indicators, savedesk: a port and a new build"`
+- [ ] ~~Port Indicators through the intake contract. Done when: it ships conformant.~~ -> `rizonesoft/Indicators`
+- [ ] ~~Record that SaveDesk is new development, not a port, with what the `[Research]/` material does and does not provide. Done when: the statement is here and the estimate reflects it.~~ -> `rizonesoft/Indicators`
+- [ ] ~~Build SaveDesk: save and restore desktop icon layout, per resolution. Done when: a layout is saved, the resolution is changed, the layout is restored, and the icons return to their recorded positions.~~ -> `rizonesoft/Indicators`
+- [ ] ~~Make saved layouts findable and identifiable. Done when: a user with several can pick one without opening it, captured.~~ -> `rizonesoft/Indicators`
+- [ ] ~~Prove the restore is genuinely a reverse. Done when: save, disturb, restore returns every icon to its recorded position, asserted.~~ -> `rizonesoft/Indicators`
+- [ ] Commit: ~~`"indicators, savedesk: a port and a new build"`~~ -> `rizonesoft/Indicators`
 
-**Test checkpoint:** Indicators passes the conformance check and runs standalone. SaveDesk saves a layout, survives a resolution change, and restores every icon to its recorded position, asserted and captured. The layout list is identifiable without opening entries.
+**Test checkpoint:** Moved with the section. The `rizonesoft/Indicators` repository's plan carries it.
 
 ## 5. The Autoruns Manager and the Hosts Editor
 

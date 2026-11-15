@@ -1,0 +1,267 @@
+{
+  "name": "BiosCodes",
+  "slug": "bioscodes",
+  "display": "BiosCodes",
+  "job": "it tells a person what a BIOS beep code means, by manufacturer, and shows the BIOS this computer reports.",
+  "tagline": "What your computer's beeps are telling you",
+  "frozen": true,
+  "elevated": false,
+  "au3": [
+    "BiosCodes"
+  ],
+  "hue": {
+    "name": "Teal",
+    "light": "#2DD4BF",
+    "dark": "#0D9488",
+    "social_ground": "#0D2623",
+    "social_muted": "#BDE8E1"
+  },
+  "icon": {
+    "idea": "Long and short bars: a beep code written down.",
+    "points": [
+      "Free-standing with no tile, and every bar has rounded ends.",
+      "Two rows of bars: the long ones in Teal and the short ones in Teal light.",
+      "The small drawing, used below 40 pixels, is one row of one long bar and two short bars."
+    ],
+    "large": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M17 34 H43\" stroke=\"#0D9488\" stroke-width=\"14\"/><path d=\"M60 34 H62\" stroke=\"#2DD4BF\" stroke-width=\"14\"/><path d=\"M78 34 H79\" stroke=\"#2DD4BF\" stroke-width=\"14\"/><path d=\"M17 62 H18\" stroke=\"#2DD4BF\" stroke-width=\"14\"/><path d=\"M36 62 H62\" stroke=\"#0D9488\" stroke-width=\"14\"/><path d=\"M78 62 H79\" stroke=\"#2DD4BF\" stroke-width=\"14\"/></g>",
+    "small": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M18 48 H38\" stroke=\"#0D9488\" stroke-width=\"16\"/><path d=\"M59 48 H60\" stroke=\"#2DD4BF\" stroke-width=\"16\"/><path d=\"M78 48 H78.01\" stroke=\"#2DD4BF\" stroke-width=\"16\"/></g>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Codes",
+        "Beep codes listed with a manufacturer filter and a search, and the meaning of the selected code"
+      ],
+      [
+        "This computer",
+        "The detected BIOS vendor and version, with the motherboard and BIOS details"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person who heard beeps at start-up finds the code and reads what it means and what to try.",
+    "primary": "Copy meaning",
+    "secondary": "Clear filter",
+    "rows": [
+      [
+        "1 Short Beep",
+        "AMI: DRAM refresh failure"
+      ],
+      [
+        "1 Long, 2 Short Beeps",
+        "Award: video adapter error"
+      ],
+      [
+        "2 Beeps",
+        "Dell: memory (RAM) not detected"
+      ],
+      [
+        "3 Long Beeps",
+        "IBM: 3270 keyboard adapter error"
+      ],
+      [
+        "1-3-3-3",
+        "Phoenix: a three-set code, one beep, three, three, three"
+      ]
+    ],
+    "status": "177 codes shown, 7 manufacturers",
+    "notes": [
+      "The list opens showing every code from every manufacturer, one row per code, with the pattern and the manufacturer on each row.",
+      "A manufacturer filter above the list narrows it to one manufacturer: AMI, AST, Award, Compaq, Dell, IBM or Phoenix. Choosing All restores the full list.",
+      "A search box narrows the list to codes whose pattern or meaning contains what was typed. Clearing it restores the list.",
+      "Selecting a row shows its meaning and the steps to try in a panel beside the list. When nothing is selected the panel shows the general text about the power-on self test, as the original does (`BiosCodes.au3:818`, `:1598`).",
+      "Phoenix codes are listed as four numbers, such as 1-3-3-3, with the short explanation of how to read a three-set code that the original showed beside that list (`BiosCodes.au3:702`).",
+      "Each row shows its state in words as well as colour, and the status bar says how many codes are shown out of the total.",
+      "When the BIOS vendor is detected on the This computer screen, the filter starts on it. Every other manufacturer stays one choice away."
+    ],
+    "cut": "The AutoIt window had a File menu with Preferences, Log and Close, a Help menu with eight web and About entries (`BiosCodes.au3:545-567`), a splash animation at start (`:739`, `Splash.au3` included at `:254`), an update-check animation (`:589`), a donate icon (`:728`), a clock label that refreshed each second (`:724`, `:745`), an ESC-to-minimise hotkey (`:526`), icon tooltips on hover (`:1602`), an About icon in the heading (`:582`), eight toggle buttons down the left in place of a sidebar (`:600-604`), and a Preferences dialog with logging, priority and memory-reduction pages (`:1968`). This window has none of them: the sidebar replaces the buttons, the framework's Settings and About replace the menus and the dialog, and the memory reduction, the splash, the animations, the donate strip, the clock and the hotkey are cut. Each cut is recorded in the plan with its reason."
+  },
+  "readme": {
+    "lead": "BiosCodes tells you what a BIOS beep code means, whoever made your motherboard's BIOS, and which BIOS your computer has.",
+    "what": [
+      "When a computer fails its power-on self test it beeps instead of starting. The pattern of long and short beeps names the fault, but only for the BIOS maker that wrote it. BiosCodes holds the codes for seven makers: AMI, AST, Award, Compaq, Dell, IBM and Phoenix. Pick a code and it shows what it means and what to try first.",
+      "It also reads the motherboard and BIOS details that Windows already holds and shows them on a second screen, so you can tell which maker's table to read. It looks things up and shows them. It changes nothing on your system."
+    ],
+    "new_intro": "The C++ version carries the AutoIt tool's codes over unchanged and makes them easier to reach.",
+    "new": [
+      [
+        "One list for every maker.",
+        "All codes are in one list with a manufacturer filter, instead of seven tabs to search."
+      ],
+      [
+        "Search by pattern.",
+        "Type what you heard, such as 1 long 2 short, and see every maker's match with its meaning."
+      ],
+      [
+        "Starts on your BIOS.",
+        "The filter starts on the maker your BIOS reports, and you can still browse the others."
+      ],
+      [
+        "Your own codes.",
+        "Add a code the list lacks, kept apart from the shipped codes and marked as yours, with an undo for each change."
+      ]
+    ]
+  },
+  "reference": {
+    "note": "The beep text is not in the script body. The display functions in `src/BiosCodes.au3` (`:783-1263`) only pick a text by index, and the texts and their English defaults are in `src/Includes/Localization.au3` (`:119-395`, 246 entries). Language packs for `de`, `en` and `ko` are under `shipped/Language/BiosCodes/`; the English pack is UTF-16."
+  },
+  "plan": {
+    "scope": "The whole port: build, baseline, data, parity, window, features",
+    "goal": "BiosCodes ships as a complete, standalone C++ tool: the beep-code data of the AutoIt original is carried over exactly, every code is found by manufacturer and by pattern, the detected BIOS is shown, and the shipped answers are proven identical to the original's by a parity check.",
+    "current_state": "Nothing exists in C++. The repository holds the AutoIt original under `reference/au3/` (`src/BiosCodes.au3`, 2,516 lines, and `src/Includes/Localization.au3`, 491 lines), the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The original is a lookup tool with seven manufacturer tabs: AMI (15 codes), AST (19), Award (5), Compaq (7), Dell (7), IBM (10) and Phoenix (114), 177 in all. The texts are 246 indexed entries, 0 to 245, loaded in `Localization.au3:119-395`, and each display function in `BiosCodes.au3:783-1263` maps a selected pattern to an index. A page reads `Win32_BaseBoard` (`:1355`) and `Win32_BIOS` (`:1405`) over WMI. Its only writes are its own `.ini` and a temporary change of the system's drag-full-windows setting during window moves (`:1645-1661`). It requests no elevation. It also has File and Help menus, a splash, two animations, a donate icon and a three-page Preferences dialog. The SDK's framework is planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`reference/au3/src/BiosCodes.au3`: the tool being ported, `reference/au3/src/Includes/Localization.au3`, which holds the beep texts and their English defaults, and `reference/au3/src/BiosCodes.sni`, which lists what ships with it.",
+      "`reference/au3/shipped/Language/BiosCodes/en.lng`: the English pack (UTF-16), whose `[BeepInformation]` section carries 244 of the 246 texts; `de.lng` and `ko.lng` are the other two packs.",
+      "`reference/au3/dist/BiosCodes_1959.zip`: the shipped build the baseline and the parity check run."
+    ],
+    "outcome": [
+      "`BiosCodes.exe` answers every one of the 177 codes with the text the AutoIt original shows for it, proven by the parity check, and reads the BIOS vendor and version the original reads.",
+      "The codes are listed with a manufacturer filter and a search, the detected vendor starts the filter, and a code the list lacks can be added, edited and removed, each change undoable.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Codes screen, where a person finds a code by manufacturer or by pattern. Reporting and audit are the Activity section, which records each lookup and each change to the user's own codes. Settings are the framework's pages. Permissions do not apply: reading the codes and the WMI details needs no right the user lacks. Reverse here means undoing an edit to the user's own code list, which the original never had; the shipped codes cannot be edited, so there is nothing else to reverse.",
+    "baseline_items": [
+      "Run `BiosCodes.exe` from `reference/au3/dist/BiosCodes_1959.zip` on a disposable machine, select every row of every manufacturer list in turn and copy the details text shown for each. Done when: `docs/baseline/codes.json` lists 177 entries, each with its manufacturer, its pattern and its exact text, and the Phoenix list shows 113 distinct rows against 114 mapped patterns (`BiosCodes.au3:691-700`, `:1022-1254`).",
+      "Select nothing in each list, and open each of the three BIOS Information buttons. Done when: `docs/baseline/default-text.json` holds the text shown with no selection (`BiosCodes.au3:1598`), and `docs/baseline/computer.json` holds every row of the Motherboard, BIOS and Characteristics lists with its text and the `Yes` or `No` icon state.",
+      "Run it again with the `de` and `ko` packs selected through Preferences. Done when: `docs/baseline/packs.json` lists, per pack, which of the 246 keys it overrides and which fall back to the English default in `Localization.au3`."
+    ],
+    "inventory_items": [
+      "Record the windows and controls in `docs/inventory.md`: the main window (`BiosCodes.au3:536`), the eight toggle buttons (`:600-604`), the BIOS Info section buttons and list (`:614-629`), the seven pattern lists (`:641-701`), the details Edit (`:717`), the donate icon (`:728`), the clock label (`:724`), and the Preferences dialog (`:1968`) with its three tabs. Done when: every control-creation call in the file is listed with its window and purpose.",
+      "Record the strings: each pack section read by `Localization.au3`, the 246 beep texts with their index and manufacturer (`Localization.au3:119-395`), the hardcoded `Yes`, `No`, `Deployable`, `Installable`, `Executable`, `Running` and `Unknown` (`BiosCodes.au3:1470-1505`), the WMI error texts (`:1534-1557`) and the ESC hotkey (`:526`). Done when: every string names its pack key or says why it is hardcoded, and the two keys absent from `en.lng` (`List_AST_19`, `List_AST_Info_19`) are marked as default-only.",
+      "Record the behaviours: the pattern-to-index mapping of every manufacturer (`BiosCodes.au3:783-1254`), the composition rule (text for the code, a blank line, then one of the five shared advice texts), the Phoenix pattern 2-1-2-4 that is mapped but never listed (`:696`, `:1022-1254`) and the duplicate 2-1-2-3 in the list (`:693`), every WMI property read (`:1355-1455`) with its column, and the single-instance guard (`:450`). Done when: every lookup and every WMI property is listed and the 177-code set is stated as the freeze scope.",
+      "Record settings, logging, the drag-full-windows change (`BiosCodes.au3:441-444`, `:1645-1661`), the start-up test log lines (`:751-755`) and the `.sni` ship list. Done when: every `.ini` key, log line and shipped file is marked keep, cut or remapped, and the `.sni` ship gap for the language packs is recorded."
+    ],
+    "engine": {
+      "title": "Beep Code Data and Lookup",
+      "intro": "The tool's core: the 177 beep codes of the AutoIt original, every manufacturer and every code, carried into one data file with their texts exactly as the original shows them, and a lookup that finds codes by manufacturer and by pattern. This is the frozen part: the answers are the original's, not rewritten.",
+      "needs": "windows-host",
+      "build": [
+        "Write the data file `resources/beepcodes.json` from `docs/baseline/codes.json`, with a loader in `src/core/BeepDb.cpp`. Done when: the loader returns 177 codes across seven manufacturers and the texts equal the baseline.",
+        "Implement the lookup in `src/core/BeepLookup.cpp`. Done when: the unit tests find a code by manufacturer and by pattern and return the original's text."
+      ],
+      "items": [
+        "Write `resources/beepcodes.json` with one record per code: manufacturer, pattern, meaning and the advice text it composes with, from `Localization.au3:119-395` and the mapping in `BiosCodes.au3:783-1254`. Done when: the file holds 177 records (AMI 15, AST 19, Award 5, Compaq 7, Dell 7, IBM 10, Phoenix 114) and a test compares each text with `docs/baseline/codes.json`.",
+        "Write the five shared advice texts and the no-selection text (`Localization.au3` entries 0 to 5) into the same file and compose a meaning as the original does: the code's text, a blank line, then the advice text its mapping names (`BiosCodes.au3:787`, `:789`). Done when: a test composes all 177 meanings and each equals the baseline text.",
+        "Implement `BeepDb::Load()` in `src/core/BeepDb.cpp`, reading the file embedded in the executable and refusing a file with a missing field by record number. Done when: a test with one record missing its pattern reports that record and loads nothing. Cheaper substitute: skipping a bad record silently, which loses a code without saying so.",
+        "Implement `Lookup::ByManufacturer(name)` and `Lookup::ByPattern(text)` in `src/core/BeepLookup.cpp`, with manufacturer names case-insensitive and a pattern matched exactly after trimming. Done when: `ByManufacturer(\"Dell\")` returns 7 and `ByPattern(\"1 Long, 2 Short Beeps\")` returns the AMI, AST, Award, Compaq and IBM entries.",
+        "Keep every Phoenix pattern including 2-1-2-4, which the original maps but never lists (`BiosCodes.au3:696`, `:1022-1254`), and list the duplicate 2-1-2-3 once. Done when: `ByManufacturer(\"Phoenix\")` returns 114 and a test confirms 2-1-2-4 and 2-1-2-3 are each found once. Cheaper substitute: dropping 2-1-2-4 because the original's list never showed it, which loses a mapped code.",
+        "Return the no-selection text for an unknown pattern, as the original does (`BiosCodes.au3:818`, `:1598`). Done when: a test with a pattern no manufacturer has returns the text in `docs/baseline/default-text.json`.",
+        "Cover every path in `tests/beepdb_test.cpp` and `tests/lookup_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L beepdb` passes, and fails when one text in `resources/beepcodes.json` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L beepdb` passes: 177 codes across seven manufacturers equal the baseline, lookup by manufacturer and by pattern answers, and it fails when one text in the data file is changed.",
+      "commit": "core: the beep-code data and lookup, carried over exactly"
+    },
+    "parity_items": [
+      "Add `tests/fixtures/baseline/` as a copy step from `docs/baseline/` at configure time. Done when: the parity test reads the committed baseline and no path is typed into a tracked build file.",
+      "Compare all 177 meanings and the no-selection text with the baseline, and record the Phoenix 2-1-2-4 and 2-1-2-3 differences. Done when: the test covers `codes.json` and `default-text.json`, and the two Phoenix list differences appear in `docs/parity.md` with their reason."
+    ],
+    "enhancements": [
+      {
+        "title": "This Computer Section",
+        "intro": "The second section of the window shows what the original's BIOS Information page showed: the motherboard, the BIOS and the BIOS characteristics, read over WMI. It reads and displays only, and the field mappings are the original's.",
+        "surface": {
+          "fidelity": "the This computer section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16, in light and dark at 100 and 150 percent.",
+          "job": "a person sees which BIOS and motherboard this computer reports. Consumer: the rendered list, read back against `docs/baseline/computer.json`.",
+          "treatment": "three groups of rows, each a name and a value, with the characteristics shown as supported or not in words as well as an icon. Cheaper substitute that fails the checkpoint: one long text box of raw property values, which cannot be scanned."
+        },
+        "build": [
+          "Read `Win32_BaseBoard` and `Win32_BIOS` in `src/core/BiosInfo.cpp` with the original's decodes. Done when: a fixture reproduces `docs/baseline/computer.json`.",
+          "Show the three groups in `src/ui/ThisComputerView.cpp`. Done when: the rows equal the baseline."
+        ],
+        "items": [
+          "Implement `BiosInfo::Read()` in `src/core/BiosInfo.cpp` reading the `Win32_BaseBoard` and `Win32_BIOS` properties the original reads (`BiosCodes.au3:1355-1455`), with the date, boolean, software-element-state and joined-array decodes (`:1458-1531`). Done when: a fixture object returns the baseline's values for every property.",
+          "Decode the 36 BIOS characteristics as supported or not (`BiosCodes.au3:1458-1467`, `:1332-1335`). Done when: a fixture with characteristics 4 and 7 set marks exactly those two as supported.",
+          "Report a WMI failure on the screen in one sentence naming what failed, in place of the original's message boxes (`BiosCodes.au3:1534-1557`). Done when: a fixture with no `Win32_BIOS` instance shows the sentence and leaves the Codes section working. Cheaper substitute: a message box, which the suite's windows do not use.",
+          "Build `src/ui/ThisComputerView.cpp` with the Motherboard, BIOS and Characteristics groups (`BiosCodes.au3:614-616`) as the SDK's list. Done when: switching between the groups shows the baseline's rows, with an icon and a word on each characteristic. Cheaper substitute: a private list control, which the contract forbids.",
+          "Cover it in `tests/bioscomputer_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L computer` passes, and fails when one decode is changed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L computer` passes for the fixtures and the failure case, and on a real machine the section shows the rows the AutoIt tool showed.",
+        "commit": "feature: the This computer section, read over WMI"
+      },
+      {
+        "title": "Vendor Filter From the BIOS",
+        "intro": "The tool already reads the BIOS manufacturer over WMI (`BiosCodes.au3:1429`) and then ignores it. Here the Codes filter starts on the matching manufacturer. It changes only where the filter starts: no code and no answer changes, and every other manufacturer stays one choice away.",
+        "surface": {
+          "fidelity": "the manufacturer filter on the Codes screen, against `sdk/DESIGN.md` section 11.",
+          "job": "a person sees their own BIOS maker's codes first without knowing the maker. Consumer: the selected filter at start, read back.",
+          "treatment": "the filter set to the matched maker with a line saying why, and the unmatched case left on All with no line. Cheaper substitute that fails the checkpoint: exact string matching, which misses makers that spell their name differently."
+        },
+        "build": [
+          "Match the manufacturer string in `src/core/VendorMatch.cpp` against a table. Done when: fixtures for three vendors match and unknown text returns none.",
+          "Set the filter in `src/ui/CodesView.cpp`. Done when: it starts on the match and on All otherwise."
+        ],
+        "items": [
+          "Write the match table in `src/core/VendorMatch.cpp`: normalised manufacturer substrings for AMI, AST, Award, Compaq, Dell, IBM and Phoenix, with the table stated as data. Done when: fixtures for `American Megatrends Inc.`, `Dell Inc.` and `Phoenix Technologies Ltd.` return AMI, Dell and Phoenix.",
+          "Fall back to All when the vendor is unknown or the WMI read failed. Done when: a fixture with an unknown vendor and one with a failed read both leave the filter on All and show no error on the Codes screen. Cheaper substitute: leaving the previous maker selected, which shows a wrong maker's codes.",
+          "Start the filter on the match in `src/ui/CodesView.cpp` with one line of status text naming the detected vendor. Done when: the driven test sees the filter set and the line shown, and the user can still choose any other maker.",
+          "Cover it in `tests/vendormatch_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L vendor` passes, and fails when a table entry is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L vendor` passes for three matched fixtures and both fallbacks, and the parity check still reports zero differing fields.",
+        "commit": "feature: the filter starts on the BIOS vendor"
+      },
+      {
+        "title": "Cross-Vendor Pattern Search",
+        "intro": "The original shows one manufacturer's list at a time, so a person who does not know the maker searches seven tabs. Here a search matches a pattern across every manufacturer and names the maker on each result. It only reads the data: no answer changes.",
+        "surface": {
+          "fidelity": "the search box and its results on the Codes screen, against `sdk/DESIGN.md` section 11; new surface, no AutoIt baseline.",
+          "job": "a person who heard the beeps but does not know the maker reaches every candidate meaning. Consumer: the results list.",
+          "treatment": "words and numbers matched by one stated rule, results ranked by a stated rule, every result naming its maker, and a plain sentence when nothing matches. Cheaper substitute that fails the checkpoint: loose substring matching with no rule, which matches nearly everything and ranks nothing."
+        },
+        "build": [
+          "Implement the matching rule in `src/core/PatternSearch.cpp`. Done when: tests show `1 long 2 short` finds every maker's entry.",
+          "Bind the search box in `src/ui/CodesView.cpp`. Done when: typing narrows the list and clearing restores it."
+        ],
+        "items": [
+          "Implement `PatternSearch::Find(text)` in `src/core/PatternSearch.cpp`: read counts and the words long, short, beep and beeps, treat `1L`, `2S` and `1-3-3-3` as the same codes, and rank exact pattern matches before meaning matches. Done when: `1 long 2 short` returns the AMI, AST, Award, Compaq and IBM `1 Long, 2 Short Beeps` entries first.",
+          "Write the rule and the ranking in the screen's help text through the framework's pack. Done when: the text states both and a test compares it with the rule's constants.",
+          "Show results in the Codes list with the maker on each row, and a sentence for no match. Done when: a pattern no maker has shows the sentence and keeps the filter. Cheaper substitute: an empty list with no explanation.",
+          "Reach the search by keyboard and name it for screen readers. Done when: Ctrl+F focuses it, and a UI Automation walk names the box and announces the result count.",
+          "Cover it in `tests/search_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L search` passes, and fails when the ranking is reversed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L search` passes for a pattern shared by several makers and an unknown pattern, and the parity check still reports zero differing fields.",
+        "commit": "feature: search a beep pattern across every maker"
+      },
+      {
+        "title": "Your Own Beep Codes",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "The shipped codes cannot change. This adds a separate list of the user's own codes, kept beside the shipped data and never inside it, marked as the user's, found by the same lookup and search. Each add, edit and delete is recorded so it can be undone; the record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the editor and the marked rows on the Codes screen, against `sdk/DESIGN.md` sections 11 and 12; new surface, no AutoIt baseline.",
+          "job": "a person records a code the list lacks and finds it again like any other. Consumer: the user file and the lookup answers.",
+          "treatment": "user rows marked with a word, shipped rows shown locked with no edit path, and a user code never replacing a shipped answer: when both exist both show, shipped first. Cheaper substitute that fails the checkpoint: editing the shipped data in place, which changes the frozen answers."
+        },
+        "build": [
+          "Store the user's codes in `src/core/UserCodes.cpp` with an atomic write and a readback. Done when: add, edit and delete survive a restart.",
+          "Wire the editor and Undo in `src/ui/CodesView.cpp`. Done when: each change is undone by one press."
+        ],
+        "items": [
+          "Implement `UserCodes::Add`, `Edit` and `Delete` in `src/core/UserCodes.cpp`, writing the user's file atomically, reading it back and refusing a record with no pattern, no meaning or an unknown manufacturer by naming the field. Done when: all three round-trip through a restart and each refusal names its field. Cheaper substitute: writing the file in place, which can leave it half-written.",
+          "Record the user file's prior state through the repair contract's restore record before each change. Done when: a test finds the record on disk before the change is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record for the last change. Done when: add then undo, edit then undo and delete then undo each leave the user file equal to before, asserted.",
+          "Keep shipped rows locked and mark user rows, including in search results, and show both when a user code and a shipped code share a pattern. Done when: a fixture with a shared pattern shows both with the shipped row first. Cheaper substitute: a user row hiding the shipped one.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one change.",
+          "Cover it in `tests/usercodes_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L usercodes` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L usercodes` passes: add, edit and delete round-trip, each is undone to the prior state, and the shipped answers are unchanged with a populated user file.",
+        "commit": "feature: your own beep codes, each change undoable"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A walk of `reference/au3/src/BiosCodes.au3` and `reference/au3/src/Includes/Localization.au3` finds every piece in `docs/inventory.md` with its home.",
+      "The parity check reports zero differing fields against the shipped AutoIt build for all 177 codes, and the two Phoenix list differences are recorded in `docs/parity.md`.",
+      "On a real machine the tool looks up, filters, searches, shows the BIOS and undoes an edit to the user's codes, in light and dark, by keyboard alone."
+    ]
+  }
+}

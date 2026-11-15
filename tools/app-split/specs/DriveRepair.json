@@ -1,0 +1,265 @@
+{
+  "name": "DriveRepair",
+  "slug": "driverepair",
+  "display": "Drive Repair",
+  "job": "it repairs the USB controllers and hubs and the CD and DVD drives Windows no longer shows, by clearing the filter drivers and policies that block them, reads back what it changed and can put it back.",
+  "tagline": "Bring back a USB or DVD drive that Windows stopped showing",
+  "frozen": true,
+  "elevated": true,
+  "au3": [
+    "USBRepair",
+    "DVDRepair"
+  ],
+  "hue": {
+    "name": "Indigo",
+    "light": "#818CF8",
+    "dark": "#4F46E5",
+    "extra": [
+      [
+        "Green",
+        "#34D399",
+        "The drive's light, back on"
+      ]
+    ],
+    "social_ground": "#171A3A",
+    "social_muted": "#CDD0F7"
+  },
+  "icon": {
+    "idea": "A drive unit with its light back on.",
+    "points": [
+      "Free-standing, with no tile behind it: a rounded drive body.",
+      "The top face is Indigo light and the front face is Indigo, with a slot and a Green light on the front.",
+      "The small drawing, below 40 pixels, drops the slot and enlarges the light."
+    ],
+    "large": "<rect x=\"12\" y=\"26\" width=\"72\" height=\"46\" rx=\"9\" fill=\"#4F46E5\"/><path d=\"M21 26 H75 A9 9 0 0 1 84 35 V44 H12 V35 A9 9 0 0 1 21 26 Z\" fill=\"#818CF8\"/><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M24 58 H50\" stroke=\"#818CF8\" stroke-width=\"6\"/></g><circle cx=\"68\" cy=\"58\" r=\"5\" fill=\"#34D399\"/>",
+    "small": "<rect x=\"12\" y=\"24\" width=\"72\" height=\"50\" rx=\"10\" fill=\"#4F46E5\"/><path d=\"M21 24 H75 A9 9 0 0 1 84 33 V42 H12 V33 A9 9 0 0 1 21 24 Z\" fill=\"#818CF8\"/><circle cx=\"64\" cy=\"58\" r=\"9\" fill=\"#34D399\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "All devices",
+        "Every USB controller, USB device and optical drive, each with its state and the repairs that apply"
+      ],
+      [
+        "USB",
+        "The USB controllers and hubs, and the filter values that can hide them"
+      ],
+      [
+        "CD and DVD",
+        "The optical drives, their filter values, the autorun policy and the ATAPI setting"
+      ],
+      [
+        "History",
+        "The repairs run before, each with what it changed and whether it was undone"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which drives and drive settings are wrong, repairs them with one button and undoes the repair if it did not help.",
+    "primary": "Repair",
+    "secondary": "Undo last repair",
+    "rows": [
+      [
+        "USB controllers and hubs",
+        "Found or None found"
+      ],
+      [
+        "USB class filters",
+        "Clear or Set (UpperFilters, LowerFilters)"
+      ],
+      [
+        "Optical drives",
+        "Found or None found"
+      ],
+      [
+        "Optical class filters",
+        "Clear or Set (UpperFilters, LowerFilters)"
+      ],
+      [
+        "Autorun policy",
+        "Default, Blocked or Reset needed"
+      ]
+    ],
+    "status": "1 optical drive found, 2 filter values set",
+    "notes": [
+      "The first screen lists every USB controller, USB device and optical drive Windows reports, one row each, with a state in words and an icon.",
+      "Under the devices sit the checks the repairs act on: the USB class filters, the optical class filters, the autorun policy and the ShellHWDetection service.",
+      "Repair applies the repairs for the selected devices. With nothing selected it applies the ones whose check shows a problem.",
+      "With no USB controller and no optical drive found, the screen says so in one sentence, Repair is disabled, and nothing is written.",
+      "A confirmation before Repair names each change it will make and each device it concerns, and declining changes nothing.",
+      "After a repair the rows are read again from the system, so they show what is now there and not what was asked for.",
+      "The autorun options of DVDRepair (reset, protect, protect the machine, repair only) are choices on the CD and DVD screen, not on this one."
+    ],
+    "cut": "The two AutoIt windows had a File and Help menu bar with a log submenu, a Troubleshoot and a Tools menu (`USBRepair.au3:519-554`, `DVDRepair.au3:531-568`), a splash screen with an animation (`USBRepair.au3:477`, `DVDRepair.au3:489`), an update animation and a processing animation in place of the icon (`USBRepair.au3:581-582`), a donate strip with a PayPal icon and label (`USBRepair.au3:615-622`, `DVDRepair.au3:634-641`), a donate dialog on exit (`USBRepair.au3:938-942`), a link to firmwarehq.com (`DVDRepair.au3:557`, which `USBRepair.au3` wires but never creates) and a plain list box for the log. This window has none of them: menus become the sidebar, the log becomes the Activity section, settings and About are the framework's pages, and the donate strip, splash and animations are cut. Each cut is recorded with its reason in `docs/inventory.md`."
+  },
+  "readme": {
+    "lead": "Drive Repair brings back a USB device or a CD or DVD drive that Windows has stopped showing, by clearing the filter drivers and policies that block it.",
+    "what": [
+      "It lists the USB controllers, USB devices and optical drives Windows knows about and checks the settings that commonly hide them: the UpperFilters and LowerFilters values of the USB and CD and DVD device classes, the autorun policy and the ATAPI interface setting. One button repairs them, reads each change back and tells you what it did. If no suitable device is connected, it says so and changes nothing.",
+      "Drive Repair replaces USBRepair and DVDRepair, two AutoIt tools of the Resolute suite that did the same job for different drives. Both are kept under `reference/au3/` as the specification this tool is measured against."
+    ],
+    "new_intro": "The C++ version keeps what both originals changed and adds the following.",
+    "new": [
+      [
+        "One tool for both drives.",
+        "USBRepair and DVDRepair become one window, with the device type as data."
+      ],
+      [
+        "No device is a result, not an error.",
+        "When no USB or optical device is present, the tool says so and writes nothing."
+      ],
+      [
+        "See before you repair.",
+        "Every device and every checked setting is listed with its state before anything changes."
+      ],
+      [
+        "Undo.",
+        "The values and the service setting a repair changed are recorded first, and Undo puts them back."
+      ],
+      [
+        "A restore point on offer.",
+        "Both originals only told you to make one. This tool offers to make it before it repairs."
+      ]
+    ]
+  },
+  "reference": {
+    "note": "`USBRepair.au3` names its repair function `_RepairDVDDrives` (`USBRepair.au3:975`) but it acts on the USB class `{36FC9E60-C465-11CF-8056-444553540000}` (`:987-988`), while `DVDRepair.au3` uses the same function name (`:1016`) for the CD and DVD class `{4D36E965-E325-11CE-BFC1-08002BE10318}` (`:1032-1033`). Both scripts also contain a `_BootMessage` function (`USBRepair.au3:1060`, `DVDRepair.au3:1152`) that nothing in either file calls."
+  },
+  "plan": {
+    "scope": "The whole port, from baseline to release",
+    "goal": "Drive Repair ships as one complete, standalone C++ tool: it makes exactly the registry and service changes the two AutoIt tools make, proven by a parity check against both shipped builds, reports clearly when no USB or optical device is present, verifies every value it writes or deletes, shows each device and setting with its state, and can put back what it changed.",
+    "current_state": "Nothing exists in C++. The repository holds the two AutoIt originals under `reference/au3/`: `USBRepair/src/USBRepair.au3` (1,703 lines) and `DVDRepair/src/DVDRepair.au3` (1,830 lines), each with its shipped files and one distribution zip, the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. Both request administrator rights (`USBRepair.au3:40`, `DVDRepair.au3:40`), allow one instance (`:432`, `:442`) and have one main window with a repair button. Neither checks that a device is present before it writes. USBRepair runs `sc config ShellHWDetection start= auto obj= LocalSystem` and `net start ShellHWDetection` (`:983-984`) and deletes `UpperFilters` and `LowerFilters` under the USB class key (`:987-988`). DVDRepair runs the same two commands (`:1028-1029`), deletes the same two values under the CD and DVD class key (`:1032-1033`), unless `DisableExtras` is set either resets autorun (`:1037-1051`) or protects against it (`:1053-1071`), and always writes `EnumDevice1` under `atapi\\Controller0` (`:1076`). Neither undoes anything or can be tested without a device. The SDK's framework and repair contract, which the port consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`reference/au3/USBRepair/src/USBRepair.au3` and `reference/au3/DVDRepair/src/DVDRepair.au3`: the tools being merged, with the `.sni` beside each listing what ships with it.",
+      "`reference/au3/USBRepair/shipped/Language/USBRepair/en.lng` and `reference/au3/DVDRepair/shipped/Language/DVDRepair/en.lng` (UTF-16): the `[Custom]` and `[Messages2]` sections carry each tool's own strings.",
+      "`reference/au3/USBRepair/dist/USBRepair_2380.zip` and `reference/au3/DVDRepair/dist/DVDRepair_2920.zip`: the shipped builds the baseline and the parity check run."
+    ],
+    "outcome": [
+      "`DriveRepair.exe` makes the same registry and service changes as both AutoIt tools, value for value, proven by the parity check, and on a machine with no USB or optical device it says so and writes nothing.",
+      "Every value written or deleted is read back and a mismatch is refused by name; each device and setting shows its state; the last repair can be undone from a restore record.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the All devices screen, where a person finds a drive and sees what is wrong with it. Reporting and audit are the Activity section, the trail of every repair and its read-back. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated write is refused by name. Reverse anchors on the undo section, which neither original had.",
+    "baseline_items": [
+      "On a disposable machine or virtual machine with a USB device attached, export `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{36FC9E60-C465-11CF-8056-444553540000}`, set a dummy `UpperFilters` on it, run `USBRepair.exe` from `reference/au3/USBRepair/dist/USBRepair_2380.zip` elevated, press Repair, and export again, also recording the `ShellHWDetection` start type and state with `sc qc` and `sc query`. Done when: `docs/baseline/usb-repair.json` lists every key, value and service setting that differs, with type and data.",
+      "Repeat for `DVDRepair.exe` from `reference/au3/DVDRepair/dist/DVDRepair_2920.zip` once per mode (reset autorun, protect autorun, protect autorun with the machine option, repair only) over the CD and DVD class key, `CDRom`, `atapi\\Controller0` and both `Policies\\Explorer` keys. Done when: `docs/baseline/dvd-reset.json`, `dvd-protect.json`, `dvd-protect-machine.json` and `dvd-repair-only.json` exist, and each shows `EnumDevice1` and the filter deletes (`DVDRepair.au3:1032-1033`, `:1076`).",
+      "Run both original tools on a machine with no USB device and no optical drive, such as a virtual machine with neither, and record what each does. Done when: `docs/baseline/no-device.json` states, for each tool, whether it warned, wrote or deleted anything, and the record names the values touched (the originals have no device check, so this is expected to show their normal writes)."
+    ],
+    "inventory_items": [
+      "Record the windows and controls of both tools in `docs/inventory.md`: the main window (`USBRepair.au3:514`, `DVDRepair.au3:526`), heading, subheading, the repair button (`USBRepair.au3:595`, `DVDRepair.au3:614`), the status list, the DVDRepair option checkboxes (`DVDRepair.au3:608-613`), the donate strip, the Preferences dialog (`USBRepair.au3:1139`, `DVDRepair.au3:1266`) and every menu item (`USBRepair.au3:519-554`, `DVDRepair.au3:531-568`). Done when: every control-creation call in both files is listed with its window and purpose.",
+      "Record the strings of both tools: each language pack section read, the `[Custom]` and `[Messages2]` keys that name a repair step (`Repair_USB_01`, `Repair_Drives_01` to `_05`) and the hardcoded values (the two `sc` and `net` commands, the class GUIDs, the firmwarehq.com address at `DVDRepair.au3:1216`). Done when: every string names its pack key or says why it is hardcoded.",
+      "Record the behaviours: every registry value written and deleted with its hive and line, the two service commands, the autorun mode logic (`DVDRepair.au3:1231-1263`), the Windows XP only branches (`DVDRepair.au3:1049-1051`, `:1056-1057`, with the verdict that they are cut), the reboot offer (`USBRepair.au3:1084`, `DVDRepair.au3:1176`), the single-instance guard and the absent device check. Done when: every registry and command call in both files is listed and the shared effect is stated as the freeze scope.",
+      "Record settings, logging, update and both `.sni` ship lists: the `DVDRepair.ini` keys (`ResetAutorun`, `ProtectAutorun`, `ProtectAutorunMachine`, `DisableExtras`) and the keys common to both. Done when: every `.ini` key, log line and shipped file is marked keep, cut or remapped."
+    ],
+    "engine": {
+      "title": "Repair Engine With Device Check",
+      "intro": "The tool's whole system effect: every repair of both originals declared as data, run by one loop that consumes the SDK's repair contract, with every value read back and every action refused by name when the process is not elevated. No device connected is a named outcome of the loop, not an error. This is the frozen part: the values, the service settings and the order are the AutoIt originals', exactly.",
+      "needs": "windows-host",
+      "build": [
+        "Declare every repair as data in `src/core/Repairs.h`. Done when: each repair states its diagnose, repair and verify steps, whether it is reversible and the line of the original it comes from, once.",
+        "Implement the run loop in `src/core/RepairRunner.cpp` against a registry root and a service interface the tests can redirect. Done when: the unit tests pass against a disposable key and a fake service."
+      ],
+      "items": [
+        "Declare in `src/core/Repairs.h` the service repair (`sc config ShellHWDetection start= auto obj= LocalSystem`, `net start ShellHWDetection`) shared by both tools, citing `USBRepair.au3:983-984` and `DVDRepair.au3:1028-1029`, and the two class repairs that delete `UpperFilters` and `LowerFilters` under `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{36FC9E60-C465-11CF-8056-444553540000}` (`USBRepair.au3:987-988`) and `{4D36E965-E325-11CE-BFC1-08002BE10318}` (`DVDRepair.au3:1032-1033`). Done when: a test compares the declared values with `docs/baseline/usb-repair.json` and `dvd-repair-only.json`. Cheaper substitute: shelling out to `sc.exe` and `reg.exe`, which cannot be redirected for a test or read back.",
+        "Declare in `src/core/Repairs.h` the autorun repairs of `DVDRepair.au3:1037-1071`: reset (write `CDRom` `AutoRun` 1, delete the six `Policies\\Explorer` values under HKCU and HKLM), protect (write `NoAutorun`, `DontSetAutoplayCheckbox` and `NoDriveTypeAutoRun` 255 under HKCU, and under HKLM when the machine option is set) and `EnumDevice1` under `atapi\\Controller0` (`:1076`). Done when: a test holds every value and compares it with the four `docs/baseline/dvd-*.json` files, with the Windows XP branches absent by design.",
+        "Implement `RunRepair(selection, mode)` in `src/core/RepairRunner.cpp` as one loop over the declared repairs that diagnoses, repairs, reads back and verifies each, and returns a record per repair through the repair contract. Done when: a test under a disposable root produces a record whose changed values equal the baseline's. Cheaper substitute: reporting success because a command returned zero, which is the original's behaviour and proves nothing.",
+        "Return `NoDeviceConnected` from `RunRepair` as its own outcome, with its own message and one activity record, when no USB controller, hub or device and no optical drive is found through `SetupDiGetClassDevsW`, before any write. Done when: a fixture with no devices returns it, writes nothing, and the outcome is not an error code. Cheaper substitute: letting the writes run and reporting nothing wrong, which is what both originals do.",
+        "Read back every value after a write or delete and return a mismatch as key, value, expected and found. Done when: a test that restores one deleted value after the repair gets that value named. Cheaper substitute: checking only the return code of the write.",
+        "Implement the mode logic of `DVDRepair.au3:1231-1263` in `src/core/RepairRunner.cpp`: repair-only skips the autorun repairs, reset and protect are exclusive, the machine option applies only to protect. Done when: a test over the four modes writes the value sets of the four baselines and no others.",
+        "Refuse `RunRepair` by name when the process is not elevated, before any write or service change, with one activity record. Done when: an unelevated test run reports the refusal and the fixture and the fake service are unchanged. Cheaper substitute: letting the first HKLM write fail with access denied halfway through.",
+        "Cover every path in `tests/repair_test.cpp`, including the no-device and unelevated cases. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L repair` passes, and fails when one value in `Repairs.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L repair` passes, including the no-device, corrupted-readback and unelevated cases, and fails when one declared value is changed.",
+      "commit": "core: both drive repairs as data, verified after every write"
+    },
+    "parity_items": [
+      "Add `tests/fixtures/baseline/` as a copy step from `docs/baseline/` at configure time. Done when: the parity test reads the committed baseline and no path is typed into a tracked build file.",
+      "Compare every baseline, the USB repair and the four DVD modes, and record the no-device behaviour as a deliberate difference in `docs/parity.md`. Done when: the test covers `usb-repair.json`, the four `dvd-*.json` files, and `no-device.json` is listed with its reason."
+    ],
+    "enhancements": [
+      {
+        "title": "Device List With Per-Device State",
+        "intro": "Neither original showed a device: they wrote to the registry whether or not a drive was there. This section enumerates USB controllers, USB devices and optical drives and shows each one's state, so a person can see what is wrong before pressing Repair and so the no-device case is visible on screen.",
+        "surface": {
+          "fidelity": "the All devices screen, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person sees every drive Windows knows, its state and what is set against it. Consumer: the devices as the system reports them, read back.",
+          "treatment": "one row per device with its name, class, state in words and an icon, and drive letter, label and size for a volume. Cheaper substitute that fails the checkpoint: a list that shows only that a device exists, which hides which one is in a problem state."
+        },
+        "build": [
+          "Enumerate the devices in `src/core/Devices.cpp` with `SetupDiGetClassDevsW` and `CM_Get_DevNode_Status`. Done when: a test with a fake enumerator returns each device with its class and state.",
+          "Show them in `src/ui/AllDevicesView.cpp` and the `USB` and `CD and DVD` screens. Done when: each screen shows the devices of its class, and the no-device sentence when there are none."
+        ],
+        "items": [
+          "Implement `EnumerateDevices()` in `src/core/Devices.cpp` for the USB class `{36FC9E60-C465-11CF-8056-444553540000}` and the CD and DVD class `{4D36E965-E325-11CE-BFC1-08002BE10318}`, returning name, class, status and problem code. Done when: a fake enumerator with one working and one problem device returns both with the right state.",
+          "Build the All devices rows in `src/ui/AllDevicesView.cpp` from the enumeration and the engine's diagnose results, with an icon and a word per row. Done when: each row shows the real state, and a fixture with no devices shows the no-device sentence and a disabled Repair. Cheaper substitute: rows typed into the view, which show nothing real.",
+          "Show drive letter, label and size on a volume row and in the repair confirmation, through the framework's message surface. Done when: a fixture volume shows all three and declining the confirmation performs nothing. Cheaper substitute: a private dialog.",
+          "Re-read the list after a repair or an Undo and on a device-change notification. Done when: attaching a device in a driven test adds its row without a restart.",
+          "Cover it in `tests/devices_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L devices` passes, and fails when a problem device is shown as working."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L devices` passes for the working, problem and no-device fixtures, and the parity check still reports zero.",
+        "commit": "feature: every drive listed with its state"
+      },
+      {
+        "title": "Undo the Last Repair",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Neither original had a way back. Before a repair, the prior state of every value it will change and of the ShellHWDetection service is recorded, so Undo restores what was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists. The one action with no reverse is a restart, and the surface says so.",
+        "surface": {
+          "fidelity": "the Undo button, the History section and the repair result, against `DESIGN.md` section 2.",
+          "job": "a person puts back what the last repair changed. Consumer: the registry values and the service setting, compared with the record.",
+          "treatment": "the recorded prior state restored value by value, each reversible repair marked reversible and the restart marked as having no reverse. Cheaper substitute that fails the checkpoint: an undo that re-adds default filters, which is not what was there before."
+        },
+        "build": [
+          "Record the prior state through the repair contract in `src/core/RepairRunner.cpp`. Done when: a record exists on disk before the first write.",
+          "Wire Undo in `src/ui/AllDevicesView.cpp` and list records in `src/ui/HistoryView.cpp`. Done when: repair then undo leaves every changed value as it was."
+        ],
+        "items": [
+          "Record, through the repair contract's restore record and before any change, each value to be written or deleted (present or absent, type, data) and the ShellHWDetection start type, account and running state. Done when: a test finds the record on disk before the first value is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record value by value, re-creating deleted values and deleting values the repair created, and returning the service to its recorded start type and state. Done when: repair then undo, in each of the four DVD modes and the USB repair, leaves every key and the fake service equal to before, asserted.",
+          "Mark each repair reversible or not in `src/core/Repairs.h` and show it on the confirmation and in History, with the restart offer (`USBRepair.au3:1084`) stated as having no reverse. Done when: the confirmation for a fixture repair names each change as reversible and the restart as not.",
+          "Disable Undo with a tooltip when there is nothing to undo, and show past repairs in `src/ui/HistoryView.cpp`. Done when: a first run shows Undo disabled and an empty History, and both fill after one repair.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: repair then undo leaves every changed value and the service setting as they were, for the USB repair and all four DVD modes.",
+        "commit": "feature: undo puts back what the repair changed"
+      },
+      {
+        "title": "Restore Point Offer",
+        "intro": "Both originals only told the person to create a System Restore Point first (the welcome text in each `en.lng`) and opened the System Protection dialog from a menu (`USBRepair.au3:1113`). This section offers to create one before the first change, so the safeguard the original text asks for is one click and not a separate trip.",
+        "surface": {
+          "fidelity": "the repair confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person can create a restore point before repairing without leaving the tool. Consumer: the system's restore point list, read back.",
+          "treatment": "a checkbox on the confirmation, on by default, naming what it will do, and a result line in Activity. Cheaper substitute that fails the checkpoint: opening the System Protection dialog and leaving the person to do it, which is what the original does."
+        },
+        "build": [
+          "Create the restore point in `src/core/RestorePoint.cpp` through `SRSetRestorePointW`. Done when: a test with a fake restore API records one begin and one end call.",
+          "Add the offer to the confirmation in `src/ui/AllDevicesView.cpp`. Done when: the checkbox is on by default and unticking it creates no restore point."
+        ],
+        "items": [
+          "Implement `CreateRestorePoint(description)` in `src/core/RestorePoint.cpp` returning created, declined by Windows or unavailable, each with a message. Done when: a test with a fake API returns each of the three and none is an exception. Cheaper substitute: ignoring the result, which tells the person a safeguard exists when it may not.",
+          "Run it before the first write of a repair when the offer is accepted, and stop the repair if the person asked for the point and it could not be made. Done when: a test with a failing API shows no value written.",
+          "Add the checkbox to the repair confirmation through the framework's message surface and record the result in Activity. Done when: both the accepted and the declined paths leave one Activity line.",
+          "Cover it in `tests/restorepoint_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restorepoint` passes, and fails when the repair runs after a failed point the person asked for."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restorepoint` passes for created, declined and unavailable, and a repair never runs after a restore point the person asked for failed.",
+        "commit": "feature: offer a restore point before repairing"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A walk of `reference/au3/USBRepair/src/USBRepair.au3` and `reference/au3/DVDRepair/src/DVDRepair.au3` finds every piece in `docs/inventory.md` with its home.",
+      "The parity check reports zero differing fields against both shipped AutoIt builds, with the no-device difference recorded in `docs/parity.md`.",
+      "On a real machine with a USB device and an optical drive, and on one with neither, the tool lists, repairs, verifies, undoes and reports no device, in light and dark, by keyboard alone."
+    ]
+  }
+}

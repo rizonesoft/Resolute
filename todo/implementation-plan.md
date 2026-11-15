@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **97 of 215 sections complete (45%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **97 of 211 sections complete (46%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -307,10 +307,6 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 
 |  ✔  | Section      | Deliverable                                       | Items |
 | :-: | ------------ | ------------------------------------------------- | :---: |
-| [ ] | `D05 T01 §1` | The intake contract, proven on UUIDGen            |   7   |
-| [ ] | `D05 T01 §2` | Complete Windows Repair                           |  11   |
-| [ ] | `D05 T01 §3` | QuickErase and WinClean                           |  14   |
-| [ ] | `D05 T01 §4` | Indicators and SaveDesk                           |   6   |
 | [ ] | `D05 T01 §5` | The four new utilities                            |  11   |
 | [ ] | `D05 T02 §1` | RegStudio on the shared framework                 |   8   |
 | [ ] | `D05 T02 §2` | The registry engine                               |   7   |
@@ -353,6 +349,11 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T07 §7` | Network Configuration Tools                       |   7   |
 | [ ] | `D05 T07 §8` | Files, Boot, Audio, and Inventory                 |  11   |
 | [ ] | `D05 T07 §9` | Printing, Search, and Scheduled Tasks             |   6   |
+
+> **Moved:** `D05 T01 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/UUIDGen` repository (`D:\Resolute_Bin\UUIDGen`) by its own plan.
+> **Moved:** `D05 T01 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/CompleteWindowsRepair` repository (`D:\Resolute_Bin\CompleteWindowsRepair`) by its own plan.
+> **Moved:** `D05 T01 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/QuickErase` and `rizonesoft/WinClean` repositories (`D:\Resolute_Bin\QuickErase`, `D:\Resolute_Bin\WinClean`), each by its own plan.
+> **Moved:** `D05 T01 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/Indicators` and `rizonesoft/SaveDesk` repositories (`D:\Resolute_Bin\Indicators`, `D:\Resolute_Bin\SaveDesk`), each by its own plan.
 
 
 ### Phase 4 -- Ship it, in every language

@@ -24,6 +24,10 @@
 param(
     [Parameter(Mandatory)][ValidatePattern('^[A-Za-z][A-Za-z0-9]{1,40}$')][string]$Name,
     [string[]]$Au3 = @(),
+    # Intake examples: folder names under resolute_au3/samples, each moved whole to reference/au3/<name>.
+    [string[]]$Samples = @(),
+    # Existing C++ under extensions/<name>: its tracked files become the app's own tree (LICENSE and .gitignore aside).
+    [string]$Extension = '',
     [Parameter(Mandatory)][string]$Goal,
     [Parameter(Mandatory)][string]$Acceptance,
     [Parameter(Mandatory)][string]$Description,
@@ -68,6 +72,21 @@ try {
             if ($dst) { $map.Add([pscustomobject]@{ Src = $f; Dst = $dst }) }
         }
     }
+    foreach ($sample in $Samples) {
+        $prefix = "resolute_au3/samples/$sample/"
+        $folder = ($sample -split ' ')[0]
+        foreach ($f in ((& git -c core.quotepath=false ls-files -z -- "resolute_au3/samples/$sample") -join '' -split "`0" | Where-Object { $_ })) {
+            $map.Add([pscustomobject]@{ Src = $f; Dst = "reference/au3/$folder/" + $f.Substring($prefix.Length) })
+        }
+    }
+    if ($Extension) {
+        $prefix = "extensions/$Extension/"
+        foreach ($f in @(& git ls-files -- "extensions/$Extension")) {
+            $rel = $f.Substring($prefix.Length)
+            if ($rel -in 'LICENSE', '.gitignore') { continue }   # the app gets the suite's licence and ignore rules
+            $map.Add([pscustomobject]@{ Src = $f; Dst = $rel })
+        }
+    }
     foreach ($m in $map) {
         $to = Join-Path $App $m.Dst
         New-Item -ItemType Directory -Force (Split-Path $to) | Out-Null
@@ -75,7 +94,9 @@ try {
         if ((Get-FileHash -LiteralPath (Join-Path $Resolute $m.Src)).Hash -ne (Get-FileHash -LiteralPath $to).Hash) { throw "copy of $($m.Src) differs" }
     }
     if ($map.Count) {
-        $map | ForEach-Object { "$($_.Src)`t$($_.Dst)" } | Set-Content (Join-Path $App 'reference\au3\MOVED-FROM.tsv')
+        $record = if ($Au3.Count -or $Samples.Count) { 'reference\au3\MOVED-FROM.tsv' } else { 'docs\origin\MOVED-FROM.tsv' }
+        New-Item -ItemType Directory -Force (Split-Path (Join-Path $App $record)) | Out-Null
+        $map | ForEach-Object { "$($_.Src)`t$($_.Dst)" } | Set-Content (Join-Path $App $record)
         # Untracked, local-only material moves with the tool: old distribution builds, loose executables, run logs.
         foreach ($tool in $Au3) {
             $local = Join-Path $App ($(if ($several) { "reference\au3\$tool\local" } else { 'reference\au3\local' }))
@@ -110,8 +131,20 @@ try {
                 }
             }
         }
-        & git rm -q -- @($map.Src)
-        if ($LASTEXITCODE -ne 0) { throw 'git rm failed in Resolute' }
+        # By folder where a whole folder goes: thousands of paths do not fit on one command line.
+        $whole = @($Samples | ForEach-Object { "resolute_au3/samples/$_" }) + $(if ($Extension) { "extensions/$Extension" })
+        $single = @($map.Src | Where-Object { $s = $_; -not ($whole | Where-Object { $s.StartsWith("$_/") }) })
+        foreach ($w in $whole) { if ($w) { & git rm -r -q -- $w; if ($LASTEXITCODE -ne 0) { throw "git rm failed for $w" } } }
+        if ($single.Count) { & git rm -q -- $single }
+        # What git did not track in those folders (build output, local files) follows the app, outside its tree's tracked part.
+        foreach ($w in $whole) {
+            $left = Join-Path $Resolute ($w -replace '/', '\')
+            if ($w -and (Test-Path -LiteralPath $left)) {
+                $dest = Join-Path $App ("reference\au3\local\untracked-" + (Split-Path $w -Leaf))
+                New-Item -ItemType Directory -Force (Split-Path $dest) | Out-Null
+                Move-Item -LiteralPath $left -Destination $dest
+            }
+        }        if ($LASTEXITCODE -ne 0) { throw 'git rm failed in Resolute' }
     }
     "step 1: $($map.Count) tracked file(s) moved to $App"
 }

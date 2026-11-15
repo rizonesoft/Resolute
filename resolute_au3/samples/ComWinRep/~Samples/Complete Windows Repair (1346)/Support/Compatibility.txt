@@ -1,3 +1,0 @@
-Complete Windows Repair has been tested on the following Windows versions:
-
-Windows 8.1
