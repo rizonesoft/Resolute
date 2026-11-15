@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **97 of 211 sections complete (46%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **97 of 205 sections complete (47%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -314,12 +314,6 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T02 §4` | Editing, with a reverse                           |   8   |
 | [ ] | `D05 T02 §5` | Search across hives                               |   5   |
 | [ ] | `D05 T02 §6` | Backup, restore, and `.reg` exchange              |   7   |
-| [ ] | `D05 T03 §1` | Restore Point Manager                             |   8   |
-| [ ] | `D05 T03 §2` | Driver Manager: backup and rollback               |   8   |
-| [ ] | `D05 T03 §3` | Disk Health                                       |   7   |
-| [ ] | `D05 T03 §4` | Crash Decoder                                     |   6   |
-| [ ] | `D05 T03 §5` | File Unlocker                                     |   7   |
-| [ ] | `D05 T03 §6` | System Report                                     |   7   |
 | [ ] | `D05 T03 §7` | Battery Health, Boot Options, File Associations   |   7   |
 | [ ] | `D05 T03 §8` | Policy Inspector and Attribute Repair             |   9   |
 | [ ] | `D05 T04 §1` | System Change Journal                             |   8   |
@@ -349,6 +343,13 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T07 §7` | Network Configuration Tools                       |   7   |
 | [ ] | `D05 T07 §8` | Files, Boot, Audio, and Inventory                 |  11   |
 | [ ] | `D05 T07 §9` | Printing, Search, and Scheduled Tasks             |   6   |
+
+> **Moved:** `D05 T03 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RestorePointManager` repository (`D:\Resolute_Bin\RestorePointManager`) by its own plan.
+> **Moved:** `D05 T03 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DriverManager` repository (`D:\Resolute_Bin\DriverManager`) by its own plan.
+> **Moved:** `D05 T03 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DiskHealth` repository (`D:\Resolute_Bin\DiskHealth`) by its own plan.
+> **Moved:** `D05 T03 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/CrashDecoder` repository (`D:\Resolute_Bin\CrashDecoder`) by its own plan.
+> **Moved:** `D05 T03 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/FileUnlocker` repository (`D:\Resolute_Bin\FileUnlocker`) by its own plan.
+> **Moved:** `D05 T03 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/SystemReport` repository (`D:\Resolute_Bin\SystemReport`) by its own plan.
 
 > **Moved:** `D05 T01 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/UUIDGen` repository (`D:\Resolute_Bin\UUIDGen`) by its own plan.
 > **Moved:** `D05 T01 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/CompleteWindowsRepair` repository (`D:\Resolute_Bin\CompleteWindowsRepair`) by its own plan.

@@ -56,6 +56,8 @@ track: P3
 
 ## 1. Restore Point Manager
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RestorePointManager` repository (`D:\Resolute_Bin\RestorePointManager`) by its own plan.
+
 This is infrastructure before it is a tool. Every repair-contract run in the suite gains the option to create a restore point first, which is a second undo layer beneath the per-item restore record, and it is the only thing that helps when a repair breaks something the record cannot describe: a driver that will not load, a service that will not start.
 
 **Fidelity:** the restore point list and the creation dialog, against `DESIGN.md` and `docs/captures/house-style/`.
@@ -64,20 +66,22 @@ This is infrastructure before it is a tool. Every repair-contract run in the sui
 **Chrome:** consume the framework and the repair contract. The creation offer is added to the contract's run loop, not to each tool.
 **Needs:** Windows host (build/test)
 
-- [ ] Create a restore point, named for what is about to happen. Done when: a point created before a fixture repair carries that repair's name, verified by reading it back.
-- [ ] List existing points with date, type, and size where available. Done when: the list renders and a user can distinguish a manual point from an automatic one.
-- [ ] Offer restore-point creation from the repair contract's run loop, as an opt-in the user controls. Done when: a fixture repair offers it, declining proceeds without one, and the choice is logged.
-- [ ] Report honestly when System Protection is disabled. Done when: on a machine with it off, the tool says so, explains the consequence, and offers to enable it rather than failing silently. Cheaper substitute that fails the checkpoint: a greyed-out button with no explanation, which is the single most common complaint about the built-in interface.
-- [ ] Trigger a restore, with a plain statement of what it will and will not undo. Done when: the confirmation states that personal files are untouched and installed programs may be affected, and declining performs nothing.
-- [ ] Log every point created and every restore triggered. Done when: each produces one line naming the point.
-- [ ] Account for the surface. Done when: every control is working or deferred to a named section.
-- [ ] Commit: `"restore points: create, browse, and restore"`
+- [ ] ~~Create a restore point, named for what is about to happen. Done when: a point created before a fixture repair carries that repair's name, verified by reading it back.~~ -> `rizonesoft/RestorePointManager`
+- [ ] ~~List existing points with date, type, and size where available. Done when: the list renders and a user can distinguish a manual point from an automatic one.~~ -> `rizonesoft/RestorePointManager`
+- [ ] ~~Offer restore-point creation from the repair contract's run loop, as an opt-in the user controls. Done when: a fixture repair offers it, declining proceeds without one, and the choice is logged.~~ -> `rizonesoft/RestorePointManager`
+- [ ] ~~Report honestly when System Protection is disabled. Done when: on a machine with it off, the tool says so, explains the consequence, and offers to enable it rather than failing silently. Cheaper substitute that fails the checkpoint: a greyed-out button with no explanation, which is the single most common complaint about the built-in interface.~~ -> `rizonesoft/RestorePointManager`
+- [ ] ~~Trigger a restore, with a plain statement of what it will and will not undo. Done when: the confirmation states that personal files are untouched and installed programs may be affected, and declining performs nothing.~~ -> `rizonesoft/RestorePointManager`
+- [ ] ~~Log every point created and every restore triggered. Done when: each produces one line naming the point.~~ -> `rizonesoft/RestorePointManager`
+- [ ] ~~Account for the surface. Done when: every control is working or deferred to a named section.~~ -> `rizonesoft/RestorePointManager`
+- [ ] Commit: ~~`"restore points: create, browse, and restore"`~~ -> `rizonesoft/RestorePointManager`
 
 **Freeze check:** What a restore actually reverts is Windows' behaviour, not this tool's, and this tool must not appear to promise more. Evidence is the confirmation text, checked against what a restore genuinely does.
 
-**Test checkpoint:** A point created before a fixture repair carries that repair's name, read back. The list distinguishes manual from automatic points, captured. A fixture repair offers creation and declining proceeds without one, both driven. With System Protection disabled, the tool explains and offers to enable it. One log line per point and per restore.
+**Test checkpoint:** Moved with the section. The `rizonesoft/RestorePointManager` repository's plan carries it.
 
 ## 2. Driver Manager: Backup and Rollback
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DriverManager` repository (`D:\Resolute_Bin\DriverManager`) by its own plan.
 
 Drivers break Windows more often than anything else this suite touches, and `pnputil` is the only built-in answer.
 
@@ -90,20 +94,22 @@ Drivers break Windows more often than anything else this suite touches, and `pnp
 **Chrome:** consume the framework and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Enumerate installed drivers with their version, date, provider, and signing state. Done when: the list matches `pnputil /enum-drivers` for the same machine, compared entry by entry.
-- [ ] Back up a driver package so it can be reinstalled. Done when: a backed-up driver is reinstalled on the same machine and the device reports the restored version.
-- [ ] Roll back a device to a recorded package as a repair-contract item. Done when: the rollback is a declared item with prior state captured and undo available.
-- [ ] Verify by reading the device state back, never by trusting the install call. Done when: a deliberately suppressed install reports failed rather than succeeded.
-- [ ] Surface devices reporting a problem, with their Device Manager error code. Done when: a device in an error state is listed with its code and the code is explained in plain words.
-- [ ] Refuse by name without the privilege, and log every backup and rollback. Done when: an unelevated rollback is refused naming the device, and each action writes one line.
-- [ ] State plainly that a rollback may require a restart, before the user commits. Done when: the statement appears on the surface.
-- [ ] Commit: `"drivers: back up and roll back, never update"`
+- [ ] ~~Enumerate installed drivers with their version, date, provider, and signing state. Done when: the list matches `pnputil /enum-drivers` for the same machine, compared entry by entry.~~ -> `rizonesoft/DriverManager`
+- [ ] ~~Back up a driver package so it can be reinstalled. Done when: a backed-up driver is reinstalled on the same machine and the device reports the restored version.~~ -> `rizonesoft/DriverManager`
+- [ ] ~~Roll back a device to a recorded package as a repair-contract item. Done when: the rollback is a declared item with prior state captured and undo available.~~ -> `rizonesoft/DriverManager`
+- [ ] ~~Verify by reading the device state back, never by trusting the install call. Done when: a deliberately suppressed install reports failed rather than succeeded.~~ -> `rizonesoft/DriverManager`
+- [ ] ~~Surface devices reporting a problem, with their Device Manager error code. Done when: a device in an error state is listed with its code and the code is explained in plain words.~~ -> `rizonesoft/DriverManager`
+- [ ] ~~Refuse by name without the privilege, and log every backup and rollback. Done when: an unelevated rollback is refused naming the device, and each action writes one line.~~ -> `rizonesoft/DriverManager`
+- [ ] ~~State plainly that a rollback may require a restart, before the user commits. Done when: the statement appears on the surface.~~ -> `rizonesoft/DriverManager`
+- [ ] Commit: ~~`"drivers: back up and roll back, never update"`~~ -> `rizonesoft/DriverManager`
 
 **Freeze check:** What this tool installs is the package it captured, unchanged. Evidence is a backup and restore cycle against a fixture driver producing an identical package hash.
 
-**Test checkpoint:** The enumeration matches `pnputil /enum-drivers` entry by entry. A backed-up driver reinstalls and the device reports the restored version. A suppressed install reports failed. A device in an error state shows its code with a plain-words explanation. An unelevated rollback is refused by name.
+**Test checkpoint:** Moved with the section. The `rizonesoft/DriverManager` repository's plan carries it.
 
 ## 3. Disk Health
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DiskHealth` repository (`D:\Resolute_Bin\DiskHealth`) by its own plan.
 
 Nothing in the suite answers the question a worried user actually has. Drive Repair handles removable media and PixRepair handles the screen; the disk holding everything they own has no owner.
 
@@ -113,17 +119,19 @@ Nothing in the suite answers the question a worried user actually has. Drive Rep
 **Chrome:** consume the framework and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Enumerate physical drives with model, size, interface, and type. Done when: the list matches what Disk Management reports for the same machine.
-- [ ] Read SMART attributes and present the ones that predict failure, in plain words, with raw values available. Done when: reallocated sectors, pending sectors, and power-on hours each render with an explanation.
-- [ ] Give an overall verdict that is honest about uncertainty. Done when: the verdict distinguishes healthy, warning, failing, and unknown, and `unknown` is used when SMART is unavailable rather than reporting healthy.
-- [ ] Run a `chkdsk` scan and show its progress and result. Done when: a read-only scan completes with its output rendered, and the window stays responsive throughout.
-- [ ] Treat a repair scan as destructive: confirm, name the drive by letter, label, and size, and state that it may require a restart. Done when: the confirmation names all three and declining performs nothing.
-- [ ] State plainly that a failing disk needs replacing, not repairing. Done when: a failing verdict says so on the surface, because no software fixes a dying drive.
-- [ ] Commit: `"disk health: smart attributes and chkdsk"`
+- [ ] ~~Enumerate physical drives with model, size, interface, and type. Done when: the list matches what Disk Management reports for the same machine.~~ -> `rizonesoft/DiskHealth`
+- [ ] ~~Read SMART attributes and present the ones that predict failure, in plain words, with raw values available. Done when: reallocated sectors, pending sectors, and power-on hours each render with an explanation.~~ -> `rizonesoft/DiskHealth`
+- [ ] ~~Give an overall verdict that is honest about uncertainty. Done when: the verdict distinguishes healthy, warning, failing, and unknown, and `unknown` is used when SMART is unavailable rather than reporting healthy.~~ -> `rizonesoft/DiskHealth`
+- [ ] ~~Run a `chkdsk` scan and show its progress and result. Done when: a read-only scan completes with its output rendered, and the window stays responsive throughout.~~ -> `rizonesoft/DiskHealth`
+- [ ] ~~Treat a repair scan as destructive: confirm, name the drive by letter, label, and size, and state that it may require a restart. Done when: the confirmation names all three and declining performs nothing.~~ -> `rizonesoft/DiskHealth`
+- [ ] ~~State plainly that a failing disk needs replacing, not repairing. Done when: a failing verdict says so on the surface, because no software fixes a dying drive.~~ -> `rizonesoft/DiskHealth`
+- [ ] Commit: ~~`"disk health: smart attributes and chkdsk"`~~ -> `rizonesoft/DiskHealth`
 
-**Test checkpoint:** The drive list matches Disk Management. Three failure-predicting attributes render with plain-words explanations. Unavailable SMART reports unknown rather than healthy. A read-only scan completes with the window responsive. A repair scan confirms by letter, label, and size. A failing verdict states that replacement is the answer.
+**Test checkpoint:** Moved with the section. The `rizonesoft/DiskHealth` repository's plan carries it.
 
 ## 4. Crash Decoder
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/CrashDecoder` repository (`D:\Resolute_Bin\CrashDecoder`) by its own plan.
 
 The sibling to `BiosCodes`, and it completes a story the suite half-tells: `BiosCodes` is for a machine that will not POST, this is for one that boots and then dies.
 
@@ -133,16 +141,18 @@ The sibling to `BiosCodes`, and it completes a story the suite half-tells: `Bios
 **Chrome:** consume the framework. This tool changes nothing, so it does not consume the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Find and list crash dumps with their date, stop code, and dump type. Done when: a fixture dump directory renders completely and an empty one reports no crashes rather than an error.
-- [ ] Decode the stop code into a plain-words explanation. Done when: a fixture set of common stop codes each render an explanation, and an unknown code says so rather than guessing.
-- [ ] Name the implicated driver or module where the dump allows it. Done when: a fixture dump naming a driver renders it, and one that does not says the cause could not be determined.
-- [ ] Export the decoded result as a file, written atomically and read back. Done when: the saved content matches the rendered result and a read-only target reports failure.
-- [ ] Handle a corrupt or truncated dump. Done when: it is reported as unreadable rather than crashing the tool, driven against a deliberately truncated fixture.
-- [ ] Commit: `"crash decoder: read and explain minidumps"`
+- [ ] ~~Find and list crash dumps with their date, stop code, and dump type. Done when: a fixture dump directory renders completely and an empty one reports no crashes rather than an error.~~ -> `rizonesoft/CrashDecoder`
+- [ ] ~~Decode the stop code into a plain-words explanation. Done when: a fixture set of common stop codes each render an explanation, and an unknown code says so rather than guessing.~~ -> `rizonesoft/CrashDecoder`
+- [ ] ~~Name the implicated driver or module where the dump allows it. Done when: a fixture dump naming a driver renders it, and one that does not says the cause could not be determined.~~ -> `rizonesoft/CrashDecoder`
+- [ ] ~~Export the decoded result as a file, written atomically and read back. Done when: the saved content matches the rendered result and a read-only target reports failure.~~ -> `rizonesoft/CrashDecoder`
+- [ ] ~~Handle a corrupt or truncated dump. Done when: it is reported as unreadable rather than crashing the tool, driven against a deliberately truncated fixture.~~ -> `rizonesoft/CrashDecoder`
+- [ ] Commit: ~~`"crash decoder: read and explain minidumps"`~~ -> `rizonesoft/CrashDecoder`
 
-**Test checkpoint:** A fixture dump directory renders completely; an empty one reports no crashes. Common stop codes each render an explanation and an unknown one says so. A dump naming a driver renders it. The export matches the rendered result and fails visibly on a read-only target. A truncated dump is reported unreadable.
+**Test checkpoint:** Moved with the section. The `rizonesoft/CrashDecoder` repository's plan carries it.
 
 ## 5. File Unlocker
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/FileUnlocker` repository (`D:\Resolute_Bin\FileUnlocker`) by its own plan.
 
 Windows tells a user their file is open in another program and then refuses to say which. This tool answers that, and it is the kind of small thing people remember a suite for.
 
@@ -152,17 +162,19 @@ Windows tells a user their file is open in another program and then refuses to s
 **Chrome:** consume the framework and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Find every process holding a handle to a given file or folder. Done when: a fixture file held open by a known process lists that process with its name, identifier, and path.
-- [ ] Offer to close the handle or end the process, as separate choices with different consequences stated. Done when: both are available, each states its risk, and declining performs nothing.
-- [ ] Warn before ending a process that may have unsaved work. Done when: the warning names the process and appears before the action, not after.
-- [ ] Add the stubborn-file cases as a second surface: paths too long, and names Windows will not accept. Done when: a fixture with an over-long path and one with a reserved name are both handled, and this section records the mechanism used.
-- [ ] Refuse by name without the privilege. Done when: an unelevated attempt against a protected process is refused naming the process.
-- [ ] Log every handle closed and every process ended. Done when: each writes one line naming the file and the process.
-- [ ] Commit: `"file unlocker: name what is holding a file, and free it"`
+- [ ] ~~Find every process holding a handle to a given file or folder. Done when: a fixture file held open by a known process lists that process with its name, identifier, and path.~~ -> `rizonesoft/FileUnlocker`
+- [ ] ~~Offer to close the handle or end the process, as separate choices with different consequences stated. Done when: both are available, each states its risk, and declining performs nothing.~~ -> `rizonesoft/FileUnlocker`
+- [ ] ~~Warn before ending a process that may have unsaved work. Done when: the warning names the process and appears before the action, not after.~~ -> `rizonesoft/FileUnlocker`
+- [ ] ~~Add the stubborn-file cases as a second surface: paths too long, and names Windows will not accept. Done when: a fixture with an over-long path and one with a reserved name are both handled, and this section records the mechanism used.~~ -> `rizonesoft/FileUnlocker`
+- [ ] ~~Refuse by name without the privilege. Done when: an unelevated attempt against a protected process is refused naming the process.~~ -> `rizonesoft/FileUnlocker`
+- [ ] ~~Log every handle closed and every process ended. Done when: each writes one line naming the file and the process.~~ -> `rizonesoft/FileUnlocker`
+- [ ] Commit: ~~`"file unlocker: name what is holding a file, and free it"`~~ -> `rizonesoft/FileUnlocker`
 
-**Test checkpoint:** A fixture file held open lists the holding process with name, identifier, and path. Close-handle and end-process are separate choices with stated risks, and declining does nothing. An over-long path and a reserved name are both handled. An unelevated attempt on a protected process is refused by name. One log line per action.
+**Test checkpoint:** Moved with the section. The `rizonesoft/FileUnlocker` repository's plan carries it.
 
 ## 6. System Report
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/SystemReport` repository (`D:\Resolute_Bin\SystemReport`) by its own plan.
 
 The support workflow made real: instead of twenty questions in a forum thread, the user attaches one file.
 
@@ -172,15 +184,15 @@ The support workflow made real: instead of twenty questions in a forum thread, t
 **Chrome:** consume the framework. `resolute_au3/SDK/Includes/CompInfo.au3` shows **what to collect**, not how: it is a third-party community UDF with no stated licence, so the collection is reimplemented from Win32 and WMI rather than ported.
 **Needs:** Windows host (build/test)
 
-- [ ] Collect the machine facts: Windows build, hardware, drives, and installed Resolute tools with their versions. Done when: a generated report carries all four and each is verified against an independent source.
-- [ ] Include recent errors and the suite's own logs, bounded in size. Done when: the report includes them and a machine with enormous logs still produces a report of reasonable size.
-- [ ] **Show the user what the report contains before it is written.** Done when: the preview renders the full content and the user can cancel.
-- [ ] Decide and record what is deliberately excluded. Done when: the exclusion list exists and names anything identifying, with its reasoning, because this file is written to be handed to a stranger.
-- [ ] Write it atomically and read it back. Done when: an export to a read-only target reports failure rather than claiming success.
-- [ ] Keep it readable without any tool. Done when: it opens legibly in a plain text editor, captured.
-- [ ] Commit: `"system report: one file that answers the first twenty questions"`
+- [ ] ~~Collect the machine facts: Windows build, hardware, drives, and installed Resolute tools with their versions. Done when: a generated report carries all four and each is verified against an independent source.~~ -> `rizonesoft/SystemReport`
+- [ ] ~~Include recent errors and the suite's own logs, bounded in size. Done when: the report includes them and a machine with enormous logs still produces a report of reasonable size.~~ -> `rizonesoft/SystemReport`
+- [ ] ~~**Show the user what the report contains before it is written.** Done when: the preview renders the full content and the user can cancel.~~ -> `rizonesoft/SystemReport`
+- [ ] ~~Decide and record what is deliberately excluded. Done when: the exclusion list exists and names anything identifying, with its reasoning, because this file is written to be handed to a stranger.~~ -> `rizonesoft/SystemReport`
+- [ ] ~~Write it atomically and read it back. Done when: an export to a read-only target reports failure rather than claiming success.~~ -> `rizonesoft/SystemReport`
+- [ ] ~~Keep it readable without any tool. Done when: it opens legibly in a plain text editor, captured.~~ -> `rizonesoft/SystemReport`
+- [ ] Commit: ~~`"system report: one file that answers the first twenty questions"`~~ -> `rizonesoft/SystemReport`
 
-**Test checkpoint:** A generated report carries build, hardware, drives, and tool versions, each verified independently. A machine with enormous logs still produces a reasonable report. The preview renders the full content and can be cancelled. The exclusion list names what is withheld and why. The file opens legibly in a plain text editor.
+**Test checkpoint:** Moved with the section. The `rizonesoft/SystemReport` repository's plan carries it.
 
 ## 7. Battery Health, Boot Options, and File Associations
 
