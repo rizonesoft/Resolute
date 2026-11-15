@@ -243,6 +243,7 @@ FETCHERS = {
     "tests/CMakeLists.txt": "first run: Catch2, pinned by commit",
     "scripts/ci-status.py": "not the first run: reads this repository's CI results",
     "tools/refdata/server.ps1": "not the first run: reference-data authoring machines only",
+    "tools/app-split/new-app.ps1": "not the first run: creates a split tool's GitHub repository (docs/plans/2026-11-15-app-split.md)",
     "scripts/quickstart.py": "not the first run: holds these patterns",
 }
 FULL_HASH = re.compile(r"GIT_TAG\s+([0-9a-f]{40})\b")
