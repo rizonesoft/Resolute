@@ -1,0 +1,257 @@
+{
+  "name": "SleepWakeDiagnostics",
+  "slug": "sleepwakediagnostics",
+  "display": "Sleep and Wake Diagnostics",
+  "job": "it says in plain words why a computer will not sleep, what woke it and which timers and devices are allowed to wake it, and lets the user take away or give back a device's permission to wake the machine.",
+  "tagline": "Why your PC will not sleep, and what keeps waking it",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Periwinkle",
+    "light": "#C7D2FE",
+    "dark": "#6366F1",
+    "social_ground": "#15163A",
+    "social_muted": "#D5DAFB"
+  },
+  "icon": {
+    "idea": "A crescent moon with a small sun beside it: sleep and wake.",
+    "points": [
+      "Free-standing with no tile: a crescent with a rayed disc at its upper right.",
+      "The moon is Periwinkle and the sun is Periwinkle light.",
+      "The small drawing, used below 40 pixels, enlarges the sun and keeps four rays."
+    ],
+    "large": "<path d=\"M40 14 A30 30 0 1 0 58 66 A24 24 0 1 1 40 14 Z\" fill=\"#6366F1\" stroke=\"#6366F1\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"66\" cy=\"34\" r=\"11\" fill=\"#C7D2FE\"/><path d=\"M66 12 V16 M66 52 V56 M44 34 H48 M84 34 H88 M51 19 L54 22 M78 46 L81 49 M81 19 L78 22\" fill=\"none\" stroke=\"#C7D2FE\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M40 14 A30 30 0 1 0 58 66 A24 24 0 1 1 40 14 Z\" fill=\"#6366F1\" stroke=\"#6366F1\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"66\" cy=\"34\" r=\"13\" fill=\"#C7D2FE\"/><path d=\"M66 10 V13 M66 55 V58 M87 34 H90 M44 34 H46\" fill=\"none\" stroke=\"#C7D2FE\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Now",
+        "Each thing keeping the machine awake right now, as a row"
+      ],
+      [
+        "Wake history",
+        "Each recent wake with its time and source"
+      ],
+      [
+        "Allowed to wake",
+        "The devices and timers permitted to wake the machine"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees what is keeping the machine awake right now, what it is and what it asked for, and refreshes the picture after changing something.",
+    "primary": "Refresh",
+    "secondary": "Stop waking",
+    "rows": [
+      [
+        "Display",
+        "Held on, or Clear"
+      ],
+      [
+        "System",
+        "Held awake, or Clear"
+      ],
+      [
+        "Away mode",
+        "Held, or Clear"
+      ],
+      [
+        "Execution",
+        "Held, or Clear"
+      ],
+      [
+        "Last wake",
+        "The source and the time, or Not recorded"
+      ]
+    ],
+    "status": "2 things keeping the PC awake, 3 devices allowed to wake it",
+    "notes": [
+      "Each row of Now is one thing keeping the machine awake: its name, its kind (display, system, away mode, execution) and what it asked for, with an icon and a word for held or clear, never colour alone.",
+      "When nothing holds the machine awake the screen says so in one sentence and shows the last wake source, so the empty state is an answer.",
+      "Refresh is the accent button: it reads everything again and the rows update from that read, not from an assumption.",
+      "Stop waking is enabled when a device is selected in Allowed to wake: it removes that device's permission to wake the machine, names the device in a confirmation, and Undo (the Undo a Wake Permission Change section) puts it back.",
+      "Every row has a plain sentence a non-expert can act on, and the raw value stays one click away.",
+      "The status bar states the counts in words, for example \"2 things keeping the PC awake, 3 devices allowed to wake it\".",
+      "When the tool is not run as an administrator it says so by name at the top of Now and refuses to read requests or change a permission, because Windows only reveals power requests to an elevated process."
+    ],
+    "cut": "This is a new tool, so there is no earlier window to cut from. The window has no menu bar, splash, animation or donate strip: it is the suite's sidebar window with the sections above, and what the tool shows is plain words with the raw value on request, never the console output of `powercfg` set in a box."
+  },
+  "readme": {
+    "lead": "Find out why your PC will not sleep, what woke it, and what is allowed to wake it.",
+    "what": [
+      "Windows already knows why a machine stays awake and what woke it, but the answer sits in `powercfg` output and the System event log. Sleep and Wake Diagnostics reads those sources and tells you in plain words: which program or driver is holding the machine awake, what woke it last and over recent days, and which timers and devices are allowed to wake it.",
+      "If a device is waking the machine when it should not, you can take away its permission to wake it, and give it back later. The tool records the permission before it changes it and reads it back afterwards. Reading power requests needs administrator rights, so the tool asks for them and says so plainly when it does not have them."
+    ],
+    "new_intro": "This tool is new in the suite and is written in C++ from the start.",
+    "new": [
+      [
+        "Plain words first.",
+        "Every finding carries a sentence you can act on, with the raw value still available."
+      ],
+      [
+        "One screen for the three questions.",
+        "Why it will not sleep, what woke it, and what is allowed to wake it are three sections of one window."
+      ],
+      [
+        "A wake permission you can take back.",
+        "A change to a device's permission is recorded first and can be undone."
+      ],
+      [
+        "One executable.",
+        "It runs on its own and is also bundled with the Resolute launcher."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "New tool: power reader, window, undo, verdict, chart, report",
+    "goal": "Sleep and Wake Diagnostics ships as a complete, standalone C++ tool that names what is keeping a Windows machine awake, what woke it last and over recent days, and which timers and devices may wake it, each in a plain sentence with the raw value still available, and that can take away or give back one device's wake permission with the prior state recorded and the setting read back.",
+    "current_state": "Nothing exists yet: there is no C++ code, no AutoIt original and no reference material. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits and `docs/origin/resolute-D05-T04-s3.md`, the tool's plan section from the Resolute repository, which is 21 lines and lists six checklist items (what prevents sleep, last wake and wake history, devices permitted to wake, wake timers, battery and standby summary, plain-words explanation). `powercfg` already answers these questions as text, and the plan's own cheaper substitute that fails is rendering that output verbatim. The sources are Windows's own: `powercfg /requests`, `/lastwake`, `/waketimers`, `/devicequery wake_armed`, `/deviceenablewake`, `/devicedisablewake`, `/sleepstudy` on Modern Standby machines and `/a` for the available sleep states, the power request and `CallNtPowerInformation` APIs behind them, and the Power-Troubleshooter event in the System log that records each wake source. Reading power requests needs elevation. The SDK's framework, repair contract and chart control, which this tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T04-s3.md`: the plan section as it stood in the Resolute repository, with its six checklist items and its test checkpoint.",
+      "`DESIGN.md`: the tool's identity and the sections of its window, and `sdk/DESIGN.md`, the contract every surface answers to.",
+      "The Windows power interfaces named above, read on a real machine with and without elevation: `powercfg` for comparison, and the System event log for the Power-Troubleshooter events."
+    ],
+    "outcome": [
+      "`SleepWakeDiagnostics.exe` names each power request holding the machine awake with its kind and what it asked for, the last wake source and the recent wake history, the wake timers with their owning tasks, and the wake-armed devices, each with a plain sentence and its raw value.",
+      "A device's wake permission can be taken away or given back with the prior state recorded and the new state read back, and the tool refuses by name when it is not elevated.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Now screen, where each thing keeping the machine awake is a row, with Wake history and Allowed to wake as its neighbours. Reporting and audit are the Activity section, which records each read and each permission change. Settings are the framework's pages. Permissions anchor on the engine, where reading requests and changing a wake permission are refused by name when the process is not elevated. Reverse means putting a device's wake permission back as it was before the tool changed it, anchored on the undo section.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Power and Wake Reader",
+      "intro": "The tool's whole system effect: reading the power requests, the last wake and wake history, the wake timers, the wake-armed devices and the supported sleep states, and changing one device's wake permission with the prior state recorded. It is independent of any window, and every Windows call sits behind an interface the tests can replace with a fixture.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the findings and the Windows sources in `src/core/Findings.h`. Done when: every finding kind (request, last wake, wake event, timer, armed device, sleep state) is one type with its raw value and a plain sentence, stated once.",
+        "Implement the readers and the permission change in `src/core/PowerReader.cpp` behind a source interface the tests can replace. Done when: the unit tests pass against fixtures with no real machine state."
+      ],
+      "items": [
+        "Implement `ReadRequests()` in `src/core/PowerReader.cpp` returning each power request (display, system, away mode, execution) with the process or driver that holds it and its reason, from the power request interface that `powercfg /requests` reads. Done when: a fixture request held by a named process comes back with its kind, its holder and what it asked for.",
+        "Implement `ReadLastWake()` and `ReadWakeHistory(int days)` from the Power-Troubleshooter events in the System log, with the matching `powercfg /lastwake` as the cross-check on a real machine. Done when: a fixture log gives the wake times with their sources and a machine with no wake events returns an explicit empty result that the caller can say in words.",
+        "Implement `ReadWakeTimers()` from the system's waitable timers that may wake it, naming the owning scheduled task where one is the owner. Done when: a fixture timer is listed with its task name and when it next fires.",
+        "Implement `ReadArmedDevices()` listing each device permitted to wake the machine, from the same source as `powercfg /devicequery wake_armed`. Done when: a fixture with three devices, one armed, lists the armed one with its instance name.",
+        "Implement `ReadSleepStates()` from the available sleep states (`powercfg /a`) and detect Modern Standby. Done when: a fixture machine with only Modern Standby reports that and the states it lacks, and one with S3 reports S3.",
+        "Implement `SetDeviceWake(device, allowed)` in `src/core/PowerReader.cpp` that records the device's prior wake permission, changes it (the `/deviceenablewake` and `/devicedisablewake` effect) and reads it back, returning a mismatch as device, expected and found. Done when: a test with a fake source that ignores the change gets the mismatch named. Cheaper substitute: checking only the return code of the call.",
+        "Refuse `ReadRequests()` and `SetDeviceWake()` by name when the process is not elevated, before any read or write, with one activity record. Done when: an unelevated test run reports the refusal naming the action and the fixture is unchanged. Cheaper substitute: letting the call fail with access denied or return an empty list, which reads as a machine that is clear.",
+        "Add `src/core/Explain.cpp` that turns each finding into one plain sentence a non-expert can act on while keeping its raw value. Done when: every finding kind in a fixture has a sentence that names the item and what to do, and a test fails when a finding has none. Cheaper substitute: returning the `powercfg` line as the sentence.",
+        "Cover every path in `tests/power_test.cpp` with fixture sources. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L power` passes, and fails when a fixture request is dropped from the reader's result."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L power` passes, including the empty-history, mismatch and unelevated cases, and fails when a fixture finding is dropped.",
+      "commit": "core: read why the machine stays awake and what wakes it, and change a device's wake permission"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Undo a Wake Permission Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Taking away a device's permission to wake the machine can surprise the user later, when a keyboard or a network card no longer wakes it. Before any change the device's prior permission is recorded, so Undo restores what was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person gives a device back the permission the tool took away. Consumer: the device's wake setting, compared with the record.",
+          "treatment": "the recorded prior permission restored for that device and read back. Cheaper substitute that fails the checkpoint: an undo that arms every device, which is not what was there before."
+        },
+        "build": [
+          "Record the prior permission through the repair contract in `src/core/PowerReader.cpp`. Done when: a record exists on disk before the first change is made.",
+          "Wire Undo in `src/ui/AllowedToWakeView.cpp`. Done when: stop then undo leaves the device's permission as it was."
+        ],
+        "items": [
+          "Record the device's prior wake permission through the repair contract's restore record before `SetDeviceWake` changes it. Done when: a test finds the record on disk before the change is made. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record and reading the permission back. Done when: stop then undo, and give then undo, each leave the device's permission equal to before, asserted.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one change.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one device is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: a permission change then undo leaves the device as it was, in both directions.",
+        "commit": "feature: undo puts a device's wake permission back as it was"
+      },
+      {
+        "title": "Plain-Words Verdict",
+        "intro": "One sentence at the top of Now says what is stopping sleep and what to do about it, so a person who reads nothing else still gets the answer. It is built from the findings, never typed by hand, and when nothing holds the machine awake it says that instead.",
+        "surface": {
+          "fidelity": "the verdict line at the top of Now, against `DESIGN.md` section 2.",
+          "job": "a person reads one sentence and knows what to do. Consumer: the sentence, compared with the findings it was built from.",
+          "treatment": "one sentence naming the main cause and the action, with the other findings counted. Cheaper substitute that fails the checkpoint: a fixed headline such as \"Issues found\", which names nothing."
+        },
+        "build": [
+          "Build the verdict from the findings in `src/core/Verdict.cpp`. Done when: the same findings always give the same sentence.",
+          "Show it at the top of Now in `src/ui/NowView.cpp`. Done when: it changes when the findings change."
+        ],
+        "items": [
+          "Write `ChooseVerdict(findings)` in `src/core/Verdict.cpp` picking the main cause by a stated order (a held display or system request first, then the nearest wake timer, then an armed device) and naming it. Done when: a fixture with a held request and a timer names the request and counts the timer.",
+          "Say that nothing holds the machine awake when the requests are clear, and name the last wake source. Done when: a clear fixture gives a sentence that says clear and names the last wake.",
+          "Show the verdict at the top of `src/ui/NowView.cpp`, selectable and copyable. Done when: Ctrl+C on it puts its text on the clipboard.",
+          "Cover it in `tests/verdict_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L verdict` passes, and fails when the order of causes is changed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L verdict` passes for the held, timer-only, device-only and clear fixtures.",
+        "commit": "feature: one sentence says what is stopping sleep and what to do"
+      },
+      {
+        "title": "Wake History Chart",
+        "needs": "sdk-framework",
+        "intro": "The wake history section shows wakes as rows. This adds a chart of wakes over the last days, so a pattern such as a wake every night at the same hour is seen at a glance. It uses the SDK's chart control, which is planned in Resolute-SDK and not built, and the rows stay beneath it.",
+        "surface": {
+          "fidelity": "the chart above the history rows, against `sdk/DESIGN.md` and `DESIGN.md` section 2.",
+          "job": "a person sees how often and when the machine woke over recent days. Consumer: the chart, compared with the history rows it is drawn from.",
+          "treatment": "wakes per day with each source distinguished by a label and a mark, not by colour alone. Cheaper substitute that fails the checkpoint: a picture drawn by the tool, which is a private chart control the contract forbids."
+        },
+        "build": [
+          "Aggregate the history into days and sources in `src/core/WakeSeries.cpp`. Done when: a fixture history gives the right count for each day and source.",
+          "Draw it with the SDK's chart control in `src/ui/WakeHistoryView.cpp`. Done when: the chart matches the rows beneath it."
+        ],
+        "items": [
+          "Write `BuildWakeSeries(history, days)` in `src/core/WakeSeries.cpp` returning wakes per day by source, with days that have no wakes present as zero. Done when: a fixture of seven days with two empty gives seven points, two of them zero.",
+          "Draw the series with the SDK's chart control in `src/ui/WakeHistoryView.cpp`, with an axis label for each day and a legend naming each source. Done when: the chart shows the fixture's counts and each source is named in words.",
+          "Show the history rows under the chart and keep them selectable. Done when: the totals of the chart equal the number of rows for the same days.",
+          "Say that there is no wake history when the series is empty, instead of drawing an empty chart. Done when: a machine with no wake events shows the sentence and no chart.",
+          "Cover it in `tests/wake_series_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L series` passes, and fails when a day is dropped from the series."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L series` passes, and the chart totals equal the history rows for the same days.",
+        "commit": "feature: a chart of wakes over the last days"
+      },
+      {
+        "title": "Modern Standby Report",
+        "intro": "On machines that use Modern Standby, Windows can produce its own sleep study report, which shows what drained the battery while the lid was closed. This opens that report from the tool, and on a machine that does not support it says so plainly and offers nothing to open.",
+        "surface": {
+          "fidelity": "the report action and its result, against `DESIGN.md` section 2.",
+          "job": "a person sees what drained the battery while the machine slept, using Windows's own report. Consumer: the generated report file, opened and checked to exist.",
+          "treatment": "a button that appears only where the machine supports it, with one sentence on what the report shows. Cheaper substitute that fails the checkpoint: a button on every machine that fails with an error on a desktop."
+        },
+        "build": [
+          "Generate the report in `src/core/SleepStudy.cpp` through `powercfg /sleepstudy` to a file in the tool's own folder. Done when: a supported fixture machine gives a report path and an unsupported one gives a refusal that says why.",
+          "Add the action to `src/ui/NowView.cpp`. Done when: it is absent on an unsupported machine and opens the report on a supported one."
+        ],
+        "items": [
+          "Write `SleepStudySupported()` in `src/core/SleepStudy.cpp` from `ReadSleepStates()`, true only for Modern Standby. Done when: a Modern Standby fixture is supported and an S3 fixture is not.",
+          "Write `WriteSleepStudy(path)` running `powercfg /sleepstudy /output` with the path and returning the path once the file exists. Done when: a fixture source writes a file and the function returns its path, and returns a named failure when no file appears. Cheaper substitute: returning success on exit code alone.",
+          "Show the action only on a supported machine and open the report with the default handler. Done when: an unsupported fixture shows no action and a supported one opens the file.",
+          "Cover it in `tests/sleepstudy_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L sleepstudy` passes, and fails when an unsupported machine is treated as supported."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L sleepstudy` passes for the supported and unsupported fixtures.",
+        "commit": "feature: open Windows's own sleep study where the machine supports it"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine, the requests, last wake, wake history, timers and armed devices the tool shows match what `powercfg` reports for the same moment, and each has its plain sentence.",
+      "A device's wake permission is taken away, read back, undone and read back again on a real machine, and an unelevated run refuses by name.",
+      "The window works in light and dark at 100 and 150 percent, by keyboard alone."
+    ]
+  }
+}

@@ -49,6 +49,8 @@ track: P3
 
 ## 1. System Change Journal
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ChangeJournal` repository (`D:\Resolute_Bin\ChangeJournal`) by its own plan.
+
 "My machine was fine last week" is the most common sentence in any support conversation, and nothing on Windows can answer it. This tool records what the machine looked like and shows what changed since.
 
 **Fidelity:** the snapshot list and the difference view, against `DESIGN.md` and `docs/captures/house-style/`.
@@ -57,18 +59,20 @@ track: P3
 **Chrome:** consume the framework, and the enumerators from `D05 T01 §5`, `D05 T03 §2`, and `D05 T03 §8`. Write no enumerator of your own.
 **Needs:** Windows host (build/test)
 
-- [ ] Define the snapshot: startup entries, services, scheduled tasks, context menu entries, drivers, installed software, file associations, applied policy, and named registry areas. Done when: the format is documented and each source names the section that owns its enumerator.
-- [ ] Take a snapshot without a perceptible wait. Done when: a full snapshot on a normal machine completes within a stated time, quoted, and the window stays responsive.
-- [ ] Diff two snapshots into added, removed, and changed, per source. Done when: a fixture pair with one known change in each source produces exactly those differences and no others.
-- [ ] Make the difference readable by somebody who is not an expert. Done when: a changed service renders as what changed in plain words, not as two raw property lists side by side.
-- [ ] Bound the storage. Done when: a retention rule exists, a machine with many snapshots stays within a stated budget, and the oldest are pruned predictably.
-- [ ] Treat the snapshot as a file that may leave the machine. Done when: the export states what it contains, the exclusion list names anything identifying, and the reasoning is recorded, as `D05 T03 §6` does for the system report.
-- [ ] Take a snapshot automatically before any repair-contract run, if the user enables it. Done when: a fixture repair produces a before-snapshot and the setting controls it.
-- [ ] Commit: `"change journal: snapshot the machine and show what changed"`
+- [ ] ~~Define the snapshot: startup entries, services, scheduled tasks, context menu entries, drivers, installed software, file associations, applied policy, and named registry areas. Done when: the format is documented and each source names the section that owns its enumerator.~~ -> `rizonesoft/ChangeJournal`
+- [ ] ~~Take a snapshot without a perceptible wait. Done when: a full snapshot on a normal machine completes within a stated time, quoted, and the window stays responsive.~~ -> `rizonesoft/ChangeJournal`
+- [ ] ~~Diff two snapshots into added, removed, and changed, per source. Done when: a fixture pair with one known change in each source produces exactly those differences and no others.~~ -> `rizonesoft/ChangeJournal`
+- [ ] ~~Make the difference readable by somebody who is not an expert. Done when: a changed service renders as what changed in plain words, not as two raw property lists side by side.~~ -> `rizonesoft/ChangeJournal`
+- [ ] ~~Bound the storage. Done when: a retention rule exists, a machine with many snapshots stays within a stated budget, and the oldest are pruned predictably.~~ -> `rizonesoft/ChangeJournal`
+- [ ] ~~Treat the snapshot as a file that may leave the machine. Done when: the export states what it contains, the exclusion list names anything identifying, and the reasoning is recorded, as `D05 T03 §6` does for the system report.~~ -> `rizonesoft/ChangeJournal`
+- [ ] ~~Take a snapshot automatically before any repair-contract run, if the user enables it. Done when: a fixture repair produces a before-snapshot and the setting controls it.~~ -> `rizonesoft/ChangeJournal`
+- [ ] Commit: ~~`"change journal: snapshot the machine and show what changed"`~~ -> `rizonesoft/ChangeJournal`
 
-**Test checkpoint:** A full snapshot completes within the stated time with the window responsive, quoted. A fixture pair with one known change per source produces exactly those differences and no others. A changed service renders in plain words. The retention rule holds on a machine with many snapshots. No enumerator in this tool duplicates one from `D05 T01 §5`, `D05 T03 §2`, or `D05 T03 §8`, proven by search.
+**Test checkpoint:** Moved with the section. The `rizonesoft/ChangeJournal` repository's plan carries it.
 
 ## 2. Repair History
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RepairHistory` repository (`D:\Resolute_Bin\RepairHistory`) by its own plan.
 
 Nobody else can build this. It exists only because every tool in this suite writes a restore record through one contract, which means the suite can show a user everything it has ever done to their machine, in one place, and let them reverse any of it.
 
@@ -78,18 +82,20 @@ Nobody else can build this. It exists only because every tool in this suite writ
 **Chrome:** consume the framework and the repair contract. This tool reads records and invokes the contract; it never writes to the system directly.
 **Needs:** Windows host (build/test)
 
-- [ ] Define where restore records live so every tool writes to one discoverable place. Done when: the location is documented, `D02 T01 §4` is updated to use it, and records from three different tools are found by one scan.
-- [ ] Render the history as a timeline: what tool, what action, what target, when, and whether it is still reversible. Done when: a fixture history from three tools renders completely.
-- [ ] Undo a past run through the owning tool's contract. Done when: a repair performed by one tool is reversed from here and the result matches reversing it in that tool, compared value by value.
-- [ ] Report honestly when a record can no longer be applied. Done when: a record whose target has since changed is shown as no longer reversible, with the reason, rather than failing at the moment the user tries.
-- [ ] Make the history searchable and filterable by tool, date, and target. Done when: each filter narrows and clearing restores.
-- [ ] Export the history as a transcript. Done when: the export matches the rendered timeline and is readable in a plain text editor.
-- [ ] Respect the standalone rule: this tool reads records that exist, and reports plainly when no other Resolute tool is installed. Done when: it runs alone in an empty folder and says there is no history rather than failing.
-- [ ] Commit: `"repair history: one timeline for everything the suite has done"`
+- [ ] ~~Define where restore records live so every tool writes to one discoverable place. Done when: the location is documented, `D02 T01 §4` is updated to use it, and records from three different tools are found by one scan.~~ -> `rizonesoft/RepairHistory`
+- [ ] ~~Render the history as a timeline: what tool, what action, what target, when, and whether it is still reversible. Done when: a fixture history from three tools renders completely.~~ -> `rizonesoft/RepairHistory`
+- [ ] ~~Undo a past run through the owning tool's contract. Done when: a repair performed by one tool is reversed from here and the result matches reversing it in that tool, compared value by value.~~ -> `rizonesoft/RepairHistory`
+- [ ] ~~Report honestly when a record can no longer be applied. Done when: a record whose target has since changed is shown as no longer reversible, with the reason, rather than failing at the moment the user tries.~~ -> `rizonesoft/RepairHistory`
+- [ ] ~~Make the history searchable and filterable by tool, date, and target. Done when: each filter narrows and clearing restores.~~ -> `rizonesoft/RepairHistory`
+- [ ] ~~Export the history as a transcript. Done when: the export matches the rendered timeline and is readable in a plain text editor.~~ -> `rizonesoft/RepairHistory`
+- [ ] ~~Respect the standalone rule: this tool reads records that exist, and reports plainly when no other Resolute tool is installed. Done when: it runs alone in an empty folder and says there is no history rather than failing.~~ -> `rizonesoft/RepairHistory`
+- [ ] Commit: ~~`"repair history: one timeline for everything the suite has done"`~~ -> `rizonesoft/RepairHistory`
 
-**Test checkpoint:** Records from three different tools are found by one scan and render in one timeline. A repair is reversed from here and the result matches reversing it in the owning tool, compared value by value. A stale record is reported as no longer reversible with its reason. The tool runs standalone and reports an empty history rather than failing.
+**Test checkpoint:** Moved with the section. The `rizonesoft/RepairHistory` repository's plan carries it.
 
 ## 3. Sleep and Wake Diagnostics
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/SleepWakeDiagnostics` repository (`D:\Resolute_Bin\SleepWakeDiagnostics`) by its own plan.
 
 `powercfg` already knows why a machine will not sleep and what woke it. It has never had a face, and the three questions it answers are among the most common and most infuriating a user has.
 
@@ -99,15 +105,15 @@ Nobody else can build this. It exists only because every tool in this suite writ
 **Chrome:** consume the framework and the repair contract for anything it changes.
 **Needs:** Windows host (build/test)
 
-- [ ] Report what is currently preventing sleep, naming the process or driver. Done when: a fixture request holding the machine awake is named and explained.
-- [ ] Report what last woke the machine, and the history of wake sources. Done when: both render and a machine with no wake history says so rather than rendering empty.
-- [ ] List devices permitted to wake the machine, and make that permission changeable as a repair-contract item. Done when: disabling a device's wake permission is undoable and verified by reading the setting back.
-- [ ] Surface wake timers, including scheduled tasks configured to wake the machine. Done when: a fixture wake timer is listed with the task that owns it.
-- [ ] Summarize the battery and standby behaviour where the system provides it. Done when: the summary renders on a laptop and reports plainly that it is unavailable on a desktop.
-- [ ] Explain each finding in plain words. Done when: every finding carries a sentence a non-expert can act on, and the raw value remains available.
-- [ ] Commit: `"sleep and wake: explain why it will not sleep and what wakes it"`
+- [ ] ~~Report what is currently preventing sleep, naming the process or driver. Done when: a fixture request holding the machine awake is named and explained.~~ -> `rizonesoft/SleepWakeDiagnostics`
+- [ ] ~~Report what last woke the machine, and the history of wake sources. Done when: both render and a machine with no wake history says so rather than rendering empty.~~ -> `rizonesoft/SleepWakeDiagnostics`
+- [ ] ~~List devices permitted to wake the machine, and make that permission changeable as a repair-contract item. Done when: disabling a device's wake permission is undoable and verified by reading the setting back.~~ -> `rizonesoft/SleepWakeDiagnostics`
+- [ ] ~~Surface wake timers, including scheduled tasks configured to wake the machine. Done when: a fixture wake timer is listed with the task that owns it.~~ -> `rizonesoft/SleepWakeDiagnostics`
+- [ ] ~~Summarize the battery and standby behaviour where the system provides it. Done when: the summary renders on a laptop and reports plainly that it is unavailable on a desktop.~~ -> `rizonesoft/SleepWakeDiagnostics`
+- [ ] ~~Explain each finding in plain words. Done when: every finding carries a sentence a non-expert can act on, and the raw value remains available.~~ -> `rizonesoft/SleepWakeDiagnostics`
+- [ ] Commit: ~~`"sleep and wake: explain why it will not sleep and what wakes it"`~~ -> `rizonesoft/SleepWakeDiagnostics`
 
-**Test checkpoint:** A fixture request holding the machine awake is named and explained. Last-wake and wake history render, and an empty history says so. Disabling a device's wake permission is undoable and verified by read-back. A fixture wake timer is listed with its owning task. Every finding carries an actionable sentence with the raw value still available.
+**Test checkpoint:** Moved with the section. The `rizonesoft/SleepWakeDiagnostics` repository's plan carries it.
 
 ## 4. Boot Time Analyzer
 

@@ -1,0 +1,250 @@
+{
+  "name": "ChangeJournal",
+  "slug": "changejournal",
+  "display": "Change Journal",
+  "job": "it takes a snapshot of what runs and is installed on a machine and shows what changed between two points in time, without changing anything on the system.",
+  "tagline": "Your PC was fine last week. See what changed",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Copper",
+    "light": "#FDBA74",
+    "dark": "#9A3412",
+    "social_ground": "#2A1206",
+    "social_muted": "#F5D3B5"
+  },
+  "icon": {
+    "idea": "Two overlapping squares, then and now, with a plus on the newer one.",
+    "points": [
+      "Free-standing with no tile: two rounded squares overlapping.",
+      "The older square behind is Copper light, the newer one in front is Copper with a Copper light plus.",
+      "The small drawing, below 40 pixels, thickens the plus."
+    ],
+    "large": "<rect x=\"10\" y=\"10\" width=\"52\" height=\"52\" rx=\"9\" fill=\"#FDBA74\"/><rect x=\"34\" y=\"34\" width=\"52\" height=\"52\" rx=\"9\" fill=\"#9A3412\"/><path d=\"M52 60 H68 M60 52 V68\" fill=\"none\" stroke=\"#FDBA74\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<rect x=\"10\" y=\"10\" width=\"52\" height=\"52\" rx=\"9\" fill=\"#FDBA74\"/><rect x=\"34\" y=\"34\" width=\"52\" height=\"52\" rx=\"9\" fill=\"#9A3412\"/><path d=\"M48 60 H72 M60 48 V72\" fill=\"none\" stroke=\"#FDBA74\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Changes",
+        "The two snapshots being compared in the header, and each difference as a row"
+      ],
+      [
+        "Snapshots",
+        "Each stored snapshot with its date and size"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees what changed on their machine between two snapshots, in plain words, and takes a new snapshot with one button.",
+    "primary": "Take snapshot",
+    "secondary": "Compare",
+    "rows": [
+      [
+        "Startup entries",
+        "Added"
+      ],
+      [
+        "Services",
+        "Changed"
+      ],
+      [
+        "Scheduled tasks",
+        "Removed"
+      ],
+      [
+        "Drivers",
+        "Changed"
+      ],
+      [
+        "Installed programs",
+        "Added"
+      ]
+    ],
+    "status": "5 changes: 2 added, 1 removed, 2 changed",
+    "notes": [
+      "The header names the two snapshots being compared, each with its date, and the Compare button picks a different pair.",
+      "Each difference is a row with what it is, its kind (startup entry, service, scheduled task, shell extension, driver, installed program, policy) and a state shown with an icon and a word: Added, Removed or Changed.",
+      "A changed item says what changed in plain words, for example that a service start type went from Manual to Automatic, not two raw property lists side by side.",
+      "Take snapshot is the accent button. It runs without blocking the window, shows progress in the status bar and adds the new snapshot to the Snapshots section.",
+      "There is nothing to undo: the tool changes nothing on the system, and a stored snapshot can simply be deleted from the Snapshots section.",
+      "The status bar counts the differences in words, for example \"5 changes: 2 added, 1 removed, 2 changed\".",
+      "With fewer than two snapshots the Changes screen says so in one sentence and offers Take snapshot. The tool does not ask for elevation."
+    ],
+    "cut": "There is no original window to cut from, because the tool is new. It has no menus, no splash, no animations and no donate strip: the suite's tool window has none, and anything of that kind is recorded in the plan as not wanted rather than left out by accident."
+  },
+  "readme": {
+    "lead": "Change Journal records what runs and is installed on your PC, and shows what changed between two points in time.",
+    "what": [
+      "\"My machine was fine last week\" is the most common sentence in a support conversation, and Windows cannot answer it. Change Journal takes a snapshot of your startup entries, services, scheduled tasks, shell extensions, drivers, installed programs and policies, and stores it. Later it compares any two snapshots and lists what was added, removed or changed.",
+      "It only reads and stores. It changes nothing on your system, and a snapshot it keeps can simply be deleted. It does not enumerate anything itself: it uses the same enumerators as the suite's Startup Manager, Driver Manager and Policy Inspector."
+    ],
+    "new_intro": "Change Journal is a new tool in the suite, written in C++ from the start.",
+    "new": [
+      [
+        "Two points in time.",
+        "Pick any two snapshots and see the difference between them, grouped by what it is."
+      ],
+      [
+        "Plain words.",
+        "A changed item says what changed, not two raw property lists."
+      ],
+      [
+        "A rename is a change.",
+        "Each item has a stable identity, so a renamed item shows as one change and not a removal plus an addition."
+      ],
+      [
+        "Nothing changed on your PC.",
+        "The tool records and compares only, and its snapshots are ordinary files you can delete."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Change Journal ships as a complete, standalone C++ tool: it takes a versioned snapshot of what runs and is installed on a machine by calling the enumerators the suite's other tools own, stores it compactly in its data folder, and shows the difference between any two snapshots as added, removed and changed items in plain words, while changing nothing on the system.",
+    "current_state": "Nothing exists yet. The tool is new and nothing is ported: there is no AutoIt original and no `reference/au3/` folder. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan section as it stood in the Resolute repository under `docs/origin/resolute-D05-T04-s1.md` (eight items, one test checkpoint). The tool composes enumerators and never writes a second one of its own. Those enumerators are built first in the Startup Manager, Driver Manager and Policy Inspector tools and offered to Resolute-SDK as a shared library, so this tool's engine waits on that library. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T04-s1.md`: the plan section this tool starts from: the snapshot sources, the time bound, the diff, plain-words rendering, retention, export and the optional snapshot before a repair run.",
+      "The shared enumerator library in Resolute-SDK, offered from the Startup Manager, Driver Manager and Policy Inspector tools: the only source of what a snapshot records.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the tool's identity and window sections, and the suite's design contract."
+    ],
+    "outcome": [
+      "`ChangeJournal.exe` takes a snapshot of startup entries, services, scheduled tasks, shell extensions, drivers, installed programs and policies through the shared enumerators, stores it in its data folder, and a search of `src/` finds no enumerator of its own.",
+      "Any two snapshots compare into added, removed and changed items per source, a fixture pair with one known change per source produces exactly those differences, and a changed item reads in plain words.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Changes screen, where a person reads each difference as a row, with Snapshots as the second list of what is stored. Reporting and audit are the Activity section, which records each snapshot taken, comparison made and snapshot deleted. Settings are the framework's pages. Permissions do not apply: the tool reads what the enumerators can read as the current user and asks for no elevation. Reverse does not apply either: the tool changes nothing on the system, and a snapshot it stores can simply be deleted.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Snapshot and Diff Engine",
+      "intro": "The tool's whole core: a versioned snapshot format, taking a snapshot by calling the shared enumerators, storing it compactly in the tool's data folder, and a diff of two snapshots into added, removed and changed. It reads and stores and writes nothing outside the tool's data folder. The enumerators belong to other tools and arrive as a shared library, so this section waits on that library.",
+      "needs": "windows-host, sdk-framework",
+      "build": [
+        "Define the snapshot format and the diff in `src/core/Snapshot.h` and `src/core/Diff.cpp`. Done when: a fixture pair with one known change per source diffs to exactly those changes and no others.",
+        "Take and store a snapshot in `src/core/Journal.cpp` through the shared enumerators. Done when: a snapshot written to a disposable data folder reads back equal to what was taken."
+      ],
+      "items": [
+        "Document the snapshot format in `src/core/Snapshot.h` and `docs/snapshot-format.md`: a format version, a header with the date and the machine's Windows build, and one record per item with a source, a stable identity key and a set of named properties. Done when: each source (startup entries, services, scheduled tasks, shell extensions, drivers, installed programs, policies) names the tool section that owns its enumerator.",
+        "Choose the stable identity per source so a rename is a change and not a remove plus an add, for example the service name and not its display name, in `src/core/Identity.cpp`. Done when: a fixture where a service display name changes diffs to one changed record, not one removed and one added.",
+        "Implement `TakeSnapshot()` in `src/core/Journal.cpp` calling only the shared enumerator library, one call per source, and recording a source that fails as unavailable instead of dropping it. Done when: a fixture enumerator set produces a snapshot with every source present, and a search of `src/` finds no registry, service-manager or task-scheduler call outside the library. Cheaper substitute: a private enumerator inside this tool, which is the duplication the plan forbids.",
+        "Store a snapshot compactly in the tool's data folder, written atomically and read back before it counts as taken. Done when: a test that truncates the file mid-write leaves the previous snapshots intact and reports the failure by name. Cheaper substitute: writing the file in place, which leaves a half snapshot if the tool is closed.",
+        "Implement `Diff(a, b)` in `src/core/Diff.cpp` returning added, removed and changed records per source, with each changed property named with its old and new value. Done when: a fixture pair with one known change in each source produces exactly those differences and no others.",
+        "Render a difference in plain words in `src/core/Describe.cpp`, one sentence per record. Done when: a changed service start type reads as \"start type changed from Manual to Automatic\" and not as two property lists side by side.",
+        "Take a snapshot without a perceptible wait: run it off the window's thread and report progress per source. Done when: a full snapshot on a normal machine completes within a stated time, quoted in the commit message, while a test thread confirms the caller was not blocked.",
+        "Cover every path in `tests/journal_test.cpp` and `tests/diff_test.cpp`, including an unavailable source and an unknown format version. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L journal` passes, and fails when the identity key of one source is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L journal` passes: a fixture pair with one known change per source produces exactly those differences, a rename is one change, and a search of `src/` finds no enumerator of the tool's own.",
+      "commit": "core: snapshot the machine through the shared enumerators and diff two snapshots"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Scheduled Snapshots",
+        "needs": "sdk-framework",
+        "intro": "The journal is only useful if a snapshot exists from before the trouble began. This section takes one by itself, daily or at sign-in, through the same engine call as the button, so nobody has to remember to press it.",
+        "surface": {
+          "fidelity": "the Scheduled Snapshots page in the Settings section, against `sdk/DESIGN.md`.",
+          "job": "a person has a snapshot from before the problem without remembering to take one. Consumer: the Snapshots list, read back.",
+          "treatment": "a page declared to the framework with a choice of off, daily or at sign-in, and the date of the next snapshot in words. Cheaper substitute that fails the checkpoint: a private scheduler inside the tool."
+        },
+        "build": [
+          "Declare the schedule setting and run the snapshot from it in `src/core/Schedule.cpp`. Done when: a fixture clock triggers exactly one snapshot per day.",
+          "Add the page in `src/ui/SettingsView.cpp`. Done when: the choice is persisted by the framework and read back after a restart."
+        ],
+        "items": [
+          "Declare the setting (off, daily, at sign-in) to the framework in `src/core/Schedule.cpp` with off as the default. Done when: a first run writes it and a second run reads it back.",
+          "Run the snapshot on schedule through the same `TakeSnapshot()` call as the button. Done when: a fixture clock produces one record in the Snapshots list per day and none when the setting is off. Cheaper substitute: a second code path for scheduled runs, which lets the two disagree.",
+          "Skip a run when a snapshot was already taken that day, and record the skip in Activity. Done when: two triggers on one day leave one snapshot and one Activity line saying so.",
+          "Cover it in `tests/schedule_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L schedule` passes, and fails when the off setting still takes a snapshot."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L schedule` passes for off, daily and at sign-in against a fixture clock.",
+        "commit": "feature: take a snapshot by itself, daily or at sign-in"
+      },
+      {
+        "title": "Filter and Search the Changes",
+        "intro": "A comparison across a month can run to hundreds of rows. This section narrows the Changes list by kind (added, removed, changed), by source and by a text search, without re-reading either snapshot.",
+        "surface": {
+          "fidelity": "the filter bar of the Changes section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person finds the one change that matters among many. Consumer: the visible rows, compared with the diff.",
+          "treatment": "kind and source filters with a search box above the list, the count of visible rows in the status bar. Cheaper substitute that fails the checkpoint: hiding rows with a style so the count and the keyboard order still include them."
+        },
+        "build": [
+          "Implement the filter over the diff result in `src/core/Filter.cpp`. Done when: each filter returns the expected subset of a fixture diff.",
+          "Add the filter bar in `src/ui/ChangesView.cpp`. Done when: the list and the status bar count change together."
+        ],
+        "items": [
+          "Implement `Filter(diff, kinds, sources, text)` in `src/core/Filter.cpp`, matching the text against the item name and its plain-words sentence. Done when: a fixture diff filtered by one source and the word \"start\" returns exactly the expected rows.",
+          "Add the kind and source filters and a search box to `src/ui/ChangesView.cpp` using the framework's controls. Done when: toggling a filter changes the list and the status bar count in one step. Cheaper substitute: a private text box, which the contract forbids.",
+          "Make the filters reachable by keyboard and name each for accessibility. Done when: a UI Automation walk names every filter control and the list is filtered without a mouse.",
+          "Cover it in `tests/filter_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L filter` passes, and fails when a hidden row is still counted."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L filter` passes and a filtered list and its status bar count agree.",
+        "commit": "feature: filter and search the changes"
+      },
+      {
+        "title": "Export a Comparison",
+        "intro": "A snapshot or a comparison may leave the machine, for a helper or a support ticket. This section writes a comparison as a text or CSV file a helper can read, states what it contains, and lists what is excluded because it identifies the person.",
+        "surface": {
+          "fidelity": "the Export action in the Changes header, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 11.",
+          "job": "a person sends what changed to someone who can help. Consumer: the exported file, read back.",
+          "treatment": "an export that first states what it will contain and what it leaves out, then writes the file through the framework's save surface. Cheaper substitute that fails the checkpoint: dumping the raw snapshot, which carries identifying values."
+        },
+        "build": [
+          "Write the text and CSV writers in `src/core/Export.cpp` with the exclusion list in `src/core/ExportPolicy.h`. Done when: an exported fixture holds the differences and none of the excluded values.",
+          "Add the Export action and its statement in `src/ui/ChangesView.cpp`. Done when: the statement appears before the file is written."
+        ],
+        "items": [
+          "Write `ExportText()` and `ExportCsv()` in `src/core/Export.cpp`, one line per difference with source, kind, name and plain-words sentence. Done when: the CSV of a fixture diff has one row per difference and opens with a header row.",
+          "Name the excluded values (for example the user name in a path and the machine name) in `src/core/ExportPolicy.h` with the reasoning in `docs/export.md`. Done when: a fixture containing both exports with neither present. Cheaper substitute: an exclusion applied by a text search over the finished file, which misses values the writer knows about.",
+          "Show what the export contains and what it excludes before saving, through the framework's message surface. Done when: the statement lists the exclusion names and the file is written only after the person confirms.",
+          "Cover it in `tests/export_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes, and fails when an excluded value reaches the file."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes and no excluded value appears in an exported fixture.",
+        "commit": "feature: export a comparison as text or CSV"
+      },
+      {
+        "title": "Storage Limit and Cleanup",
+        "intro": "A snapshot a day adds up. This section keeps at most a set number or age of snapshots, prunes the oldest predictably, and lets a person delete any one by hand. Deleting changes only the tool's own data folder.",
+        "surface": {
+          "fidelity": "the Snapshots section and its retention setting, against `DESIGN.md` section 2 and `sdk/DESIGN.md`.",
+          "job": "a person keeps the journal within a size they chose. Consumer: the Snapshots list and the data folder, read back.",
+          "treatment": "a setting for the most snapshots or the greatest age to keep, a Delete action on a selected snapshot with a confirmation, and the total size in the status bar. Cheaper substitute that fails the checkpoint: pruning silently with no record in Activity."
+        },
+        "build": [
+          "Implement the retention rule in `src/core/Retention.cpp`. Done when: a fixture folder with many snapshots prunes the oldest first and stays within the stated limit.",
+          "Add Delete and the setting in `src/ui/SnapshotsView.cpp`. Done when: a deleted snapshot disappears from the list and the folder."
+        ],
+        "items": [
+          "Implement `Prune(limit)` in `src/core/Retention.cpp` removing the oldest snapshots past a count or an age, never the most recent two. Done when: a fixture of many snapshots ends at the limit, oldest removed first, and the newest two always remain.",
+          "Record each prune and each manual delete as one Activity line naming the snapshot and its date. Done when: a fixture prune of three snapshots writes three lines. Cheaper substitute: pruning without a record, which leaves a person unable to say why a snapshot is gone.",
+          "Add Delete to `src/ui/SnapshotsView.cpp` with a confirmation through the framework's message surface. Done when: deleting a snapshot that is one side of the open comparison says so before it removes it.",
+          "Declare the retention setting to the framework with a default. Done when: a first run writes it and a second run reads it back.",
+          "Cover it in `tests/retention_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L retention` passes, and fails when the newest snapshot is pruned."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L retention` passes: a folder with many snapshots stays within the limit, oldest first, and every removal has an Activity line.",
+        "commit": "feature: bound the journal with a retention rule and manual delete"
+      }
+    ],
+    "no_reverse": "the tool records and compares; it changes nothing on the system, and a snapshot it stores can simply be deleted",
+    "verification": [
+      "A search of `src/` finds no enumerator of the tool's own, and each snapshot source names the tool whose enumerator it uses.",
+      "A fixture pair with one known change per source produces exactly those differences, and a changed service reads in plain words.",
+      "On a real machine the tool takes snapshots, compares any two, exports a comparison and prunes by its rule, in light and dark, by keyboard alone."
+    ]
+  }
+}

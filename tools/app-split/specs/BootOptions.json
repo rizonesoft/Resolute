@@ -1,0 +1,250 @@
+{
+  "name": "BootOptions",
+  "slug": "bootoptions",
+  "display": "Boot Options",
+  "job": "it turns safe mode, safe mode with networking, driver signature enforcement and boot logging on and off for the next Windows start, shows what is set now, and always leaves a way back.",
+  "tagline": "Start in safe mode next time, and get back out again",
+  "frozen": true,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Harbour",
+    "light": "#BAE6FD",
+    "dark": "#0284C7",
+    "social_ground": "#082436",
+    "social_muted": "#C6E4F3"
+  },
+  "icon": {
+    "idea": "A lifebuoy: safe mode, the way back in.",
+    "points": [
+      "Free-standing, with no tile: a thick ring.",
+      "The ring is Harbour, with four Harbour light bands across it.",
+      "The small drawing, used below 40 pixels, thickens the bands."
+    ],
+    "large": "<circle cx=\"48\" cy=\"48\" r=\"28\" fill=\"none\" stroke=\"#0284C7\" stroke-width=\"16\"/><path d=\"M48 12 V28 M48 68 V84 M12 48 H28 M68 48 H84\" fill=\"none\" stroke=\"#BAE6FD\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<circle cx=\"48\" cy=\"48\" r=\"27\" fill=\"none\" stroke=\"#0284C7\" stroke-width=\"20\"/><path d=\"M48 12 V30 M48 66 V84 M12 48 H30 M66 48 H84\" fill=\"none\" stroke=\"#BAE6FD\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Next start",
+        "Each boot option as a row: what it is set to now and what it will be at the next start"
+      ],
+      [
+        "History",
+        "The boot changes this tool made, with the values before and after each, and how to put each one back"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which boot options are set now and what the next start will be, changes them, and can always put them back.",
+    "primary": "Apply and restart",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Safe mode",
+        "On or Off now; On or Off at the next start"
+      ],
+      [
+        "Safe mode with networking",
+        "On or Off now; On or Off at the next start"
+      ],
+      [
+        "Driver signature enforcement",
+        "Enforced or Off now; Enforced or Off at the next start"
+      ],
+      [
+        "Boot logging",
+        "On or Off now; On or Off at the next start"
+      ]
+    ],
+    "status": "Safe mode will start next time",
+    "notes": [
+      "Each option is one row with two columns, Now and Next start, each shown as an icon and a word (On, Off, Enforced), never by colour alone. A row whose next start differs from now is marked Changed in words.",
+      "Safe mode and safe mode with networking are one setting in the boot configuration (`safeboot`), so choosing one turns the other off, and the rows say so.",
+      "Apply and restart is the accent button. It writes only the rows that changed, reads each value back, then asks before it restarts. Nothing restarts without that confirmation.",
+      "Before anything is applied the window states, in words on the surface, what each change does, that it needs a restart, and what to do if the machine will not start normally: the recovery steps are shown there and not only in the guide.",
+      "Undo puts the boot options back as they were before the last change, from the recorded prior values. It is disabled, with a tooltip, when there is nothing to undo.",
+      "When the machine is in safe mode because of a setting still in force, the status bar says so and the window offers one press to clear it.",
+      "The tool is refused by name when it is not running elevated, before any read that could mislead and before any write. The status bar then says Run as administrator."
+    ],
+    "cut": "There is no earlier window: the tool is new. The suite's usual extras are not part of it: no menus, no splash, no animations and no donate strip. The window is the Sidebar tool window and its first screen, and what it leaves out is recorded in the plan."
+  },
+  "readme": {
+    "lead": "Boot Options starts Windows in safe mode next time, turns driver signature enforcement and boot logging on or off, and gets you back out again.",
+    "what": [
+      "It shows the boot options of the Windows you are running: safe mode, safe mode with networking, driver signature enforcement and boot logging, each with what it is set to now and what it will be at the next start. You change them for the next start, the tool reads each value back to check it took, and it asks before it restarts.",
+      "A wrong boot setting can leave a machine that starts only in safe mode, so every change is recorded first and can be undone, and the way back is written on the screen. The tool needs administrator rights, and it says so by name when it does not have them."
+    ],
+    "new_intro": "Boot Options is a new tool of the suite, with no earlier version.",
+    "new": [
+      [
+        "No `bcdedit` to remember.",
+        "Safe mode and the other options are rows you change, not commands you type."
+      ],
+      [
+        "A way back every time.",
+        "The values before each change are recorded, and Undo restores them exactly."
+      ],
+      [
+        "Stuck in safe mode, handled.",
+        "If the machine is in safe mode because of this tool, it says so and clears it with one press."
+      ],
+      [
+        "Plain words for each option.",
+        "Each option says what it does, what it risks and how to recover if the machine will not start."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Boot Options ships as a complete, standalone C++ tool: it reads the current boot entry's safe mode, driver signature and boot logging settings, sets and clears each for the next start with the exact boot configuration values frozen, reads every value back, records the prior values before any write, refuses by name when not elevated, shows what is set now and what the next start will be, and always leaves a way back from a setting that would leave the machine in safe mode.",
+    "current_state": "Nothing exists yet. This is a new tool: there is no AutoIt version, no source to port and no earlier behaviour to match, and nothing has been built in C++. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T03-s7.md`, 22 lines, whose section 7 covers three tools, of which only the second concerns this one: safe mode, driver signature enforcement and boot logging, each a repair-contract item with prior state captured and undo, each stating its restart requirement and recovery path on the surface, and a frozen boot configuration write proven by a fixture change and undo that reproduce the original entry exactly. From Windows itself: the boot configuration data store holds the elements `safeboot`, `safebootalternateshell`, `bootlog`, `nointegritychecks` and `testsigning` on the boot entry, readable and writable through the BCD WMI provider or `bcdedit`, applying to the current entry and taking effect at the next start; Secure Boot limits what the signature settings do; and a `safeboot` left set makes every start a safe mode start. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T03-s7.md`: the plan section as it stood in the Resolute repository, of which only its Boot Options item, its recovery-on-the-surface item, its freeze check and its test checkpoint apply here.",
+      "The boot configuration data store of the running machine, read and written through the BCD WMI provider (namespace `root\\WMI`, class `BcdStore`) on the `{current}` entry, with `bcdedit /enum {current}` as the cross-check in tests on a virtual machine.",
+      "`GetSystemMetrics(SM_CLEANBOOT)` for whether this start is a safe mode start, and the `UEFISecureBootEnabled` value under `HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State` for whether Secure Boot is on."
+    ],
+    "outcome": [
+      "`BootOptions.exe` shows each option's value now and at the next start, sets and clears safe mode (minimal and with networking), driver signature enforcement and boot logging on the current entry with values byte-identical to the frozen set, and reads each one back.",
+      "The prior values are recorded before any write, a refusal names the cause (not elevated, Secure Boot, read-back mismatch), the last change can be undone, and a machine left in safe mode by this tool is told so and cleared in one press.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, states each change's restart need and recovery path on the surface, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Next start screen, where a person reads each option as one row with its value now and at the next start. Reporting is the History section, which shows each change with its before and after, and audit is the Activity section, which is the trail of what the tool wrote. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated action is refused by name before any write. Reverse anchors on the undo section, which restores the recorded prior values, including an option that was absent, through the SDK repair contract once it exists.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Boot Entry Engine",
+      "intro": "The tool's whole system effect: reading the current boot entry's options, setting and clearing each one with the value read back, and recording the prior values before any write. It has no window, and the store sits behind one small interface so the tests run against a fake store and a virtual machine, never against the developer's own machine. The values it writes are the frozen part: they are the exact boot configuration values listed in the first item and nothing else.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the options and their frozen values as data in `src/core/BootOptions.h`. Done when: every element, its type and the one value the tool writes or the absence it restores is stated once, and a test compares the table with `tests/fixtures/bcd/frozen.json`.",
+        "Implement read, set, clear, verify and prior-state capture in `src/core/BootStore.cpp` against a store interface the tests replace. Done when: the unit tests pass against a fake store and the same cases pass against a virtual machine's real store."
+      ],
+      "items": [
+        "Declare in `src/core/BootOptions.h` the elements the tool sets or clears on the `{current}` entry: `safeboot` as `Minimal` or `Network` (`0x250000F0`), `bootlog` as `Yes` (`0x260000B0`) and `nointegritychecks` as `Yes` (`0x16000048`), and the two it only reads and clears, `safebootalternateshell` (`0x250000F1`) and `testsigning` (`0x16000049`). Done when: the header states each element once and `tests/fixtures/bcd/frozen.json` equals it, and each element id equals what `bcdedit /enum {current} /v` prints on a virtual machine. Cheaper substitute: ids typed from memory and never read off a real store.",
+        "Read the current entry in `src/core/BootStore.cpp` through the BCD WMI provider (`root\\WMI`, `BcdStore.OpenStore`, `OpenObject` on `{current}`, `GetElement`), returning each element as present with its value or absent. Done when: a fake store with `safeboot` absent and `bootlog` present reads back exactly that, and a virtual machine's `bcdedit /enum {current}` agrees. Cheaper substitute: parsing `bcdedit` text, which is localized and breaks on a non-English system.",
+        "Capture the prior state before any write: a `PriorState` holding, for each of the five elements, present with its value or absent, handed to a recorder interface and written through the SDK repair contract's restore record once it exists. Done when: a test finds the record complete before the first element is written, and a recorder that fails stops the write with nothing changed. Cheaper substitute: remembering the values in memory, which are lost if the tool closes or the machine restarts.",
+        "Implement `Set(option, value)` and `Clear(option)` in `src/core/BootStore.cpp` writing only the frozen values, with `safeboot` replacing the other mode so minimal and network are never both set, and `Clear` deleting the element so the entry returns to the state it had when the element never existed. Done when: a fixture set then clear leaves the entry byte-equal to the fixture entry before, asserted element by element. Cheaper substitute: clearing by writing `No` or `0`, which leaves a present element where there was none.",
+        "Read every value back after each write and return a mismatch as element, expected and found. Done when: a fake store that drops one write is reported by name, and the engine leaves the prior state recorded and unchanged on disk. Cheaper substitute: checking only the return code of the write.",
+        "Refuse every `Set` and `Clear` by name when the process is not elevated, before any write and before reading anything that could mislead, with one activity record. Done when: an unelevated test run reports `NotElevated` and the fake store is unchanged. Cheaper substitute: letting the provider fail with access denied halfway through.",
+        "Report a signature setting that Secure Boot protects as its own refusal: when Secure Boot is on and the write of `nointegritychecks` or `testsigning` is refused or does not read back, return `BlockedBySecureBoot` naming the element, never a generic failure and never a pretended success. Done when: a fake store that protects those two elements returns `BlockedBySecureBoot` for each and leaves the entry unchanged.",
+        "Offer the restart in `src/core/Restart.cpp` only through an explicit call after a verified apply, using `InitiateSystemShutdownEx` with the restart flag and a reason, and never from `Set` or `Clear`. Done when: a test with a fake shutdown sink shows no call during `Set` and `Clear` and one call after the explicit restart request. Cheaper substitute: restarting automatically after a write, which leaves no moment to change one's mind.",
+        "Cover every path in `tests/boot_test.cpp` with the fake store and the fixture entries: each element set and cleared, safe mode replaced by safe mode with networking, an absent element, a dropped write, a Secure Boot refusal and an unelevated refusal. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L boot` passes, and fails when one frozen value in `src/core/BootOptions.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L boot` passes, including the dropped-write, Secure Boot and unelevated cases, and fails when one declared value is changed.",
+      "commit": "core: the boot entry read, set, cleared and verified, with prior state recorded"
+    },
+    "enhancements": [
+      {
+        "title": "Undo the Last Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A boot change has to be reversible, so the prior state of the five elements is recorded before every write, and Undo restores what was actually there, including an element that did not exist, not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists. The History section lists each change with its before and after.",
+        "surface": {
+          "fidelity": "the Undo button, its result and the History section, against `DESIGN.md` section 2.",
+          "job": "a person puts the boot options back as they were before the last change. Consumer: the boot entry, compared with the record.",
+          "treatment": "the recorded prior state restored element by element, present or absent, then read back. Cheaper substitute that fails the checkpoint: an undo that clears every option, which is not what was there before."
+        },
+        "build": [
+          "Bind the recorder to the repair contract's restore record in `src/core/BootStore.cpp`. Done when: a record exists on disk before the first element is written.",
+          "Wire Undo and the History list in `src/ui/NextstartView.cpp` and `src/ui/HistoryView.cpp`. Done when: apply then undo leaves the entry as it was."
+        ],
+        "items": [
+          "Write the prior-state record through the repair contract's restore record, before any write, in `src/core/BootStore.cpp`. Done when: a test finds the record on disk before the first element is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring each of the five elements to present with its recorded value or to absent, then reading each back. Done when: apply then undo, and clear then undo, each leave the fixture entry byte-equal to before, asserted element by element. Cheaper substitute: clearing everything, which loses an option that was set before.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one applied change.",
+          "List each change in `src/ui/HistoryView.cpp` with the time, the elements changed and their values before and after, in words. Done when: after two applies the list shows two entries newest first matching the records.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one element is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: apply then undo and clear then undo both leave the fixture entry as it was, and the fixture change and undo reproduce the original entry exactly.",
+        "commit": "feature: undo restores the boot options as they were"
+      },
+      {
+        "title": "Safe Mode Loop Guard",
+        "intro": "If `safeboot` is left set, every start is a safe mode start and the machine looks broken. When the machine is in safe mode and this tool set it, the tool says so at start and offers one press to clear it. When the machine is in safe mode for another reason, it says that too and offers the same press, because the next start will be safe mode again only while the setting remains.",
+        "surface": {
+          "fidelity": "the status bar line and the clear action on the Next start screen, against `DESIGN.md` section 2.",
+          "job": "a person who is stuck in safe mode gets out of it in one press. Consumer: the boot entry, read back with `safeboot` absent.",
+          "treatment": "one plain sentence at the top of the Next start screen saying this start is safe mode, whether this tool set it and when, with one action that clears it and asks before restarting. Cheaper substitute that fails the checkpoint: a line of text telling the user to run `bcdedit` themselves."
+        },
+        "build": [
+          "Detect the condition in `src/core/LoopGuard.cpp` from `GetSystemMetrics(SM_CLEANBOOT)`, the current entry and the tool's own change record. Done when: fixtures separate safe mode set by the tool, safe mode set by something else and a normal start.",
+          "Show the notice and the clear action in `src/ui/NextstartView.cpp`. Done when: the notice appears at start in safe mode and one press clears `safeboot` and reads it back."
+        ],
+        "items": [
+          "Add `src/core/LoopGuard.cpp` returning `InSafeModeByThisTool`, `InSafeModeOther` or `Normal` from `GetSystemMetrics(SM_CLEANBOOT)`, whether `safeboot` is present on the current entry and whether the History record shows this tool set it. Done when: a fixture for each of the three cases returns the expected value. Cheaper substitute: checking only `SM_CLEANBOOT`, which cannot tell whether the setting will cause a second safe mode start.",
+          "Show the notice at start in `src/ui/NextstartView.cpp` before anything else, naming the cause in words and the time the tool set it. Done when: a fake safe mode start shows the notice and a normal start shows none.",
+          "Clear `safeboot` and `safebootalternateshell` with one action through the engine, record the prior state first and read both back. Done when: a fixture in safe mode leaves the entry without either element, the prior state is on disk before the write, and the restart is only offered after. Cheaper substitute: deleting the elements without the record, which leaves no way back.",
+          "Say plainly that the current session stays in safe mode until a restart. Done when: the notice after a clear states that the next start will be normal and this session is unchanged.",
+          "Cover it in `tests/loopguard_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L loopguard` passes for the three cases, and fails when the History check is skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L loopguard` passes for the tool-set, other-cause and normal cases, and one press clears `safeboot` and reads it back absent.",
+        "commit": "feature: say when safe mode will repeat, and clear it in one press"
+      },
+      {
+        "title": "Explain Each Option",
+        "intro": "Each option says in plain words what it does, what it risks, that it needs a restart, and how to recover if the machine will not start. The recovery text is on the surface beside the option, so a person reads it before applying and not after the machine fails to start. The words are the language pack's.",
+        "surface": {
+          "fidelity": "the explanation panel on the Next start screen, against `DESIGN.md` section 2 and `sdk/DESIGN.md`.",
+          "job": "a person knows what a change will do and how to get back before pressing Apply and restart. Consumer: the panel text, compared with the option selected.",
+          "treatment": "one short block per option: what it does, the risk, the restart need and the recovery steps, shown when the row is selected and again in the confirmation. Cheaper substitute that fails the checkpoint: the recovery steps only in `docs/guide.md`, which nobody reads while the machine will not start."
+        },
+        "build": [
+          "Write the explanation set in `src/core/Explain.cpp` with the text in the language pack, one entry per option. Done when: every option has its four parts and a test finds none missing.",
+          "Show it in `src/ui/NextstartView.cpp` and in the confirmation before apply. Done when: selecting a row shows its block and the confirmation repeats the recovery steps."
+        ],
+        "items": [
+          "Add `src/core/Explain.cpp` mapping each option to what it does, its risk, its restart need and its recovery steps, kept in the language pack under named keys. Done when: a test over every option returns four non-empty parts and a search of `src/` finds no explanation literal. Cheaper substitute: sentences typed in the view.",
+          "State the recovery path in each block: restart into Windows Recovery after failed starts, open Command Prompt, and run `bcdedit /deletevalue {default} safeboot` for safe mode, or the matching `bcdedit /deletevalue` for the option in question. Done when: each block names its own command and a test asserts the command matches the element in `src/core/BootOptions.h`. Cheaper substitute: one generic sentence for every option.",
+          "Say in the driver signature block that off means unsigned drivers will load, which is a security risk, and that with Secure Boot on the setting may be refused. Done when: the block contains both statements and the Secure Boot one is shown only when Secure Boot is on.",
+          "Repeat the recovery steps in the confirmation before Apply and restart, in `src/ui/NextstartView.cpp`. Done when: the confirmation text of a safe mode change contains the recovery steps and the restart notice. Cheaper substitute: a bare yes or no.",
+          "Cover it in `tests/explain_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes, and fails when an option has no recovery steps."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes and, in a driven run, the recovery steps appear on the screen and in the confirmation for every option.",
+        "commit": "feature: each option explained with its risk and its way back"
+      },
+      {
+        "title": "Secure Boot Notice",
+        "intro": "With Secure Boot on, Windows can refuse to change the signature settings, and a test signing change may do nothing. The tool reads the Secure Boot state and says so on the driver signature row before the person tries, instead of reporting a failure after.",
+        "surface": {
+          "fidelity": "the driver signature row and its note on the Next start screen, against `DESIGN.md` section 2.",
+          "job": "a person knows that Secure Boot limits the driver signature setting before they try it. Consumer: the row, compared with the registry's Secure Boot state.",
+          "treatment": "a note on the row in words, Secure Boot is on and this setting may be refused, with the row's action still available so the outcome is read back, not assumed. Cheaper substitute that fails the checkpoint: hiding the row when Secure Boot is on, which removes information the person needs."
+        },
+        "build": [
+          "Read the Secure Boot state in `src/core/SecureBoot.cpp` through `UEFISecureBootEnabled`. Done when: fixtures return on, off and not supported, the last on a legacy start.",
+          "Show the note on the row in `src/ui/NextstartView.cpp`. Done when: the note appears only when Secure Boot is on."
+        ],
+        "items": [
+          "Add `src/core/SecureBoot.cpp` returning `On`, `Off` or `NotSupported` from `HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State`, where a missing key means `NotSupported`. Done when: fixtures for the three cases return the expected value. Cheaper substitute: treating a missing key as off, which says something untrue on a legacy start.",
+          "Show the note on the driver signature row in `src/ui/NextstartView.cpp` in words, with the row's action still available. Done when: Secure Boot on shows the note and the action, off and not supported show neither.",
+          "Show `BlockedBySecureBoot` from the engine as one plain sentence in the Activity list and on the row. Done when: a fake store that refuses the write shows that sentence and the row's next start is unchanged.",
+          "Cover it in `tests/secureboot_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L secureboot` passes, and fails when the note is shown with Secure Boot off."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L secureboot` passes for on, off and not-supported, and on a virtual machine with Secure Boot on the refusal shows as one sentence.",
+        "commit": "feature: say when Secure Boot limits the signature setting"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a virtual machine, each option is set, read back from `bcdedit /enum {current}`, undone, and the entry equals the original, with the fixture change and undo reproducing the original entry exactly.",
+      "An unelevated run, a Secure Boot refusal and a dropped write each say what is true and change nothing, and a machine left in safe mode by the tool is told so and cleared in one press.",
+      "The tool is driven in light and dark, by keyboard alone, and every change shows its restart need and recovery path on the screen."
+    ]
+  }
+}

@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **97 of 204 sections complete (48%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **97 of 199 sections complete (49%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -313,11 +313,6 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T02 §4` | Editing, with a reverse                           |   8   |
 | [ ] | `D05 T02 §5` | Search across hives                               |   5   |
 | [ ] | `D05 T02 §6` | Backup, restore, and `.reg` exchange              |   7   |
-| [ ] | `D05 T03 §7` | Battery Health, Boot Options, File Associations   |   7   |
-| [ ] | `D05 T03 §8` | Policy Inspector and Attribute Repair             |   9   |
-| [ ] | `D05 T04 §1` | System Change Journal                             |   8   |
-| [ ] | `D05 T04 §2` | Repair History                                    |   8   |
-| [ ] | `D05 T04 §3` | Sleep and Wake Diagnostics                        |   7   |
 | [ ] | `D05 T04 §4` | Boot Time Analyzer                                |   6   |
 | [ ] | `D05 T04 §5` | Why Is This Denied                                |   6   |
 | [ ] | `D05 T04 §6` | Pending Reboot Inspector                          |   5   |
@@ -342,6 +337,12 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T07 §7` | Network Configuration Tools                       |   7   |
 | [ ] | `D05 T07 §8` | Files, Boot, Audio, and Inventory                 |  11   |
 | [ ] | `D05 T07 §9` | Printing, Search, and Scheduled Tasks             |   6   |
+
+> **Moved:** `D05 T03 §7` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BatteryHealth`, `rizonesoft/BootOptions` and `rizonesoft/FileAssociationRepair` repositories (under `D:\Resolute_Bin`), each by its own plan.
+> **Moved:** `D05 T03 §8` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PolicyInspector` and `rizonesoft/AttributeRepair` repositories (under `D:\Resolute_Bin`), each by its own plan.
+> **Moved:** `D05 T04 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ChangeJournal` repository (`D:\Resolute_Bin\ChangeJournal`) by its own plan.
+> **Moved:** `D05 T04 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RepairHistory` repository (`D:\Resolute_Bin\RepairHistory`) by its own plan.
+> **Moved:** `D05 T04 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/SleepWakeDiagnostics` repository (`D:\Resolute_Bin\SleepWakeDiagnostics`) by its own plan.
 
 > **Moved:** `D05 T01 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/StartupManager` and `rizonesoft/HostsEditor` repositories (`D:\Resolute_Bin\StartupManager`, `D:\Resolute_Bin\HostsEditor`), each by its own plan.
 

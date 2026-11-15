@@ -1,0 +1,266 @@
+{
+  "name": "StartupManager",
+  "slug": "startupmanager",
+  "display": "Startup Manager",
+  "job": "it lists everything that runs by itself on a Windows machine (startup entries, services, scheduled tasks and right-click menu entries) through one entry model, switches any entry off and back on, and records every change so it can be undone.",
+  "tagline": "See everything that starts by itself, and switch off what you do not want",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Indigo",
+    "light": "#A5B4FC",
+    "dark": "#4338CA",
+    "social_ground": "#14143A",
+    "social_muted": "#CFD3FA"
+  },
+  "icon": {
+    "idea": "The power symbol: what starts when the machine starts.",
+    "points": [
+      "Free-standing with no tile: an open ring with a bar through its gap, both with rounded ends.",
+      "The ring is Indigo and the bar is Indigo light.",
+      "The small drawing, used below 40 pixels, thickens both."
+    ],
+    "large": "<path d=\"M30 30 A27 27 0 1 0 66 30\" fill=\"none\" stroke=\"#4338CA\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M48 12 V44\" fill=\"none\" stroke=\"#A5B4FC\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M28 30 A29 29 0 1 0 68 30\" fill=\"none\" stroke=\"#4338CA\" stroke-width=\"14\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M48 10 V44\" fill=\"none\" stroke=\"#A5B4FC\" stroke-width=\"14\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "All entries",
+        "Every entry as a row with its name, its source, its publisher, what it runs and whether it is on"
+      ],
+      [
+        "Startup",
+        "The entries of the Run keys and the Startup folders, as the same rows"
+      ],
+      [
+        "Services",
+        "The Windows services and their start types, as the same rows"
+      ],
+      [
+        "Scheduled tasks",
+        "The tasks of the Task Scheduler, as the same rows"
+      ],
+      [
+        "Right-click menu",
+        "The shell extension entries of the Explorer context menu, as the same rows"
+      ],
+      [
+        "Activity",
+        "What the tool changed and what it undid, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees everything that runs by itself on the machine in one list, finds an entry by searching, and switches it off or back on with one button.",
+    "primary": "Switch off",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "A Run key entry",
+        "On or Off"
+      ],
+      [
+        "A Windows service",
+        "On (automatic), On (manual) or Off (disabled)"
+      ],
+      [
+        "A scheduled task",
+        "On or Off"
+      ],
+      [
+        "A right-click menu entry",
+        "On or Off"
+      ],
+      [
+        "An entry with no file",
+        "Missing target"
+      ]
+    ],
+    "status": "412 entries, 37 off, 9 unsigned, 3 missing target",
+    "notes": [
+      "Every row shows its name, its source, its publisher, what it runs and its state, with an icon and a word for the state (On, Off, Missing target, Unsigned). Colour is never the only signal.",
+      "The same row layout is used for all four sources and for the search results: the view has no branch per source. The source is a column, not a different screen.",
+      "The primary action is labelled with what it will do for the selected row: Switch off when the entry is on, Switch on when it is off. After the change the row is re-read from the system, not assumed.",
+      "Undo reverses the last change from the recorded prior state. It is disabled with a tooltip when there is nothing to undo.",
+      "The search box above the list narrows all rows across every source, and each hit shows its source. Choosing Startup, Services, Scheduled tasks or Right-click menu shows the same list filtered to that source.",
+      "The status bar counts entries, entries that are off, unsigned entries and entries whose target file is missing, in words.",
+      "A change to a machine-wide entry when the tool is not elevated is refused by name before anything is written, with the entry and the source in the message and one record in Activity. Entries of the current user need no elevation."
+    ],
+    "cut": "This is a new tool, so there is no earlier window to cut from. It also has no menu bar, no splash, no animations and no donate strip: the suite's sidebar window, its Settings and its About page from the framework carry what those would have held."
+  },
+  "readme": {
+    "lead": "Startup Manager shows everything that starts by itself on your Windows machine and lets you switch any of it off and back on.",
+    "what": [
+      "It reads startup entries, services, scheduled tasks and right-click menu entries into one list. Each row says what the entry is, where it comes from, who signed the file it runs, what it runs and whether it is on. One search covers all four sources.",
+      "Switching an entry off does not delete it. The tool records what the entry was before the change, so Undo puts it back exactly. Changes to machine-wide entries need an elevated tool, and the tool says so by name when it is not."
+    ],
+    "new_intro": "Startup Manager is new in the Resolute suite, written in C++ from the start.",
+    "new": [
+      [
+        "One list for four sources.",
+        "Startup entries, services, scheduled tasks and right-click entries share one model and one set of rows, so you ask one question: what runs on my machine."
+      ],
+      [
+        "Switch off, switch on, undo.",
+        "Every change is reversible and every change is recorded in Activity."
+      ],
+      [
+        "Publisher and missing file flags.",
+        "An entry whose file is unsigned or no longer exists is marked with an icon and a word."
+      ],
+      [
+        "Search across everything.",
+        "One search narrows all sources at once and each hit names its source."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Startup Manager ships as a complete, standalone C++ tool: it reads startup entries, services, scheduled tasks and right-click menu entries into one entry model with no per-source branch in the surface, searches all four at once, switches any entry off and back on with the result read back from the system, flags unsigned and missing targets, and records every change so it can be undone.",
+    "current_state": "Nothing exists yet. This is a new tool of the suite and nothing is ported: the repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T01-s5.md`, the plan text for this tool as it stood in the Resolute repository (the same text also describes a hosts file editor, which is a separate tool and not part of this plan). That text asks for one entry model over four sources, a tab per source, a single search that names each hit's source, and every change declared as a repair-contract item. It also asks that the four enumerators become a shared library other suite tools consume. They are built here first, inside this tool, and proposed to Resolute-SDK; until that proposal is accepted no other tool depends on them. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built, so every section that needs them carries the Need `sdk-framework`. The sources of truth for the C++ are Windows itself: the Run and RunOnce keys in HKLM and HKCU including the 32-bit view, the Startup folders, the StartupApproved keys that Task Manager uses to disable entries, the service control manager, the Task Scheduler COM interface, the shell extension handlers under `HKEY_CLASSES_ROOT` `shellex\\ContextMenuHandlers`, and the Authenticode signature of each target file.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T01-s5.md`: the plan section for this tool, from which only what concerns Startup Manager is taken.",
+      "`DESIGN.md`: the identity and the window's sections, with `sdk/DESIGN.md`, the suite's contract.",
+      "The Windows interfaces named in the current state: registry keys, the service control manager, the Task Scheduler COM interface and `WinVerifyTrust`, read on a real machine."
+    ],
+    "outcome": [
+      "`StartupManager.exe` lists startup entries, services, scheduled tasks and right-click entries as one model, searches them together and shows each entry's publisher and whether its target file exists.",
+      "Any entry can be switched off and on, each change is read back from the system, a machine-wide change is refused by name when the tool is not elevated, and the last change can be undone from a recorded prior state.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the All entries screen, where a person sees every entry and finds one by searching. Reporting and audit are the Activity section, which records each change and each refusal. Settings are the framework's pages. Permissions anchor on the engine, where a machine-wide change without elevation is refused by name before any write. Reverse anchors on the undo section: it means putting an entry back to the state recorded before the last change, not guessing what it was.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "verification": [
+      "On a real machine each source lists its entries, one entry per source is switched off and on, and each result is read back from the system.",
+      "After an entry is switched off and the machine restarted, the entry did not run; Undo restores it and the next restart runs it.",
+      "The tool lists, searches, switches off, switches on and undoes, in light and dark, by keyboard alone."
+    ],
+    "engine": {
+      "title": "Entry Model and Four Enumerators",
+      "intro": "The tool's whole system effect: one entry model filled by four enumerators (startup, services, scheduled tasks, right-click menu), and one disable and enable operation per source that records the prior state and reads the result back. Nothing here knows about a window. This is the library proposed to Resolute-SDK once it works here.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the entry model and the source interface in `src/core/Entry.h` and `src/core/Source.h`. Done when: all four sources are described by the one `Entry` type and a test builds an entry list from fake sources.",
+        "Implement the four enumerators and the per-source switch in `src/core/`, each against a root or interface the tests can replace. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L entries` passes without touching the real system."
+      ],
+      "items": [
+        "Declare `Entry` in `src/core/Entry.h` with name, source, command, target file, publisher, state and where it is defined, and one `Source` interface (`Enumerate`, `Disable`, `Enable`, `ReadState`) in `src/core/Source.h`. Done when: a test fills one list from four fake sources and a search of `src/ui/` finds no branch on the source type. Cheaper substitute: a struct per source, which is the duplication this tool exists to remove.",
+        "Implement the startup enumerator in `src/core/StartupSource.cpp`: the Run and RunOnce keys of HKLM and HKCU including the 32-bit view, the common and per-user Startup folders, and the StartupApproved keys that Task Manager reads. Done when: a disposable registry root with one entry per place lists all of them, each with its defining key or folder. Cheaper substitute: reading only `Run`, which misses the folders and the 32-bit view.",
+        "Implement the startup switch in `src/core/StartupSource.cpp`: Disable and Enable write the StartupApproved value Task Manager uses and never delete the entry. Done when: a test disables an entry, reads its state back as Off, and the Run value is unchanged. Cheaper substitute: deleting the Run value, which cannot be undone exactly.",
+        "Implement the service enumerator and switch in `src/core/ServiceSource.cpp` through the service control manager: name, display name, image path, account and start type, and a change of start type to Disabled and back to the recorded type. Done when: a fake service manager test reads each change back, and a run on a real test service restores its prior start type. Cheaper substitute: stopping the service only, which does not stop it starting next boot.",
+        "Implement the scheduled task enumerator and switch in `src/core/TaskSource.cpp` through the Task Scheduler COM interface (`ITaskService`): every task in every folder with its action and its enabled flag, switched by the task's own Enabled setting. Done when: a test on a fake task folder switches a task off and on and reads each state back. Cheaper substitute: parsing `schtasks` output, which breaks by language.",
+        "Implement the right-click enumerator and switch in `src/core/ContextMenuSource.cpp`: the handlers under `shellex\\ContextMenuHandlers` for `*`, `Directory`, `Drive` and `AllFilesystemObjects` with their CLSID's server path, switched by adding or removing the CLSID in the shell's Blocked list rather than deleting the handler. Done when: a disposable root test lists a handler, blocks it, reads it back as Off and unblocks it, with the handler key untouched.",
+        "Resolve each entry's target file and publisher in `src/core/Publisher.cpp`: the command line is parsed to its executable, the file's existence is checked and its Authenticode signer read through `WinVerifyTrust`. Done when: a signed file gives its publisher, an unsigned file gives none and a missing file gives the state Missing target. Cheaper substitute: reading the version resource's company name, which any file can set.",
+        "Record the prior state before every switch and refuse a machine-wide change by name when the process is not elevated, before any write, with one activity record. Done when: an unelevated test run names the entry and the source, and the fixture is unchanged. Cheaper substitute: letting the write fail with access denied partway through.",
+        "Cover every path in `tests/entries_test.cpp` against disposable roots and fakes. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L entries` passes, and fails when the switch of one source is made a no-op."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L entries` passes: all four sources fill the one model, each switch is read back, the unelevated case is refused by name, and it fails when one source's switch does nothing.",
+      "commit": "core: one entry model, four enumerators, a read-back switch per source"
+    },
+    "enhancements": [
+      {
+        "title": "Undo Any Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before every switch the prior state of the entry is recorded, so Undo restores what was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back what the last change did. Consumer: the entry's source, compared with the record.",
+          "treatment": "the recorded prior state restored through the same source operation that changed it. Cheaper substitute that fails the checkpoint: an undo that switches the entry on, which is not what was there before when it started disabled."
+        },
+        "build": [
+          "Record the prior state through the repair contract in `src/core/Journal.cpp`. Done when: a record is on disk before the first write of a change.",
+          "Wire Undo in `src/ui/AllEntriesView.cpp`. Done when: switching an entry off and then pressing Undo leaves the entry as it was."
+        ],
+        "items": [
+          "Write the prior state of each entry through the repair contract's restore record in `src/core/Journal.cpp` before any switch. Done when: a test finds the record on disk before the value is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring from the record through the source's own `Enable` or `Disable`. Done when: for each of the four sources a switch then Undo leaves the entry's state and defining location equal to before, asserted.",
+          "Keep an entry that was already Off before the change Off after Undo. Done when: a test starting from an Off entry switches it on, undoes, and finds it Off.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one change.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one source's restore is skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: a switch then Undo leaves an entry of each of the four sources as it was.",
+        "commit": "feature: undo puts an entry back to its recorded state"
+      },
+      {
+        "title": "One Search Across All Sources",
+        "intro": "A person looks for a name, not for a source. One search box narrows the rows of all four sources at once, and every hit names its source.",
+        "surface": {
+          "fidelity": "the search box and the result rows, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person finds an entry by any part of its name, command, publisher or target file. Consumer: the rows, read back against the entry list.",
+          "treatment": "one filter over the one model, with the source shown in every row. Cheaper substitute that fails the checkpoint: a search per section, which makes a person guess the source first."
+        },
+        "build": [
+          "Implement the filter over the entry model in `src/core/Search.cpp`. Done when: a test finds one entry of each source with one query.",
+          "Bind the search box in `src/ui/AllEntriesView.cpp`. Done when: typing narrows the list and each row shows its source."
+        ],
+        "items": [
+          "Implement `Search(const std::vector<Entry>&, std::wstring_view)` in `src/core/Search.cpp` matching name, command, target file and publisher, case-insensitively. Done when: a test with entries from all four sources returns exactly those that contain the query, each with its source.",
+          "Add the search box to the content header in `src/ui/AllEntriesView.cpp`, filtering as the person types. Done when: typing a name narrows the list and clearing it restores every row. Cheaper substitute: a private text box, which the contract forbids.",
+          "Apply the same filter inside Startup, Services, Scheduled tasks and Right-click menu, so the search box narrows whichever section is open. Done when: the same query in a section shows only that section's hits.",
+          "Say the result in the status bar in words, for example \"6 of 412 entries match\". Done when: the text changes with the query.",
+          "Cover it in `tests/search_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L search` passes, and fails when one source is left out of the filter."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L search` passes: one query finds hits in all four sources and each names its source.",
+        "commit": "feature: one search across startup, services, tasks and menu entries"
+      },
+      {
+        "title": "Publisher and Missing Target Flags",
+        "intro": "The cheapest way to spot a bad entry is to see who signed the file it runs and whether the file exists. Unsigned and missing targets are flagged on the row with an icon and a word.",
+        "surface": {
+          "fidelity": "the flag cell of the rows, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person sees at a glance which entries run unsigned code or point at a file that is gone. Consumer: the rows, read back against the file system and the signature.",
+          "treatment": "an icon and a word in each flagged row (Unsigned, Missing target) and the count in the status bar. Cheaper substitute that fails the checkpoint: a red row, which shows state by colour alone."
+        },
+        "build": [
+          "Expose the publisher and the file state from `src/core/Publisher.cpp` on every `Entry`. Done when: a test lists a signed, an unsigned and a missing target.",
+          "Show the flags in `src/ui/AllEntriesView.cpp`. Done when: each flagged row shows its icon and word."
+        ],
+        "items": [
+          "Show the publisher in its own column and leave it blank, not a dash, when the file is unsigned. Done when: a signed fixture shows its publisher and an unsigned one shows an empty cell and the word Unsigned.",
+          "Flag a row whose target file does not exist with an icon and the words Missing target, and keep it switchable. Done when: a fixture entry pointing at a deleted file shows the flag and can still be switched off.",
+          "Resolve the target of a command that is quoted, has arguments or uses environment variables, such as `\"%ProgramFiles%\\App\\app.exe\" /minimized`. Done when: a test with four such commands resolves each to the right file.",
+          "Add a filter for flagged rows beside the search box. Done when: choosing it shows only Unsigned and Missing target rows.",
+          "Cover it in `tests/publisher_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L publisher` passes, and fails when a missing file is reported as present."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L publisher` passes: signed, unsigned and missing targets are told apart and each flagged row shows an icon and a word.",
+        "commit": "feature: publisher and missing target flags on every entry"
+      },
+      {
+        "title": "Open the Entry's Location",
+        "intro": "A person who wants to know more about an entry needs to see where it is defined and where its file is. One action opens either, without the person hunting through the registry.",
+        "surface": {
+          "fidelity": "the row's action menu, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person opens the file an entry runs, or the place that defines it. Consumer: Explorer or the registry editor opened at the right place.",
+          "treatment": "two actions on the selected row, each naming what it opens. Cheaper substitute that fails the checkpoint: copying the path to the clipboard, which leaves the person to find it."
+        },
+        "build": [
+          "Implement the location resolver in `src/core/Location.cpp`. Done when: each of the four sources returns a defining location and a target file path.",
+          "Add the two actions to `src/ui/AllEntriesView.cpp`. Done when: each opens the right place for a selected row."
+        ],
+        "items": [
+          "Implement `DefinedAt(const Entry&)` in `src/core/Location.cpp` returning the registry key, Startup folder, service name or task path for each source. Done when: a test returns the right location for one entry of each source.",
+          "Add \"Show file in Explorer\" to the row's actions, opening Explorer with the target selected through `SHOpenFolderAndSelectItems`. Done when: it opens the target's folder with the file selected, and is disabled with a tooltip when the file is missing.",
+          "Add \"Show where it is defined\" for registry entries, opening the registry editor at the key. Done when: it opens at the defining key of a Run entry. Cheaper substitute: showing the key as text, which leaves the person to navigate there.",
+          "Cover it in `tests/location_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L location` passes, and fails when a source returns another source's location."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L location` passes and both actions open the right place for a row of each source.",
+        "commit": "feature: open an entry's file or its defining location"
+      }
+    ],
+    "no_reverse": ""
+  }
+}

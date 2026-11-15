@@ -1,0 +1,253 @@
+{
+  "name": "AttributeRepair",
+  "slug": "attributerepair",
+  "display": "Attribute Repair",
+  "job": "it finds files and folders wrongly marked hidden and system, the usual sign of USB malware that hides a person's files and leaves shortcuts in their place, and clears those two attributes in the places the person chooses, leaving Windows' own protected files alone.",
+  "tagline": "Bring back files that a USB virus hid",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Olive",
+    "light": "#A3E635",
+    "dark": "#4D7C0F",
+    "social_ground": "#16230A",
+    "social_muted": "#D6ECAE"
+  },
+  "icon": {
+    "idea": "A hidden file, drawn dashed, with a solid one stepping out of it.",
+    "points": [
+      "Free-standing with no tile: two documents overlapping.",
+      "The hidden one is a dashed Olive light outline and the revealed one is solid Olive.",
+      "The small drawing, below 40 pixels, uses a thicker, shorter dash."
+    ],
+    "large": "<path d=\"M14 20 H42 L56 34 V78 H14 Z\" fill=\"none\" stroke=\"#BEF264\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-dasharray=\"7 7\"/><path d=\"M38 24 H64 L80 40 V84 H38 Z\" fill=\"#4D7C0F\" stroke=\"#4D7C0F\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<path d=\"M14 20 H42 L56 34 V78 H14 Z\" fill=\"none\" stroke=\"#BEF264\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-dasharray=\"10 10\"/><path d=\"M38 24 H64 L80 40 V84 H38 Z\" fill=\"#4D7C0F\" stroke=\"#4D7C0F\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Scan",
+        "The chosen place and each wrongly hidden item: path, attributes, reason"
+      ],
+      [
+        "Exclusions",
+        "The names the tool always leaves alone"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person chooses a drive or folder, sees which items are hidden and system and probably should not be, and brings them back with one button.",
+    "primary": "Unhide",
+    "secondary": "Choose a place",
+    "rows": [
+      [
+        "Photos",
+        "Hidden and system, thought wrong"
+      ],
+      [
+        "Work Documents",
+        "Hidden and system, thought wrong"
+      ],
+      [
+        "desktop.ini",
+        "Hidden and system, left alone: Windows uses it"
+      ],
+      [
+        "System Volume Information",
+        "Hidden and system, left alone: protected"
+      ],
+      [
+        "Old Jobs",
+        "Skipped: a reparse point, not followed"
+      ]
+    ],
+    "status": "2 to unhide, 2 left alone, 1 skipped",
+    "notes": [
+      "Each row shows its state with an icon and a word: To unhide, Left alone, Skipped or Could not change. Colour is never the only sign.",
+      "A row carries the item's path, the attributes it has (for example Hidden, System) and one plain sentence for why it is thought wrong or left alone.",
+      "Items thought wrong start ticked and items left alone start unticked and cannot be ticked, so a protected file is never one click from being changed.",
+      "Choose a place opens the folder picker. Unhide clears the two attributes on the ticked rows only, then re-reads each item and updates the row from what Windows reports.",
+      "An item that could not be changed stays in the list as Could not change, with the reason in words (access denied, in use, gone).",
+      "The status bar counts the rows in words, for example \"2 to unhide, 2 left alone, 1 skipped\", and changes with the rows.",
+      "The tool never asks for elevation. A place that needs more rights than the person has shows its items as Could not change and says so."
+    ],
+    "cut": "There is no original window to compare with, so nothing is cut from one. The suite's usual extras are not part of this tool: no splash, no animations, no donate strip and no menu bar. Settings, About and updates come from the framework's pages. Each of these is recorded as a decision in the plan."
+  },
+  "readme": {
+    "lead": "Bring back files that a USB virus hid.",
+    "what": [
+      "A common USB virus sets the Hidden and System attributes on a person's own files and folders, then leaves shortcuts with the same names in their place. The files are still on the drive, but Explorer no longer shows them. Attribute Repair scans a drive or folder you choose, lists every item carrying both attributes and says why it thinks each one is wrong or should be left alone.",
+      "You tick what to bring back and press Unhide. The tool clears the Hidden and System attributes and nothing else: not the file's content, not its permissions. It leaves the files Windows hides on purpose, such as desktop.ini, System Volume Information and the Recycle Bin, and it does not follow junctions or symbolic links out of the place you chose."
+    ],
+    "new_intro": "Attribute Repair is a new tool of the suite, written in C++ from the start.",
+    "new": [
+      [
+        "Says why.",
+        "Every row gives its reason in words, so you see what was judged wrong and what was left alone on purpose."
+      ],
+      [
+        "Leaves Windows alone.",
+        "A list of names that are legitimately hidden and system is checked before anything is offered, and you can add names of your own."
+      ],
+      [
+        "Can be undone.",
+        "The attributes each item had before are recorded, so the last run can be put back exactly."
+      ],
+      [
+        "Finds the leftovers.",
+        "It can list the shortcut files such a virus leaves beside the hidden originals and offer to remove them, after you confirm."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: engine, window, features, release",
+    "goal": "Attribute Repair ships as a complete, standalone C++ tool: a person chooses a drive or folder, sees every item carrying the Hidden and System attributes with a plain reason for each, clears those two attributes on the items they tick with every read-back checked, leaves Windows' own protected files alone, and can undo the last run.",
+    "current_state": "Nothing exists yet: no code, no AutoIt original and no reference folder. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The only source is the plan section in `docs/origin/resolute-D05-T03-s8.md` (section 8), which describes this tool and Policy Inspector together; this plan takes only what concerns Attribute Repair. That section says to find files and folders carrying hidden or system attributes in user-chosen places, restore them, make the change undoable and scoped, and refuse a system directory where those attributes are legitimate. It records that `USBRepair` was checked on 2026-09-16 and does not do this, and a freeze rule: only the two attributes are cleared, never file content, never ACLs. The rest comes from Windows itself: `GetFileAttributesW` and `SetFileAttributesW` with `FILE_ATTRIBUTE_HIDDEN` and `FILE_ATTRIBUTE_SYSTEM`, reparse points (`FILE_ATTRIBUTE_REPARSE_POINT`) that must not be followed, long paths through the `\\\\?\\` prefix, and the files that are legitimately hidden and system. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T03-s8.md`: the plan section for this tool, with the Policy Inspector lines not used here.",
+      "`DESIGN.md` and `brand/`: the tool's identity and its window's sections.",
+      "`sdk/DESIGN.md`: the suite's contract every surface answers to, from the pinned Resolute-SDK."
+    ],
+    "outcome": [
+      "`AttributeRepair.exe` scans a chosen folder or drive without following reparse points and lists each hidden and system item with its attributes and a reason, judged against a data list of names that are legitimately so.",
+      "Unhide clears only the Hidden and System attributes of the ticked items, records each prior attribute value, reads every item back, and reports what could not be changed and why.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Scan screen, where a person finds an item by its path and the reason it was judged. Reporting and audit are the Activity section, the trail of every scan and every change. Settings are the framework's pages, and the Exclusions section is the tool's own list of names declared to the framework. Permissions do not apply: the tool never elevates, and an item it cannot change for lack of rights is reported by name. Reverse anchors on the undo section, which puts each item's recorded prior attribute value back.",
+    "engine": {
+      "title": "Attribute Scan and Clear Engine",
+      "intro": "The tool's whole system effect: walking a chosen place, judging each hidden and system item, and clearing those two attributes on the items chosen. It is independent of any window. It changes attribute bits only, never file content and never permissions.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the legitimate names as data in `src/core/KnownNames.h` and implement the walk and the judgement in `src/core/Walker.cpp` and `src/core/Judge.cpp`. Done when: a fixture tree is walked and every hidden and system item comes back with a verdict and a reason.",
+        "Implement the clear, the read-back and the result report in `src/core/Clear.cpp`. Done when: the unit tests pass against a fixture tree in a scratch folder."
+      ],
+      "items": [
+        "Declare in `src/core/KnownNames.h` the names that are legitimately hidden and system, as data with the reason for each: `desktop.ini`, `Thumbs.db`, `System Volume Information`, `$RECYCLE.BIN`, `RECYCLER`, `pagefile.sys`, `swapfile.sys`, `hiberfil.sys`, `IconCache.db`, `bootmgr`, `BOOTNXT`, `Config.Msi`, `Recovery` and `$WinREAgent`. Done when: a test lists each name and its reason, and a name absent from the list is not matched.",
+        "Implement `Walk(path)` in `src/core/Walker.cpp` that visits a chosen folder or drive with `FindFirstFileExW`, reads each item's attributes, and never descends into an item carrying `FILE_ATTRIBUTE_REPARSE_POINT`. Done when: a fixture holding a junction to a folder outside the place is walked and nothing outside is listed, and the junction itself is reported as skipped. Cheaper substitute: `std::filesystem::recursive_directory_iterator` with default options, which can follow links out of the chosen place.",
+        "Make the walk work on long paths by prefixing absolute paths with `\\\\?\\` inside `src/core/Walker.cpp`. Done when: a fixture path longer than 260 characters is walked and its hidden item is found.",
+        "Implement `Judge(item)` in `src/core/Judge.cpp` returning one of To unhide, Left alone or Skipped, with a reason sentence. An item is thought wrong only when it carries both Hidden and System and its name is not in `src/core/KnownNames.h` or the user's Exclusions; one attribute alone is left alone. Done when: a fixture with `desktop.ini`, a hidden-only folder, a user folder with both attributes and an excluded name returns exactly one To unhide, and each other row names its reason.",
+        "Refuse a protected place before any scan or write in `src/core/Scope.cpp`: the Windows directory, `Program Files` and the drive's own system folders, named in the refusal. Done when: a test that chooses the fixture's stand-in for the Windows directory gets the refusal naming it and no item is read. Cheaper substitute: relying on the per-item name list alone, which still lets a person clear attributes inside the Windows tree.",
+        "Implement `Clear(items)` in `src/core/Clear.cpp` that, for each item, reads its attributes with `GetFileAttributesW`, records the prior value, calls `SetFileAttributesW` with the value minus `FILE_ATTRIBUTE_HIDDEN` and `FILE_ATTRIBUTE_SYSTEM` only (using `FILE_ATTRIBUTE_NORMAL` when nothing else remains), and reads it back. Done when: a test shows Archive, ReadOnly and Directory bits unchanged, the two attributes gone, and a read-back mismatch reported with expected and found. Cheaper substitute: running `attrib -h -s` and trusting its exit code, which hides the read-back and the prior value.",
+        "Prove nothing but the two attributes changed in `tests/clear_test.cpp`: compare content hash, size, timestamps, and security descriptor before and after. Done when: the test passes for files and folders and fails when `Clear` is made to touch the content or the ACL.",
+        "Report each item that could not be changed in `src/core/Clear.cpp` as a result with the path, the Windows error and a reason in words (access denied, in use, no longer there). Done when: a read-only locked fixture and a deleted fixture each produce their reason and the other items are still cleared.",
+        "Cover the engine in `tests/scan_test.cpp` and `tests/clear_test.cpp` with fixtures built in a scratch folder. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when one name is removed from `src/core/KnownNames.h`."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, including the junction, long-path, protected-place and read-back cases, and fails when one known name is removed.",
+      "commit": "core: scan and clear the hidden and system attributes, nothing else"
+    },
+    "parity_items": [],
+    "baseline_items": [],
+    "inventory_items": [],
+    "enhancements": [
+      {
+        "title": "Undo the Last Run",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Each item's attribute value is recorded before it is changed, so Undo puts back what was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo action and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back what the last run changed. Consumer: each item's attributes, compared with the record.",
+          "treatment": "each item's recorded attribute value restored, item by item. Cheaper substitute that fails the checkpoint: setting Hidden and System on every item again, which is not what each one had."
+        },
+        "build": [
+          "Record each item's prior attribute value through the repair contract in `src/core/Clear.cpp`. Done when: a record exists on disk before the first attribute is changed.",
+          "Wire Undo in `src/ui/ScanView.cpp`. Done when: unhide then undo leaves every item with its original attributes."
+        ],
+        "items": [
+          "Write the restore record through the repair contract before any `SetFileAttributesW` call, holding the path and the full prior attribute value of each item. Done when: a test finds the record on disk before the first change. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo in `src/core/Clear.cpp` restoring each recorded value and reading it back. Done when: unhide then undo leaves every fixture item with exactly its original attributes, asserted.",
+          "Report an item that no longer exists, or whose attributes were changed since, as not restored with the reason. Done when: a fixture with one deleted item restores the rest and names the missing one.",
+          "Disable Undo with a tooltip in `src/ui/ScanView.cpp` when there is nothing to undo. Done when: a first run shows it disabled and it enables after one run.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: unhide then undo leaves every item with its original attributes.",
+        "commit": "feature: undo puts back each recorded attribute value"
+      },
+      {
+        "title": "Leftover Shortcut Check",
+        "intro": "Such malware leaves a shortcut with the hidden item's name beside it, and the shortcut starts the malware. This section lists those shortcuts next to the originals they replaced and offers to remove them, only after the person confirms.",
+        "surface": {
+          "fidelity": "the shortcut list and its confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person sees which shortcuts sit where a hidden item was and removes the ones that start something suspicious. Consumer: the shortcut files, read back.",
+          "treatment": "each shortcut shown with the hidden item it matches and the command it runs, removal only after a confirmation naming each file. Cheaper substitute that fails the checkpoint: deleting every shortcut in the place, which removes shortcuts a person made."
+        },
+        "build": [
+          "Find the shortcuts in `src/core/Shortcuts.cpp`. Done when: a fixture shortcut beside a hidden folder of the same name is listed with its target.",
+          "Show and confirm removal in `src/ui/ScanView.cpp`. Done when: the confirmation names each file and nothing is removed without it."
+        ],
+        "items": [
+          "Implement `FindShortcuts(place)` in `src/core/Shortcuts.cpp` listing `.lnk` files whose name matches a hidden item found in the same folder, reading each target and arguments through `IShellLinkW`. Done when: a fixture shortcut named like a hidden folder is listed with its target, and a shortcut with an unrelated name is not.",
+          "Mark a shortcut as suspicious only when its target is a script host, `cmd.exe`, `powershell.exe` or an executable inside the same place, with the reason in words. Done when: a fixture shortcut that opens the matching folder normally is listed but not marked, and one that runs `wscript.exe` is marked.",
+          "Remove the chosen shortcuts after a confirmation naming each file, through the framework's message surface, recording each in the restore record. Done when: a fixture with two shortcuts removes the one confirmed and keeps the other, and Undo brings the removed file back. Cheaper substitute: a private dialog, or deleting without the record.",
+          "Never remove a hidden original or anything but a `.lnk` file in `src/core/Shortcuts.cpp`. Done when: a test that asks to remove the hidden folder is refused by name.",
+          "Cover it in `tests/shortcuts_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L shortcuts` passes, and fails when a shortcut is removed without the confirmation."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L shortcuts` passes: matching shortcuts are listed, only the confirmed ones are removed, and the originals are untouched.",
+        "commit": "feature: list and remove the shortcuts the virus left, after confirmation"
+      },
+      {
+        "title": "Removable Drives First",
+        "intro": "The usual victim is a USB stick, so at start the tool offers the connected removable drives as places to scan instead of making the person browse for the letter.",
+        "surface": {
+          "fidelity": "the start screen's list of drives, against `DESIGN.md` section 2.",
+          "job": "a person picks the infected USB drive in one click. Consumer: the drives Windows reports, read back.",
+          "treatment": "each removable drive shown with its letter, label and size, chosen with one action. Cheaper substitute that fails the checkpoint: a hardcoded list of letters, which shows drives that are not there."
+        },
+        "build": [
+          "List removable drives in `src/core/Drives.cpp`. Done when: a fake drive provider returns its removable drives only.",
+          "Offer them on the Scan screen in `src/ui/ScanView.cpp`. Done when: choosing one starts a scan of that drive."
+        ],
+        "items": [
+          "Implement `RemovableDrives()` in `src/core/Drives.cpp` using `GetLogicalDrives` and `GetDriveTypeW` with `DRIVE_REMOVABLE`, returning letter, volume label and size. Done when: a test with a fake provider returns the removable entries only and none of the fixed ones. Cheaper substitute: assuming every letter after C is a USB drive.",
+          "Show the drives on the empty Scan screen in `src/ui/ScanView.cpp`, each as a button that starts a scan of that drive. Done when: choosing a drive lists its items without opening the folder picker.",
+          "Refresh the list when a drive is connected or removed, through the framework's device notification. Done when: a driven test connecting a fake drive adds it and removing it takes it away.",
+          "Cover it in `tests/drives_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L drives` passes, and fails when a fixed drive is listed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L drives` passes: only removable drives are offered and choosing one starts its scan.",
+        "commit": "feature: offer connected USB drives at start"
+      },
+      {
+        "title": "Preview Before Changing",
+        "intro": "Before any attribute is cleared, the person sees exactly what will happen to each ticked item: its path, the attributes it has now and the attributes it will have after. Nothing is changed until they confirm.",
+        "surface": {
+          "fidelity": "the preview and its confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person checks what Unhide will do before it does it. Consumer: the preview, compared with the items afterwards.",
+          "treatment": "one line per ticked item with its attributes before and after, and a count, shown before the confirmation. Cheaper substitute that fails the checkpoint: a generic are-you-sure question, which says nothing about what will change."
+        },
+        "build": [
+          "Compute the planned change without writing in `src/core/Clear.cpp`. Done when: a dry run returns each item's before and after attributes and changes nothing.",
+          "Show it in `src/ui/PreviewDialog.cpp` before Unhide. Done when: cancelling the preview leaves every item unchanged."
+        ],
+        "items": [
+          "Add `Plan(items)` to `src/core/Clear.cpp` returning each item's current and resulting attribute value without calling `SetFileAttributesW`. Done when: a test shows the fixture unchanged after `Plan` and the result equal to what `Clear` then produces.",
+          "Show the plan through the framework's message surface in `src/ui/PreviewDialog.cpp` before Unhide, with Unhide and Cancel. Done when: Cancel leaves every item as it was and Unhide then runs the same plan. Cheaper substitute: a private dialog.",
+          "Add a setting to skip the preview, declared to the framework, off by default. Done when: the setting persists and read back after a restart, and with it on Unhide runs at once.",
+          "Cover it in `tests/preview_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L preview` passes, and fails when `Plan` writes an attribute."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L preview` passes: the preview changes nothing and matches what Unhide then does.",
+        "commit": "feature: preview each change before Unhide runs"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A fixture tree with Hidden and System set on a user folder and a file is listed, cleared and read back, with everything but the two attributes compared equal before and after.",
+      "A protected place and each name in `src/core/KnownNames.h` are refused or left alone by name, and a junction is skipped without being followed.",
+      "On a real machine the tool scans a USB drive, unhides, undoes, and lists leftover shortcuts, in light and dark, by keyboard alone."
+    ]
+  }
+}

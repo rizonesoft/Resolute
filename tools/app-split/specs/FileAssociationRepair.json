@@ -1,0 +1,250 @@
+{
+  "name": "FileAssociationRepair",
+  "slug": "fileassociationrepair",
+  "display": "File Association Repair",
+  "job": "it shows which program opens each file type and puts the Windows default back when an association is broken, recording what it changed so it can be undone.",
+  "tagline": "When files stop opening, put the right program back",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Pink",
+    "light": "#F9A8D4",
+    "dark": "#BE185D",
+    "social_ground": "#2E0A1C",
+    "social_muted": "#F7CFE3"
+  },
+  "icon": {
+    "idea": "A file with a play tile on its corner: the program that opens it.",
+    "points": [
+      "Free-standing with no tile: a document with a folded corner and a rounded tile overlapping its lower right.",
+      "The document is Pink, the tile Pink light with a Pink triangle.",
+      "The small drawing, used below 40 pixels, enlarges the tile."
+    ],
+    "large": "<path d=\"M22 12 H54 L72 30 V84 H22 Z\" fill=\"#BE185D\" stroke=\"#BE185D\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><rect x=\"46\" y=\"50\" width=\"38\" height=\"36\" rx=\"9\" fill=\"#F9A8D4\"/><path d=\"M60 60 L72 68 L60 76 Z\" fill=\"#BE185D\" stroke=\"#BE185D\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<path d=\"M22 12 H54 L72 30 V84 H22 Z\" fill=\"#BE185D\" stroke=\"#BE185D\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><rect x=\"40\" y=\"44\" width=\"46\" height=\"44\" rx=\"10\" fill=\"#F9A8D4\"/><path d=\"M56 55 L74 66 L56 77 Z\" fill=\"#BE185D\" stroke=\"#BE185D\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "File types",
+        "One row per file type: its extension, what opens it now, the Windows default and whether they differ"
+      ],
+      [
+        "Repairs",
+        "What the tool changed, each with the state it replaced and a way back"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which program opens a file type, sees where that differs from the Windows default, and puts the default back with one button.",
+    "primary": "Restore default",
+    "secondary": "Undo",
+    "rows": [
+      [
+        ".exe",
+        "Default or Changed"
+      ],
+      [
+        ".lnk",
+        "Default or Changed"
+      ],
+      [
+        ".bat",
+        "Default or Changed"
+      ],
+      [
+        ".reg",
+        "Default or Changed"
+      ],
+      [
+        ".txt",
+        "Default, Changed or Your choice"
+      ]
+    ],
+    "status": "1 of 8 critical types changed",
+    "notes": [
+      "Each row shows the extension, what opens it now, the Windows default and a state with an icon and a word: Default, Changed, Broken (the handler is missing or points to a file that does not exist) or Your choice (a per-user choice the tool does not change).",
+      "Restore default is the accent button and is enabled only for a row in the Changed or Broken state; its label names the extension it will repair.",
+      "Undo sits beside it and puts back the registration the last repair replaced; it is disabled with a tooltip when there is nothing to undo.",
+      "A row in the Your choice state offers Open Windows Default Apps instead of a repair, because the per-user choice is protected by a hash the tool never forges.",
+      "The status bar counts in words (for example \"1 of 8 critical types changed\") and changes with the rows.",
+      "A repair is confirmed first with a sentence naming the extension, what opens it now and what it will open, and the result is read back and shown.",
+      "When the process is not elevated, a repair of a machine-wide key is refused by name before any write, and the window says why."
+    ],
+    "cut": "There is no original window to compare with, so nothing is cut. The window has no menu bar, splash, animation or donate strip: the suite's tool window, its Settings and About sections and its Activity list cover what those carried."
+  },
+  "readme": {
+    "lead": "File Association Repair shows which program opens a file type and puts the Windows default back when an association is broken.",
+    "what": [
+      "When a cleaner or malware changes how Windows opens a file type, programs, shortcuts, batch files or registry files can stop opening. File Association Repair lists each file type with what opens it now and what Windows opens by default, and marks the ones that differ.",
+      "For a broken type it writes the Windows default class registration back, reads it to confirm, and records what it replaced so the repair can be undone. It never forges the protected per-user choice that Windows keeps for a file type: for that it opens the Windows Default Apps setting."
+    ],
+    "new_intro": "This is a new tool, written in C++ for the suite from the start.",
+    "new": [
+      [
+        "Shows the difference.",
+        "Each file type is a row with its current handler, the Windows default and whether the two differ."
+      ],
+      [
+        "Repairs at the right layer.",
+        "A default is restored by writing the class registration, never by faking the per-user choice."
+      ],
+      [
+        "Reads back what it wrote.",
+        "Every repair is checked by asking Windows for the handler again."
+      ],
+      [
+        "Undoes a repair.",
+        "The registration a repair replaced is recorded, and Undo puts it back exactly."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The new tool: build, engine, window, features, release",
+    "goal": "File Association Repair ships as a complete, standalone C++ tool: it reads which program opens each file type, compares it with a table of the Windows defaults for the critical types, restores a default by writing the class registration with the prior state recorded, reads the handler back to verify, refuses by name when not elevated for machine-wide keys, and can undo a repair.",
+    "current_state": "Nothing exists yet. There is no AutoIt original and no code: the repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan section that named the tool (`docs/origin/resolute-D05-T03-s7.md`, shared with Battery Health and Boot Options, of which only the File Association Repair lines apply). That section asks for the current handler of an extension, a restore of the Windows default, a deliberately broken association repaired and verified by read-back, and an undo that returns the handler to exactly what it was. What Windows does is known and is not measured here: `HKCR` is the merged view of `HKLM\\Software\\Classes` and `HKCU\\Software\\Classes`, an extension key names a ProgID, and the ProgID's `shell\\open\\command` is the handler. The per-user `UserChoice` key under `Explorer\\FileExts` is protected by a hash that a program must not forge. The SDK's framework and repair contract, which the tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T03-s7.md`: the plan section that names the tool, read for the File Association Repair lines only.",
+      "`HKCR`, `HKLM\\Software\\Classes`, `HKCU\\Software\\Classes` and `HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts`: the registry the tool reads and, for class registrations, writes.",
+      "`IApplicationAssociationRegistration` and `AssocQueryStringW`: the Windows calls that report the effective handler, used for reading."
+    ],
+    "outcome": [
+      "`FileAssociationRepair.exe` lists each file type with its effective handler, the Windows default and whether they differ, and restores the default of a changed critical type by writing its class registration.",
+      "Every repair is read back and a mismatch is refused by name; a repair needing a machine-wide key is refused by name when not elevated; the per-user choice is never written, and the tool opens Windows Default Apps instead.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the File types screen, where a person finds a type by its extension and sees whether it differs. Reporting and audit are the Activity section, which is the trail of what a repair did. Settings are the framework's pages. Permissions anchor on the engine, where a write to a machine-wide key is refused by name when the process is not elevated. Reverse anchors on the Undo a Repair section: the registration a repair replaced is recorded before the write and restored exactly.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Association Repair Engine",
+      "intro": "The tool's whole system effect: reading the effective handler of a file type, comparing it with the Windows default from a data table, and restoring a default by writing the class registration. The protected per-user choice is only read and is never written. Every write is read back, the prior state is recorded first, and a machine-wide write is refused by name when the process is not elevated.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the critical types and their Windows defaults as data in `src/core/KnownDefaults.h`. Done when: each type's extension, ProgID, command line and friendly name are stated once, with no logic in the header.",
+        "Implement read, compare and restore in `src/core/Associations.cpp` against a registry root the tests can redirect. Done when: the unit tests pass against a disposable key."
+      ],
+      "items": [
+        "Declare in `src/core/KnownDefaults.h` the Windows defaults for `.exe`, `.lnk`, `.bat`, `.cmd`, `.com`, `.reg`, `.msi` and `.scr` (ProgID, `shell\\open\\command` value and class name), and a non-critical `.txt` row. Done when: the header holds one record per type and a test checks each ProgID against a known-good fixture hive. Cheaper substitute: defaults typed inside the restore function, which hides them from review.",
+        "Implement `ReadHandler(ext)` in `src/core/Associations.cpp` returning the effective handler through `AssocQueryStringW`, the extension key's ProgID from `HKCR` and the per-user `UserChoice` ProgID separately. Done when: a fixture where `UserChoice` differs from the class key reports both. Cheaper substitute: reading only `HKCR`, which cannot see a per-user override.",
+        "Implement `Compare(ext)` returning Default, Changed, Broken (the handler is missing or its command names a file that does not exist) or UserChoice. Done when: a fixture with `exefile\\shell\\open\\command` set to `notepad.exe \"%1\"` reports Changed, and one with the key deleted reports Broken.",
+        "Implement `Restore(ext)` writing the default class registration under `HKLM\\Software\\Classes` (the extension's default value, the ProgID and its `shell\\open\\command`), recording the prior values first through the repair contract's restore record. Done when: a fixture broken on purpose is restored and `Compare` then reports Default. Cheaper substitute: writing or deleting the per-user `UserChoice` key, which is protected by a hash the tool must not forge.",
+        "Read back every value after writing and return a mismatch as extension, value, expected and found. Done when: a test that corrupts one value after the write gets it named. Cheaper substitute: checking only the return code of the write.",
+        "Refuse `Restore` by name when the process is not elevated and the key is machine-wide, before any write, with one activity record. Done when: an unelevated test run reports the refusal and the fixture is unchanged. Cheaper substitute: letting the write fail with access denied halfway through.",
+        "Refuse `Restore` for a type whose default is a per-user choice only, returning the reason and the Windows Default Apps target. Done when: a `UserChoice` fixture returns a refusal naming the extension and writes nothing.",
+        "Cover every path in `tests/associations_test.cpp` with a disposable root. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L associations` passes, and fails when one default in `KnownDefaults.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L associations` passes, including the broken-key, corrupted-write and unelevated cases, and fails when one declared default is changed.",
+      "commit": "core: read, compare and restore file associations, verified and refused when unelevated"
+    },
+    "enhancements": [
+      {
+        "title": "Undo a Repair",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A repair replaces a registration, so the prior state of every key and value it touches is recorded before the write and Undo restores what was actually there, including a missing key. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and the Repairs section, against `DESIGN.md` section 2.",
+          "job": "a person puts back what the last repair changed. Consumer: the registration, compared with the record.",
+          "treatment": "the recorded prior state restored key by key and value by value. Cheaper substitute that fails the checkpoint: an undo that restores the Windows default again, which is not what was there before."
+        },
+        "build": [
+          "Record the prior state through the repair contract in `src/core/Associations.cpp`. Done when: a record exists on disk before the first write.",
+          "Wire Undo and the Repairs list in `src/ui/RepairsView.cpp`. Done when: repair then undo leaves the registration as it was."
+        ],
+        "items": [
+          "Record the prior values of every key a repair touches, including a key that did not exist, through the repair contract's restore record before any write. Done when: a test finds the record on disk before the first value is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record key by key and value by value, deleting a key the repair created. Done when: repair then undo leaves the handler equal to before, asserted by reading it back.",
+          "List each repair in `src/ui/RepairsView.cpp` with the extension, the time and the state it replaced, and disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one repair. Cheaper substitute: a text box of the log.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: a deliberately broken association is repaired, then undone, and the handler equals what it was before the repair.",
+        "commit": "feature: undo puts back the registration a repair replaced"
+      },
+      {
+        "title": "Critical Types First",
+        "intro": "The types whose loss stops programs or shortcuts from opening (`.exe`, `.lnk`, `.bat`, `.cmd`, `.com`, `.reg`, `.msi`, `.scr`) are checked at start and shown at the top, so a person who cannot open anything finds the damage without searching.",
+        "surface": {
+          "fidelity": "the top of the File types list, against `DESIGN.md` section 2.",
+          "job": "a person sees at once whether a type that stops programs from opening is broken. Consumer: the list, read back against the engine.",
+          "treatment": "the critical types pinned at the top with a count in the status bar, each state in an icon and a word. Cheaper substitute that fails the checkpoint: sorting the whole list by name, which buries a broken `.exe`."
+        },
+        "build": [
+          "Mark critical types in `src/core/KnownDefaults.h` and check them at start in `src/core/Associations.cpp`. Done when: the engine returns the critical set with its states.",
+          "Pin them in `src/ui/FileTypesView.cpp`. Done when: the critical types are the first rows and the status bar counts the changed ones."
+        ],
+        "items": [
+          "Add a `critical` flag to each record in `src/core/KnownDefaults.h` and a `CheckCritical()` in `src/core/Associations.cpp` returning each critical type's state. Done when: a fixture with `.lnk` broken returns it first. Cheaper substitute: a list of names in the view, which the engine cannot test.",
+          "Run `CheckCritical()` once at start without a write. Done when: opening the window changes nothing in a fixture registry, asserted.",
+          "Pin the critical rows at the top of `src/ui/FileTypesView.cpp` under a heading, each with its icon and word. Done when: a broken critical type is the first row. Cheaper substitute: colouring the row, which shows state by colour alone.",
+          "Show the count in the status bar, for example \"1 of 8 critical types changed\". Done when: it changes after a repair.",
+          "Cover it in `tests/critical_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L critical` passes, and fails when a critical type is not flagged."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L critical` passes: critical types are checked at start without a write and listed first.",
+        "commit": "feature: critical file types checked at start and shown first"
+      },
+      {
+        "title": "Open Windows Default Apps",
+        "intro": "Windows protects the per-user choice of a file type with a hash, so the tool never writes it. For a type whose handler is a per-user choice, the tool opens the Windows Default Apps setting at the right place and says why.",
+        "surface": {
+          "fidelity": "the Your choice row and its action, against `sdk/DESIGN.md` section 11.",
+          "job": "a person who must change a per-user choice is taken to the Windows setting for it. Consumer: the opened Settings page.",
+          "treatment": "a button naming the extension that opens the Windows setting, with one sentence saying why the tool does not change it. Cheaper substitute that fails the checkpoint: writing the `UserChoice` key directly, which Windows rejects or resets."
+        },
+        "build": [
+          "Add the launch of the Default Apps setting in `src/core/DefaultApps.cpp`. Done when: it opens `ms-settings:defaultapps` for a type.",
+          "Show the action on a Your choice row in `src/ui/FileTypesView.cpp`. Done when: the row offers it instead of Restore default."
+        ],
+        "items": [
+          "Add `OpenDefaultApps(ext)` in `src/core/DefaultApps.cpp` opening the `ms-settings:defaultapps` page through `ShellExecuteW`, behind an interface the tests can replace. Done when: a test records the URI requested for `.pdf`. Cheaper substitute: running `control.exe`, which no longer reaches the page.",
+          "Show Open Windows Default Apps on a row in the Your choice state in `src/ui/FileTypesView.cpp`, with one sentence of reason. Done when: the row shows it and Restore default is disabled. Cheaper substitute: a Restore default that quietly does nothing.",
+          "Assert in a test that no path of the engine writes under `Explorer\\FileExts\\*\\UserChoice`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L defaultapps` passes, and fails when a write to `UserChoice` is added."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L defaultapps` passes: a per-user choice row offers the Windows setting and the engine never writes `UserChoice`.",
+        "commit": "feature: open Windows Default Apps for a per-user choice"
+      },
+      {
+        "title": "Search File Types",
+        "intro": "A machine has hundreds of registered extensions. A search box in the File types section filters the list by extension or by program name, so a person finds `.reg` or a handler without scrolling. The filter changes what is shown and nothing on the system.",
+        "surface": {
+          "fidelity": "the search field above the File types list, against `sdk/DESIGN.md` section 11.",
+          "job": "a person finds one file type among all registered ones. Consumer: the list, read back against the engine.",
+          "treatment": "the framework's search field filtering as the person types, with a count of matches. Cheaper substitute that fails the checkpoint: a private text box that does not announce its result count."
+        },
+        "build": [
+          "Add `Filter(text)` in `src/core/Associations.cpp`. Done when: it returns the matching types.",
+          "Host the search field in `src/ui/FileTypesView.cpp`. Done when: typing narrows the list."
+        ],
+        "items": [
+          "Add `Filter(text)` in `src/core/Associations.cpp` matching the extension or the handler's program name, case-insensitively. Done when: a fixture of ten types returns exactly the `.reg` row for `reg`. Cheaper substitute: filtering in the view, which the engine cannot test.",
+          "Enumerate every registered extension from `HKCR` on demand and show them after the critical ones. Done when: a fixture with twenty extensions lists twenty rows.",
+          "Host the framework's search field in `src/ui/FileTypesView.cpp` with an accessible name and a count of matches. Done when: typing narrows the list and Escape clears it. Cheaper substitute: a private edit control.",
+          "Cover it in `tests/search_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L search` passes, and fails when the match ignores the program name."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L search` passes: the list narrows by extension or program name and clears again.",
+        "commit": "feature: search the file types by extension or program"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a disposable machine or virtual machine, `.exe` and `.lnk` are broken on purpose, the tool shows them as Changed or Broken, restores them, reads the handler back as the Windows default, and Undo returns the handler to exactly what it was.",
+      "A search of `src/` finds no write under `Explorer\\FileExts\\*\\UserChoice`, and an unelevated run refuses a machine-wide repair by name before any write.",
+      "On a real machine the tool lists, repairs, verifies and undoes in light and dark, by keyboard alone."
+    ]
+  }
+}

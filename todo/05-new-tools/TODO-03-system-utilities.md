@@ -196,6 +196,8 @@ The support workflow made real: instead of twenty questions in a forum thread, t
 
 ## 7. Battery Health, Boot Options, and File Associations
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BatteryHealth`, `rizonesoft/BootOptions` and `rizonesoft/FileAssociationRepair` repositories (under `D:\Resolute_Bin`), each by its own plan.
+
 Three small tools grouped because each is a single surface over a single system facility, and separating them into three sections would be ceremony rather than clarity.
 
 **Fidelity:** each tool's main window, against `DESIGN.md`.
@@ -204,19 +206,21 @@ Three small tools grouped because each is a single surface over a single system 
 **Chrome:** consume the framework, and the repair contract for the two that change anything.
 **Needs:** Windows host (build/test)
 
-- [ ] Build Battery Health over the system battery report: design capacity, full-charge capacity, cycle count, and wear percentage. Done when: all four render on a laptop and the tool reports plainly that there is no battery on a desktop.
-- [ ] Build Boot Options covering safe mode, driver signature enforcement, and boot logging, each as a repair-contract item. Done when: each is a declared item with prior state captured and undo available.
-- [ ] Make every boot change reversible and say so before committing. Done when: each change states what it does, that it needs a restart, and how to undo it if the machine will not boot. Done when: that recovery instruction is on the surface, not only in documentation.
-- [ ] Build File Association Repair: show the current handler for an extension and restore the Windows default. Done when: a deliberately broken association is repaired and verified by reading the handler back.
-- [ ] Make association changes undoable through the contract. Done when: a repair followed by undo returns the handler to exactly what it was.
-- [ ] Account for all three surfaces. Done when: three accounts are written and each deferral resolves.
-- [ ] Commit: `"battery health, boot options, and file associations"`
+- [ ] ~~Build Battery Health over the system battery report: design capacity, full-charge capacity, cycle count, and wear percentage. Done when: all four render on a laptop and the tool reports plainly that there is no battery on a desktop.~~ -> `rizonesoft/BatteryHealth`
+- [ ] ~~Build Boot Options covering safe mode, driver signature enforcement, and boot logging, each as a repair-contract item. Done when: each is a declared item with prior state captured and undo available.~~ -> `rizonesoft/BatteryHealth`
+- [ ] ~~Make every boot change reversible and say so before committing. Done when: each change states what it does, that it needs a restart, and how to undo it if the machine will not boot. Done when: that recovery instruction is on the surface, not only in documentation.~~ -> `rizonesoft/BatteryHealth`
+- [ ] ~~Build File Association Repair: show the current handler for an extension and restore the Windows default. Done when: a deliberately broken association is repaired and verified by reading the handler back.~~ -> `rizonesoft/BatteryHealth`
+- [ ] ~~Make association changes undoable through the contract. Done when: a repair followed by undo returns the handler to exactly what it was.~~ -> `rizonesoft/BatteryHealth`
+- [ ] ~~Account for all three surfaces. Done when: three accounts are written and each deferral resolves.~~ -> `rizonesoft/BatteryHealth`
+- [ ] Commit: ~~`"battery health, boot options, and file associations"`~~ -> `rizonesoft/BatteryHealth`
 
 **Freeze check:** What Boot Options writes to the boot configuration is frozen from the moment it ships, because a mistake there costs the user their machine. Evidence is a fixture boot-configuration change and undo reproducing the original entry exactly.
 
-**Test checkpoint:** Battery Health renders four values on a laptop and reports no battery on a desktop. Each boot option is a declared contract item with undo, and each states its restart requirement and recovery path on the surface. A deliberately broken association is repaired and verified by read-back, and undo restores the previous handler exactly.
+**Test checkpoint:** Moved with the section. The `rizonesoft/BatteryHealth` repository's plan carries it.
 
 ## 8. Policy Inspector and Attribute Repair
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PolicyInspector` and `rizonesoft/AttributeRepair` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 Two tools that exist because nothing else does. Neither is a big build; both answer a question a user currently cannot get answered anywhere.
 
@@ -226,19 +230,19 @@ Two tools that exist because nothing else does. Neither is a big build; both ans
 **Chrome:** consume the framework and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Enumerate applied policy from the machine and user policy areas, with the setting each one controls. Done when: a fixture policy value renders with the Windows setting it affects, named in plain words rather than as a registry path.
-- [ ] Identify orphaned policy: entries left behind by software that is no longer installed. Done when: a fixture orphan is flagged as orphaned and the reasoning is shown, and a legitimately applied policy is not.
-- [ ] Explain "managed by your organization" on a machine with no organization. Done when: the surface states which policy produced the message and what removing it would restore. Cheaper substitute that fails the checkpoint: reporting that a policy exists without saying what it did to the user.
-- [ ] Remove an orphaned policy as a repair-contract item, so it is undoable. Done when: removal is a declared item with prior state captured, and undo restores the entry exactly.
-- [ ] Refuse to touch policy on a genuinely domain-joined machine without an explicit override. Done when: a domain-joined fixture produces the refusal naming the domain, because removing real policy from a managed machine is somebody else's decision.
-- [ ] Build Attribute Repair: find files and folders carrying hidden or system attributes in user-chosen locations, and restore them. Done when: a fixture tree with `+h +s` set renders and the attributes are cleared, verified by read-back. `USBRepair` was checked on 2026-09-16 and does not do this, so it is not a duplicate.
-- [ ] Make the attribute change undoable and scoped. Done when: it is a repair-contract item, and the tool refuses to run against a system directory where those attributes are legitimate.
-- [ ] Account for both surfaces. Done when: two accounts are written and each deferral resolves.
-- [ ] Commit: `"policy inspector and attribute repair"`
+- [ ] ~~Enumerate applied policy from the machine and user policy areas, with the setting each one controls. Done when: a fixture policy value renders with the Windows setting it affects, named in plain words rather than as a registry path.~~ -> `rizonesoft/PolicyInspector`
+- [ ] ~~Identify orphaned policy: entries left behind by software that is no longer installed. Done when: a fixture orphan is flagged as orphaned and the reasoning is shown, and a legitimately applied policy is not.~~ -> `rizonesoft/PolicyInspector`
+- [ ] ~~Explain "managed by your organization" on a machine with no organization. Done when: the surface states which policy produced the message and what removing it would restore. Cheaper substitute that fails the checkpoint: reporting that a policy exists without saying what it did to the user.~~ -> `rizonesoft/PolicyInspector`
+- [ ] ~~Remove an orphaned policy as a repair-contract item, so it is undoable. Done when: removal is a declared item with prior state captured, and undo restores the entry exactly.~~ -> `rizonesoft/PolicyInspector`
+- [ ] ~~Refuse to touch policy on a genuinely domain-joined machine without an explicit override. Done when: a domain-joined fixture produces the refusal naming the domain, because removing real policy from a managed machine is somebody else's decision.~~ -> `rizonesoft/PolicyInspector`
+- [ ] ~~Build Attribute Repair: find files and folders carrying hidden or system attributes in user-chosen locations, and restore them. Done when: a fixture tree with `+h +s` set renders and the attributes are cleared, verified by read-back. `USBRepair` was checked on 2026-09-16 and does not do this, so it is not a duplicate.~~ -> `rizonesoft/PolicyInspector`
+- [ ] ~~Make the attribute change undoable and scoped. Done when: it is a repair-contract item, and the tool refuses to run against a system directory where those attributes are legitimate.~~ -> `rizonesoft/PolicyInspector`
+- [ ] ~~Account for both surfaces. Done when: two accounts are written and each deferral resolves.~~ -> `rizonesoft/PolicyInspector`
+- [ ] Commit: ~~`"policy inspector and attribute repair"`~~ -> `rizonesoft/PolicyInspector`
 
 **Freeze check:** What Attribute Repair clears is frozen once shipped: hidden and system attributes only, never file content, never ACLs. Evidence is a fixture tree compared before and after for everything except the two attributes.
 
-**Test checkpoint:** A fixture policy value renders with the setting it controls in plain words. An orphan is flagged with its reasoning and a legitimate policy is not. The surface names which policy produced "managed by your organization". Removal is a contract item and undo restores it exactly. A domain-joined fixture is refused by name. A `+h +s` fixture tree is cleared and verified, and a system directory is refused.
+**Test checkpoint:** Moved with the section. The `rizonesoft/PolicyInspector` repository's plan carries it.
 
 ## Verification
 

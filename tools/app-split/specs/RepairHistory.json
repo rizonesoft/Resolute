@@ -1,0 +1,254 @@
+{
+  "name": "RepairHistory",
+  "slug": "repairhistory",
+  "display": "Repair History",
+  "job": "it shows one timeline of every repair any Resolute tool has run on this PC, what each one changed, and lets a person undo one through the tool that made it.",
+  "tagline": "Every repair made on this PC, and a way to undo each one",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Meadow",
+    "light": "#86EFAC",
+    "dark": "#1F9D55",
+    "social_ground": "#0B2817",
+    "social_muted": "#C4EFD2"
+  },
+  "icon": {
+    "idea": "A clock beside a list: a record over time.",
+    "points": [
+      "Free-standing with no tile: a ring with clock hands and three bars to its right, all with rounded ends.",
+      "The clock is Meadow and the bars are Meadow light.",
+      "The small drawing below 40 pixels has two thicker bars."
+    ],
+    "large": "<circle cx=\"34\" cy=\"48\" r=\"22\" fill=\"none\" stroke=\"#1F9D55\" stroke-width=\"10\"/><path d=\"M34 36 V48 L42 54\" fill=\"none\" stroke=\"#1F9D55\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M66 30 H86 M66 48 H86 M66 66 H80\" fill=\"none\" stroke=\"#86EFAC\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<circle cx=\"34\" cy=\"48\" r=\"22\" fill=\"none\" stroke=\"#1F9D55\" stroke-width=\"12\"/><path d=\"M34 36 V48 L42 54\" fill=\"none\" stroke=\"#1F9D55\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M68 36 H86 M68 60 H86\" fill=\"none\" stroke=\"#86EFAC\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Timeline",
+        "Each repair run as a row with its date, the tool that made it, what it changed in words, and whether it can still be undone"
+      ],
+      [
+        "Details",
+        "The selected run item by item"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees everything Resolute has repaired on this PC, newest first, and undoes a run through the tool that made it.",
+    "primary": "Undo",
+    "secondary": "Open the tool",
+    "rows": [
+      [
+        "Registry repair, today",
+        "Can be undone"
+      ],
+      [
+        "Drive repair, yesterday",
+        "Can be undone"
+      ],
+      [
+        "Startup change, last week",
+        "Cannot be undone: the target has changed since"
+      ],
+      [
+        "Cleanup run, last month",
+        "Cannot be undone: the owning tool is not installed"
+      ],
+      [
+        "Disk check, last month",
+        "Already undone"
+      ]
+    ],
+    "status": "5 repair runs, 2 can be undone",
+    "notes": [
+      "Each row is one repair run: its date, the tool that made it, what it changed in words, and a state shown with an icon and a word: can be undone, cannot be undone (with the reason), or already undone.",
+      "Rows are ordered newest first and the selected row opens in the Details section item by item, so a person sees exactly what the run changed before undoing it.",
+      "Undo is the accent button and is the tool's one write. It asks the owning tool's contract to reverse the run and never writes the system itself, and it is disabled with the reason in its tooltip when the run cannot be undone.",
+      "Open the tool starts the Resolute tool that made the run, and is disabled by name when that tool is not installed.",
+      "Undo asks for a confirmation that names the run, the tool and what will be put back, and the row is re-read from the record afterwards, not assumed.",
+      "With no Resolute tool installed, or no repair run yet, the Timeline shows an empty state that says why it is empty and what will appear when a repair has run, and does not fail.",
+      "The status bar reads the rows in words, for example how many runs there are and how many can be undone. Nothing needs elevation here: the owning tool asks for it when an undo needs it."
+    ],
+    "cut": "There is no original window to compare with, because this tool is new and nothing is ported. The window has no menus, no splash, no animations and no donate strip: the suite's tool window does not carry them, and Settings and About are the framework's pages. Each is recorded as a decision in the plan so that no later section adds one."
+  },
+  "readme": {
+    "lead": "Every repair made on this PC, and a way to undo each one.",
+    "what": [
+      "Repair History reads the restore records that every repair tool in Resolute writes, and shows them as one timeline: when each repair ran, which tool ran it, what it changed in words, and whether it can still be undone. Select a run to see it item by item.",
+      "To undo a run, Repair History asks the tool that made it, through the suite's repair contract. It never changes your system itself. It runs on its own: with no other Resolute tool installed it shows an empty history and tells you why."
+    ],
+    "new_intro": "This tool is new in the suite. It exists because every repair tool writes a restore record in one agreed format.",
+    "new": [
+      [
+        "One timeline.",
+        "Every repair from every Resolute tool in one list, newest first."
+      ],
+      [
+        "Honest states.",
+        "Each run says whether it can still be undone, and if not, why: the target has changed, or the owning tool is not installed."
+      ],
+      [
+        "Undo through the owning tool.",
+        "The reversal is done by the tool that made the repair, so the result is the same as undoing it there."
+      ],
+      [
+        "Filter and export.",
+        "Narrow the list by tool and date, and save the history as a text file for support."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Repair History ships as a complete, standalone C++ tool: it finds the restore records every Resolute repair tool writes, shows them as one timeline of what was changed, says honestly which runs can still be undone, and undoes a run only through the repair contract and the tool that made it, while running alone with no other Resolute tool installed.",
+    "current_state": "Nothing exists yet and nothing is ported: the repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan section in `docs/origin/resolute-D05-T04-s2.md` (one section, eight checklist items and a test checkpoint). The restore record's format and location are defined by the SDK's repair contract, which, like the framework and the chart control, is planned in Resolute-SDK and not built, so the engine waits on it. The plan section's first item, defining where records live so that one scan finds every tool's, belongs to that contract, and this tool reads what the contract defines. The tool exists only because every repair tool of the suite writes a restore record through that contract.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T04-s2.md`: the plan section for this tool, with its job, treatment, standalone rule and test checkpoint.",
+      "The SDK's repair contract in `sdk/`, once built: the restore record's format and location, and the call that undoes a run.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the tool's identity and window sections, and the suite's contract every surface answers to."
+    ],
+    "outcome": [
+      "`RepairHistory.exe` finds records written by several tools in one scan, shows one timeline newest first, and shows each run item by item with whether it can still be undone and why not when it cannot.",
+      "A run is undone through the contract and the owning tool, the result matches undoing it in that tool, and the tool itself writes nothing to the system; run alone it shows an empty history with the reason.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Timeline screen, where a person finds a repair by when it ran, which tool ran it and what it changed. Reporting and audit are the Activity section: what this tool read and which undo it asked for, newest first, which is the trail a support reader checks. Settings are the framework's pages. Permissions do not apply here: the tool needs no right the user lacks, and when an undo needs elevation the owning tool asks for it. Reverse anchors on the Undo Through the Owning Tool section: the tool's one write is an undo, and reversing the undo means redoing the repair from the tool that made it.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Restore Record Reader and Undo",
+      "intro": "The tool's whole core, independent of any window: finding the restore records at the location the SDK's repair contract defines, reading them into runs, presenting the runs newest first, and asking the contract to undo one. It reads and invokes; it never writes the system. It waits on the repair contract, which is planned in Resolute-SDK and not built, and it must work when no record exists.",
+      "needs": "windows-host, sdk-framework",
+      "build": [
+        "Implement the record finder and reader in `src/core/Records.cpp` against the location and format the repair contract defines. Done when: the unit tests read fixture records from three different tools in one scan.",
+        "Implement the run list and the undo call in `src/core/History.cpp` through the contract's interface. Done when: the unit tests undo a fixture run through a fake owning tool and refuse the unsupported cases by name."
+      ],
+      "items": [
+        "Declare in `src/core/Records.h` the `Run` and `RunItem` types (tool, time, what changed in words, target, state, reason) filled from a restore record, with the field names the repair contract defines. Done when: a test loads one fixture record and every field of the run equals the record's, asserted.",
+        "Implement `FindRecords()` in `src/core/Records.cpp` scanning the one location the contract defines and returning every record found, whichever tool wrote it. Done when: a fixture folder holding records from three tools returns three tools' runs from one call. Cheaper substitute: a list of folders typed per tool, which stops working when a tool is added.",
+        "Read a record written by a newer or an older contract version without failing: use the fields it understands, mark the run as read from another version, and keep the rest. Done when: fixtures of an older and a newer version each load, and a record with an unreadable body becomes one named unreadable run instead of an exception. Cheaper substitute: skipping a record it cannot parse, which hides a repair from the history.",
+        "Implement `Timeline()` returning the runs newest first with a state for each: can be undone, cannot be undone with the reason, or already undone. Done when: a fixture of five runs in mixed order comes back sorted newest first with the right states.",
+        "Implement `Undo(runId)` that only calls the contract's undo for the owning tool and reads the run back afterwards. Done when: a test with a fake owning tool sees exactly one contract call, no write by this tool, and the run's state re-read from the record. Cheaper substitute: reversing the change inside this tool, which would make it a second implementation of every tool's undo (`docs/origin/resolute-D05-T04-s2.md:7`).",
+        "Refuse `Undo` by name before any call when the owning tool is not installed, or when the record says the run cannot be undone, giving the reason. Done when: each case returns a refusal with its reason and the fake tool receives no call. Cheaper substitute: attempting the undo and showing the failure afterwards, which fails at the moment the user tries (`docs/origin/resolute-D05-T04-s2.md:14`).",
+        "Return an empty history with a stated reason when no Resolute tool is installed or the record location does not exist or holds nothing. Done when: a run in an empty folder returns zero runs and the reason, and does not throw. Cheaper substitute: treating a missing location as an error, which breaks the standalone rule (`docs/origin/resolute-D05-T04-s2.md:17`).",
+        "Cover every path in `tests/history_test.cpp` with fixture records from three tools. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L history` passes, and fails when the sort order or one refusal is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L history` passes for the three-tool scan, the older and newer versions, the refusals and the empty case, and fails when the sort order is changed.",
+      "commit": "core: read restore records into one history and undo through the contract"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Undo Through the Owning Tool",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "This is the tool's one write and the reason it exists: undoing a past run long after the tool that made it was closed. The reversal is done by the owning tool through the repair contract and not reimplemented here, so the result is the same as undoing it in that tool. Its own reverse is redoing the repair from the tool that made it.",
+        "surface": {
+          "fidelity": "the Undo and Open the tool actions and the Details section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 11.",
+          "job": "a person undoes a past repair and sees what was put back. Consumer: the run's state, re-read from the record, and the owning tool's own result.",
+          "treatment": "a confirmation that names the run and what will be put back, the contract's undo, then the row re-read from the record. Cheaper substitute that fails the checkpoint: this tool learning how to reverse each kind of change itself, which makes a second implementation of every tool's undo."
+        },
+        "build": [
+          "Wire Undo and Open the tool in `src/ui/TimelineView.cpp` to the engine. Done when: Undo calls `Undo(runId)` once and the row updates from a re-read.",
+          "Show the selected run item by item in `src/ui/DetailsView.cpp`. Done when: the items match the record's items one for one."
+        ],
+        "items": [
+          "Wire the Undo button in `src/ui/TimelineView.cpp` to `Undo(runId)` after a confirmation through the framework's message surface that names the run, the tool and what will be put back. Done when: pressing Undo and confirming makes one contract call and the row then shows already undone from a re-read. Cheaper substitute: a private dialog, or marking the row undone before the contract answers.",
+          "Disable Undo with a tooltip giving the reason when the selected run cannot be undone, and disable Open the tool by name when the owning tool is not installed. Done when: a stale fixture shows Undo disabled with its reason and a run of an absent tool shows both actions disabled with the tool named. Cheaper substitute: leaving Undo enabled and failing on press.",
+          "Build the Details section in `src/ui/DetailsView.cpp` listing the selected run item by item: target, what changed in words, and each item's state. Done when: every item of a three-item fixture is shown and matches the record. Cheaper substitute: showing the raw record text, which a person cannot read.",
+          "Compare an undo with the owning tool's own undo value by value in `tests/undo_compare_test.cpp` using a fixture tool. Done when: the state after undoing from here equals the state after undoing in the fixture tool, asserted field by field, and the test fails when this tool writes anything itself.",
+          "Implement Open the tool in `src/core/History.cpp` starting the owning tool by the identity in the record. Done when: a test sees the owning tool's launch request and none when the tool is absent.",
+          "Cover it in `tests/undo_ui_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when the confirmation is skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: an undo from here equals the owning tool's undo value by value, a stale run is refused with its reason, and the tool wrote nothing itself.",
+        "commit": "feature: undo a past repair through the tool that made it"
+      },
+      {
+        "title": "Filter by Tool and Date",
+        "intro": "A machine that has been repaired for a year has a long history. This section narrows the timeline by tool, by date range and by target text, and clearing the filters restores the whole list.",
+        "surface": {
+          "fidelity": "the filter controls in the Timeline header, against `sdk/DESIGN.md` section 16 and `DESIGN.md` section 2.",
+          "job": "a person finds one repair among many by tool, date or target. Consumer: the rows shown, compared with the engine's runs.",
+          "treatment": "a tool choice, a date range and a search field in the header, with the count shown in the status bar. Cheaper substitute that fails the checkpoint: hiding rows with a style, so the count and the selection no longer match the list."
+        },
+        "build": [
+          "Add `Filter(runs, tool, from, to, text)` in `src/core/Filter.cpp`. Done when: each criterion narrows the fixture and clearing returns every run.",
+          "Add the filter controls in `src/ui/TimelineView.cpp`. Done when: changing a control re-reads the rows from `Filter` and the status bar count changes."
+        ],
+        "items": [
+          "Implement `Filter(runs, tool, from, to, text)` in `src/core/Filter.cpp` as a pure function over the runs, matching text against tool, target and the words of what changed. Done when: a test of each criterion alone and together returns the expected runs, and an empty filter returns all.",
+          "Add the tool choice, date range and search field to `src/ui/TimelineView.cpp`, the tool choice listing only tools that appear in the history. Done when: choosing a tool shows only its runs and the status bar says how many of how many. Cheaper substitute: a fixed list of tool names, which shows tools that have no runs.",
+          "Add a Clear filters action that restores the full list and the previous selection if it is still present. Done when: after narrowing and clearing the rows equal the unfiltered rows.",
+          "Show a stated message when a filter matches nothing, naming that filters are on. Done when: a filter with no match shows the message and clearing hides it.",
+          "Cover it in `tests/filter_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L filter` passes, and fails when the date range includes one day too many."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L filter` passes: each filter narrows, they combine, and clearing restores every run.",
+        "commit": "feature: filter the history by tool, date and target"
+      },
+      {
+        "title": "Export the History",
+        "intro": "A support reader needs the history as text. This section saves the timeline as a plain text file that matches what the window shows, readable in any text editor.",
+        "needs": "sdk-framework",
+        "surface": {
+          "fidelity": "the Export action and the save dialog, against `sdk/DESIGN.md` section 11 and `DESIGN.md` section 2.",
+          "job": "a person sends their repair history to someone who can help. Consumer: the file, read back against the rendered timeline.",
+          "treatment": "an Export action in the Timeline header that saves the rows now shown, including the details of each run, through the framework's save dialog, with a status line saying where it went. Cheaper substitute that fails the checkpoint: copying the raw record files, which a support reader cannot read."
+        },
+        "build": [
+          "Implement `ToTranscript(runs)` in `src/core/Export.cpp`. Done when: a test compares the output with a fixed file for three runs.",
+          "Wire Export in `src/ui/TimelineView.cpp` to the framework's save dialog and an atomic write. Done when: the saved file equals the transcript of the rows shown."
+        ],
+        "items": [
+          "Implement `ToTranscript(runs)` in `src/core/Export.cpp` writing, per run, the date, the tool, what changed in words, the state with its reason and each item, in UTF-8 with a stated line ending. Done when: a test compares the output for three runs with a fixed file and finds no raw record text in it.",
+          "Make the transcript match the rendered timeline: the same order, the same states and, when a filter is on, only the rows shown. Done when: a test with a filter on finds the transcript lists exactly the filtered runs.",
+          "Wire Export in `src/ui/TimelineView.cpp` through the framework's save dialog with an atomic write (a temporary file then a rename). Done when: a test finds the file complete, and a failed write leaves no partial file. Cheaper substitute: writing straight to the chosen name, which leaves a partial file when the write fails.",
+          "Cover it in `tests/export_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes, and fails when one run is dropped from the transcript."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes: the saved file equals the rendered timeline and opens in a plain text editor.",
+        "commit": "feature: export the history as a text file"
+      },
+      {
+        "title": "Empty State That Explains",
+        "intro": "The tool must run standalone. When no other Resolute tool is installed, or none has repaired anything yet, the Timeline is empty, and an empty list with no words looks broken. This section says plainly why it is empty and what will appear when a repair has run.",
+        "needs": "sdk-framework",
+        "surface": {
+          "fidelity": "the Timeline's empty state, against `sdk/DESIGN.md` section 16 and `DESIGN.md` section 2.",
+          "job": "a person with no history understands why, and what to do. Consumer: the rendered empty state, read back.",
+          "treatment": "one sentence for the reason (no Resolute repair has run on this PC yet, or no Resolute tool is installed) and one for what will appear when one does. Cheaper substitute that fails the checkpoint: a blank list, or an error message for a state that is not an error."
+        },
+        "build": [
+          "Make the engine report the reason a history is empty in `src/core/History.cpp`. Done when: a test tells no tools installed from no repairs run.",
+          "Show the reason in `src/ui/TimelineView.cpp`. Done when: the empty state shows the reason and disappears after the first run is found."
+        ],
+        "items": [
+          "Return from `Timeline()` a reason value when empty: the record location is absent, the location exists but holds no records, or all records are filtered out. Done when: a test of each case gets its own reason. Cheaper substitute: one generic message, which cannot say what to do.",
+          "Show the empty state in `src/ui/TimelineView.cpp` with the reason and what will appear when a repair has run, and disable Undo and Open the tool. Done when: the window run alone in an empty folder shows the message and no error, and it disappears once a fixture record is added and the list is re-read. Cheaper substitute: a blank list.",
+          "Run the whole tool alone from an empty folder in `tests/standalone_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L standalone` passes: the tool starts, shows the empty state and exits without an error, and it fails when the location is required to exist."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L standalone` passes: the tool run alone shows an empty history with its reason and fails nothing.",
+        "commit": "feature: an empty state that says why and what comes next"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A walk of `docs/origin/resolute-D05-T04-s2.md` finds each of its eight items either in a section of the plan or named as belonging to the SDK's repair contract.",
+      "Records from three different tools are found by one scan and render in one timeline, a repair is undone from here with the same result as in the owning tool, and a stale record is shown as not undoable with its reason.",
+      "On a real machine the tool runs alone and shows an empty history with the reason, and with records present it shows, details, filters, exports and undoes, in light and dark, by keyboard alone."
+    ]
+  }
+}

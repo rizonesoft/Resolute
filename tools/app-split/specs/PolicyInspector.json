@@ -1,0 +1,252 @@
+{
+  "name": "PolicyInspector",
+  "slug": "policyinspector",
+  "display": "Policy Inspector",
+  "job": "it explains why a Windows setting says it is managed by your organization on a personal machine, names the policy value responsible and what most likely set it, and removes policy left behind by uninstalled software.",
+  "tagline": "Find out why a Windows setting is locked",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Plum",
+    "light": "#D8B4FE",
+    "dark": "#7E22CE",
+    "social_ground": "#220B38",
+    "social_muted": "#E6D3F9"
+  },
+  "icon": {
+    "idea": "A sheet of rules, one ticked and one crossed.",
+    "points": [
+      "Free-standing with no tile: a document with a folded corner.",
+      "The document is Plum, with a tick row and a cross row in Plum light.",
+      "The small drawing below 40 pixels shows one larger tick and one bar."
+    ],
+    "large": "<path d=\"M22 12 H54 L72 30 V84 H22 Z\" fill=\"#7E22CE\" stroke=\"#7E22CE\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M32 44 L37 49 L45 39\" fill=\"none\" stroke=\"#D8B4FE\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M52 44 H62\" fill=\"none\" stroke=\"#D8B4FE\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M33 62 L43 72 M43 62 L33 72\" fill=\"none\" stroke=\"#D8B4FE\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M52 67 H62\" fill=\"none\" stroke=\"#D8B4FE\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M22 12 H54 L72 30 V84 H22 Z\" fill=\"#7E22CE\" stroke=\"#7E22CE\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M32 46 L40 54 L56 36\" fill=\"none\" stroke=\"#D8B4FE\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M34 70 H60\" fill=\"none\" stroke=\"#D8B4FE\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Policies",
+        "Each policy value in force as a row: its plain name, where it is set, what set it if known, and whether it looks left over"
+      ],
+      [
+        "This computer",
+        "Whether the machine is domain joined or managed, and what that means for removal"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which policy values are in force on this computer, why each one is there and which look left over, and removes the left-over ones with one button.",
+    "primary": "Remove",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Disable Task Manager",
+        "In force, set by a local policy file, looks current"
+      ],
+      [
+        "Hide the Settings page for Windows Update",
+        "In force, owner not installed, looks left over"
+      ],
+      [
+        "Turn off a browser's start page change",
+        "In force, set by software that is no longer installed, looks left over"
+      ],
+      [
+        "Block the Control Panel",
+        "In force, set by the domain, managed"
+      ],
+      [
+        "Unknown policy value",
+        "In force, no plain name found, cause unknown"
+      ]
+    ],
+    "status": "5 policy values in force, 2 look left over",
+    "notes": [
+      "Each row shows its state with an icon and a word: Current, Left over, Managed or Unknown. Colour is never the only signal.",
+      "A row reads as a sentence: the plain name from the ADMX file when one is installed (the value name otherwise), where it is set (machine or user, registry or local policy file), and what most likely set it.",
+      "Selecting a row shows the reasoning: which program is expected to own the value and why the tool thinks it is or is not installed.",
+      "Remove is the accent button and acts on the selected left-over rows. It records the prior state first, and also removes the value from the local policy file so it does not come back at the next policy refresh. Undo is beside it and is disabled until there is something to undo.",
+      "The status bar says how many policy values are in force and how many look left over, in words.",
+      "Remove asks for confirmation naming each value and where it will be removed from. On a domain joined or managed machine Remove is refused with the reason, and the only way past it is the explicit override on the This computer screen.",
+      "When the process is not elevated, Remove is refused by name before anything is written, and the list stays readable."
+    ],
+    "cut": "The tool is new and has no earlier window, so nothing is cut from an original. It has no menus, no splash, no animations and no donate strip, as no tool of the suite does. Preferences and About are the framework's pages hosted in the sidebar, and the plan records them as their own sections."
+  },
+  "readme": {
+    "lead": "Policy Inspector finds out why a Windows setting is locked, and removes the policy that software left behind.",
+    "what": [
+      "When a Windows setting is greyed out with the message \"Some settings are managed by your organization\" on a computer that belongs to no organization, the cause is usually a policy value in the registry or in a local policy file. Policy Inspector lists every policy value in force, gives each its plain name, says where it is set and what most likely set it, and marks the ones that look left over because the program that owned them is no longer installed.",
+      "It removes a left-over policy value with the prior state recorded, so the removal can be undone, and it clears the value from the local policy file too so Windows does not put it back. On a computer that is joined to a domain or enrolled in device management, it refuses to remove policy unless you override it, because real policy is somebody else's decision."
+    ],
+    "new_intro": "Policy Inspector is a new tool, not a port, so everything in it is new.",
+    "new": [
+      [
+        "It explains why.",
+        "A policy value is shown as the setting it controls, in plain words, with what set it, instead of as a registry path."
+      ],
+      [
+        "It finds left-over policy.",
+        "A value whose owning program is not installed is flagged as left over, with the reasoning shown."
+      ],
+      [
+        "It removes policy so it stays removed.",
+        "Removal covers the registry and the local policy file, and records the prior state so Undo restores it."
+      ],
+      [
+        "It protects managed machines.",
+        "On a domain joined or device managed computer it refuses to remove policy and names the reason, unless you override it."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new tool: engine, window, guard, undo, release",
+    "goal": "Policy Inspector ships as a complete, standalone C++ tool that explains why a Windows setting is locked: it lists the policy values in force from both registry trees and the local policy files, names each one from its ADMX file, says what most likely set it, judges which are left over by software that is no longer installed, removes those with the prior state recorded and from the local policy file as well, and refuses to remove anything on a domain joined or managed machine without an explicit override.",
+    "current_state": "Nothing exists yet: this is a new tool and no code, no original and no reference material exist for it. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan text of the Resolute repository in `docs/origin/resolute-D05-T03-s8.md`, which describes it alongside Attribute Repair (only the Policy Inspector part applies here). The design rests on how Windows stores policy: values under `HKLM\\Software\\Policies`, `HKCU\\Software\\Policies`, and `Software\\Microsoft\\Windows\\CurrentVersion\\Policies` in both hives, and the local Group Policy files `Registry.pol` under `%SystemRoot%\\System32\\GroupPolicy` that re-apply values. The Local Group Policy Editor is absent on Home editions, which is why a person cannot inspect these there. A domain join is read with `NetGetJoinInformation` or `DsRoleGetPrimaryDomainInformation`, and device management from the enrolments under `HKLM\\Software\\Microsoft\\Enrollments`. A policy's human name comes from ADMX files under `%SystemRoot%\\PolicyDefinitions`. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T03-s8.md`: the plan section as it stood in the Resolute repository. Only the Policy Inspector part applies; Attribute Repair is a different tool.",
+      "`%SystemRoot%\\PolicyDefinitions\\*.admx` and its language files: the source of each policy's plain name, read on the machine and never copied into the tool.",
+      "`HKLM` and `HKCU` under `Software\\Policies` and `Software\\Microsoft\\Windows\\CurrentVersion\\Policies`, the `Registry.pol` files under `%SystemRoot%\\System32\\GroupPolicy`, and the installed-software lists: what the engine reads."
+    ],
+    "outcome": [
+      "`PolicyInspector.exe` lists every policy value in force with its plain name, its location and its likely cause, and flags the ones whose owning program is not installed, showing the reasoning.",
+      "A left-over value is removed from the registry and from `Registry.pol` with its prior state recorded, and does not come back; on a domain joined or managed machine, or when not elevated, the removal is refused by name.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Policies screen, where a person finds the setting that is locked and reads why. Reporting and audit are the Activity section, the trail of every removal. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated removal and a removal on a managed machine are refused by name before any write. Reverse anchors on the undo section: the prior state of every removed value, in the registry and in the policy file, is recorded and restored exactly.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Policy Inspection Engine",
+      "intro": "The tool's whole system effect and everything it knows, independent of any window: enumerating policy values from both registry trees and the local policy files, naming each from ADMX, judging orphans, detecting a managed machine, and removing a value with the prior state recorded, including from `Registry.pol` so it does not return. Every action is refused by name when the process is not elevated and when the machine is managed.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the policy locations and the owner table as data in `src/core/PolicyLocations.h`. Done when: every registry tree and policy file path the tool reads is stated once, with the reason it is read.",
+        "Implement enumerate, name, judge, detect and remove in `src/core/Policy.cpp` against a registry root and a policy folder the tests can redirect. Done when: the unit tests pass against a disposable key and a temporary folder."
+      ],
+      "items": [
+        "Implement `EnumeratePolicy()` in `src/core/Policy.cpp` reading every value under `Software\\Policies` and `Software\\Microsoft\\Windows\\CurrentVersion\\Policies` in `HKLM` and `HKCU`, and every entry of the `Registry.pol` files under `System32\\GroupPolicy`. Done when: a fixture with one value in each place returns four rows, each with hive, path, name, type, data and source. Cheaper substitute: shelling out to `reg query`, which cannot be redirected for a test and drops the policy files.",
+        "Implement `NamePolicy()` in `src/core/Admx.cpp` resolving a value to its plain name and the Settings page it affects from the installed ADMX and ADML files, falling back to the value name and marking it unnamed. Done when: a fixture ADMX names one value and an unknown value is returned as unnamed, not guessed.",
+        "Implement `JudgeOrphan()` in `src/core/Orphans.cpp` flagging a value as left over when the program its key belongs to (from the owner table in `src/core/OwnerTable.h`) is not installed according to the uninstall keys and the app paths, and returning the reasoning as text. Done when: a fixture orphan is flagged with its reasoning and a value owned by an installed program is not. Cheaper substitute: flagging every value outside `Microsoft`, which marks legitimate policy as left over.",
+        "Implement `DetectManagement()` in `src/core/Management.cpp` combining `NetGetJoinInformation` (domain or workgroup), `DsRoleGetPrimaryDomainInformation` and the enrolment keys under `HKLM\\Software\\Microsoft\\Enrollments` for device management, returning the domain or provider name. Done when: three fixtures (workgroup, domain joined, enrolled) return unmanaged, managed by the domain name, and managed by the provider name.",
+        "Implement `RemovePolicy(item, override)` in `src/core/Remove.cpp` recording the prior state first, then deleting the registry value and the matching `Registry.pol` entry, then reading both back. Done when: a fixture value is gone from both places after removal and a mismatch on read-back is returned as place, expected and found. Cheaper substitute: deleting only the registry value, which Windows re-applies from the policy file at the next refresh.",
+        "Refuse `RemovePolicy` by name when the process is not elevated, and when `DetectManagement()` reports a managed machine and `override` is false, before any write, with one activity record naming the reason and the domain or provider. Done when: an unelevated run and a domain joined fixture both return the refusal and the fixture is unchanged. Cheaper substitute: letting the write fail with access denied halfway through.",
+        "Explain the lock in `src/core/Explain.cpp`: for a row, return one sentence of what it does to the user, what most likely set it and what removing it would restore. Done when: a fixture value renders as plain words naming the setting and its cause, not as a registry path.",
+        "Cover every path in `tests/policy_test.cpp` with a disposable root and a temporary policy folder. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L policy` passes, and fails when an orphan rule or a refusal is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L policy` passes, including the orphan, the managed machine and the unelevated refusal, and fails when one of those rules is removed.",
+      "commit": "core: policy inspection, orphan judgement and guarded removal"
+    },
+    "enhancements": [
+      {
+        "title": "Managed Machine Guard",
+        "intro": "On a computer that is joined to a domain or enrolled in device management, policy is somebody else's decision, so the tool refuses to remove it. This section is the screen that says so, names the reason, and holds the one explicit override.",
+        "surface": {
+          "fidelity": "the This computer section, against `DESIGN.md` section 2.",
+          "job": "a person learns whether this computer is managed and what that means before removing anything. Consumer: the engine's management result, read back.",
+          "treatment": "a plain statement of the state and its source, with the override behind an explicit confirmation. Cheaper substitute that fails the checkpoint: a disabled Remove button with no reason."
+        },
+        "build": [
+          "Build the screen in `src/ui/ThisComputerView.cpp`. Done when: it shows workgroup, domain joined or enrolled, with the name.",
+          "Wire the override. Done when: removal on a managed fixture is refused until the override is confirmed, and is recorded when used."
+        ],
+        "items": [
+          "Show the management state in `src/ui/ThisComputerView.cpp` from `DetectManagement()`: the state in words, the domain or provider name, and what it means for removal. Done when: the three fixtures each show the right sentence.",
+          "Add the explicit override as a confirmation that names the domain or provider and states that the policy belongs to someone else. Done when: removal on a managed fixture is refused without it and proceeds with it. Cheaper substitute: a checkbox in Settings that turns the guard off for good.",
+          "Make the override last for one removal only and record its use in the Activity record. Done when: a second removal asks again and the first appears in the log as an override.",
+          "Show the refusal reason in the Policies screen when Remove is pressed on a managed machine. Done when: the message names the domain and the screen is unchanged.",
+          "Cover it in `tests/guard_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L guard` passes, and fails when the override persists to a second removal."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L guard` passes: a managed fixture is refused by name, the override works once, and it is logged.",
+        "commit": "feature: the managed machine guard and its explicit override"
+      },
+      {
+        "title": "Undo a Removal",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before a removal, the prior state of the registry value and of the policy file entry is recorded, so Undo restores what was actually there. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back a policy value that a removal took away. Consumer: the registry and the policy file, compared with the record.",
+          "treatment": "the recorded prior state restored value by value and entry by entry. Cheaper substitute that fails the checkpoint: an undo that recreates the value from its name alone, which loses its type and data."
+        },
+        "build": [
+          "Record the prior state through the repair contract in `src/core/Remove.cpp`. Done when: a record exists on disk before the first deletion.",
+          "Wire Undo in `src/ui/PoliciesView.cpp`. Done when: remove then undo leaves the registry and the policy file as they were."
+        ],
+        "items": [
+          "Record the registry value (type and data) and the `Registry.pol` entry through the repair contract's restore record before any deletion. Done when: a test finds the record on disk before the first value is removed. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record value by value and entry by entry, in the registry and in `Registry.pol`. Done when: remove then undo leaves both equal to before, asserted byte for byte for the policy file.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one removal.",
+          "Refuse Undo on a machine that has become managed since the removal, naming the reason. Done when: a fixture that turns managed between remove and undo returns the refusal.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: remove then undo leaves the registry and the policy file as they were.",
+        "commit": "feature: undo puts back the removed policy exactly"
+      },
+      {
+        "title": "Which Setting Does This Lock",
+        "intro": "A person usually starts from a greyed-out Settings page, not from a policy value. A data table maps each known policy to the Settings page it greys out, so the tool can answer from either end.",
+        "surface": {
+          "fidelity": "the Policies screen and its search, against `DESIGN.md` section 2.",
+          "job": "a person finds the policy behind a locked Settings page by naming the page. Consumer: the table, read back against the list.",
+          "treatment": "a search by Settings page that selects the rows responsible. Cheaper substitute that fails the checkpoint: a search over registry paths, which is what the person cannot already name."
+        },
+        "build": [
+          "Write the table as data in `src/core/SettingsMap.h`. Done when: each entry names a policy, the Settings page and the page's plain label.",
+          "Add the search in `src/ui/PoliciesView.cpp`. Done when: typing a page name selects the matching rows."
+        ],
+        "items": [
+          "Write `src/core/SettingsMap.h` mapping each known policy value to the Settings page it affects and the plain words for what is locked. Done when: every entry names a policy, a page and a label, and a test finds no entry without all three.",
+          "Add a search box to `src/ui/PoliciesView.cpp` that filters the rows by Settings page, plain name or value name. Done when: typing a page name leaves exactly the rows mapped to it.",
+          "Show the Settings page in the row's detail beside the reasoning. Done when: a mapped row names its page and an unmapped one says it is not mapped.",
+          "Cover it in `tests/settingsmap_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L settingsmap` passes, and fails when an entry loses its page."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L settingsmap` passes: a fixture policy is found from the Settings page it greys out.",
+        "commit": "feature: find the policy behind a locked Settings page"
+      },
+      {
+        "title": "Export the List",
+        "intro": "A person asking for help, or a support reader, needs the list in a form that can be sent. The export writes what the screen shows, as text, with the reasoning.",
+        "surface": {
+          "fidelity": "the Policies screen's export action, against `DESIGN.md` section 2.",
+          "job": "a person saves or copies the list of policy values and their causes. Consumer: the saved file, read back against the rows.",
+          "treatment": "one line per value with its plain name, location, likely cause and state. Cheaper substitute that fails the checkpoint: dumping the raw registry keys, which is what the tool exists to improve on."
+        },
+        "build": [
+          "Write the export in `src/core/Export.cpp`. Done when: the file holds one record per row with every column of the screen.",
+          "Add the action in `src/ui/PoliciesView.cpp`. Done when: it saves to a chosen file and copies to the clipboard."
+        ],
+        "items": [
+          "Implement `ExportList()` in `src/core/Export.cpp` writing the rows as plain text and as CSV, with the state in words. Done when: a fixture list round trips through the CSV with every field equal.",
+          "Add an Export action to `src/ui/PoliciesView.cpp` through the framework's file dialog, and a Copy action for the clipboard. Done when: both produce the same text as the file.",
+          "Leave out nothing the screen shows and add no data it does not, such as user names or machine identifiers beyond the domain name already displayed. Done when: a test compares the columns of the export with the columns of the list.",
+          "Cover it in `tests/export_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes, and fails when a column is dropped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes: the exported file equals the list on screen.",
+        "commit": "feature: export the policy list"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A fixture policy value renders with the Windows setting it controls in plain words, an orphan is flagged with its reasoning, and a legitimately applied policy is not.",
+      "A domain joined fixture and an unelevated run are each refused by name, and removal followed by undo leaves the registry and the policy file as they were.",
+      "On a real machine the tool lists, explains, removes and undoes, in light and dark, by keyboard alone."
+    ]
+  }
+}
