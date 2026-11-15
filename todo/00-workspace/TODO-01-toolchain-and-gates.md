@@ -200,7 +200,7 @@ The intake brings a working CMake structure: C++23, presets driving Ninja, LTO o
   Catch2 arrives the same way when `D00 T02 §1` lands, pinned by commit for the same reason.
 
   **The rule for adding a dependency later:** it arrives through `FetchContent` pinned by commit, it is recorded here with what it is for, and the decision names what the suite would do without it. Two dependencies do not justify a package manager, and a package manager is itself a dependency with its own bootstrap, its own pinning story and its own failure modes. That trade changes if the count grows past a handful, and this line is where to revisit it.
-<!-- claim: count "lunasvg" shared/lucide/CMakeLists.txt = 7 -->
+<!-- claim: count "lunasvg" sdk/shared/lucide/CMakeLists.txt = 7 -->
 <!-- claim: absent .gitmodules -->
 - [x] Keep static linking explicit and enforced. **Corrected 2026-09-17:** the goal is already met and the prescription is not. The root sets only `add_link_options(-static)`; `-static-libgcc` and `-static-libstdc++` appear nowhere outside `extensions/RegStudio`. `llvm-objdump -p` on the built executable nonetheless lists no compiler runtime DLL. Done when: all three flags are set **once at the root** so every target inherits them and no per-tool `CMakeLists.txt` has to remember, `extensions/RegStudio` stops setting its own copy, and the import table is re-checked after the change and still names no compiler runtime. Cheaper substitute that fails the checkpoint: leaving the flags per-target, which is the fourteen-copies failure `AGENTS.md` exists to prevent, arriving one tool at a time.
 
@@ -229,8 +229,8 @@ The intake brings a working CMake structure: C++23, presets driving Ninja, LTO o
   **Read that first line precisely.** It means the *launcher* ships as one file. `Bin/Release/System/` is not empty in general: it is where **extension executables** are deployed for the launcher to discover, which is the `RESEXT` model in `docs/extensions.md`. Building RegStudio puts `RegStudio.exe` there, as it should. What is gone is shared **libraries**: no tool loads a DLL that another tool owns, which is the rule `AGENTS.md` states and which the two removed SHARED targets would have broken.
 
   The last line is the one the checkpoint insists on: a launcher with no icons still draws a window, so counting them is the only thing that distinguishes a working icon set from a missing one.
-<!-- claim: count "LoadLibraryW" shared/resolute-ui/src/icons.cpp = 3 -->
-<!-- claim: count "LUCIDE_STATIC" shared/resolute-ui/src/icons.cpp = 2 -->
+<!-- claim: count "LoadLibraryW" sdk/shared/resolute-ui/src/icons.cpp = 3 -->
+<!-- claim: count "LUCIDE_STATIC" sdk/shared/resolute-ui/src/icons.cpp = 2 -->
 <!-- claim: count "Lucide_static" src/CMakeLists.txt = 1 -->
 <!-- claim: count "ResoluteUI_static" src/CMakeLists.txt = 1 -->
 - [x] Record what the release preset ships today, so the change has a before. **Re-measured 2026-09-17 after `§1` added the application manifest:** `Bin/Release/Resolute.exe` at **1,384,960** bytes plus `System/ResoluteUI.dll` at 898,048 and `System/Lucide.dll` at 1,717,760, **4,079,106** bytes in total. This read 1,381,376 and `ExoUI.dll` before; the manifest added 3,584 bytes and `§3` renamed the library. **Corrected 2026-09-17 by `D00 T03 §2`:** this read `ExoSuite.exe` at 1,380,352 bytes. The rename added 1,024 bytes, which is the version-resource block that executable had never carried. `shared/resolute-ui/CMakeLists.txt:33` and `shared/lucide/CMakeLists.txt:58` still build `SHARED` targets even though the application does not link ExoUI's. Done when: the unused shared target is either removed or its purpose recorded.
@@ -372,11 +372,11 @@ A warning level that varies per target is a warning level nobody trusts. A gate 
   and reverting it returns the build to exit 0 with zero warnings in our code. The diagnostic names `-Werror` itself, so the failure is the gate rather than a compile error that would have happened anyway.
 - [x] Commit: `"workspace: warnings as errors at one level, with a tidy baseline"`
 
-<!-- claim: exists cmake/ResoluteWarnings.cmake -->
+<!-- claim: exists sdk/cmake/ResoluteWarnings.cmake -->
 <!-- claim: exists .clang-tidy -->
 <!-- claim: exists todo/.tidy-baseline -->
 <!-- claim: count "CMAKE_EXPORT_COMPILE_COMMANDS" CMakePresets.json = 2 -->
-<!-- claim: count "resolute_set_warnings" cmake/ResoluteWarnings.cmake = 4 -->
+<!-- claim: count "resolute_set_warnings" sdk/cmake/ResoluteWarnings.cmake = 4 -->
 
 **Test checkpoint:** A deliberate warning in `src/` fails the build; the **identical** warning inside **lunasvg** does not, proven by compiling the same statement on both sides of the policy line. `clang-tidy` reports a count that matches `todo/.tidy-baseline`. The failing and passing outputs are both quoted.
 
@@ -671,12 +671,12 @@ Five gates that must each be remembered are five gates that get skipped under ti
 >
 > The pinned llvm-mingw carries clang 21.1.8, measured from a real bootstrap on 2026-09-17.
 
-<!-- claim: count "20260908" toolchain.json = 3 -->
-<!-- claim: exists scripts/cpp-env.ps1 -->
+<!-- claim: count "20260908" sdk/toolchain.json = 3 -->
+<!-- claim: exists sdk/scripts/cpp-env.ps1 -->
 <!-- claim: exists src/Resolute.manifest -->
-<!-- claim: count "NTDDI_VERSION=0x0A000006" CMakeLists.txt = 1 -->
-<!-- claim: count "4\.4\.3" toolchain.json = 3 -->
-<!-- claim: count "1\.13\.2" toolchain.json = 2 -->
+<!-- claim: count "NTDDI_VERSION=0x0A000006" sdk/cmake/ResolutePlatform.cmake = 1 -->
+<!-- claim: count "4\.4\.3" sdk/toolchain.json = 3 -->
+<!-- claim: count "1\.13\.2" sdk/toolchain.json = 2 -->
 
 **The tension this section resolves.** Pinning and "latest" pull against each other and both are right: a pin buys reproducibility, currency buys compiler fixes and newer C++23 support. The resolution is that **a pin is a dated decision, not a permanent one**, and that falling behind must be *visible* rather than discovered by accident nine months later.
 
@@ -801,9 +801,9 @@ Five gates that must each be remembered are five gates that get skipped under ti
   **What is not proven here:** that `20260908` is better for this tree in ways the gate cannot see. The gate proves it builds, produces no new compiler warnings, leaves every pre-existing analyser check unchanged, and yields a binary that runs. It does not prove the generated code is faster, smaller elsewhere, or more correct at runtime, and nothing in this section should be read as saying so.
 - [x] Commit: `"workspace: bring the toolchain pins current and report when they fall behind"`
 
-<!-- claim: exists scripts/toolchain-latest.ps1 -->
-<!-- claim: count "Set-Content" scripts/toolchain-latest.ps1 = 0 -->
-<!-- claim: count "clang 23" toolchain.json = 0 -->
+<!-- claim: exists sdk/scripts/toolchain-latest.ps1 -->
+<!-- claim: count "Set-Content" sdk/scripts/toolchain-latest.ps1 = 0 -->
+<!-- claim: count "clang 23" sdk/toolchain.json = 0 -->
 
 > **Verified:** 2026-09-17 | §6 | three pins bumped **one at a time with the full gate between each**, per this section's own build order, so a new diagnostic could be attributed: ninja `1.13.1`→`1.13.2`, cmake `4.2.3`→`4.4.3` with no new policy warnings, llvm-mingw `20251216`→`20260908` · every hash taken from a real download and cross-checked against GitHub's own recorded digest, all three matching, byte counts matching · **the date hid the number that mattered: clang 21.1.8 → 23.1.1**, two major versions, read from the installed binaries · **zero new compiler warnings** across a clean rebuild at `-Wall -Wextra -Werror` in both configurations, nothing suppressed and no `-Wno-` added · `clang-tidy` 103→**169**, attributed exactly: +49 `bugprone-signed-bitwise`, +12 `bugprone-unhandled-code-paths`, +4 widened `misc-use-internal-linkage`, +2 `performance-faster-string-find`, **-1** retired, and **every pre-existing check reports an identical count**, which is what makes it a stronger analyser rather than worse code · **the retired finding is the return on currency**: `bugprone-nondeterministic-pointer-iteration-order` at `src/main.cpp:382` no longer fires on unchanged code, the check still exists, and the sort compares cell contents rather than pointer values, so clang-tidy 21 was wrong and 23 is right · binary 2,512,384→**2,744,832**, +9.25 percent, recorded rather than explained away, imports unchanged · `scripts/toolchain-latest.ps1` reports three distinct exit codes, all driven, including a **partial** failure where a confirmed stale pin is still reported while overall currency stays unknown · advisory never automatic, proven by search: zero write calls, the manifest is only ever read · wired into the gate as a warning that does not stop a build, driven · bootstrap from a deleted `reskit/ninja` installs and leaves `git status` clean · driven: window 'Resolute', responding · `check-all` 11 gates ok, 1 not present
 > **Review:** round 2, candidate `0227f4b` `d0c8441` -- `adversarial` approve after fixes (2) · `consistency` approve · `integration` approve · `source-defect` approve · `design` approve after fix (1) · `record` approve after fixes (2). Raw findings: docs/reviews/00-workspace/D00-T01-s6.md

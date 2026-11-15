@@ -1,4 +1,4 @@
-﻿#Requires -Version 7.0
+#Requires -Version 7.0
 <#
 .SYNOPSIS
     Starts Resolute's unattended plan run (the campaign) in Claude Code or Google Antigravity, with its goal set.
@@ -217,7 +217,7 @@ if (-not $pin.ok) {
 }
 
 # ── Healed, not refused ──────────────────────────────────────
-if (-not (Test-Path -LiteralPath (Join-Path $root 'reskit\llvm-mingw\bin\clang++.exe'))) {
+if (-not (Test-Path -LiteralPath (Join-Path $root 'sdk\reskit\llvm-mingw\bin\clang++.exe'))) {
     if ($PrintOnly) {
         Write-Warning 'The pinned toolchain is not installed; a real start runs scripts/bootstrap.ps1 first.'
     } else {

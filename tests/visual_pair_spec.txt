@@ -5,7 +5,7 @@
 # Coordinates are fractions of the captured window image (1082x711 at
 # 150%). The main regions are the four panes and the title. The control
 # rectangles come from the library layout: toolbar items from kItems in
-# shared/resolute-ui/include/resolute/controls/toolbar.h (View dropdown,
+# sdk/shared/resolute-ui/include/resolute/controls/toolbar.h (View dropdown,
 # Refresh, Settings, Theme), sidebar categories from kCategories in
 # sidebar.h (All, System, Network, Security, Display, Programs; item
 # height 40 and YStart 44 at 96 DPI, scaled), and list columns from the

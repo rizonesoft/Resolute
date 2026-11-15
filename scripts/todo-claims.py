@@ -64,6 +64,9 @@ CITED_PATH_RE = re.compile(r"`([A-Za-z0-9_][A-Za-z0-9_./\-]*[A-Za-z0-9_/])`")
 # was MEASURED on 2026-09-17 by D00 T04 §1, not to what would be nice: a floor
 # above the real number fails on day one and gets deleted rather than met.
 # 3 of 20 `Current state` blocks carried a claim when this was written.
+# A path inside the pinned SDK, and not inside its downloaded toolchain.
+PINNED_SDK_RE = re.compile(r"^sdk/(?!reskit/(llvm-mingw|cmake|ninja|python|sccache|mysql)(/|$))")
+
 COVERAGE_FLOOR = 3
 DEFAULT_ROOT = "todo"
 
@@ -101,6 +104,13 @@ def _ignored(target: str) -> bool:
     # more, which a returncode test reads as "not ignored" and which silently
     # broke the literal case when this fix was first written. Without `-q`,
     # check-ignore prints each ignored path and exits 0 when any are ignored.
+    # sdk/ is the one ignored tree a claim may cite (2026-11-15). It is the
+    # pinned Resolute-SDK: sdk.json names the commit and scripts/sdk.ps1 puts
+    # exactly that commit there, so what a claim measures under sdk/ is the
+    # same on every machine, which is the property this check protects. The
+    # downloaded toolchain inside it is not pinned by commit and stays refused.
+    if PINNED_SDK_RE.match(target):
+        return False
     probes = []
     prefix = target.split("*")[0].rstrip("/")
     if prefix:
@@ -524,6 +534,13 @@ def _self_test() -> int:
     except Stale:
         pass
 
+    # The pinned SDK is the one ignored tree a claim may cite; the toolchain
+    # downloaded into it is not.
+    for target, allowed in (("sdk/cmake/ResoluteSdk.cmake", True), ("sdk/reskit/Init-ResKit.ps1", True),
+                            ("sdk/reskit/llvm-mingw/bin/clang.exe", False), ("sdkx/file", False)):
+        if bool(PINNED_SDK_RE.match(target)) != allowed:
+            print(f"  FAIL  pinned-SDK rule: {target} should be {'allowed' if allowed else 'refused'}")
+            failed += 1
     # An unterminated claim is reported, not skipped. This is the defect that
     # made two real claims vanish while the summary said everything held.
     split = tmp / "split.md"
@@ -598,7 +615,7 @@ def _self_test() -> int:
         f.unlink()
     tmp.rmdir()
 
-    total = len(cases) + 3 + 10
+    total = len(cases) + 3 + 10 + 4
     print(f"todo-claims self-test: {total} cases, {failed} failed")
     return 1 if failed else 0
 

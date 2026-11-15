@@ -3,7 +3,7 @@
     The private, authoring-only MySQL server for reference data (D00 T06 section 1).
 
 .DESCRIPTION
-    -Install   download the pinned server named in server.json, verify its SHA-256, and unpack it into reskit/mysql
+    -Install   download the pinned server named in server.json, verify its SHA-256, and unpack it into sdk/reskit/mysql
     -Start     start the private server on 127.0.0.1 (initializing its data on first use)
     -Status    say whether the private server this script started is running
     -Stop      stop the private server this script started
@@ -45,7 +45,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$InstallDir = Join-Path $RepoRoot 'reskit\mysql'
+$InstallDir = Join-Path $RepoRoot 'sdk\reskit\mysql'
 $Home_ = $HomeDir
 $ServerDir = Join-Path $Home_ 'server'
 $DataDir = Join-Path $ServerDir 'data'

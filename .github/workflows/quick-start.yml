@@ -8,8 +8,9 @@ name: quick-start
 # build, check-all. So the README and what this lane proves cannot drift
 # apart: a command that no longer works turns the lane red at that command.
 #
-# Nothing is restored from a cache. Bootstrap downloads every component
-# toolchain.json pins and checks each against its SHA-256 on every run, and
+# Nothing is restored from a cache. Bootstrap clones the SDK at the commit
+# sdk.json pins, downloads every component the SDK's toolchain.json pins and
+# checks each against its SHA-256 on every run, and
 # the build starts from an empty tree, which is what a first run is.
 #
 # Not on pull requests: the README's clone takes `main`, never a fork's
@@ -24,7 +25,7 @@ on:
   workflow_dispatch:
     inputs:
       prove_wrong_pin:
-        description: 'Proof that a wrong pin fails this lane: change one pinned hash in the clone, for this run only, before bootstrap'
+        description: 'Proof that a wrong pin fails this lane: change the pinned SDK commit in the clone, for this run only, before bootstrap'
         type: boolean
         default: false
 

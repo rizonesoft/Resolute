@@ -89,6 +89,21 @@ class MovedClone(unittest.TestCase):
         self.reset()
         self.assertTrue(note.is_file())
 
+    def test_a_tree_made_here_goes_when_a_tool_its_cache_names_is_gone(self):
+        # 2026-11-15: the toolchain moved from reskit/ to sdk/reskit/, and every tree made before named the old place.
+        here = str(self.root).replace("\\", "/")
+        present = self.keep("sdk/reskit/llvm-mingw/bin/llvm-ar.exe")
+        stale = self.tree("build/debug", here)
+        with (stale / "CMakeCache.txt").open("a", encoding="utf-8") as cache:
+            cache.write(f"CMAKE_CXX_COMPILER:STRING={present.as_posix()}\nCMAKE_AR:FILEPATH={here}/reskit/llvm-mingw/bin/llvm-ar.exe\n")
+        current = self.tree("build/release", here)
+        with (current / "CMakeCache.txt").open("a", encoding="utf-8") as cache:
+            cache.write(f"CMAKE_AR:FILEPATH={present.as_posix()}\nCMAKE_LINKER:FILEPATH=lld\n")
+        said = self.reset()
+        self.assertFalse(stale.exists())
+        self.assertIn("llvm-ar.exe, which is gone", said)
+        self.assertTrue((current / "build.ninja").is_file(), "a tree whose tools are all present was removed")
+
 
 class ParallelRatchet(unittest.TestCase):
     """Analysing several units at once must give what one at a time gave: the findings, the log and the refusal."""

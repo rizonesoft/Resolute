@@ -133,23 +133,23 @@ New-Item -ItemType Directory -Path $RunDir | Out-Null
 $Report = [System.Collections.Generic.List[string]]::new()
 function Note([string]$line) { $Report.Add($line); Add-Content -Path (Join-Path $RunDir 'run.log') -Value $line }
 
-$env:PATH = "$Root\reskit\cmake\bin;$Root\reskit\ninja;$Root\reskit\llvm-mingw\bin;$env:PATH"
+$env:PATH = "$Root\sdk\reskit\cmake\bin;$Root\sdk\reskit\ninja;$Root\sdk\reskit\llvm-mingw\bin;$env:PATH"
 $Python = (Get-Command python).Source
 
 # The commit to build, checked out into its own worktree with the toolchain
-# linked in (reskit/ is ignored, so a worktree does not carry it).
+# linked in (sdk/ is ignored, so a worktree does not carry it).
 function Get-Worktree([string]$sha) {
     $wt = Join-Path $NightDir "wt\$($sha.Substring(0, 12))"
     if (-not (Test-Path (Join-Path $wt '.git'))) {
         & git -C $Root worktree add --detach $wt $sha 2>&1 | Out-Null
         if ($LASTEXITCODE -ne 0) { throw "worktree add $sha failed" }
     }
-    # reskit/ itself is tracked (its scripts); the toolchain inside it is not.
-    foreach ($tool in 'cmake', 'ninja', 'llvm-mingw') {
-        $link = Join-Path $wt "reskit\$tool"
-        if (-not (Test-Path $link)) {
-            New-Item -ItemType Junction -Path $link -Target (Join-Path $Root "reskit\$tool") | Out-Null
-        }
+    # The SDK (the shared library, the CMake policies and the toolchain) is
+    # this clone's sdk/, linked whole: one link where three tool links stood
+    # before the toolchain moved to the SDK on 2026-11-15.
+    $link = Join-Path $wt 'sdk'
+    if (-not (Test-Path $link)) {
+        New-Item -ItemType Junction -Path $link -Target (Get-Item -LiteralPath (Join-Path $Root 'sdk')).FullName | Out-Null
     }
     return $wt
 }

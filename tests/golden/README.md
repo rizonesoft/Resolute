@@ -4,7 +4,7 @@ D00 T02 §9. `tests/ui_render_test.cpp` paints every shared control offscreen, t
 
 ## Naming
 
-`<control>[-<state>]-<appearance>-<dpi>.png`: `appearance` is `light` or `dark`, `dpi` is `96` (100 percent) or `144` (150 percent). Every control in `shared/resolute-ui/src/controls/` has its four; `glyphs-*` shows the eight glyphs D00 T02 §8 and §9 added (the seven restored names and the `square-dashed` fallback) at their drawn size.
+`<control>[-<state>]-<appearance>-<dpi>.png`: `appearance` is `light` or `dark`, `dpi` is `96` (100 percent) or `144` (150 percent). Every control in `sdk/shared/resolute-ui/src/controls/` has its four; `glyphs-*` shows the eight glyphs D00 T02 §8 and §9 added (the seven restored names and the `square-dashed` fallback) at their drawn size.
 
 ## How they are made
 

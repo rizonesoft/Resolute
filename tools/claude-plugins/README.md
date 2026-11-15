@@ -8,7 +8,7 @@ Language servers, so a session sees compiler and type errors right after an edit
 
 | Server | Files | What starts |
 | ------ | ----- | ----------- |
-| clangd | `.c`, `.h`, `.hpp`, `.cpp`, `.cc`, `.cxx`, `.inl` | The clangd in `reskit/llvm-mingw/bin`, beside the compiler the build uses, reading `build/debug/compile_commands.json`, with clang-tidy on |
+| clangd | `.c`, `.h`, `.hpp`, `.cpp`, `.cc`, `.cxx`, `.inl` | The clangd in `sdk/reskit/llvm-mingw/bin`, beside the compiler the build uses, reading `build/debug/compile_commands.json`, with clang-tidy on |
 | pyright | `.py` | `pyright-langserver` from `PATH`, limited by `pyrightconfig.json` to `scripts/` |
 
 Both start through `python scripts/lsp-launch.py <server>`, which finds the binary, holds it in a job object, and exits when the process that started it exits, so a language server never outlives its session.

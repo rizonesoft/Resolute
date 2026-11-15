@@ -19,7 +19,7 @@
 
 find_program(RESOLUTE_PYTHON
     NAMES python python3
-    HINTS "${CMAKE_SOURCE_DIR}/reskit/python"
+    HINTS "${CMAKE_SOURCE_DIR}/sdk/reskit/python"
     DOC "The Python that runs the build's reference-data packer")
 
 function(resolute_embed_refdata target)

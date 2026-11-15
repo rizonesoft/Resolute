@@ -8,6 +8,7 @@ on:
       - '.conclave/**'
       - '.claude/**'
       - 'AGENTS.md'
+      - 'sdk.json'
       - 'todo/**'
       - 'tools/githooks/**'
       - '.gitattributes'
@@ -26,6 +27,11 @@ jobs:
           # Full history: the validator's git legs (provenance candidates,
           # fix-commit proofs, ancestry) cannot resolve on a shallow checkout.
           fetch-depth: 0
+      - name: Fetch the pinned SDK
+        # The plan's claims measure files in sdk/ (the shared library, the
+        # CMake policies, the toolchain pins), at the commit sdk.json names.
+        shell: pwsh
+        run: pwsh scripts/sdk.ps1
       - name: Self-test the TODO graph tool
         shell: bash
         run: python scripts/todo-graph.py self-test

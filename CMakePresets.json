@@ -17,15 +17,15 @@
             },
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/clang.exe",
-                "CMAKE_CXX_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/clang++.exe",
+                "CMAKE_C_COMPILER": "${sourceDir}/sdk/reskit/llvm-mingw/bin/clang.exe",
+                "CMAKE_CXX_COMPILER": "${sourceDir}/sdk/reskit/llvm-mingw/bin/clang++.exe",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_C_COMPILER_LAUNCHER": "${sourceDir}/reskit/sccache/sccache.exe",
-                "CMAKE_CXX_COMPILER_LAUNCHER": "${sourceDir}/reskit/sccache/sccache.exe",
+                "CMAKE_C_COMPILER_LAUNCHER": "${sourceDir}/sdk/reskit/sccache/sccache.exe",
+                "CMAKE_CXX_COMPILER_LAUNCHER": "${sourceDir}/sdk/reskit/sccache/sccache.exe",
                 "FETCHCONTENT_BASE_DIR": "${sourceDir}/build/deps/debug",
                 "FETCHCONTENT_UPDATES_DISCONNECTED": "ON",
-                "CMAKE_RC_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/llvm-windres.exe",
-                "CMAKE_MAKE_PROGRAM": "${sourceDir}/reskit/ninja/ninja.exe"
+                "CMAKE_RC_COMPILER": "${sourceDir}/sdk/reskit/llvm-mingw/bin/llvm-windres.exe",
+                "CMAKE_MAKE_PROGRAM": "${sourceDir}/sdk/reskit/ninja/ninja.exe"
             }
         },
         {
@@ -39,15 +39,15 @@
             },
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_C_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/clang.exe",
-                "CMAKE_CXX_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/clang++.exe",
+                "CMAKE_C_COMPILER": "${sourceDir}/sdk/reskit/llvm-mingw/bin/clang.exe",
+                "CMAKE_CXX_COMPILER": "${sourceDir}/sdk/reskit/llvm-mingw/bin/clang++.exe",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_C_COMPILER_LAUNCHER": "${sourceDir}/reskit/sccache/sccache.exe",
-                "CMAKE_CXX_COMPILER_LAUNCHER": "${sourceDir}/reskit/sccache/sccache.exe",
+                "CMAKE_C_COMPILER_LAUNCHER": "${sourceDir}/sdk/reskit/sccache/sccache.exe",
+                "CMAKE_CXX_COMPILER_LAUNCHER": "${sourceDir}/sdk/reskit/sccache/sccache.exe",
                 "FETCHCONTENT_BASE_DIR": "${sourceDir}/build/deps/release",
                 "FETCHCONTENT_UPDATES_DISCONNECTED": "ON",
-                "CMAKE_RC_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/llvm-windres.exe",
-                "CMAKE_MAKE_PROGRAM": "${sourceDir}/reskit/ninja/ninja.exe"
+                "CMAKE_RC_COMPILER": "${sourceDir}/sdk/reskit/llvm-mingw/bin/llvm-windres.exe",
+                "CMAKE_MAKE_PROGRAM": "${sourceDir}/sdk/reskit/ninja/ninja.exe"
             }
         }
     ],

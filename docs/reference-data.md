@@ -19,7 +19,7 @@ This is the one external dependency `AGENTS.md` allows outside the toolchain and
 The private server is MySQL 8.4 LTS, pinned in `tools/refdata/server.json` (version, URL, SHA-256 from a real download, size) and installed on demand. `scripts/bootstrap.ps1` never fetches it.
 
 ```powershell
-pwsh tools/refdata/server.ps1 -Install    # download, verify the SHA-256, unpack into reskit/mysql (ignored)
+pwsh tools/refdata/server.ps1 -Install    # download, verify the SHA-256, unpack into sdk/reskit/mysql (ignored)
 pwsh tools/refdata/server.ps1 -Start      # run it on 127.0.0.1:33061; -Port N for another port
 pwsh tools/refdata/server.ps1 -Status     # whether the server this script started is running and answering
 pwsh tools/refdata/server.ps1 -Stop       # stop it

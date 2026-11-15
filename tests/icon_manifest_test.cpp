@@ -109,9 +109,11 @@ TEST_CASE("Every icon-shaped literal in the sources is in the manifest", "[ui][i
 
     namespace fs = std::filesystem;
     const fs::path root = RESOLUTE_SOURCE_ROOT;
-    std::vector<fs::path> dirs = {root / "shared/resolute-ui/include", root / "shared/resolute-ui/src", root / "src"};
-    for (const auto& ext : fs::directory_iterator(root / "extensions"))
-        if (fs::is_directory(ext.path() / "src")) dirs.push_back(ext.path() / "src");
+    std::vector<fs::path> dirs = {root / "sdk/shared/resolute-ui/include", root / "sdk/shared/resolute-ui/src", root / "src"};
+    // extensions/ goes when the last tool has left for its own repository.
+    if (fs::is_directory(root / "extensions"))
+        for (const auto& ext : fs::directory_iterator(root / "extensions"))
+            if (fs::is_directory(ext.path() / "src")) dirs.push_back(ext.path() / "src");
 
     // Any single-token narrow literal, whatever its case or separator, so a
     // malformed name ("chevron-Up", "chevron_up") is caught as well as a
@@ -124,7 +126,10 @@ TEST_CASE("Every icon-shaped literal in the sources is in the manifest", "[ui][i
         for (const auto& f : fs::recursive_directory_iterator(dir)) {
             const auto ext = f.path().extension().string();
             if (!f.is_regular_file() || (ext != ".h" && ext != ".hpp" && ext != ".cpp")) continue;
-            const std::string rel = fs::relative(f.path(), root).generic_string();
+            // Lexical, never fs::relative: that resolves links, and sdk/ is a link to the
+            // developer's SDK checkout on a machine that has one (scripts/sdk.ps1), which
+            // made every SDK path read ../Resolute-SDK/... and miss its manifest row.
+            const std::string rel = f.path().lexically_relative(root).generic_string();
             std::ifstream in(f.path());
             std::string line;
             for (int n = 1; std::getline(in, line); ++n) {

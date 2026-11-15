@@ -215,6 +215,8 @@ It exists before it is needed deliberately: built once, promoting any repair to 
 
 ## 8. Licensing and Attribution
 
+> **Decided 2026-11-15 (operator):** the launcher and every tool are GPL v3 and the shared SDK is MIT. `LICENSE` (the GPL v3 text) is in this repository from that date, each tool carries the same file in its own repository, and Resolute-SDK carries the MIT text and Lucide's ISC text. What this section still owes is the rest: RegStudio's move from MIT, the attribution check, and the contributor licence decision.
+
 The tree currently carries two licences with no recorded decision, and ships third-party code with no licence file at all. Both are distribution defects today, and both get harder to fix with every tool added.
 
 **Needs:** C++ toolchain (compile)

@@ -7,9 +7,9 @@ project(RegStudio LANGUAGES CXX RC)
 # Removing the flags from here on the assumption the root supplied them added
 # libc++.dll and libunwind.dll imports to the standalone build, caught by the
 # independent review of 6062ecb.
-include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ResoluteLinkPolicy.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ResoluteWarnings.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ResoluteJobPools.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../sdk/cmake/ResoluteLinkPolicy.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../sdk/cmake/ResoluteWarnings.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../sdk/cmake/ResoluteJobPools.cmake")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

@@ -493,8 +493,8 @@ Round 5 of the §5 panel caught one vacuous assertion and the hard cap left it f
 -> SOURCE: plan-D00-T02-s5-2026-09-19-PR19 D00-T02-S5-PR19
 
 <!-- claim: count "TEST_CASE" tests/ui_test.cpp = 33 -->
-<!-- claim: count "IsHighContrast" shared/resolute-ui/src/*.cpp = 1 -->
-<!-- claim: count "IsHighContrast" shared/resolute-ui/src/controls/*.cpp = 0 -->
+<!-- claim: count "IsHighContrast" sdk/shared/resolute-ui/src/*.cpp = 1 -->
+<!-- claim: count "IsHighContrast" sdk/shared/resolute-ui/src/controls/*.cpp = 0 -->
 
 **Test checkpoint:** `ctest --preset debug -L ui` exits 0 with `100% tests passed out of 42`, and the direct binary run reports the same 42 cases with one fewer assertion than §5's 271.
 
@@ -526,8 +526,8 @@ Round 5 of the §5 panel caught one vacuous assertion and the hard cap left it f
 -> SOURCE: plan-D00-T02-s6-2026-09-26-PR4 D00-T02-S6-PR4
 -> SOURCE: plan-D00-T02-s7-2026-09-26-PR5 D00-T02-S7-PR5
 
-<!-- claim: count "\.Animate\(" shared/resolute-ui/src/controls/*.cpp = 0 -->
-<!-- claim: count "\.AnimateStaggered\(" shared/resolute-ui/src/controls/*.cpp = 0 -->
+<!-- claim: count "\.Animate\(" sdk/shared/resolute-ui/src/controls/*.cpp = 0 -->
+<!-- claim: count "\.AnimateStaggered\(" sdk/shared/resolute-ui/src/controls/*.cpp = 0 -->
 
 - -> XREF: D00 T02 §10 -- the focus fence this host runs under; the driven completions ship headful, the gate proves the default run never is
 

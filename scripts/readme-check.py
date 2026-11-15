@@ -9,7 +9,7 @@ Each problem is named with its file and line, exit 1 when there is any:
 - a heading that skips a level, or more than one top-level heading;
 - a paragraph broken across lines (AGENTS.md: one line per paragraph and per list item);
 - trailing whitespace;
-- a README toolchain badge whose llvm-mingw version is not the one toolchain.json pins.
+- a README toolchain badge whose llvm-mingw version is not the one the pinned SDK's toolchain.json pins (checked when sdk/ is present).
 Links to the web are not fetched: this gate runs offline on every push. Stdlib only.
 """
 
@@ -154,7 +154,7 @@ def targets(repo: Path) -> list[Path]:
 
 def toolchain_badge(repo: Path) -> list[str]:
     """The README's toolchain badge names the pinned llvm-mingw version (shields writes a hyphen as two)."""
-    pin_file, readme = repo / "toolchain.json", repo / "README.md"
+    pin_file, readme = repo / "sdk" / "toolchain.json", repo / "README.md"
     if not pin_file.is_file() or not readme.is_file():
         return []
     components = json.loads(pin_file.read_text(encoding="utf-8"))["components"]
@@ -189,7 +189,8 @@ def self_test() -> int:
         (root / "docs").mkdir()
         (root / "docs" / "guide.md").write_text("# Guide\n\n## How do I start?\n", encoding="utf-8")
         (root / "image.png").write_bytes(b"\x89PNG")
-        (root / "toolchain.json").write_text(json.dumps({"components": [{"name": "llvm-mingw", "version": "20260908"}]}), encoding="utf-8")
+        (root / "sdk").mkdir(exist_ok=True)
+        (root / "sdk" / "toolchain.json").write_text(json.dumps({"components": [{"name": "llvm-mingw", "version": "20260908"}]}), encoding="utf-8")
         clean = ("# Project\n\n![llvm-mingw](https://img.shields.io/badge/llvm--mingw-20260908-blue)\n\nOne line per paragraph, see [the guide](docs/guide.md#how-do-i-start) and [below](#usage).\n\n"
                  "## Usage\n\n<img src=\"image.png\" alt=\"shot\">\n\n- an item\n- another\n\n| a | b |\n| - | - |\n\nA range of 1–5 is fine.\n")
         for name in ("CONTRIBUTING.md", "SECURITY.md", ".github/PULL_REQUEST_TEMPLATE.md"):

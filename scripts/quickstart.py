@@ -217,12 +217,12 @@ def run(readme: Path, work: Path, expect: str = "", timeout: float = DEFAULT_TIM
 
 
 def break_pin(pins: Path) -> int:
-    """The wrong-pin proof: change the first component's hash in a clone's toolchain.json. Never run on a tree that is kept."""
+    """The wrong-pin proof: change the SDK commit a clone's sdk.json pins. Never run on a tree that is kept."""
     data = json.loads(pins.read_text(encoding="utf-8"))
-    first = data["components"][0]
-    first["sha256"] = ("0" if first["sha256"][0] != "0" else "1") + first["sha256"][1:]
+    commit = data["commit"]
+    data["commit"] = ("0" if commit[0] != "0" else "1") + commit[1:]
     pins.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
-    print(f"quickstart: proof: the pinned hash of {first['name']} was changed in {pins}")
+    print(f"quickstart: proof: the pinned SDK commit was changed in {pins}")
     return 0
 
 
@@ -239,10 +239,8 @@ FETCH = re.compile(r"Invoke-WebRequest|Invoke-RestMethod|WebClient|urlretrieve|u
 # Every tracked file that reaches the network, and what it is to the first run. A new one fails `facts` until it is
 # recorded here, which is the moment somebody decides whether a first run now depends on it.
 FETCHERS = {
-    "scripts/bootstrap.ps1": "first run: downloads each component toolchain.json pins, and checks its SHA-256",
+    "scripts/sdk.ps1": "first run: clones Resolute-SDK at the commit sdk.json pins; the SDK then downloads the toolchain its toolchain.json pins by SHA-256",
     "tests/CMakeLists.txt": "first run: Catch2, pinned by commit",
-    "shared/lucide/CMakeLists.txt": "first run: the Lucide icon set, pinned by commit",
-    "scripts/toolchain-latest.ps1": "advisory: asks whether a pin has fallen behind; check-all never fails on it",
     "scripts/ci-status.py": "not the first run: reads this repository's CI results",
     "tools/refdata/server.ps1": "not the first run: reference-data authoring machines only",
     "scripts/quickstart.py": "not the first run: holds these patterns",
@@ -277,15 +275,21 @@ def facts(repo: Path, fetchers: dict[str, str] = FETCHERS) -> tuple[list[str], l
             if len(FULL_HASH.findall(text)) < declared:
                 problems.append(f"{name}: a FetchContent_Declare is not pinned by a full commit hash in GIT_TAG")
     problems += [f"{name}: recorded in FETCHERS and no longer fetches or no longer exists" for name in fetchers if name not in found]
-    pins = repo / "toolchain.json"
+    # The SDK is the one thing a first run takes by name, and it is pinned by a full commit hash. The toolchain's own
+    # pins are the SDK's (sdk/toolchain.json): they are checked here when the SDK is on disk, which it is after bootstrap.
+    pin = repo / "sdk.json"
+    commit = str(json.loads(pin.read_text(encoding="utf-8")).get("commit", "")) if pin.is_file() else ""
+    if not re.fullmatch(r"[0-9a-f]{40}", commit):
+        problems.append("sdk.json: the SDK is not pinned by a full commit hash")
+    pins = repo / "sdk" / "toolchain.json"
     components = json.loads(pins.read_text(encoding="utf-8")).get("components", []) if pins.is_file() else []
     unhashed = [c.get("name", "?") for c in components if not re.fullmatch(r"[0-9a-fA-F]{64}", str(c.get("sha256", "")))]
-    problems += [f"toolchain.json: {name} has no SHA-256 pin" for name in unhashed]
+    problems += [f"sdk/toolchain.json: {name} has no SHA-256 pin" for name in unhashed]
     first = [name for name, role in fetchers.items() if role.startswith("first run")]
     said = [
         ".env: does not apply. No .env file is tracked, and no script or build file names one or loads one; every setting is a script parameter.",
-        f"first run: takes from outside the clone only the {len(components)} component(s) toolchain.json pins by SHA-256 "
-        f"({', '.join(c.get('name', '?') for c in components)}) and the commit-pinned sources fetched by {', '.join(sorted(first))}. "
+        f"first run: takes from outside the clone only Resolute-SDK at the commit sdk.json pins ({commit[:12]}), the toolchain "
+        f"components that SDK pins by SHA-256, and the commit-pinned sources fetched by {', '.join(sorted(first))}. "
         "Nothing else seeds it: no data, account, service or earlier build.",
     ]
     return said, problems
@@ -448,18 +452,19 @@ def self_test() -> int:
         check("every preset built is clean", unbuilt_presets(lanes) == [])
 
         # The wrong-pin proof changes a hash and nothing else.
-        pins = root / "toolchain.json"
-        pins.write_text(json.dumps({"components": [{"name": "one", "sha256": "ab" * 32}, {"name": "two", "sha256": "cd" * 32}]}), encoding="utf-8")
+        pins = root / "sdk.json"
+        pins.write_text(json.dumps({"repository": "https://example.invalid/sdk.git", "commit": "ab" * 20}), encoding="utf-8")
         break_pin(pins)
-        after = json.loads(pins.read_text(encoding="utf-8"))["components"]
-        check("the wrong-pin proof changes one hash", after[0]["sha256"] != "ab" * 32 and len(after[0]["sha256"]) == 64 and after[1]["sha256"] == "cd" * 32)
+        after = json.loads(pins.read_text(encoding="utf-8"))
+        check("the wrong-pin proof changes the commit and nothing else",
+              after["commit"] != "ab" * 20 and len(after["commit"]) == 40 and after["repository"] == "https://example.invalid/sdk.git")
 
         # The facts, on a tree where each can be made false.
         tree = root / "tree"
         (tree / "scripts").mkdir(parents=True)
         (tree / "tests").mkdir()
         sh(*git, "init", "-q", "-b", "main", cwd=tree)
-        (tree / "toolchain.json").write_text(json.dumps({"components": [{"name": "one", "sha256": "ab" * 32}]}), encoding="utf-8")
+        (tree / "sdk.json").write_text(json.dumps({"repository": "https://example.invalid/sdk.git", "commit": "ab" * 20}), encoding="utf-8")
         (tree / "scripts" / "bootstrap.ps1").write_text("Invoke-WebRequest $url -OutFile $zip\n", encoding="utf-8")
         (tree / "tests" / "CMakeLists.txt").write_text("FetchContent_Declare(\n  Catch2\n  GIT_TAG " + "a1" * 20 + "\n)\n", encoding="utf-8")
         known = {"scripts/bootstrap.ps1": "first run: the pinned components", "tests/CMakeLists.txt": "first run: Catch2"}
@@ -507,9 +512,9 @@ def main() -> int:
     runner.add_argument("--readme", type=Path, default=REPO / "README.md")
     runner.add_argument("--expect-commit", default="", help="refuse unless the clone is at this commit")
     runner.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT)
-    runner.add_argument("--prove-wrong-pin", action="store_true", help="proof run only: change one pinned hash in the clone before bootstrap")
+    runner.add_argument("--prove-wrong-pin", action="store_true", help="proof run only: change the pinned SDK commit in the clone before bootstrap")
     commands.add_parser("facts", help="check and print the .env and first-run facts")
-    breaker = commands.add_parser("break-pin", help="proof run only: change the first pinned hash in a clone's toolchain.json")
+    breaker = commands.add_parser("break-pin", help="proof run only: change the SDK commit a clone's sdk.json pins")
     breaker.add_argument("pins", type=Path)
     args = parser.parse_args()
     if os.name != "nt":
@@ -519,7 +524,7 @@ def main() -> int:
         if args.self_test:
             return self_test()
         if args.command == "run":
-            after = f"& {_quoted(sys.executable)} {_quoted(str(Path(__file__).resolve()))} break-pin toolchain.json" if args.prove_wrong_pin else ""
+            after = f"& {_quoted(sys.executable)} {_quoted(str(Path(__file__).resolve()))} break-pin sdk.json" if args.prove_wrong_pin else ""
             return run(args.readme, args.work, args.expect_commit, args.timeout, after)
         if args.command == "facts":
             return cmd_facts(REPO)

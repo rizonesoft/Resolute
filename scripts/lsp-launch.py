@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Starts a language server for Claude Code, on the toolchain this repository pins.
 
-    python scripts/lsp-launch.py clangd     C and C++: the clangd in reskit/llvm-mingw, beside the compiler the build uses
+    python scripts/lsp-launch.py clangd     C and C++: the clangd in sdk/reskit/llvm-mingw, beside the compiler the build uses
     python scripts/lsp-launch.py pyright    Python: pyright-langserver from PATH (npm install -g pyright)
 
 The plugin in tools/claude-plugins/resolute-lsp names this file as each server's command. The server talks to Claude
@@ -28,7 +28,7 @@ import sys
 
 REPO = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 COMPILE_DB = os.path.join(REPO, "build", "debug")
-CLANGD = os.path.join(REPO, "reskit", "llvm-mingw", "bin", "clangd.exe")
+CLANGD = os.path.join(REPO, "sdk", "reskit", "llvm-mingw", "bin", "clangd.exe")
 
 class LaunchError(Exception):
     """Why the server cannot start; printed to stderr, where Claude Code's plugin errors show it."""
@@ -40,7 +40,7 @@ def clangd() -> list[str]:
     if not os.path.isfile(os.path.join(COMPILE_DB, "compile_commands.json")):
         print("lsp-launch: no compile database yet; run `pwsh scripts/build.ps1 Resolute -Config Debug` for exact diagnostics", file=sys.stderr)
     # --query-driver lets clangd ask the pinned compiler for its own include paths, which the database does not list.
-    driver = os.path.join(REPO, "reskit", "llvm-mingw", "bin", "*").replace("\\", "/")
+    driver = os.path.join(REPO, "sdk", "reskit", "llvm-mingw", "bin", "*").replace("\\", "/")
     return [CLANGD, f"--compile-commands-dir={COMPILE_DB}", f"--query-driver={driver}", "--background-index", "-j=4",
             "--pch-storage=disk", "--clang-tidy", "--header-insertion=never", "--log=error"]
 

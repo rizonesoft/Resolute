@@ -9,7 +9,7 @@
 
 **Windows repair and system tools that fix the problem, show what they changed, and can put it back.**
 
-[![gates](https://github.com/rizonesoft/Resolute/actions/workflows/gates.yml/badge.svg)](https://github.com/rizonesoft/Resolute/actions/workflows/gates.yml) [![plan-gates](https://github.com/rizonesoft/Resolute/actions/workflows/plan.yml/badge.svg)](https://github.com/rizonesoft/Resolute/actions/workflows/plan.yml) [![quick-start](https://github.com/rizonesoft/Resolute/actions/workflows/quick-start.yml/badge.svg)](https://github.com/rizonesoft/Resolute/actions/workflows/quick-start.yml) ![license: not yet declared](https://img.shields.io/badge/license-not%20yet%20declared-lightgrey) ![llvm-mingw 20260908](https://img.shields.io/badge/llvm--mingw-20260908-blue) ![platform: Windows](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011%20x64-0078D4)
+[![gates](https://github.com/rizonesoft/Resolute/actions/workflows/gates.yml/badge.svg)](https://github.com/rizonesoft/Resolute/actions/workflows/gates.yml) [![plan-gates](https://github.com/rizonesoft/Resolute/actions/workflows/plan.yml/badge.svg)](https://github.com/rizonesoft/Resolute/actions/workflows/plan.yml) [![quick-start](https://github.com/rizonesoft/Resolute/actions/workflows/quick-start.yml/badge.svg)](https://github.com/rizonesoft/Resolute/actions/workflows/quick-start.yml) [![license: GPL v3](https://img.shields.io/badge/license-GPL%20v3-blue)](LICENSE) ![llvm-mingw 20260908](https://img.shields.io/badge/llvm--mingw-20260908-blue) ![platform: Windows](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011%20x64-0078D4)
 
 </div>
 
@@ -58,7 +58,7 @@ On Windows 10 or 11 x64 with Git and PowerShell 7, from an empty folder:
 ```powershell
 git clone https://github.com/rizonesoft/Resolute.git
 cd Resolute
-pwsh scripts/bootstrap.ps1     # downloads the pinned llvm-mingw, CMake, Ninja, Python and sccache into reskit/, hash-checked
+pwsh scripts/bootstrap.ps1     # fetches the pinned Resolute-SDK into sdk/, then its pinned llvm-mingw, CMake, Ninja, Python and sccache, hash-checked
 pwsh scripts/build.ps1 -All    # builds the launcher and every C++ tool, Release
 pwsh scripts/check-all.ps1     # runs every gate: build, clang-tidy, tests, plan and document checks
 ```
@@ -79,7 +79,7 @@ Every setting is a script parameter; there is no configuration file to write.
 | `build.ps1 -ResetMovedTrees` | off | Deletes the build trees that a clone at another path made, and builds nothing. It is the cleanup alone, not a preview: an ordinary build does the same cleanup first and then builds. `pwsh scripts/build.ps1 -ResetMovedTrees` |
 | `check-all.ps1 -SkipBuild` | off | Skips the build and tidy gates, for a change to documents only |
 
-The pinned versions and their hashes live in [`toolchain.json`](toolchain.json); a download whose hash differs is refused.
+The shared UI library, the build rules and the toolchain come from [Resolute-SDK](https://github.com/rizonesoft/Resolute-SDK), at the commit [`sdk.json`](sdk.json) pins. The toolchain's pinned versions and their hashes live in the SDK's `toolchain.json`; a download whose hash differs is refused.
 
 ## Usage
 
@@ -141,7 +141,7 @@ flowchart LR
     launcher["Launcher: src/<br/>finds tools and<br/>starts them"]
     repair["Repair contract:<br/>src/repair/<br/>diagnose, result list,<br/>restore record, undo<br/>(D02 T01)"]
     framework["Framework:<br/>src/framework/<br/>startup, settings, logging,<br/>language, update, About<br/>(D01 T01)"]
-    ui["UI library:<br/>shared/resolute-ui/"]
+    ui["UI library:<br/>Resolute-SDK,<br/>sdk/shared/resolute-ui/"]
     tools -- repair tools only --> repair
     tools --> framework
     launcher --> framework
@@ -157,11 +157,11 @@ The repair contract is for the repair tools only. The UI library draws every con
 | Path | What is there |
 | --- | --- |
 | `src/` | The launcher shell, and nothing else |
-| `shared/resolute-ui/` | The Direct2D UI library every tool draws with |
-| `shared/lucide/` | The icon set, linked into each executable |
+| `sdk/shared/resolute-ui/` | The Direct2D UI library every tool draws with. Part of [Resolute-SDK](https://github.com/rizonesoft/Resolute-SDK), fetched at the commit `sdk.json` pins and not tracked here |
+| `sdk/shared/lucide/` | The icon set, linked into each executable. Part of the SDK |
 | `extensions/` | The tools, each building as its own standalone executable |
 | `tests/` | The Catch2 suites, fixtures and the parity driver |
-| `reskit/` | The downloaded toolchain (ignored) and its environment helpers |
+| `sdk/reskit/` | The downloaded toolchain and its environment helpers. Part of the SDK |
 | `scripts/` | Bootstrap, build, the gates and the plan tooling |
 | `resources/` | Application icons and the Rizonesoft logos |
 | `resolute_au3/` | The AutoIt suite: frozen, and the specification the port is measured against |
@@ -182,7 +182,7 @@ The repair contract is for the repair tools only. The UI library draws every con
 | What you see | Why, and what to do |
 | --- | --- |
 | `pwsh` is not recognised | The scripts need PowerShell 7. Install it from Microsoft and run them from `pwsh`, not Windows PowerShell 5. |
-| bootstrap refuses a download because its hash differs | The file is not the one pinned in `toolchain.json`, so that component was not installed. Components bootstrap had already installed before it stay installed. Run bootstrap again: it skips what is present at its pinned version and retries the rest. If the refusal persists, the mirror changed and the pin needs review. |
+| bootstrap refuses a download because its hash differs | The file is not the one pinned in the SDK's `toolchain.json`, so that component was not installed. Components bootstrap had already installed before it stay installed. Run bootstrap again: it skips what is present at its pinned version and retries the rest. If the refusal persists, the mirror changed and the pin needs review. |
 | CMake complains that the build tree was made at another path | `build.ps1` removes and rebuilds a tree another clone made; run it again rather than `cmake` by hand. |
 | the launcher's list is empty | Expected today: no tool declares itself to the launcher yet (`D05 T02 §1`). Start a tool directly from `Bin\<Config>\System\`. |
 | a gate fails in `check-all` | Its log is under `build\logs\`, named after the gate; the last lines name the failure. |
@@ -202,4 +202,6 @@ Questions and bugs go to [GitHub issues](https://github.com/rizonesoft/Resolute/
 
 The AutoIt suite is the one in use today, and the C++ suite replaces it tool by tool as the plan above says.
 
-No licence is declared yet. `D06 T01 §8` owns declaring it, and plans the framework under MIT and the tools under GPL v3. Until a `LICENSE` file is in this repository, treat the tree as all rights reserved.
+Resolute is licensed under the GNU General Public License, version 3: see [`LICENSE`](LICENSE). Each tool carries the same licence in its own repository. The shared [Resolute-SDK](https://github.com/rizonesoft/Resolute-SDK) is MIT, and the Lucide icons it carries are ISC.
+
+Each tool is moving to its own repository, and this one becomes the launcher: [`docs/plans/2026-11-15-app-split.md`](docs/plans/2026-11-15-app-split.md) tracks the move. A tool still listed above and found in this tree is one the move has not reached yet.

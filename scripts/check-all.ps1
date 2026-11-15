@@ -69,14 +69,14 @@ Push-Location $RepoRoot
 $LogDir = Join-Path $RepoRoot 'build\logs'
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 
-$Cmake = Join-Path $RepoRoot 'reskit\cmake\bin\cmake.exe'
-$Ctest = Join-Path $RepoRoot 'reskit\cmake\bin\ctest.exe'
+$Cmake = Join-Path $RepoRoot 'sdk\reskit\cmake\bin\cmake.exe'
+$Ctest = Join-Path $RepoRoot 'sdk\reskit\cmake\bin\ctest.exe'
 
 # The TODO scripts are stdlib-only. They run under the pinned CPython in
-# reskit/python (toolchain.json, installed by scripts/bootstrap.ps1), so
+# sdk/reskit/python (the SDK's toolchain.json, installed by scripts/bootstrap.ps1), so
 # every machine and every gate uses the same interpreter and no machine
 # argues with its system Python again. Resolve once, here.
-$PinnedPython = Join-Path $RepoRoot 'reskit\python\python.exe'
+$PinnedPython = Join-Path $RepoRoot 'sdk\reskit\python\python.exe'
 if (Test-Path $PinnedPython) {
     $Python = $PinnedPython
 } else {
@@ -86,8 +86,8 @@ if (Test-Path $PinnedPython) {
     $Python = @('python', 'python3', 'py') | ForEach-Object {
         Get-Command $_ -ErrorAction SilentlyContinue
     } | Select-Object -First 1 -ExpandProperty Source
-    if (-not $Python) { throw 'check-all: no Python found (looked in reskit\python, then python, python3, py on PATH); fix: pwsh scripts/bootstrap.ps1' }
-    Write-Host "check-all: reskit\python not present, using $Python from PATH (run pwsh scripts/bootstrap.ps1 for the pinned interpreter)" -ForegroundColor Yellow
+    if (-not $Python) { throw 'check-all: no Python found (looked in sdk\reskit\python, then python, python3, py on PATH); fix: pwsh scripts/bootstrap.ps1' }
+    Write-Host "check-all: sdk\reskit\python not present, using $Python from PATH (run pwsh scripts/bootstrap.ps1 for the pinned interpreter)" -ForegroundColor Yellow
 }
 
 $results = [System.Collections.ArrayList]::new()
@@ -346,7 +346,7 @@ Invoke-Gate -Name 'refdata embed self-test' -LogName 'gate-refdata-embed-selftes
 
 $tcLog = Join-Path $LogDir 'gate-toolchain.log'
 $tcClock = [System.Diagnostics.Stopwatch]::StartNew()
-& pwsh -NoProfile -File (Join-Path $RepoRoot 'scripts\toolchain-latest.ps1') *> $tcLog
+& pwsh -NoProfile -File (Join-Path $RepoRoot 'sdk\scripts\toolchain-latest.ps1') *> $tcLog
 $tcCode = $LASTEXITCODE
 $tcClock.Stop()
 

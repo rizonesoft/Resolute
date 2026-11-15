@@ -84,7 +84,7 @@ SENT = [0]   # client sessions started, so the self-test can show a refusal sent
 def client_path(name: str = "mysql") -> Path:
     if name == "mysql" and os.environ.get("RESOLUTE_REFDATA_CLIENT"):
         return Path(os.environ["RESOLUTE_REFDATA_CLIENT"])
-    base = Path(os.environ["RESOLUTE_REFDATA_CLIENT"]).parent if os.environ.get("RESOLUTE_REFDATA_CLIENT") else REPO / "reskit" / "mysql" / "bin"
+    base = Path(os.environ["RESOLUTE_REFDATA_CLIENT"]).parent if os.environ.get("RESOLUTE_REFDATA_CLIENT") else REPO / "sdk" / "reskit" / "mysql" / "bin"
     return base / f"{name}.exe"
 
 

@@ -11,10 +11,10 @@ It is being **rewritten in C++** from a mature AutoIt3 implementation. The AutoI
 | Path | Purpose |
 | ---- | ------- |
 | `src/` | The launcher shell |
-| `shared/` | The framework and the UI library. Every tool consumes these |
+| `sdk/` | **Not tracked.** Resolute-SDK at the commit `sdk.json` pins, put there by `scripts/sdk.ps1`: the UI library and icon set (`sdk/shared/`), the CMake policies (`sdk/cmake/`), and the bootstrapped toolchain (`sdk/reskit/`). A clone on CI and a fresh machine, or a link to the developer's checkout named by `RESOLUTE_SDK_DIR`. See "The split" |
 | `extensions/` | The tools, each building as a standalone executable |
-| `reskit/` | The portable toolchain: llvm-mingw, CMake, Ninja, downloaded into it and gitignored, plus the tracked environment and build helpers. Renamed from `exokit/` by `D00 T03 §3` |
-| `scripts/bootstrap.ps1` | The one entry point that downloads the toolchain into `reskit/`. `D00 T01 §1` hardens it |
+| `sdk.json` | The SDK pin: the repository and the full commit hash this tree builds against. Taking a newer SDK is changing this commit, and nothing else |
+| `scripts/bootstrap.ps1` | The one entry point a build needs first: it puts the pinned SDK at `sdk/` (`scripts/sdk.ps1`), then runs the SDK's own bootstrap, which downloads the toolchain into `sdk/reskit/` |
 | `resources/` | Application icons and embedded resources |
 | `resolute_au3/` | The frozen AutoIt suite. **The executable specification**, not a maintenance target |
 | `resolute_au3/todo/` | The archived AutoIt plan, superseded 2026-09-16, kept for its per-tool analysis |
@@ -34,12 +34,22 @@ Everything here is Windows-only, the TODO tooling (`scripts/`, plan checks) incl
 
 Recorded in `docs/brainstorm/2026-09-16-completion-brainstorm.md`. Read it before proposing anything that contradicts one.
 
-- **C++23 on llvm-mingw** (clang targeting MinGW-w64 on UCRT), built with CMake and Ninja through `scripts/build.ps1`, with `sccache` as the compile cache. No vcpkg and no package manager: the toolchain is pinned in `toolchain.json` and bootstrapped into `reskit/`. This is the brainstorm's decision 18 as `D00 T01 §1` built it; decision 13 (MSVC 2022 and vcpkg) is superseded.
-- **`resolute-ui`, statically linked.** The suite's own Direct2D UI library under `shared/resolute-ui/` (ExoUI at intake), one self-contained executable per tool. It replaced wxWidgets by the brainstorm's decision 24, which records why; the deciding constraints were standalone distribution and size.
+- **C++23 on llvm-mingw** (clang targeting MinGW-w64 on UCRT), built with CMake and Ninja through `scripts/build.ps1`, with `sccache` as the compile cache. No vcpkg and no package manager: the toolchain is pinned in the SDK's `toolchain.json` and bootstrapped into `sdk/reskit/`. This is the brainstorm's decision 18 as `D00 T01 §1` built it; decision 13 (MSVC 2022 and vcpkg) is superseded.
+- **`resolute-ui`, statically linked.** The suite's own Direct2D UI library, in Resolute-SDK at `sdk/shared/resolute-ui/` (ExoUI at intake), one self-contained executable per tool. It replaced wxWidgets by the brainstorm's decision 24, which records why; the deciding constraints were standalone distribution and size.
 - **Catch2 v3** for tests.
 - **1:1 on behavior, not on pixels.** The C++ tool must have the same effect on a system as its AutoIt counterpart, proven by running both against the same fixture. The UI is rebuilt rather than reproduced, because the AutoIt windows are not DPI-aware and have no dark mode.
 - **Framework first, then the tools.** One vertical slice through `Ownership` proves the framework end to end before the remaining tools port.
 - **Every tool is distributed independently.** Its own download, update file, language packs, documentation, and About page. A tool may never depend at runtime on another tool, on the launcher, or on a suite-wide file. "Shared" always means shared at author time or build time.
+
+## The split
+
+Operator decision 2026-11-15, tracked in `docs/plans/2026-11-15-app-split.md`. It supersedes the brainstorm's decision 34 and every sentence here that places a tool or the shared code in this tree.
+
+- **This repository is the launcher.** Every tool moves to its own repository under `D:\Resolute_Bin\<Tool>` (`rizonesoft/<Tool>`), one at a time, in the tracker's order. The launcher imports the tools from their repositories only when a distribution is built.
+- **The shared code is Resolute-SDK** (`D:\Resolute-SDK`, `rizonesoft/Resolute-SDK`, MIT): the UI library, the icon set, the CMake policies and the toolchain today, and the framework and the repair contract when they are built. The launcher and every tool pin it by commit in `sdk.json`. A change to shared code is made in the SDK, committed and pushed there, and taken here by bumping the pin; `sdk/` in this tree is never edited as if it were this repository's.
+- **`pwsh scripts/sdk.ps1 -Check`** says whether `sdk/` is the pinned commit with a clean tree. A linked checkout at another commit builds with a warning and must not be pushed against: bump `sdk.json` first.
+- **Not moved yet, and why:** the UI library's tests (`tests/`), the design contract (`DESIGN.md`), the reference-data tooling and plan domains `01-framework` and `02-repair-contract` describe or exercise SDK code and still sit here. Each is owned by a section of the SDK's plan and leaves when that section is worked.
+- **Licence:** GPL v3 for the launcher and every tool; the SDK is MIT.
 
 ## The two shared layers
 
@@ -78,9 +88,10 @@ src/
     ResultList.h/.cpp         per-item outcome and counts      D02 T01 S3
     RestoreRecord.h/.cpp      prior state, and undo            D02 T01 S4
     Transcript.h/.cpp         the carryable result             D02 T01 S5
-shared/
-  resolute-ui/          the Direct2D UI library, from the intake. Namespace `rui::`, include prefix `resolute/`, export macro `RESUI_API`
-  lucide/               icon set
+sdk/                    Resolute-SDK at the pinned commit, not tracked here
+  shared/resolute-ui/   the Direct2D UI library, from the intake. Namespace `rui::`, include prefix `resolute/`, export macro `RESUI_API`
+  shared/lucide/        icon set
+  cmake/                the policies every consumer includes through ResoluteSdk.cmake
 extensions/<Tool>/      one directory per tool, one standalone executable
 tests/                  Catch2 suites, fixtures, and the parity driver
 ```
@@ -139,8 +150,8 @@ A checkpoint citing a gate that does not exist yet is unfalsifiable and is not a
 - **One suite, one framework:** shared behavior is consumed from the framework or the repair contract, never reimplemented in a tool. A second progress bar, About dialog, settings writer, or log format is a defect.
 - **Elevation is checked at the action**, not only at startup.
 - **`resolute_au3/` is read-only** except under the maintenance domain. It is the specification. Changing it changes what the port is measured against.
-- **Every tool lives at `extensions/<Tool>/`** and builds as its own standalone executable linking the shared library statically. `src/` is the launcher shell and nothing else.
-- **The tree has no external dependencies** beyond the bootstrapped toolchain and the test framework. Adding one is a decision with a recorded reason, not a convenience. The one recorded so far: **MySQL 8.4 LTS on reference-data authoring machines only** (`D00 T06 §1`), because reviewed, versioned data shared by several authors needs rules every client obeys and a queryable history; it is installed on demand by `tools/refdata/server.ps1 -Install`, never by `scripts/bootstrap.ps1`, so no build, CI run or user machine needs it. Reversal: the committed export files become the source and the server is dropped. See `docs/reference-data.md`.
+- **Every tool lives in its own repository** (`D:\Resolute_Bin\<Tool>`, `rizonesoft/<Tool>`) and builds as its own standalone executable linking the SDK's library statically. `src/` is the launcher shell and nothing else. A tool still under `extensions/` or `resolute_au3/` is one the split has not reached yet (`docs/plans/2026-11-15-app-split.md`): it is moved, never extended here.
+- **The tree has no external dependencies** beyond the pinned SDK, the toolchain it bootstraps and the test framework. Adding one is a decision with a recorded reason, not a convenience. The one recorded so far: **MySQL 8.4 LTS on reference-data authoring machines only** (`D00 T06 §1`), because reviewed, versioned data shared by several authors needs rules every client obeys and a queryable history; it is installed on demand by `tools/refdata/server.ps1 -Install`, never by `scripts/bootstrap.ps1`, so no build, CI run or user machine needs it. Reversal: the committed export files become the source and the server is dropped. See `docs/reference-data.md`.
 - **Every surface answers to [`DESIGN.md`](./DESIGN.md).** A tool never draws a control the shared library provides, and never hardcodes a colour, a size, or a spacing value. Application icons are the one deliberate exception.
 - **No em dashes** in authored prose. One line per paragraph and list item in Markdown.
 - **Source of truth:** target behavior via the `resolute_au3/` source and a driven run of the shipped tool, the design rules via `DESIGN.md` with the captures under `docs/captures/` as its visual reference, plan state via `todo/`. Disagreements are recorded decisions, not silent reinterpretations.
@@ -208,7 +219,7 @@ Write a claim for anything a later reader would otherwise have to trust: a line 
 
 ## Unknowns and questions
 
-Answer from source first: the `resolute_au3/` script, a driven run of the shipped tool, Microsoft's documentation for a Win32 or Direct2D call, or the `shared/resolute-ui/` headers. When an unanswered question would change implementation, take a justified default, record that it is a default with its cost of changing, and carry on. Do not stall a section waiting for an answer; do not silently reinterpret a section into something buildable.
+Answer from source first: the `resolute_au3/` script, a driven run of the shipped tool, Microsoft's documentation for a Win32 or Direct2D call, or the `sdk/shared/resolute-ui/` headers. When an unanswered question would change implementation, take a justified default, record that it is a default with its cost of changing, and carry on. Do not stall a section waiting for an answer; do not silently reinterpret a section into something buildable.
 
 ## Validation
 
@@ -235,7 +246,7 @@ python scripts/todo-graph.py plan --check         # fail if the projection went 
 Build and gates, landed by `D00 T01`:
 
 ```powershell
-pwsh scripts/bootstrap.ps1                        # download the pinned toolchain into reskit/
+pwsh scripts/bootstrap.ps1                        # the pinned SDK into sdk/, then its pinned toolchain into sdk/reskit/
 pwsh scripts/build.ps1 Resolute -Config Debug     # one target; -All builds the launcher and every extension
 bosun run -- pwsh scripts/check-all.ps1           # every gate, locally: phase closeout, a release, or reproducing a red CI run
 ```

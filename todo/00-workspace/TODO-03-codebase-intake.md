@@ -15,10 +15,10 @@ track: W1
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** `ExoSuite`, `RegStudio`, and `SDImage` are **separate repositories** under `github.com/rizonesoft`, checked out locally under `samples/` and **deliberately not tracked** by this repository: `/samples/` is gitignored. The subtree merge pulls from the remotes, so nothing depends on a local working copy. `deps/libvterm` is a **git submodule** pointing at `neovim/libvterm`, currently populated with 81 files (**Groomed 2026-09-23:** this paragraph is the intake-day state of 2026-09-16; since then `libvterm` and `Console` were retired, no `deps/` or `.gitmodules` remains, `extensions/` holds only `RegStudio/`, and `shared/exo-ui` is `shared/resolute-ui`). **Corrected 2026-09-17 after independent review:** an earlier draft called it the tree's *only* external dependency, which was wrong. `shared/lucide/CMakeLists.txt:9` also fetches `sammycage/lunasvg` v3.5.0 through `FetchContent` at configure time. ExoSuite is a working native C++23 application: `shared/exo-ui` is 6,865 lines of Direct2D and DirectWrite UI framework, `src/main.cpp` is a 573-line shell (**572 from 2026-09-17**, when `D00 T01 §3` removed an MSVC-only `#pragma comment(lib, ...)` that clang ignores; the claim below tracks the live file, and this sentence records the intake state, which is why the two numbers differ), `extensions/` holds `RegStudio` and `Console`, and `exokit/` is a working toolchain bootstrap pulling llvm-mingw 20251216, CMake 4.2.3, and Ninja 1.13.1. `Bin/Release/ExoSuite.exe` is 1,423,872 bytes, 1.36 MiB. **Corrected 2026-09-17:** it is **not** fully static. Rebuilding the merged tree produces a 1,380,352-byte executable plus `System/ExoUI.dll` and `System/Lucide.dll`, 3.9 MB in total. `D00 T01 §2` owns the correction. There is **no vcpkg**. There are **no tests**; `test_font.cpp` is a scratch file. The `README.md` still describes a Rust and Slint stack that commit `efdce6177` removed. The product name appears in 32 files; `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files.
 >
-> <!-- claim: exists shared/resolute-ui/include/resolute/theme.h -->
+> <!-- claim: exists sdk/shared/resolute-ui/include/resolute/theme.h -->
 > <!-- claim: exists scripts/bootstrap.ps1 -->
 > <!-- claim: lines src/main.cpp = 572 -->
-> <!-- claim: count "llvm-mingw" toolchain.json = 4 -->
+> <!-- claim: count "llvm-mingw" sdk/toolchain.json = 4 -->
 >
 > **Corrected 2026-09-16** during `§1` validation, three claims in the paragraph above were wrong:
 >
@@ -131,7 +131,8 @@ track: W1
 - [x] Confirm `samples/` stays out of the repository. `git ls-files samples` is empty and no embedded-repository warning appears. Done when: `/samples/` is gitignored, `git ls-files samples` is empty, and `git status` reports no embedded-repository warning. The local checkouts may stay on disk; they are working copies, not repository content.
 - [x] Reconcile the two `.gitignore` files so the merged tree ignores `build/`, `Bin/`, and the bootstrapped toolchain directory. **A full release build leaves `git status` clean**, verified after building 52/52 targets. **Verified again 2026-09-17 by review, this time against a real bootstrap:** running `exokit/Bootstrap-ExoKit.ps1` downloaded the toolchain into `exokit/` and `git status` stayed clean, so the ignore rules hold for the directories rather than only for the build output. The rules are written for both `exokit/` and the `reskit/` name `§3` renames it to, so the rename cannot silently un-ignore 850 MB.
 <!-- claim: absent exokit -->
-<!-- claim: count "reskit/llvm-mingw" .gitignore = 1 -->
+<!-- claim: count "reskit/llvm-mingw" sdk/.gitignore = 1 -->
+<!-- claim: count "^/sdk$" .gitignore = 1 -->
 - [x] Record what was merged, from which source, and at which commit:
 
   | Source | Mechanism | Commit | Landed |
@@ -189,7 +190,7 @@ ExoSuite is not a second product. It is the Resolute launcher, and leaving the o
 >
 > **`src/ExoSuite.rc` has no `VS_VERSION_INFO` block at all.** Measured 2026-09-17: the file is five lines and declares two icons and nothing else. So company and copyright are *absent*, not wrong, and this section adds the block rather than editing one.
 
-<!-- claim: absent shared/exo-ui -->
+<!-- claim: absent sdk/shared/exo-ui -->
 <!-- claim: absent todo/extensions -->
 <!-- claim: count "\n- \[ \]" TODO.md = 348 -->
 <!-- claim: count "\n- \[ \]" TODO-ux.md = 101 -->

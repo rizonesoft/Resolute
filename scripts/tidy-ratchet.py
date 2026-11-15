@@ -315,7 +315,7 @@ def resource_namespaces(root: Path) -> list:
     """One namespace per .rc/.rc.in outside build trees: its own lines
     plus the headers it includes by quoted path (transitively)."""
     scripts = []
-    for base in (root / "src", root / "shared", root / "extensions"):
+    for base in (root / "src", root / "sdk" / "shared", root / "extensions"):
         if not base.is_dir():
             continue
         for p in sorted(base.rglob("*")):
@@ -602,7 +602,7 @@ INPUT_SUFFIXES = {
 
 def input_manifest(root: Path) -> str:
     """SHA-256 over every build input's path and bytes: sources and
-    headers under src/, shared/, extensions/, cmake/, tests/, plus
+    headers under src/, sdk/shared/, sdk/cmake/, extensions/, cmake/, tests/, plus
     root build configuration. Captured before analysis and verified
     after it (and again by the conformance check's C24), so a change
     before, during, or after measurement voids the evidence. This
@@ -611,7 +611,7 @@ def input_manifest(root: Path) -> str:
     import hashlib
 
     entries = []
-    for base_name in ("src", "shared", "extensions", "cmake", "tests", "resources"):
+    for base_name in ("src", "sdk/shared", "sdk/cmake", "extensions", "cmake", "tests", "resources"):
         base = root / base_name
         if not base.is_dir():
             continue
@@ -1790,7 +1790,7 @@ def main(argv=None) -> int:
     clang_tidy = (
         Path(args.clang_tidy)
         if args.clang_tidy
-        else root / "reskit" / "llvm-mingw" / "bin" / "clang-tidy.exe"
+        else root / "sdk" / "reskit" / "llvm-mingw" / "bin" / "clang-tidy.exe"
     )
     try:
         return run(root, clang_tidy, args.base, args.log, args.result_json)

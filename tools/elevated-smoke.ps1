@@ -17,7 +17,7 @@
 #   * The drivers (scripts/smoke-run.py, scripts/conformance-check.py) are
 #     pinned by SHA-256 at registration, staged into that directory before
 #     each run, verified there, and run from there.
-#   * Python is the repository's pinned runtime (reskit/python), copied into
+#   * Python is the repository's pinned runtime (sdk/reskit/python), copied into
 #     that directory at registration. The machine's own python may sit in a
 #     folder any signed-in account can modify, so it is never used.
 #   * The tool executables change with every build, so -Run, as the operator,
@@ -69,7 +69,7 @@ $RegistrationLockName = 'Global\Resolute-ElevatedSmoke-Registration'
 $RefusalCodes = @{   # a plain hashtable: an ordered one reads an integer key as a position
     10 = 'refused: the registration copy is not elevated'
     11 = 'refused: the consent was given as another account; the task must run as the account that asked for it. Sign in as an administrator, or give this account administrator rights, and register again'
-    12 = 'refused: the pinned Python is not installed in reskit\python (run pwsh scripts/bootstrap.ps1)'
+    12 = 'refused: the pinned Python is not installed in sdk\reskit\python (run pwsh scripts/bootstrap.ps1)'
     13 = 'refused: the elevated smoke task is running or queued; let it finish or run -Remove first'
     14 = 'refused: registering the elevated smoke task is not possible now: another elevated smoke operation (a registration, a recovery, a run or a removal) holds the lock; try again when it has finished'
 }
@@ -86,7 +86,7 @@ $Registration = [pscustomobject]@{
     RequireElevation = $true
     RunLevel = 'Highest'
     Protect = $true
-    Source = { Join-Path $Root 'reskit\python' }
+    Source = { Join-Path $Root 'sdk\reskit\python' }
     Action = $null
     Readiness = { Get-TransactionRefusals }
     JournalTrusted = { Test-JournalTrusted @(Get-DirectoryRefusals) (Get-JournalOwner) }

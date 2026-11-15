@@ -1221,7 +1221,7 @@ def self_test() -> int:
         import time as _time
 
         tmp, tools, log, status, result = fixture()
-        shared = tmp / "shared" / "lib"
+        shared = tmp / "sdk" / "shared" / "lib"   # where the shared library sits since it moved to the pinned SDK
         shared.mkdir(parents=True)
         f = shared / "ui.cpp"
         f.write_text("int x;\n")

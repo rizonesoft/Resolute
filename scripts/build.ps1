@@ -27,7 +27,7 @@
       Bin\<Config>\Resolute.exe          the launcher
       Bin\<Config>\System\<Tool>.exe     every extension
     where <Config> is Debug or Release. Nothing is written outside the
-    repository and no absolute path is baked into any build file: the AutoIt
+    repository or the SDK it pins and no absolute path is baked into any build file: the AutoIt
     suite under resolute_au3/ no longer builds because 13 .sni descriptors
     point at R:\Workspace\Resolute, which stopped existing.
 
@@ -79,10 +79,10 @@ $RepoRoot = Split-Path $PSScriptRoot -Parent
 # CMakeRCCompiler.cmake failed to parse.
 $RepoRootFwd = $RepoRoot -replace '\\', '/'
 
-$Cmake = Join-Path $RepoRoot 'reskit\cmake\bin\cmake.exe'
-$Ninja = Join-Path $RepoRoot 'reskit\ninja\ninja.exe'
-$Python = Join-Path $RepoRoot 'reskit\python\python.exe'
-$Sccache = Join-Path $RepoRoot 'reskit\sccache\sccache.exe'
+$Cmake = Join-Path $RepoRoot 'sdk\reskit\cmake\bin\cmake.exe'
+$Ninja = Join-Path $RepoRoot 'sdk\reskit\ninja\ninja.exe'
+$Python = Join-Path $RepoRoot 'sdk\reskit\python\python.exe'
+$Sccache = Join-Path $RepoRoot 'sdk\reskit\sccache\sccache.exe'
 
 # The compile cache lives under build/, capped, never in the user profile:
 # a cache in the profile is machine state two checkouts would silently
@@ -98,12 +98,12 @@ $env:SCCACHE_CACHE_SIZE = '10G'
 # a build command that dies with "command not found" undoes that.
 function Assert-Toolchain {
     $missing = @()
-    if (-not (Test-Path $Cmake)) { $missing += 'reskit\cmake\bin\cmake.exe' }
-    if (-not (Test-Path $Ninja)) { $missing += 'reskit\ninja\ninja.exe' }
-    if (-not (Test-Path $Python)) { $missing += 'reskit\python\python.exe' }
-    if (-not (Test-Path $Sccache)) { $missing += 'reskit\sccache\sccache.exe' }
-    $clang = Join-Path $RepoRoot 'reskit\llvm-mingw\bin\clang++.exe'
-    if (-not (Test-Path $clang)) { $missing += 'reskit\llvm-mingw\bin\clang++.exe' }
+    if (-not (Test-Path $Cmake)) { $missing += 'sdk\reskit\cmake\bin\cmake.exe' }
+    if (-not (Test-Path $Ninja)) { $missing += 'sdk\reskit\ninja\ninja.exe' }
+    if (-not (Test-Path $Python)) { $missing += 'sdk\reskit\python\python.exe' }
+    if (-not (Test-Path $Sccache)) { $missing += 'sdk\reskit\sccache\sccache.exe' }
+    $clang = Join-Path $RepoRoot 'sdk\reskit\llvm-mingw\bin\clang++.exe'
+    if (-not (Test-Path $clang)) { $missing += 'sdk\reskit\llvm-mingw\bin\clang++.exe' }
 
     if ($missing.Count -gt 0) {
         Write-Host 'build: the portable toolchain is not installed' -ForegroundColor Red
@@ -191,6 +191,23 @@ function Get-MovedBuildTrees {
         $made = ($line.Matches[0].Groups[1].Value.Trim() -replace '/', '\').TrimEnd('\')
         if ($made -ine $t.Source.TrimEnd('\')) {
             $moved += [pscustomobject]@{ Dir = $t.Dir; MadeFor = $made }
+            continue
+        }
+        # The same failure by another route: a tree whose cache names a compiler
+        # that is no longer there. CMake refuses it ("is not a full path to an
+        # existing compiler tool") and never recovers by itself. On 2026-11-15
+        # the toolchain moved from reskit/ to sdk/reskit/ with the SDK, and
+        # every tree made before that named the old path.
+        # Every tool the cache names, not the compiler alone: a configure that
+        # fails this way has already rewritten the compiler entries from the
+        # preset, and leaves the archiver and the rest pointing at the old place.
+        $tools = Select-String -Path $cache -Pattern '^CMAKE_(C_COMPILER|CXX_COMPILER|RC_COMPILER|AR|RANLIB|LINKER|MAKE_PROGRAM):[A-Z]+=(.+)$'
+        foreach ($tool in $tools) {
+            $path = $tool.Matches[0].Groups[2].Value.Trim()
+            if ([IO.Path]::IsPathRooted($path) -and -not (Test-Path -LiteralPath $path)) {
+                $moved += [pscustomobject]@{ Dir = $t.Dir; MadeFor = "the tool $path, which is gone" }
+                break
+            }
         }
     }
     return $moved
@@ -200,7 +217,7 @@ function Reset-MovedBuildTrees {
     $moved = @(Get-MovedBuildTrees)
     if ($moved.Count -eq 0) { return }
     foreach ($m in $moved) {
-        Write-Host "build: $($m.Dir) was made for $($m.MadeFor); this clone has moved, so the tree is removed and rebuilt" -ForegroundColor Yellow
+        Write-Host "build: $($m.Dir) was made for $($m.MadeFor); the tree is stale, so it is removed and rebuilt" -ForegroundColor Yellow
         Remove-Item -LiteralPath $m.Dir -Recurse -Force
     }
     $deps = Join-Path $RepoRoot 'build\deps'
@@ -274,12 +291,12 @@ function Build-Extension {
             & $Cmake "$extPath" -G Ninja --no-warn-unused-cli `
                 "-DCMAKE_BUILD_TYPE=$Configuration" `
                 "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON" `
-                "-DCMAKE_C_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/clang.exe" `
-                "-DCMAKE_CXX_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/clang++.exe" `
-                "-DCMAKE_RC_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/llvm-windres.exe" `
-                "-DCMAKE_MAKE_PROGRAM=$RepoRootFwd/reskit/ninja/ninja.exe" `
-                "-DCMAKE_C_COMPILER_LAUNCHER=$RepoRootFwd/reskit/sccache/sccache.exe" `
-                "-DCMAKE_CXX_COMPILER_LAUNCHER=$RepoRootFwd/reskit/sccache/sccache.exe" `
+                "-DCMAKE_C_COMPILER=$RepoRootFwd/sdk/reskit/llvm-mingw/bin/clang.exe" `
+                "-DCMAKE_CXX_COMPILER=$RepoRootFwd/sdk/reskit/llvm-mingw/bin/clang++.exe" `
+                "-DCMAKE_RC_COMPILER=$RepoRootFwd/sdk/reskit/llvm-mingw/bin/llvm-windres.exe" `
+                "-DCMAKE_MAKE_PROGRAM=$RepoRootFwd/sdk/reskit/ninja/ninja.exe" `
+                "-DCMAKE_C_COMPILER_LAUNCHER=$RepoRootFwd/sdk/reskit/sccache/sccache.exe" `
+                "-DCMAKE_CXX_COMPILER_LAUNCHER=$RepoRootFwd/sdk/reskit/sccache/sccache.exe" `
                 "-DFETCHCONTENT_BASE_DIR=$RepoRootFwd/build/deps/$Configuration" `
                 "-DFETCHCONTENT_UPDATES_DISCONNECTED=ON"
         }

@@ -8,13 +8,13 @@
 # moves a line never breaks the audit.
 #
 # Scope, enumerated 2026-09-26 by searching every quoted kebab-case literal:
-#   the shared controls   shared/resolute-ui/ (headers and sources)
+#   the shared controls   sdk/shared/resolute-ui/ (headers and sources)
 #   the launcher          src/main.cpp names no icon itself; it reaches icons
 #                         only through the shared controls listed here
 #   the tool descriptors  extensions/RegStudio draws no Lucide icon
 # The case scans those same sources both ways: every single-token narrow
-# literal (letters, digits, `-`, `_`, any case) in shared/resolute-ui/include,
-# shared/resolute-ui/src, src, and
+# literal (letters, digits, `-`, `_`, any case) in sdk/shared/resolute-ui/include,
+# sdk/shared/resolute-ui/src, src, and
 # extensions/*/src must be listed for its file, either as an icon referrer
 # here or as a declared non-icon line starting with `!` below.
 # An unlisted literal fails by name, so a new or misspelled icon reference
@@ -24,33 +24,33 @@
 # still has to resolve until it is removed from the set.
 #
 # name	referrer [referrer ...]   (fields separated by tabs)
-view-list	shared/resolute-ui/include/resolute/controls/sidebar.h	shared/resolute-ui/include/resolute/controls/toolbar.h
-system	shared/resolute-ui/include/resolute/controls/sidebar.h
-network	shared/resolute-ui/include/resolute/controls/sidebar.h
-security	shared/resolute-ui/include/resolute/controls/sidebar.h
-display	shared/resolute-ui/include/resolute/controls/sidebar.h
-programs	shared/resolute-ui/include/resolute/controls/sidebar.h
-view-large-icons	shared/resolute-ui/include/resolute/controls/toolbar.h
-view-small-icons	shared/resolute-ui/include/resolute/controls/toolbar.h
-view-details	shared/resolute-ui/include/resolute/controls/toolbar.h
-refresh	shared/resolute-ui/include/resolute/controls/toolbar.h
-settings	shared/resolute-ui/include/resolute/controls/toolbar.h
-theme-dark	shared/resolute-ui/include/resolute/controls/toolbar.h	shared/resolute-ui/src/controls/toolbar.cpp
-theme-light	shared/resolute-ui/src/controls/toolbar.cpp
-theme-system	shared/resolute-ui/src/controls/toolbar.cpp
-chevron-down	shared/resolute-ui/src/controls/toolbar.cpp
-ellipsis	shared/resolute-ui/src/controls/toolbar.cpp
-folder-open	shared/resolute-ui/include/resolute/controls/contentview.h
-inbox	shared/resolute-ui/src/controls/contentview.cpp
-alert-triangle	shared/resolute-ui/src/controls/contentview.cpp	shared/resolute-ui/src/controls/statusbar.cpp
-check-circle	shared/resolute-ui/src/controls/contentview.cpp
-chevron-up	shared/resolute-ui/src/controls/listview.cpp
-chevron-left	shared/resolute-ui/src/controls/sidebar.cpp
-chevron-right	shared/resolute-ui/src/controls/sidebar.cpp
-circle	shared/resolute-ui/src/controls/statusbar.cpp
-loader-2	shared/resolute-ui/src/controls/statusbar.cpp
-check	shared/resolute-ui/src/controls/statusbar.cpp
-square-dashed	shared/resolute-ui/include/resolute/icons.h
+view-list	sdk/shared/resolute-ui/include/resolute/controls/sidebar.h	sdk/shared/resolute-ui/include/resolute/controls/toolbar.h
+system	sdk/shared/resolute-ui/include/resolute/controls/sidebar.h
+network	sdk/shared/resolute-ui/include/resolute/controls/sidebar.h
+security	sdk/shared/resolute-ui/include/resolute/controls/sidebar.h
+display	sdk/shared/resolute-ui/include/resolute/controls/sidebar.h
+programs	sdk/shared/resolute-ui/include/resolute/controls/sidebar.h
+view-large-icons	sdk/shared/resolute-ui/include/resolute/controls/toolbar.h
+view-small-icons	sdk/shared/resolute-ui/include/resolute/controls/toolbar.h
+view-details	sdk/shared/resolute-ui/include/resolute/controls/toolbar.h
+refresh	sdk/shared/resolute-ui/include/resolute/controls/toolbar.h
+settings	sdk/shared/resolute-ui/include/resolute/controls/toolbar.h
+theme-dark	sdk/shared/resolute-ui/include/resolute/controls/toolbar.h	sdk/shared/resolute-ui/src/controls/toolbar.cpp
+theme-light	sdk/shared/resolute-ui/src/controls/toolbar.cpp
+theme-system	sdk/shared/resolute-ui/src/controls/toolbar.cpp
+chevron-down	sdk/shared/resolute-ui/src/controls/toolbar.cpp
+ellipsis	sdk/shared/resolute-ui/src/controls/toolbar.cpp
+folder-open	sdk/shared/resolute-ui/include/resolute/controls/contentview.h
+inbox	sdk/shared/resolute-ui/src/controls/contentview.cpp
+alert-triangle	sdk/shared/resolute-ui/src/controls/contentview.cpp	sdk/shared/resolute-ui/src/controls/statusbar.cpp
+check-circle	sdk/shared/resolute-ui/src/controls/contentview.cpp
+chevron-up	sdk/shared/resolute-ui/src/controls/listview.cpp
+chevron-left	sdk/shared/resolute-ui/src/controls/sidebar.cpp
+chevron-right	sdk/shared/resolute-ui/src/controls/sidebar.cpp
+circle	sdk/shared/resolute-ui/src/controls/statusbar.cpp
+loader-2	sdk/shared/resolute-ui/src/controls/statusbar.cpp
+check	sdk/shared/resolute-ui/src/controls/statusbar.cpp
+square-dashed	sdk/shared/resolute-ui/include/resolute/icons.h
 #
 # Declared non-icon literals: !literal<TAB>file [file ...]
 # category: a JSON key the launcher reads
@@ -58,38 +58,38 @@ square-dashed	shared/resolute-ui/include/resolute/icons.h
 # description: a JSON key
 !description	src/main.cpp
 # from: a word in a comment
-!from	shared/resolute-ui/src/theme.cpp
+!from	sdk/shared/resolute-ui/src/theme.cpp
 # height: an SVG attribute
-!height	shared/resolute-ui/src/render.cpp
+!height	sdk/shared/resolute-ui/src/render.cpp
 # key: a JSON key
 !key	src/main.cpp
 # name: a JSON key
 !name	src/main.cpp
 # otf: a font file extension
-!otf	shared/resolute-ui/src/typography.cpp
+!otf	sdk/shared/resolute-ui/src/typography.cpp
 # s: a plural suffix
 !s	extensions/RegStudio/src/main.cpp
 # settings: a doc comment's example
-!settings	shared/resolute-ui/include/resolute/render.h
+!settings	sdk/shared/resolute-ui/include/resolute/render.h
 # ttf: a font file extension
-!ttf	shared/resolute-ui/src/typography.cpp
+!ttf	sdk/shared/resolute-ui/src/typography.cpp
 # value: a JSON key
 !value	src/main.cpp
 # version: a JSON key
 !version	src/main.cpp
 # width: an SVG attribute
-!width	shared/resolute-ui/src/render.cpp
+!width	sdk/shared/resolute-ui/src/render.cpp
 # LucideCreateHBitmap: an entry point GetProcAddress resolves
-!LucideCreateHBitmap	shared/resolute-ui/src/icons.cpp
+!LucideCreateHBitmap	sdk/shared/resolute-ui/src/icons.cpp
 # LucideFree: an entry point GetProcAddress resolves
-!LucideFree	shared/resolute-ui/src/icons.cpp
+!LucideFree	sdk/shared/resolute-ui/src/icons.cpp
 # LucideGetIconCount: an entry point GetProcAddress resolves
-!LucideGetIconCount	shared/resolute-ui/src/icons.cpp
+!LucideGetIconCount	sdk/shared/resolute-ui/src/icons.cpp
 # LucideGetIconName: an entry point GetProcAddress resolves
-!LucideGetIconName	shared/resolute-ui/src/icons.cpp
+!LucideGetIconName	sdk/shared/resolute-ui/src/icons.cpp
 # LucideGetSvgData: an entry point GetProcAddress resolves
-!LucideGetSvgData	shared/resolute-ui/src/icons.cpp
+!LucideGetSvgData	sdk/shared/resolute-ui/src/icons.cpp
 # LucideRenderIcon: an entry point GetProcAddress resolves
-!LucideRenderIcon	shared/resolute-ui/src/icons.cpp
+!LucideRenderIcon	sdk/shared/resolute-ui/src/icons.cpp
 # currentColor: the SVG colour keyword the renderer replaces
-!currentColor	shared/resolute-ui/src/render.cpp
+!currentColor	sdk/shared/resolute-ui/src/render.cpp

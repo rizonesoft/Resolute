@@ -41,7 +41,7 @@ Work the three questions across the diff and its blast radius. You may also run 
 - Reimplementing shared framework (`src/framework/`) or repair contract (`src/repair/`) behavior privately in a tool.
 - A file or registry write without atomic replacement and readback, or a system mutation without a `RestoreRecord` or explicit non-reversibility notice.
 - Missing action-time elevation check on an administrative operation.
-- A hard-coded colour, size or spacing where `DESIGN.md` tokens or `shared/resolute-ui` own it, or a control without an accessible name.
+- A hard-coded colour, size or spacing where `DESIGN.md` tokens or `sdk/shared/resolute-ui` own it, or a control without an accessible name.
 - A test that passes without exercising the behavior.
 
 ### 3. Independent review rounds (the pinned reviewer)
@@ -61,7 +61,7 @@ The dispatcher appends a `## Round N` section naming the reviewer, its model, ef
 | `plan` | Will the section as written produce a 100% complete feature? (plan review only) |
 | `plan-delivery` | Does the build deliver every item the plan promised, with nothing quietly narrowed? |
 | `adversarial` | How does this fail on hostile input, races, aborts, missing elevation, or unsafe writes? |
-| `consistency` | Does it match the module rules (`src/framework/`, `src/repair/`, `shared/resolute-ui`), naming, and settings? |
+| `consistency` | Does it match the module rules (`src/framework/`, `src/repair/`, `sdk/shared/resolute-ui`), naming, and settings? |
 | `integration` | Do callers and consumers still hold, with every contract kept? |
 | `source-defect` | Is the upstream spec (`resolute_au3/`, `DESIGN.md`, Win32/wxWidgets docs) read accurately with deviations noted? |
 | `quality` | Is the code clear, tested where it can fail, and free of dead or duplicated logic? |

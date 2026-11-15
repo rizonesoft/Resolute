@@ -45,16 +45,24 @@ jobs:
           # revision cannot resolve on a shallow checkout.
           fetch-depth: 0
 
+      - name: Fetch the pinned SDK
+        # Resolute-SDK at the commit sdk.json names, cloned to sdk/. Before
+        # the cache below, which restores the toolchain INTO sdk/reskit: a
+        # sdk/ that the cache created first would not be a checkout.
+        shell: pwsh
+        run: pwsh scripts/sdk.ps1
+
       - name: Restore the pinned toolchain
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
-            reskit/llvm-mingw
-            reskit/cmake
-            reskit/ninja
-            reskit/python
-            reskit/sccache
-          key: toolchain-${{ runner.os }}-${{ hashFiles('toolchain.json') }}
+            sdk/reskit/llvm-mingw
+            sdk/reskit/cmake
+            sdk/reskit/ninja
+            sdk/reskit/python
+            sdk/reskit/sccache
+          # The toolchain's pins live in the SDK, so the SDK pin names them.
+          key: toolchain-${{ runner.os }}-${{ hashFiles('sdk.json') }}
 
       - name: Bootstrap the toolchain
         # Detects before it downloads: nothing to do on a cache hit, the
