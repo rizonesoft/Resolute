@@ -1,0 +1,248 @@
+{
+  "name": "EraseVerification",
+  "slug": "eraseverification",
+  "display": "Erase Verification",
+  "job": "it scans a drive or the free space of a volume for data a recovery tool could still find, reads only, and reports what it found with the confidence the scan supports.",
+  "tagline": "Check that erased really means gone",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Orchid",
+    "light": "#F0ABFC",
+    "dark": "#A21CAF",
+    "social_ground": "#2A0A2E",
+    "social_muted": "#F2D3F7"
+  },
+  "icon": {
+    "idea": "A magnifier with a tick in it: looked, and found it clean.",
+    "points": [
+      "Free-standing with no tile: a ring with a slanted handle.",
+      "The lens and handle are Orchid and the tick is Orchid light.",
+      "The small drawing below 40 pixels thickens the handle and the tick."
+    ],
+    "large": "<circle cx=\"40\" cy=\"40\" r=\"26\" fill=\"none\" stroke=\"#A21CAF\" stroke-width=\"11\"/><path d=\"M60 60 L84 84\" fill=\"none\" stroke=\"#A21CAF\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M29 40 L37 48 L51 32\" fill=\"none\" stroke=\"#F0ABFC\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<circle cx=\"40\" cy=\"40\" r=\"26\" fill=\"none\" stroke=\"#A21CAF\" stroke-width=\"13\"/><path d=\"M62 62 L84 84\" fill=\"none\" stroke=\"#A21CAF\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M28 40 L37 49 L52 31\" fill=\"none\" stroke=\"#F0ABFC\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Verdict",
+        "The drive checked, a one-sentence verdict with its confidence, and each kind of remnant found"
+      ],
+      [
+        "Details",
+        "Each remnant with where it lies on the drive"
+      ],
+      [
+        "Activity",
+        "What the tool scanned and found, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person who erased a drive sees, in one sentence, whether anything a recovery tool could find is still on it and how sure the scan lets the tool be.",
+    "primary": "Verify",
+    "secondary": "Choose a drive",
+    "rows": [
+      [
+        "Recoverable files",
+        "Found with a count and an example, or None found"
+      ],
+      [
+        "Deleted file records",
+        "Found with a count and an example, or None found"
+      ],
+      [
+        "Readable text",
+        "Found with a count and an example, or None found"
+      ],
+      [
+        "Other non-zero data",
+        "Found with a count and an example, or None found"
+      ]
+    ],
+    "status": "Scanned 100 percent of free space, 3 kinds of remnant found",
+    "notes": [
+      "The header names the drive checked and whether the whole drive or only the free space of a volume was scanned, with the fraction read stated in words.",
+      "Under the header is a one-sentence verdict with its confidence, such as what was found, by which scan, and what that scan cannot show. It never says more than the scan proved.",
+      "Each kind of remnant is a row with an icon and a word for its state (Found or None found), a count and one example. State is never shown by colour alone.",
+      "Verify is the accent button and reads the chosen target. Choose a drive opens a picker of drives and volumes, and Verify stays disabled until one is chosen.",
+      "While a scan runs the status bar shows how much has been read, and the scan can be stopped. A stopped scan is reported as partial with the fraction it read.",
+      "When the chosen drive is a solid-state drive the verdict says plainly what a read cannot prove there, instead of a reassuring result.",
+      "When the process is not elevated the tool refuses by name before reading anything, naming the right it lacks, and offers to restart elevated. There is no undo because the tool changes nothing."
+    ],
+    "cut": "This is a new tool, so there is no earlier window to cut from. It has no menus, splash, animations, donate strip or second results screen: the verdict, its details and the activity trail are sections of the suite's tool window, and anything a reader might expect from a recovery tool (restoring or saving found files) is deliberately absent, recorded in the plan, because this tool reads and reports and never recovers."
+  },
+  "readme": {
+    "lead": "Check that an erase worked by scanning a drive, or its free space, for data a recovery tool could still find.",
+    "what": [
+      "Erase Verification reads a whole drive, or the free space of a volume, and looks for what recovery tools look for: file signatures, deleted file records, readable text and non-zero data of no known kind. It reports each kind it found with a count and an example, and states a verdict that says only what the scan proved.",
+      "It is the counterpart of QuickErase, and it reads only. It never writes to the drive, never erases anything and never restores what it finds. It runs elevated because reading a raw drive needs it, and it refuses by name when it is not."
+    ],
+    "new_intro": "This is a new tool of the suite, not a port, and it is built around saying honestly what a scan can and cannot prove.",
+    "new": [
+      [
+        "A verdict with its confidence.",
+        "The result is one sentence that names what was scanned, how much of it was read and what was found, never a bare claim that a drive is clean."
+      ],
+      [
+        "Free space or the whole drive.",
+        "It can scan the free clusters of a volume, found from the volume bitmap, or an entire drive, and a sampled scan states the fraction read."
+      ],
+      [
+        "Honest about solid-state drives.",
+        "A read of zeros says nothing about spare cells that wear levelling and TRIM keep out of reach, and the tool says so instead of reporting a drive clean."
+      ],
+      [
+        "Read only, and provably so.",
+        "The tool opens drives for reading only, and a test shows that no write handle is ever requested."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new read-only erase verifier: engine, window, features",
+    "goal": "Erase Verification ships as a complete, standalone C++ tool that scans a drive or a volume's free space for data a recovery tool could still find, classifies what it finds, and states a verdict with its confidence that never claims more than the scan proved, reading only and refusing by name when it is not elevated.",
+    "current_state": "Nothing exists yet: this is a new tool, with no AutoIt original and no code. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and one plan section under `docs/origin/` (`resolute-D05-T05-s3.md`, 22 lines) that sets the job: it is the counterpart of the suite's QuickErase tool, it must present a finding stated with its limits and not a file list, and it must never print a bare claim that data was securely erased. The tool uses the suite's read-only recovery engine, built first in the sibling Undelete tool and proposed to Resolute-SDK; that engine, the SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T05-s3.md`: the plan section this tool began as, including the limits the report must state.",
+      "The shared read-only recovery engine from Resolute-SDK, pinned in `sdk.json`, which supplies raw reads, file signatures and deleted record parsing.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the tool's identity and window sections, and the suite's contract every surface answers to."
+    ],
+    "outcome": [
+      "`EraseVerification.exe` scans a chosen drive or a volume's free space, in full or sampled with the fraction read stated, and classifies what it finds as a file signature, a deleted record, readable text or non-zero data of no known kind.",
+      "Every result is a verdict that names what was scanned, how much was read and what that cannot prove, with a test showing that an erased fixture and a control fixture get different verdicts and that no result ever says more than the scan established.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Verdict screen, where a person sees what was found by kind, and Details is the same findings with their locations. Reporting and audit are the Activity section, which records each scan, its target, the fraction read and its outcome. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated scan is refused by name before any read. Reverse does not apply: the tool reads a drive and reports, so there is nothing to put back.",
+    "engine": {
+      "title": "Scan and Verdict Engine",
+      "intro": "The tool's core, independent of any window: choosing what to scan, reading it with the shared recovery engine, classifying what is found and forming a verdict that never says more than the scan proved. It reads only and refuses by name when the process is not elevated. Free clusters come from the volume bitmap (`FSCTL_GET_VOLUME_BITMAP`), so the free-space scan reads exactly the clusters the file system says are unused. It waits on the shared recovery engine, which is proposed to Resolute-SDK and not built.",
+      "needs": "windows-host, sdk-framework",
+      "build": [
+        "Define the scan target, the finding kinds and the verdict as plain types in `src/core/Verdict.h`. Done when: the header states every finding kind and every confidence level once and a test compiles against it.",
+        "Implement target selection, scanning, classification and the verdict in `src/core/Scan.cpp` against a block source the tests can replace. Done when: the unit tests pass against an in-memory image."
+      ],
+      "items": [
+        "Implement target selection in `src/core/Target.cpp`: a whole physical drive, or the free space of one volume as the set of clusters `FSCTL_GET_VOLUME_BITMAP` reports as unused. Done when: a test image with a known bitmap yields exactly its free cluster ranges and none of the used ones. Cheaper substitute: scanning the whole volume and calling it free space, which reports live files as remnants.",
+        "Refuse by name before any read when the process is not elevated, in `src/core/Elevation.cpp`, with one activity record. Done when: an unelevated test run reports the refusal naming the missing right and no device is opened. Cheaper substitute: letting the open fail with access denied partway through a scan.",
+        "Implement the full scan in `src/core/Scan.cpp`, reading every sector of the target through the shared read-only engine and stating that 100 percent was read. Done when: a test image with one planted remnant in its last sector is found, and the result states the whole target was read.",
+        "Implement the sampled scan in `src/core/Scan.cpp`, reading a stated fraction of the target chosen evenly and by fixed seed, and returning the fraction actually read. Done when: the same seed reads the same sectors twice, and the result carries the fraction as a number and in words. Cheaper substitute: a sample reported as if it were a full scan, which claims more than was read.",
+        "Classify each non-empty block in `src/core/Classify.cpp` as a file signature match, a deleted file record, readable text or non-zero data of no known kind, using the shared engine's signature and record parsers. Done when: a fixture with one of each kind is classified into those four kinds with the right counts.",
+        "Examine slack space: for each file the volume's records name, read the bytes after its end up to the end of its last cluster and classify them the same way. Done when: a fixture with text hidden in a file's slack reports it as a remnant in slack, with the file named.",
+        "Form the verdict in `src/core/Verdict.cpp` from what was scanned, the fraction read, the kinds found and the media type, and make it say only what that supports: a sampled scan with nothing found is reported as nothing found in the sample, never as clean. Done when: tests over an erased fixture, a control fixture and a sampled fixture each produce their own sentence, and a search of `src/` finds no string claiming a drive is securely erased. Cheaper substitute: reporting clean from the absence of findings, which a sample or a solid-state drive cannot establish.",
+        "Open every device for reading only and prove it in `tests/readonly_test.cpp`, with a block source that fails the test if a write is requested. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L scan` passes and fails when a write access flag is added to the open call."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L scan` passes for the erased, control, sampled and unelevated cases, and fails when a write flag is added to a device open.",
+      "commit": "core: scan and verdict that never claim more than the scan proved"
+    },
+    "parity_items": [],
+    "baseline_items": [],
+    "inventory_items": [],
+    "enhancements": [
+      {
+        "title": "Quick Sample or Full Scan",
+        "needs": "sdk-framework",
+        "intro": "A full scan reads everything and can prove that no recoverable remnant exists in what it read. A sample reads a stated fraction and can only show that remnants exist, never that they do not. This section lets a person choose, and states beside the choice what each can prove.",
+        "surface": {
+          "fidelity": "the scan choice on the Verdict screen, against `DESIGN.md` section 2.",
+          "job": "a person decides how much of the drive to read, knowing what each choice can and cannot prove. Consumer: the verdict sentence, which carries the choice.",
+          "treatment": "two choices each with a plain sentence of what it can prove, and the fraction read shown while scanning and in the verdict. Cheaper substitute that fails the checkpoint: a single Verify with no stated fraction, which hides what a sample proves."
+        },
+        "build": [
+          "Add the scan choice and the fraction control in `src/ui/VerdictView.cpp`. Done when: choosing Quick Sample shows its fraction and the sentence of what a sample can prove.",
+          "Carry the choice into the verdict in `src/core/Verdict.cpp`. Done when: the verdict sentence names the fraction read."
+        ],
+        "items": [
+          "Add a choice of Quick Sample or Full Scan to the Verdict screen in `src/ui/VerdictView.cpp`, each with one sentence of what it can prove, through the framework's controls. Done when: the sentence changes with the choice and is read by a UI Automation walk. Cheaper substitute: a private radio group, which the contract forbids.",
+          "Let the sample's fraction be set within bounds and show the fraction read live in the status bar. Done when: a driven scan shows a rising fraction and ends on the fraction the result states.",
+          "Make the verdict sentence say that a sample with no findings found nothing in that fraction and cannot show the rest is empty, in `src/core/Verdict.cpp`. Done when: a test on a sampled erased fixture asserts that sentence and that the word clean is absent.",
+          "Cover it in `tests/sample_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L sample` passes, and fails when a sampled result is phrased like a full one."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L sample` passes: a sampled and a full result of the same fixture state different claims, and the sampled one states its fraction.",
+        "commit": "feature: quick sample or full scan, each with what it can prove"
+      },
+      {
+        "title": "Solid-State Drive Honesty",
+        "needs": "sdk-framework",
+        "intro": "On a solid-state drive, TRIM and wear levelling mean a read of zeros is not proof about the spare and remapped cells the drive keeps out of reach. This section detects the media type and makes the verdict say what a read cannot prove there, and what the drive's own secure erase is for.",
+        "surface": {
+          "fidelity": "the media notice on the Verdict screen, against `DESIGN.md` section 2.",
+          "job": "a person with a solid-state drive learns what a scan cannot establish about it. Consumer: the verdict sentence and the notice beside it.",
+          "treatment": "a notice in words, beside the verdict, naming the limit and pointing to the drive's own secure erase. Cheaper substitute that fails the checkpoint: a generic disclaimer shown for every drive, which a person learns to ignore."
+        },
+        "build": [
+          "Detect the media type of the target in `src/core/Media.cpp`. Done when: a fixture reports a solid-state and a magnetic drive differently.",
+          "Show the notice in `src/ui/VerdictView.cpp` and carry it into `src/core/Verdict.cpp`. Done when: a solid-state target's verdict names the limit."
+        ],
+        "items": [
+          "Detect whether the target is solid-state, through the storage seek-penalty and TRIM properties, in `src/core/Media.cpp`, and report unknown when neither is available. Done when: a fixture per case returns solid-state, magnetic or unknown. Cheaper substitute: guessing from the drive's name, which misreads many drives.",
+          "Make the verdict for a solid-state target say that a read of zeros does not show spare or remapped cells are empty, in `src/core/Verdict.cpp`. Done when: a test on a solid-state fixture with nothing found asserts that sentence and that the target is not called clean.",
+          "State what the drive's own secure erase is for, in one sentence in the notice, and never offer to run it. Done when: the notice carries the sentence and a search of `src/` finds no call that erases.",
+          "Show the notice with an icon and a word, in `src/ui/VerdictView.cpp`, read by a UI Automation walk. Done when: the notice is named in the walk and is not colour alone.",
+          "Cover it in `tests/media_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L media` passes, and fails when the solid-state sentence is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L media` passes: a solid-state result with nothing found states what a read cannot prove, and a magnetic one does not carry that sentence.",
+        "commit": "feature: say what a read cannot prove on a solid-state drive"
+      },
+      {
+        "title": "Save a Verification Report",
+        "needs": "sdk-framework",
+        "intro": "A person handing a drive on needs a record of what was checked and what was found. This section writes a dated report with the target, the scan and its fraction, the findings by kind and the verdict with the same limits the screen states.",
+        "surface": {
+          "fidelity": "the Save a report action on the Verdict screen, against `DESIGN.md` section 2.",
+          "job": "a person keeps a dated record of what was checked and found. Consumer: the saved file, read back and compared with the screen.",
+          "treatment": "a plain text report written atomically and read back, carrying the same verdict and limits as the screen. Cheaper substitute that fails the checkpoint: a report with only the verdict, which loses what was scanned and the limits."
+        },
+        "build": [
+          "Write the report in `src/core/Report.cpp`. Done when: a report written for a fixture result is read back with every field.",
+          "Add Save a report to the Verdict header in `src/ui/VerdictView.cpp`. Done when: the action writes a file and the activity line names it."
+        ],
+        "items": [
+          "Write the report in `src/core/Report.cpp` with the date, the target, the scan type, the fraction read, the findings by kind with counts and examples, and the verdict with its limits. Done when: a test compares the report text with the result field by field.",
+          "Write the file atomically (a temporary file, then a rename) and read it back to confirm it. Done when: a test that interrupts the write leaves no partial report. Cheaper substitute: writing straight to the final name, which can leave half a report.",
+          "Add Save a report to the Verdict header in `src/ui/VerdictView.cpp`, enabled only after a scan, through the framework's file dialog. Done when: a driven run saves a report and the Activity section names it.",
+          "Cover it in `tests/report_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L report` passes, and fails when a limit sentence is dropped from the report."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L report` passes: the saved report is read back equal to the screen's verdict and limits.",
+        "commit": "feature: a dated verification report for handing a drive on"
+      },
+      {
+        "title": "Proof It Never Writes",
+        "intro": "Trust in a verifier rests on its never changing what it checks. This section makes the read-only promise checkable: every device open is for reading, the tool says so in its window, and a test fails if any write path appears.",
+        "surface": {
+          "fidelity": "the read-only statement in the About and Settings sections, against `sdk/DESIGN.md`.",
+          "job": "a person sees that the tool only reads and can check the claim. Consumer: the statement and the test that backs it.",
+          "treatment": "one plain sentence stating that the tool opens drives for reading only, shown where a person looks for what the tool does. Cheaper substitute that fails the checkpoint: a claim in the readme with no test behind it."
+        },
+        "build": [
+          "Route every device open through one function in `src/core/Device.cpp` that can only request read access. Done when: no other file calls the open.",
+          "Add the proof test in `tests/readonly_test.cpp`. Done when: it fails when a write flag or write call is added."
+        ],
+        "items": [
+          "Route every device and file open through `OpenForRead` in `src/core/Device.cpp`, which requests read access only. Done when: a search of `src/` finds no other call that opens a device. Cheaper substitute: a convention that nobody writes, which nothing enforces.",
+          "Write a test in `tests/readonly_test.cpp` that scans a fixture through a handle that records every access flag and call, and fails on any write, flush or control code that changes a drive. Done when: it passes on the real scan and fails when a write flag is added.",
+          "Show the read-only sentence in the About section's text through the descriptor in `src/Descriptor.h`. Done when: the About page shows it and the test reads it.",
+          "Cover the search rule in `tests/readonly_test.cpp`: no source file names a write access flag. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L readonly` passes, and fails when one is added."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L readonly` passes, and fails when a write access flag is added to any device open.",
+        "commit": "feature: the read-only promise, enforced by a test"
+      }
+    ],
+    "no_reverse": "the tool reads a drive and reports; it erases and changes nothing",
+    "verification": [
+      "A search of `src/` finds no string that says a drive is securely erased, and every verdict in the tests names what was scanned, how much was read and what that cannot show.",
+      "An erased fixture and a control fixture, scanned in full and by sample, give different, correctly worded verdicts, and a test shows no write is ever requested.",
+      "On a real machine the tool scans a drive and a volume's free space, states its verdict with confidence, saves a report, and refuses by name when not elevated, in light and dark, by keyboard alone."
+    ]
+  }
+}

@@ -1,0 +1,252 @@
+{
+  "name": "BootTimeAnalyzer",
+  "slug": "boottimeanalyzer",
+  "display": "Boot Time Analyzer",
+  "job": "it reads Windows' own boot records, shows how long the last start took and which drivers, services and startup programs cost the most time, and keeps a history so a slowdown can be seen.",
+  "tagline": "How long your PC takes to start, and what is slowing it down",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Amber",
+    "light": "#FCD34D",
+    "dark": "#D97706",
+    "social_ground": "#2B1A05",
+    "social_muted": "#F5DFAE"
+  },
+  "icon": {
+    "idea": "A stopwatch: timing the start-up.",
+    "points": [
+      "Free-standing with no tile: a ring with a crown and a side button.",
+      "The watch is Amber and its hand is Amber light.",
+      "The small drawing, used below 40 pixels, drops the side button and thickens the hand."
+    ],
+    "large": "<circle cx=\"48\" cy=\"54\" r=\"27\" fill=\"none\" stroke=\"#D97706\" stroke-width=\"11\"/><path d=\"M40 12 H56 M48 12 V24\" fill=\"none\" stroke=\"#D97706\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M48 54 L60 42\" fill=\"none\" stroke=\"#FCD34D\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M72 26 L78 20\" fill=\"none\" stroke=\"#D97706\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<circle cx=\"48\" cy=\"54\" r=\"27\" fill=\"none\" stroke=\"#D97706\" stroke-width=\"14\"/><path d=\"M38 12 H58 M48 12 V26\" fill=\"none\" stroke=\"#D97706\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M48 54 L61 41\" fill=\"none\" stroke=\"#FCD34D\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Last start",
+        "The last boot's total time, and each thing that slowed it"
+      ],
+      [
+        "History",
+        "Each recorded boot with its time, as a chart and a list"
+      ],
+      [
+        "Activity",
+        "What the tool read and found, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees how long the last start took and which drivers, services and startup programs cost the most, in seconds and not adjectives.",
+    "primary": "Refresh",
+    "secondary": "Copy summary",
+    "rows": [
+      [
+        "Total start time",
+        "Shown in the header, as a full start or a Fast Startup resume"
+      ],
+      [
+        "A driver",
+        "Its name, kind and the time it cost"
+      ],
+      [
+        "A service",
+        "Its name, kind and the time it cost"
+      ],
+      [
+        "A startup program",
+        "Its name, kind and the time it cost"
+      ],
+      [
+        "A device",
+        "Its name, kind and the time it cost"
+      ]
+    ],
+    "status": "Last start 48 s, slower than your usual, 5 things listed",
+    "notes": [
+      "The header shows the last boot's total time and a verdict in plain words against this machine's own history, for example slower than usual, or not enough history yet.",
+      "Each contributor is a row with an icon for its kind (driver, service, startup program, device), its name in words, and the time it cost. The list is sorted by time, largest first.",
+      "A start that was a Fast Startup resume from hibernation is labelled as one, with an icon and the words Fast Startup resume, so a person is not told their machine booted slowly when it resumed.",
+      "Refresh is the accent button: it reads the log again and updates the rows from that read. Copy summary puts the total, the verdict and the list on the clipboard as plain text. The tool changes nothing, so there is no undo.",
+      "When the diagnostics log is empty, disabled or cannot be read, the screen says which of the three it is and what that means, instead of showing an empty list.",
+      "A line under the list states what this data cannot show: only things Windows judged slow enough to record appear, so the list is not every cost of the start.",
+      "When the tool is not elevated it refuses by name before reading anything, saying that the diagnostics log needs administrator rights. The status bar gives the total, the verdict and the count in words."
+    ],
+    "cut": "The tool has no source window to cut from, because nothing was ported. It does not have menus, a splash screen, animations or a donate strip, and the plan records that choice. It also shows no score, grade or rating of its own: only times Windows recorded."
+  },
+  "readme": {
+    "lead": "Boot Time Analyzer shows how long your PC took to start, and which drivers, services and startup programs slowed it down.",
+    "what": [
+      "Windows already records every start in its own diagnostics log, with the total time and the things that took too long. Boot Time Analyzer reads those records and shows them as numbers: the last start's total, what cost the most time, and how that compares with this machine's earlier starts.",
+      "It keeps a history of the starts it has seen, so you can tell whether your PC is getting slower. It only reads. It never disables, removes or changes anything, and it says plainly when the log is empty, switched off, or shows a Fast Startup resume instead of a full boot."
+    ],
+    "new_intro": "This is a new tool in the suite, built in C++ from the start.",
+    "new": [
+      [
+        "Real numbers, not grades.",
+        "Every figure is a time Windows recorded, and the limits of that data are stated on the screen."
+      ],
+      [
+        "Full boot or Fast Startup.",
+        "It tells a full start from a resume from hibernation, so a quick start is not mistaken for a slow one."
+      ],
+      [
+        "A history of your starts.",
+        "Each boot is recorded once, with a chart and a list, so a slowdown shows over time."
+      ],
+      [
+        "Hands off to Startup Manager.",
+        "A slow startup program can be opened in the suite's Startup Manager when it is installed. This tool never disables anything itself."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new tool: build, engine, window, history chart, release",
+    "goal": "Boot Time Analyzer ships as a complete, standalone C++ tool that reads Windows' own boot records, shows the last start's total time and each driver, service, startup program or device that slowed it with the time it cost, tells a full boot from a Fast Startup resume, gives a verdict in plain words against the machine's own history, keeps that history with a chart, says honestly when the log is empty or disabled, and changes nothing on the machine.",
+    "current_state": "Nothing exists yet. This is a new tool, not a port: there is no AutoIt original and no `reference/au3/` folder. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and one plan section as it stood in the Resolute repository (`docs/origin/resolute-D05-T04-s4.md`, five items, none started). It names the records to read, the contributor attribution, the stated limits, the hand-off for disabling and the history. The data source is Windows' `Microsoft-Windows-Diagnostics-Performance/Operational` log: event 100 carries `BootTime`, `MainPathBootTime` and `BootPostBootTime`, and events 101 to 110 name the application, driver, service or device that slowed a boot. Reading that log needs administrator rights. With Fast Startup on, a shutdown and start is really a resume from hibernation. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T04-s4.md`: the plan section for this tool as it stood in the Resolute repository, with the job, the treatment and the five items.",
+      "`DESIGN.md`: the tool's identity and its window's sections, with `sdk/DESIGN.md`, the suite's contract.",
+      "`tests/fixtures/events/`: boot records and contributor events captured from a real machine, which the engine's tests are built from."
+    ],
+    "outcome": [
+      "`BootTimeAnalyzer.exe` reads the boot records, shows the last start's total and each contributor with its time, and agrees with an independent measurement of the same boot.",
+      "A full boot is told from a Fast Startup resume, the verdict is in plain words against the machine's own history, the history persists and charts, and an empty, disabled or unreadable log is named and never shown as zero.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Last start screen, where each contributor is a row with its kind and cost, and the History section is its second face over time. Reporting and audit are the Activity section, which records what each read found, including a refusal or an empty log. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated read is refused by name before the log is opened. Reverse does not apply: the tool reads Windows' own records and changes nothing, and disabling a startup program is handed to the Startup Manager with its own undo.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Boot Records Engine",
+      "intro": "The tool's whole data path, independent of any window: read boot records and their contributors from the diagnostics log, tell a full boot from a Fast Startup resume, judge the last start against the machine's own history in words, and say honestly when there is nothing to read. It reads only, and refuses by name when the process is not elevated.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the boot record, the contributor and the log state in `src/core/BootRecord.h`. Done when: a boot with its phases, kind and contributors is one value that every later piece takes and returns.",
+        "Implement the log reader, the parsers, the verdict and the history in `src/core/` against a log source the tests can replace. Done when: the unit tests pass on fixtures captured from a real machine."
+      ],
+      "items": [
+        "Declare in `src/core/BootRecord.h` a `BootRecord` (start time, `BootTime`, `MainPathBootTime`, `BootPostBootTime`, kind full or resume) and a `Contributor` (name, kind application, driver, service or device, time cost, source event id). Done when: a test builds one of each and a fixture-parsed record fills every field.",
+        "Implement `ReadBootEvents()` in `src/core/EventLog.cpp` with `EvtQuery` and `EvtNext` on the channel `Microsoft-Windows-Diagnostics-Performance/Operational`, selecting event ids 100 to 110 through an XPath query and returning each event's XML, from a source interface the tests replace with files. Done when: a run on the elevated development machine returns the real events and a test reads the same shape from `tests/fixtures/events/`. Cheaper substitute: shelling out to `wevtutil` or `Get-WinEvent`, which cannot be replaced for a test and needs text parsing.",
+        "Parse event 100 in `src/core/BootParse.cpp` into `BootTime`, `MainPathBootTime`, `BootPostBootTime` and the boot start. Done when: a fixture captured from a real event gives the same milliseconds that the event's XML holds, and the figures for the last several boots are compared with an independent measurement of the same boots, quoted in `docs/measurements.md`.",
+        "Parse events 101 to 110 into contributors with their kind and the time they cost, using one table of event id to kind. Done when: the table is committed in `src/core/BootParse.cpp` and checked against events read on a real machine, and a fixture with a deliberately slowed service is identified as a contributor with its figure.",
+        "Tell a full boot from a Fast Startup resume in `src/core/BootKind.cpp` from the records Windows keeps, and mark the record with its kind. Done when: fixtures of a full boot and of a Fast Startup resume each get the right kind, and a record with no sign either way is marked unknown, never guessed.",
+        "Work out the verdict in `src/core/Verdict.cpp` from the last full boot against this machine's earlier full boots, in words: faster than usual, about usual, slower than usual, or not enough history. Done when: fixtures of a longer, a similar and a shorter boot each give the right words, a single recorded boot gives not enough history, and the rule's constants are named in the header with their reason. Cheaper substitute: an invented score or grade, which is the failure the plan section names.",
+        "Return a named log state from `src/core/LogState.cpp`: readable, empty, disabled or access denied. Done when: fixtures for each give that state and the screen text can name it, so an empty or disabled log is never shown as zero seconds. Cheaper substitute: returning an empty list, which looks like a fast machine.",
+        "Refuse every read by name when the process is not elevated, before `EvtQuery` is called, with one activity record. Done when: an unelevated test run reports the refusal and the log source was never touched. Cheaper substitute: letting `EvtQuery` fail with access denied, which reports a vague error and not the cause.",
+        "Cover every path in `tests/boot_test.cpp` and record each boot once in `src/core/History.cpp`, keyed by its start time, in a file written atomically. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L boot` passes, reading the same boot twice keeps one entry, and a corrupted history file is reported and not silently replaced."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L boot` passes, including the Fast Startup, empty-log, unelevated and slowed-service cases, and fails when one parsed field is changed.",
+      "commit": "core: boot records, contributors, kind and verdict, read-only"
+    },
+    "enhancements": [
+      {
+        "title": "Boot Time History Chart",
+        "needs": "sdk-framework",
+        "intro": "The History section: each recorded boot with its time, as a chart and a list, so a person can tell whether the machine is getting slower. It uses the SDK's chart control, which is planned in Resolute-SDK and not built. A machine with one recorded boot says so instead of drawing a line.",
+        "surface": {
+          "fidelity": "the History section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person sees whether starts are getting slower over time. Consumer: the chart and list, read back against the history file.",
+          "treatment": "one point per recorded full boot with its time in seconds, the list beside it with the same values, and Fast Startup resumes marked apart. Cheaper substitute that fails the checkpoint: a chart drawn by the tool itself, or one that joins resumes and full boots into one line."
+        },
+        "build": [
+          "Build the History section in `src/ui/HistoryView.cpp` from the SDK's chart and list controls. Done when: the section shows the recorded boots as a chart and a list.",
+          "Bind it to `src/core/History.cpp`. Done when: a new boot read on Refresh appears in both."
+        ],
+        "items": [
+          "Build `src/ui/HistoryView.cpp` with the SDK's chart control plotting each recorded full boot's total time, and the list beside it. Done when: a fixture history of several boots renders the same values in both. Cheaper substitute: a private drawing control, which the contract forbids.",
+          "Mark Fast Startup resumes apart from full boots in the chart and the list, with an icon and a word. Done when: a fixture with both kinds shows the resumes outside the full-boot line.",
+          "Show an empty state in words for a history of one boot: that there is one recorded boot and a trend needs more. Done when: a one-boot fixture shows that sentence and no line.",
+          "Make the chart readable without colour and by keyboard: values in the list, a focus order, accessible names. Done when: the section is driven without a mouse and a UI Automation walk names the chart and each row.",
+          "Cover it in `tests/history_view_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L history` passes, and fails when a plotted value differs from the list."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L history` passes for the several-boot, mixed-kind and one-boot fixtures.",
+        "commit": "feature: the boot history as a chart and a list"
+      },
+      {
+        "title": "Explain Each Contributor",
+        "intro": "A name such as a driver file or a service is not enough for a person to decide anything. This reads what the system already knows about each contributor, a description and the maker, and shows it beside the row. It reads only, and it says when Windows holds nothing.",
+        "surface": {
+          "fidelity": "the contributor detail in the Last start screen, against `DESIGN.md` section 2.",
+          "job": "a person learns what a slow driver, service or program is and who made it. Consumer: the detail text, read back against the file's version information.",
+          "treatment": "a short block under the selected row with the description, the maker and the path, and the words not available where Windows has none. Cheaper substitute that fails the checkpoint: a web lookup or a built-in table of names, which goes stale and invents answers."
+        },
+        "build": [
+          "Read the description, maker and path in `src/core/Describe.cpp`. Done when: a service and a driver fixture give their file's maker and description.",
+          "Show it under the selected row in `src/ui/LastStartView.cpp`. Done when: selecting a row shows its detail."
+        ],
+        "items": [
+          "Implement `Describe(const Contributor&)` in `src/core/Describe.cpp`: for a service read its configured path with `QueryServiceConfig`, for a driver or program read the file's version resource with `GetFileVersionInfo`. Done when: a test on a known system service returns its description and maker. Cheaper substitute: guessing from the file name, which names the wrong maker.",
+          "Return not available, with the reason, when the file or the entry is gone. Done when: a contributor whose file was removed shows not available and the reason, never an empty maker.",
+          "Show the detail under the selected row in `src/ui/LastStartView.cpp` and let it be copied. Done when: selecting a row shows description, maker and path, and Ctrl+C copies them.",
+          "Cover it in `tests/describe_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L describe` passes, and fails when the maker of a fixture is dropped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L describe` passes for a service, a driver, a program and a removed file.",
+        "commit": "feature: say what each contributor is and who made it"
+      },
+      {
+        "title": "Open in Startup Manager",
+        "intro": "The original plan says disabling must route through the suite's startup tool and not be built here. For a slow startup program, this offers to open it in Startup Manager when that tool is installed. This tool never disables, removes or edits anything, and the undo is Startup Manager's.",
+        "surface": {
+          "fidelity": "the Open in Startup Manager action on a startup program row, against `sdk/DESIGN.md` section 11.",
+          "job": "a person who finds a slow startup program can go straight to where it is managed. Consumer: the launched tool, which shows that entry.",
+          "treatment": "an action on startup program rows only, shown when Startup Manager is installed and otherwise explained in a tooltip. Cheaper substitute that fails the checkpoint: a disable button here, which would put a system change in a tool that reads only."
+        },
+        "build": [
+          "Find the installed Startup Manager and start it in `src/core/Handoff.cpp`. Done when: with it installed the action starts it with the entry named.",
+          "Show the action in `src/ui/LastStartView.cpp`. Done when: it appears on startup program rows and nowhere else."
+        ],
+        "items": [
+          "Implement `FindStartupManager()` in `src/core/Handoff.cpp` that looks for the installed tool and returns its path or nothing. Done when: a test with a fake installation finds it and one without returns nothing. Cheaper substitute: a hard-coded path, which fails on a portable copy.",
+          "Implement `OpenEntry(name)` starting Startup Manager with the entry named, through the command line that its plan defines. Done when: a test with a fake executable receives the entry name. Cheaper substitute: writing to the Run keys here, which is a system change this tool must not make.",
+          "Show Open in Startup Manager on startup program rows only, disabled with a tooltip when it is not installed. Done when: a driver row shows no action and a program row shows it, enabled or disabled by installation.",
+          "Prove no disable logic exists here with a search of `src/` for registry writes and service control calls. Done when: the search finds none, and the result is quoted in the commit message.",
+          "Cover it in `tests/handoff_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes, and fails when the action is shown on a driver row."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes, and a search of `src/` finds no code that disables anything.",
+        "commit": "feature: hand a slow startup program to Startup Manager"
+      },
+      {
+        "title": "Fast Startup Explained",
+        "intro": "With Fast Startup on, shutting down and starting again is a resume from hibernation, so the time is short and the numbers mean something different. This section says so where a person is looking, so a quick start is not read as a healthy machine and a resume is not read as a slow boot.",
+        "surface": {
+          "fidelity": "the Fast Startup note in the Last start header, against `DESIGN.md` section 2.",
+          "job": "a person understands why this start looks the way it does and what a full boot would show. Consumer: the note, read back against the record's kind.",
+          "treatment": "a plain note in the header when the last start was a resume, with the date of the last full boot the tool has recorded. Cheaper substitute that fails the checkpoint: a generic help link, which does not say what this start was."
+        },
+        "build": [
+          "Choose the note from the record's kind in `src/core/Explain.cpp`. Done when: each kind gives its own text.",
+          "Show it in the header in `src/ui/LastStartView.cpp`. Done when: a resume fixture shows the note and a full boot shows none."
+        ],
+        "items": [
+          "Write `src/core/Explain.cpp` returning the note for a full boot, a Fast Startup resume and an unknown kind, in plain words with no jargon. Done when: a test gets different text for each and none is empty.",
+          "Include the last full boot's date and time from `src/core/History.cpp` in the resume note, or say none has been recorded. Done when: a fixture with a recorded full boot shows its date and one without says so.",
+          "Show the note in the header of `src/ui/LastStartView.cpp` with an icon and the words Fast Startup resume. Done when: a resume fixture shows it, a full boot fixture does not.",
+          "Cover it in `tests/explain_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes, and fails when a resume is described as a full boot."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes for the full, resume and unknown kinds.",
+        "commit": "feature: explain Fast Startup where the start is shown"
+      }
+    ],
+    "no_reverse": "the tool reads Windows' own boot records and changes nothing",
+    "verification": [
+      "The last several boots' totals and phases match an independent measurement of the same boots, and a deliberately slowed fixture service is listed with its figure.",
+      "A Fast Startup resume, an empty log, a disabled log and an unelevated start each show their own named state, never a zero or a blank list.",
+      "On a real machine the tool reads, shows, records history and hands a startup program to Startup Manager, in light and dark, by keyboard alone, with no disable logic in `src/`."
+    ]
+  }
+}

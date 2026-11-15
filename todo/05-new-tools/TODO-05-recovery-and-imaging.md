@@ -68,6 +68,8 @@ track: P3
 
 ## 1. The Recovery Engine, Read-Only By Design
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/Undelete` repository (`D:\Resolute_Bin\Undelete`) by its own plan.
+
 A file system's on-disk layout is documented and its structures are facts. A deleted MFT record is one whose in-use flag is clear; a deleted FAT directory entry begins with `0xE5`. None of that belongs to anyone, and this section implements it from the specifications rather than from somebody's C#.
 
 It also makes the engine structurally incapable of writing to the volume it reads.
@@ -86,21 +88,23 @@ It also makes the engine structurally incapable of writing to the volume it read
 6. **Add recoverability classification last**, because it depends on both parsers. Done when: fully recoverable, partially overwritten, and unrecoverable are distinguishable on fixtures.
 7. **Prove nothing from the original is present.** Done when: `git grep` finds no file, identifier, or comment traceable to `samples/Undelete/`.
 
-- [ ] Name the specifications this engine is written from, and the formats it supports. Done when: each supported format cites the published documentation it was implemented against, and a fixture image of each enumerates its deleted entries.
-- [ ] **Record the clean-room discipline and who held it.** Done when: this section states that the implementer did not read the Kickass Undelete source, names who wrote the engine, and confirms no file from it is referenced by, included in, or copied into the build. The gitignored `samples/` tree makes this easy to hold and easy to demonstrate. Cheaper substitute that fails the checkpoint: consulting the original "just for the tricky parts", which is precisely where a derivative-work claim would land.
-- [ ] Make the engine **physically unable to write to the source volume.** Done when: it opens the volume read-only, exposes no write path, and a search proves no write call exists. Cheaper substitute that fails the checkpoint: a write path guarded by a flag, which is one mistake away from destroying the data the user is trying to recover.
-- [ ] Recover to a destination on a different volume, and refuse a destination on the source. Done when: a same-volume destination is refused by name, because writing recovered data onto the volume being recovered from overwrites what has not been recovered yet.
-- [ ] Report recoverability honestly per entry. Done when: fully recoverable, partially overwritten, and unrecoverable are distinguishable, and a partially overwritten fixture is not reported as recoverable.
-- [ ] Guard raw volume access behind the framework's elevation check, at the call. Done when: an unelevated scan is refused by name and nothing is opened.
-- [ ] Confirm the result is unencumbered. Done when: the engine carries no third-party copyright notice, `D06 T01 §8` records it as owned code, and the licence it ships under is the suite's choice rather than an inherited obligation.
-- [ ] Add engine assertions against committed fixture images, with no physical disk. Done when: each supported format asserts headlessly.
-- [ ] Commit: `"recovery engine: clean-room file system parser, read-only"`
+- [ ] ~~Name the specifications this engine is written from, and the formats it supports. Done when: each supported format cites the published documentation it was implemented against, and a fixture image of each enumerates its deleted entries.~~ -> `rizonesoft/Undelete`
+- [ ] ~~**Record the clean-room discipline and who held it.** Done when: this section states that the implementer did not read the Kickass Undelete source, names who wrote the engine, and confirms no file from it is referenced by, included in, or copied into the build. The gitignored `samples/` tree makes this easy to hold and easy to demonstrate. Cheaper substitute that fails the checkpoint: consulting the original "just for the tricky parts", which is precisely where a derivative-work claim would land.~~ -> `rizonesoft/Undelete`
+- [ ] ~~Make the engine **physically unable to write to the source volume.** Done when: it opens the volume read-only, exposes no write path, and a search proves no write call exists. Cheaper substitute that fails the checkpoint: a write path guarded by a flag, which is one mistake away from destroying the data the user is trying to recover.~~ -> `rizonesoft/Undelete`
+- [ ] ~~Recover to a destination on a different volume, and refuse a destination on the source. Done when: a same-volume destination is refused by name, because writing recovered data onto the volume being recovered from overwrites what has not been recovered yet.~~ -> `rizonesoft/Undelete`
+- [ ] ~~Report recoverability honestly per entry. Done when: fully recoverable, partially overwritten, and unrecoverable are distinguishable, and a partially overwritten fixture is not reported as recoverable.~~ -> `rizonesoft/Undelete`
+- [ ] ~~Guard raw volume access behind the framework's elevation check, at the call. Done when: an unelevated scan is refused by name and nothing is opened.~~ -> `rizonesoft/Undelete`
+- [ ] ~~Confirm the result is unencumbered. Done when: the engine carries no third-party copyright notice, `D06 T01 §8` records it as owned code, and the licence it ships under is the suite's choice rather than an inherited obligation.~~ -> `rizonesoft/Undelete`
+- [ ] ~~Add engine assertions against committed fixture images, with no physical disk. Done when: each supported format asserts headlessly.~~ -> `rizonesoft/Undelete`
+- [ ] Commit: ~~`"recovery engine: clean-room file system parser, read-only"`~~ -> `rizonesoft/Undelete`
 
 **Freeze check:** What the engine reports as recoverable is frozen once shipped, because a user deletes data on the strength of it. Evidence is a fixture image per format producing an identical entry list across changes. Fixture source: `tests/fixtures/volumes/`.
 
-**Test checkpoint:** Each supported format cites the specification it was implemented from and enumerates its deleted entries from a committed fixture image, headlessly. The clean-room statement names the implementer, and no file from `samples/Undelete/` appears in the build, proven by search. No write call exists in the engine, proven by search. A same-volume destination is refused by name. A partially overwritten fixture is not reported as recoverable. An unelevated scan is refused.
+**Test checkpoint:** Moved with the section. The `rizonesoft/Undelete` repository's plan carries it.
 
 ## 2. Undelete
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/Undelete` repository (`D:\Resolute_Bin\Undelete`) by its own plan.
 
 The straightforward half, once §1 exists. It competes with well-established free tools, so it earns its place by being the one already installed when the user needs it, and by being honest about what it cannot do.
 
@@ -110,16 +114,18 @@ The straightforward half, once §1 exists. It competes with well-established fre
 **Chrome:** consume the framework and the shared virtualized list. The engine is §1's; this tool adds no parsing.
 **Needs:** Windows host (build/test)
 
-- [ ] Scan a volume and render results through the shared virtualized list. Done when: a fixture image with many entries scrolls smoothly and the scan leaves the window responsive.
-- [ ] Filter by name, type, size, and recoverability. Done when: each filter narrows and clearing restores.
-- [ ] Recover selected files and verify each after writing. Done when: recovered content is compared against the fixture original byte for byte, and a failed write is reported per file rather than as a batch result.
-- [ ] Tell the user the one thing that actually matters, before they scan. Done when: the surface states that continuing to use the drive reduces what can be recovered, where they will read it rather than in documentation.
-- [ ] Account for the surface. Done when: every control is working or deferred to a named section.
-- [ ] Commit: `"undelete: recover deleted files, honestly"`
+- [ ] ~~Scan a volume and render results through the shared virtualized list. Done when: a fixture image with many entries scrolls smoothly and the scan leaves the window responsive.~~ -> `rizonesoft/Undelete`
+- [ ] ~~Filter by name, type, size, and recoverability. Done when: each filter narrows and clearing restores.~~ -> `rizonesoft/Undelete`
+- [ ] ~~Recover selected files and verify each after writing. Done when: recovered content is compared against the fixture original byte for byte, and a failed write is reported per file rather than as a batch result.~~ -> `rizonesoft/Undelete`
+- [ ] ~~Tell the user the one thing that actually matters, before they scan. Done when: the surface states that continuing to use the drive reduces what can be recovered, where they will read it rather than in documentation.~~ -> `rizonesoft/Undelete`
+- [ ] ~~Account for the surface. Done when: every control is working or deferred to a named section.~~ -> `rizonesoft/Undelete`
+- [ ] Commit: ~~`"undelete: recover deleted files, honestly"`~~ -> `rizonesoft/Undelete`
 
-**Test checkpoint:** A fixture image with many entries scrolls smoothly with the window responsive. Each filter narrows and restores. Recovered content matches the fixture original byte for byte, and a failed write is reported per file. The continued-use warning appears on the surface, captured.
+**Test checkpoint:** Moved with the section. The `rizonesoft/Undelete` repository's plan carries it.
 
 ## 3. Erase Verification
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/EraseVerification` repository (`D:\Resolute_Bin\EraseVerification`) by its own plan.
 
 The reason this port is worth making. `QuickErase` claims a file is unrecoverable; this proves it. No comparable suite ships a secure-erase tool that can verify its own claim, and running the recovery engine over an erased target is the only honest way to make one.
 
@@ -129,20 +135,22 @@ The reason this port is worth making. `QuickErase` claims a file is unrecoverabl
 **Chrome:** consume the framework and the §1 engine. Add no second scanner.
 **Needs:** Windows host (build/test)
 
-- [ ] Scan a target after a `QuickErase` run and report what, if anything, the engine can still find. Done when: an erased fixture reports nothing recoverable and a deliberately non-erased control reports its entries.
-- [ ] Offer verification directly from `QuickErase` after an erase. Done when: the hand-off works and the result names the erase run it verifies.
-- [ ] **State the limits of the claim plainly.** Done when: the report says what was checked, by what method, and what this cannot establish, naming at least the remapped-sector case and the SSD wear-levelling case, where data can survive in blocks no file system read will ever reach.
-- [ ] Carry the erase method through from `QuickErase`, because the honest claim differs by method. Done when: a report on an overwritten magnetic target and one on a firmware-erased solid state target state different findings, and a report on an **overwritten** solid state target says plainly that a file system scan cannot establish erasure there.
-- [ ] Never report a bare "securely erased". Done when: every result is phrased as what was and was not found by a stated method, proven by there being no such string in the surface.
-- [ ] Export the verification as a transcript. Done when: it is written atomically, read back, and carries the same limits the surface states.
-- [ ] Log every verification. Done when: each writes one line naming the target and the outcome.
-- [ ] Commit: `"erase verification: prove what quickerase claimed"`
+- [ ] ~~Scan a target after a `QuickErase` run and report what, if anything, the engine can still find. Done when: an erased fixture reports nothing recoverable and a deliberately non-erased control reports its entries.~~ -> `rizonesoft/EraseVerification`
+- [ ] ~~Offer verification directly from `QuickErase` after an erase. Done when: the hand-off works and the result names the erase run it verifies.~~ -> `rizonesoft/EraseVerification`
+- [ ] ~~**State the limits of the claim plainly.** Done when: the report says what was checked, by what method, and what this cannot establish, naming at least the remapped-sector case and the SSD wear-levelling case, where data can survive in blocks no file system read will ever reach.~~ -> `rizonesoft/EraseVerification`
+- [ ] ~~Carry the erase method through from `QuickErase`, because the honest claim differs by method. Done when: a report on an overwritten magnetic target and one on a firmware-erased solid state target state different findings, and a report on an **overwritten** solid state target says plainly that a file system scan cannot establish erasure there.~~ -> `rizonesoft/EraseVerification`
+- [ ] ~~Never report a bare "securely erased". Done when: every result is phrased as what was and was not found by a stated method, proven by there being no such string in the surface.~~ -> `rizonesoft/EraseVerification`
+- [ ] ~~Export the verification as a transcript. Done when: it is written atomically, read back, and carries the same limits the surface states.~~ -> `rizonesoft/EraseVerification`
+- [ ] ~~Log every verification. Done when: each writes one line naming the target and the outcome.~~ -> `rizonesoft/EraseVerification`
+- [ ] Commit: ~~`"erase verification: prove what quickerase claimed"`~~ -> `rizonesoft/EraseVerification`
 
 **Freeze check:** What this reports and refuses to report is frozen once shipped, because a user may make a disclosure decision on it. Evidence is an erased fixture and a control fixture producing identical findings and identical limit statements across changes.
 
-**Test checkpoint:** An erased fixture reports nothing recoverable; a non-erased control reports its entries. The hand-off from `QuickErase` names the run and the method it verifies. The report names the remapped-sector and SSD wear-levelling limits, and an overwritten solid state target is reported as not establishable by scan. No "securely erased" phrasing exists in the surface, proven by search. The transcript carries the same limits.
+**Test checkpoint:** Moved with the section. The `rizonesoft/EraseVerification` repository's plan carries it.
 
 ## 4. Rescue Imaging
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RescueImaging` repository (`D:\Resolute_Bin\RescueImaging`) by its own plan.
 
 Tools that write images to healthy drives are numerous and good. Reading an image **off** a drive that is failing is a different job, far less served on Windows, and it is the one that matters at the moment Disk Health says the disk is dying.
 
@@ -163,25 +171,25 @@ Tools that write images to healthy drives are numerous and good. Reading an imag
 6. **Add resumability.** Done when: an interrupted run restarts from its map and does not re-read completed regions.
 7. **Add the write-back path last**, because it is the only destructive one. Done when: the confirmation names letter, label, and size, and the destination can never be the source.
 
-- [ ] Image a source drive to a file, reading read-only and never writing to the source. Done when: no write path to the source exists, proven by search, and the source is byte-identical after a run.
-- [ ] Record the read strategy as a design decision with its reasoning. Done when: this section states the phase order, the retry bounds, and why unbounded retrying is refused, so a later change cannot quietly weaken it.
-- [ ] Implement the read strategy explicitly, in phases: a fast first pass that copies every readable region without retrying, then a second pass over the gaps, then bounded retries on what remains. Done when: the phases are documented, and a fixture with unreadable regions shows the first pass completing before any retry is attempted.
-- [ ] Bound the retry budget per region and overall, and make it visible. Done when: the budget is stated on the surface, a fixture exhausts it, and the run continues rather than stalling. Cheaper substitute that fails the checkpoint: unlimited retries, which is how a marginal drive is pushed over the edge while the user watches a progress bar that is not moving.
-- [ ] Minimise stress on a failing drive. Done when: the section records what was done to avoid it, and a fixture run is measured for total re-reads against a stated ceiling.
-- [ ] Make the run resumable. Done when: an interrupted run restarts from its map rather than from the beginning, because re-reading a dying drive from zero is the most expensive thing the tool could do.
-- [ ] Record every unreadable region and continue. Done when: a fixture with deliberately unreadable regions produces a complete image with those regions recorded and zero-filled, and the run completes.
-- [ ] Produce a map of what could not be read. Done when: the map ships beside the image and names each unreadable region by offset and length.
-- [ ] Offer imaging from Disk Health when a drive reports failing. Done when: the hand-off works and carries the drive identity across.
-- [ ] Verify the image after writing. Done when: readable regions are compared against the source and any mismatch is reported.
-- [ ] Support writing an image back to a drive, with a confirmation naming the destination by letter, label, and size. Done when: the confirmation names all three, declining performs nothing, and the destination is never the source.
-- [ ] State plainly that writing an image destroys everything on the destination. Done when: that statement is on the surface before the user commits.
-- [ ] Implement raw drive access from the Win32 API rather than porting it. Done when: the access layer is written against `CreateFile` on `\\.\PhysicalDriveN` and the documented IOCTLs, and no file from `samples/SDImage/` appears in the build, proven by search. At roughly fifty lines this is faster than porting regardless of who owns the original.
-- [ ] Resolve SD Imager's provenance, or record that it remains unresolved. Done when: either the rights are established and recorded in `D06 T01 §8`, or this section states that the question was left open and made moot by implementing from Win32.
-- [ ] Commit: `"rescue imaging: image a failing drive, bad sectors and all"`
+- [ ] ~~Image a source drive to a file, reading read-only and never writing to the source. Done when: no write path to the source exists, proven by search, and the source is byte-identical after a run.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~Record the read strategy as a design decision with its reasoning. Done when: this section states the phase order, the retry bounds, and why unbounded retrying is refused, so a later change cannot quietly weaken it.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~Implement the read strategy explicitly, in phases: a fast first pass that copies every readable region without retrying, then a second pass over the gaps, then bounded retries on what remains. Done when: the phases are documented, and a fixture with unreadable regions shows the first pass completing before any retry is attempted.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~Bound the retry budget per region and overall, and make it visible. Done when: the budget is stated on the surface, a fixture exhausts it, and the run continues rather than stalling. Cheaper substitute that fails the checkpoint: unlimited retries, which is how a marginal drive is pushed over the edge while the user watches a progress bar that is not moving.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~Minimise stress on a failing drive. Done when: the section records what was done to avoid it, and a fixture run is measured for total re-reads against a stated ceiling.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~Make the run resumable. Done when: an interrupted run restarts from its map rather than from the beginning, because re-reading a dying drive from zero is the most expensive thing the tool could do.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~Record every unreadable region and continue. Done when: a fixture with deliberately unreadable regions produces a complete image with those regions recorded and zero-filled, and the run completes.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~Produce a map of what could not be read. Done when: the map ships beside the image and names each unreadable region by offset and length.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~Offer imaging from Disk Health when a drive reports failing. Done when: the hand-off works and carries the drive identity across.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~Verify the image after writing. Done when: readable regions are compared against the source and any mismatch is reported.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~Support writing an image back to a drive, with a confirmation naming the destination by letter, label, and size. Done when: the confirmation names all three, declining performs nothing, and the destination is never the source.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~State plainly that writing an image destroys everything on the destination. Done when: that statement is on the surface before the user commits.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~Implement raw drive access from the Win32 API rather than porting it. Done when: the access layer is written against `CreateFile` on `\\.\PhysicalDriveN` and the documented IOCTLs, and no file from `samples/SDImage/` appears in the build, proven by search. At roughly fifty lines this is faster than porting regardless of who owns the original.~~ -> `rizonesoft/RescueImaging`
+- [ ] ~~Resolve SD Imager's provenance, or record that it remains unresolved. Done when: either the rights are established and recorded in `D06 T01 §8`, or this section states that the question was left open and made moot by implementing from Win32.~~ -> `rizonesoft/RescueImaging`
+- [ ] Commit: ~~`"rescue imaging: image a failing drive, bad sectors and all"`~~ -> `rizonesoft/RescueImaging`
 
 **Freeze check:** What is written to a destination drive is frozen once shipped, because a mistake destroys a user's data. Evidence is a fixture image written to a fixture target producing a byte-identical result across changes.
 
-**Test checkpoint:** No write path to the source exists, proven by search, and the source is byte-identical after a run. No file from `samples/SDImage/` appears in the build, proven by search. On a fixture with unreadable regions the fast first pass completes before any retry is attempted, the retry budget is exhausted without stalling the run, and total re-reads are measured against the stated ceiling, all quoted. An interrupted run resumes from its map. The unreadable map names each region by offset and length. The Disk Health hand-off carries the drive identity. A write confirmation names letter, label, and size, and declining does nothing.
+**Test checkpoint:** Moved with the section. The `rizonesoft/RescueImaging` repository's plan carries it.
 
 ## Verification
 

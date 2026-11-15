@@ -1,0 +1,254 @@
+{
+  "name": "RescueImaging",
+  "slug": "rescueimaging",
+  "display": "Rescue Imaging",
+  "job": "it copies a failing drive to an image file on another drive, reading the good areas first and the bad ones last, keeps a map of what has been read so the copy can be stopped and resumed, and never writes to the drive it copies.",
+  "tagline": "Copy a failing drive while it can still be read",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Signal red",
+    "light": "#FECACA",
+    "dark": "#DC2626",
+    "social_ground": "#2E0B0B",
+    "social_muted": "#F8D2D2"
+  },
+  "icon": {
+    "idea": "A drive with a first-aid cross: emergency care for a drive.",
+    "points": [
+      "Free-standing with no tile: one rounded drive body.",
+      "The drive is Signal red and the cross is Signal red light.",
+      "The small drawing, used below 40 pixels, thickens the cross."
+    ],
+    "large": "<rect x=\"8\" y=\"26\" width=\"80\" height=\"46\" rx=\"11\" fill=\"#DC2626\"/><path d=\"M48 36 V62 M35 49 H61\" fill=\"none\" stroke=\"#FECACA\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<rect x=\"6\" y=\"22\" width=\"84\" height=\"52\" rx=\"12\" fill=\"#DC2626\"/><path d=\"M48 34 V62 M34 48 H62\" fill=\"none\" stroke=\"#FECACA\" stroke-width=\"13\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Copy",
+        "The source and the image, a map of the drive, and each pass with its progress and errors"
+      ],
+      [
+        "Bad areas",
+        "Each unreadable range with its position and size"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person picks a failing drive and a place for its image, starts the copy and sees what has been read, what has not and what is bad.",
+    "primary": "Start",
+    "secondary": "Pause",
+    "rows": [
+      [
+        "Source drive",
+        "Chosen, Not chosen or Not found"
+      ],
+      [
+        "Image file",
+        "Ready, Not enough room or Same drive as the source"
+      ],
+      [
+        "Pass 1, copy",
+        "Waiting, Running or Done, with bytes read and errors met"
+      ],
+      [
+        "Passes 2 and 3, trim and scrape",
+        "Waiting, Running or Done, with bytes read and errors met"
+      ],
+      [
+        "Pass 4, retry",
+        "Waiting, Running or Done, with bytes read and errors met"
+      ]
+    ],
+    "status": "Pass 1 running, 3 errors met",
+    "notes": [
+      "The header holds the source drive and the image file, each chosen with a button. Below it sit the map of the drive and one row per pass.",
+      "The map shows read, unread and bad areas as separate marks, each with a word in its legend, so no state depends on colour alone.",
+      "Each pass row shows an icon and a word (Waiting, Running, Done), how much that pass has read and how many errors it met.",
+      "Start is disabled until the source is a drive, the image is on a different physical drive and that drive has as much free space as the source. The reason is written beside the row that blocks it.",
+      "Pause stops after the block being read, writes the map and lets Start resume from it. The window never offers Pause as a way to cancel a read already issued.",
+      "Opening the tool without administrator rights shows one sentence naming the refusal and disables Start. Nothing is opened on the drive.",
+      "Before Start the window states that the source drive is only read and that the image is a new file."
+    ],
+    "cut": "There is no earlier window: Rescue Imaging is a new tool and nothing is ported, so no menu bar, splash screen, animation or donate strip is carried over. The tool has none of them. Menus are the sidebar, the log is the Activity section, and settings and About are the framework's pages."
+  },
+  "readme": {
+    "lead": "Rescue Imaging copies a failing drive to an image file while the drive can still be read.",
+    "what": [
+      "It reads the parts of the drive that are still good first, skips a bad area quickly instead of fighting it, and comes back to the bad areas later with smaller steps and retries. A map records which ranges are finished, untried, bad or still to be looked at again, so the copy can be stopped and resumed without reading the good areas twice. When it ends, it says how much was read and lists what was not. Unread sectors are filled with zeros in the image, and the report says so.",
+      "The source drive is opened for reading only and is never written. The image goes to another physical drive that has as much free space as the source. The suite's Disk Health tool can hand a failing drive to it."
+    ],
+    "new_intro": "Rescue Imaging is a new tool, with no earlier version, and it is built on these rules.",
+    "new": [
+      [
+        "Good areas first.",
+        "Every extra read of a dying drive risks it, so the readable parts are copied before the bad parts are touched."
+      ],
+      [
+        "A map you can stop and resume.",
+        "The map is written after each step, so a crash or a pause loses nothing and a later run continues where this one ended."
+      ],
+      [
+        "The source is never written.",
+        "No write path to the source drive exists, and the tool shows proof of it."
+      ],
+      [
+        "An honest end report.",
+        "It says how much was read, lists what was not, and states that unread sectors are zeros in the image."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new tool: build, engine, window, features, release",
+    "goal": "Rescue Imaging ships as a complete, standalone C++ tool that copies a failing drive to an image file on another physical drive in a fixed order of passes, reads the good areas before the bad ones, keeps a map that lets a stopped copy resume, never writes to the source, and ends with an honest report of what was read and what was not.",
+    "current_state": "Nothing exists yet: no C++, no AutoIt original and no reference folder, because the tool is new and nothing is ported. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T05-s4.md` (41 lines), the tool's plan section as it stood in the Resolute repository. That text is the binding design: it makes the read strategy the product, orders the work so the source is never at risk before the strategy exists, and refuses two failures by name, a copy that aborts on the first read error and one that retries a bad sector without end (`docs/origin/resolute-D05-T05-s4.md:7`). It also mentions a write-back path and an older imaging sample; this plan drops both, because the tool never writes to a drive and is written from the Win32 API alone. The read-only recovery engine the tool uses is built first in the sibling Undelete tool and proposed to Resolute-SDK. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T05-s4.md`: the binding design, including the phase order, the retry bounds and the safety rules.",
+      "`sdk/`: the SDK's framework and its shared read-only recovery engine, taken at the commit `sdk.json` pins once both exist.",
+      "`tests/fixtures/`: fake source drives with chosen unreadable ranges and a fake drive that disappears mid-run, written by the tests. No real failing drive is needed to build."
+    ],
+    "outcome": [
+      "`RescueImaging.exe` copies a source drive to an image file on another physical drive in the passes forward copy, trim, scrape and retry, with a map written safely after each step and resumable after a stop or a crash.",
+      "The source is opened for reading only, no write path to it exists, and the destination is proven to be a different physical drive with enough room before the first read.",
+      "The Sidebar window of `DESIGN.md` shows the drive map, each pass and every bad area, in light and dark at every scale and by keyboard alone, and the tool ends every run with a report of what was read and what was not."
+    ],
+    "adjacency_rationale": "The list is the Copy screen, where a person sees the passes and the map, and the Bad areas section lists each unreadable range. Reporting and audit are the Activity section and the end report of each run. Settings are the framework's pages, where the retry limit and the block sizes live. Permissions anchor on the engine, where opening a physical drive without elevation is refused by name before anything is opened. Reverse does not apply: the tool never writes to the drive it copies, and the image is a new file on another drive that can simply be deleted.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Read-Only Rescue Engine",
+      "intro": "The tool's whole system effect: reading a source drive in an order that spares it, and writing an image and a map on another drive. Every extra read of a dying drive risks it, so the order of the passes is the product. The engine waits on the shared recovery engine, which is built first in the Undelete tool and proposed to Resolute-SDK.",
+      "needs": "windows-host, sdk-framework",
+      "build": [
+        "Write the read-only source reader and the destination checks in `src/core/SourceReader.cpp` and `src/core/Destination.cpp`. Done when: `tests/rescue_test.cpp` reads a fixture source and refuses a destination on the source's own drive.",
+        "Write the map, the pass plan and the end report in `src/core/RescueMap.cpp`, `src/core/PassPlan.cpp` and `src/core/Report.cpp`. Done when: a fixture with unreadable ranges produces an image, a map and a report, and a stopped run resumes from the map."
+      ],
+      "items": [
+        "Implement `OpenSource` in `src/core/SourceReader.cpp`: open `\\\\.\\PhysicalDriveN` with `GENERIC_READ` only, size it with `IOCTL_DISK_GET_LENGTH_INFO` and `IOCTL_DISK_GET_DRIVE_GEOMETRY_EX`, read in large sector-aligned blocks and halve the block on a read error down to one sector, and refuse by name when the process is not elevated before the drive is opened. Done when: a test reads a fixture source, an unelevated run reports the refusal with no handle opened, and a search of `src/` for `GENERIC_WRITE` and `WriteFile` on the source handle finds none. Cheaper substitute: a read-only flag checked at run time while a write path is still compiled in.",
+        "Implement `ChooseDrives` in `src/core/Destination.cpp`: list the physical drives, take the source by number or by the identity passed on the command line, and prove the image path is on a different physical drive by resolving its volume with `IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS` and comparing disk numbers, then require at least as much free space as the source from `GetDiskFreeSpaceExW`. Done when: tests refuse, by name, an image on the source's own drive, on another letter of the same disk and on a drive with too little room, and accept a different drive with enough. Cheaper substitute: comparing drive letters, which passes two partitions of one disk.",
+        "Implement the map in `src/core/RescueMap.cpp` in the style of GNU ddrescue: ranges as start, length and one of finished, untried, non-trimmed, non-scraped or bad, merged when neighbours share a state, and saved after each step by writing a temporary file, flushing it and renaming it over the map. Done when: a test that stops the engine at a random step always leaves a map that loads, with no range lost or overlapped. Cheaper substitute: writing the map only at the end of a run, which loses everything on a crash.",
+        "Implement the pass plan in `src/core/PassPlan.cpp`: pass 1 copies forward and, on an error, skips ahead and marks the area non-trimmed; pass 2 trims the edges of each non-trimmed area; pass 3 scrapes what is left sector by sector; pass 4 retries bad sectors up to a retry limit read from the settings. Done when: the fixture log shows every pass 1 read before the first trim, scrape or retry read, and a sector that never reads ends as bad after the limit. Cheaper substitute: a copy that aborts at the first read error, or one that retries a bad sector without end (`docs/origin/resolute-D05-T05-s4.md:7`).",
+        "Handle slow reads and a drive that leaves the bus in `src/core/SourceReader.cpp`: issue reads as overlapped I/O with a timeout, cancel a late read with `CancelIoEx`, and on `ERROR_DEVICE_NOT_CONNECTED` or `ERROR_NO_SUCH_DEVICE` stop the run, save the map and report the source as lost. Done when: a fixture that disappears at a chosen offset ends with a saved map and the state Source lost, and a later run resumes from that map. Cheaper substitute: marking the rest of the drive bad, which turns a lost drive into false bad areas.",
+        "Write the image in `src/core/ImageWriter.cpp`: create the image file at the source's size on the destination, write each finished range at its offset and leave every unread range as zeros. Done when: a fixture with unreadable ranges produces an image of the source's size whose bytes at those ranges are zero and whose other bytes equal the fixture. Cheaper substitute: writing the read buffer after a failed read, which puts stale data in the image.",
+        "Implement `Resume` in `src/core/RescueMap.cpp`: load a map, check that its recorded source size and identity match the chosen drive and that the image has the matching size, and continue with the passes still open. Done when: a test counts the reads of a resumed run and none falls inside a finished range, and a map from another drive is refused by name. Cheaper substitute: restarting from zero, the most expensive thing the tool could do to a dying drive.",
+        "Write the end report in `src/core/Report.cpp`: bytes read, bytes still untried, bytes bad, each unread range by offset and length, the number of reads made, and a sentence that unread sectors are zeros in the image. Done when: a fixture run reports figures equal to the map's totals and names every bad range. Cheaper substitute: reporting Done without the figures, which hides what was lost.",
+        "Cover every path in `tests/rescue_test.cpp` with fake sources, including a map crash test. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L rescue` passes, and fails when the pass order is changed so a trim runs before pass 1 ends."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L rescue` passes, including the pass order, the dropped drive, the resumed run and the refused destinations, and fails when the pass order is changed.",
+      "commit": "core: read the good areas first, map every step, never write the source"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Drive Map View",
+        "needs": "sdk-framework",
+        "intro": "The picture of the drive on the Copy screen: every area drawn as read, unread or bad, so a person sees the copy's progress and where the damage is. It uses the SDK's chart control where that fits, and a custom control only where it does not, and it reads the engine's map, never the drive.",
+        "surface": {
+          "fidelity": "the drive map on the Copy screen, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16, in light and dark.",
+          "job": "a person sees which parts of the drive are read, unread or bad while the copy runs. Consumer: the drawn map, compared with the engine's map file.",
+          "treatment": "each cell drawn from the map with a mark and a legend word for read, unread and bad, and a tooltip with the offset and size. Cheaper substitute that fails the checkpoint: a progress bar, which shows how much was read but not where the bad areas are."
+        },
+        "build": [
+          "Draw the map in `src/ui/DriveMapView.cpp` from the engine's ranges. Done when: a fixture map shows its read, unread and bad areas in the right places.",
+          "Bind it to the running copy. Done when: the picture updates as ranges change state, without reading the drive."
+        ],
+        "items": [
+          "Build `src/ui/DriveMapView.cpp` from the SDK's chart control, falling back to one custom control in the same file only where the chart cannot draw it, listing the reason in a comment. Done when: a fixture map of known ranges draws each area in its state. Cheaper substitute: a private bitmap drawn outside the framework.",
+          "Show each state with a mark and a legend word as well as a colour. Done when: a capture in the colour-blind simulation still tells read, unread and bad apart.",
+          "Update the view from the engine's map on each saved step, never from the drive. Done when: a test shows the view changes after a range changes state and that no read is issued by the view.",
+          "Show a tooltip with the offset and size on hover and on keyboard focus, and let the arrow keys move between areas. Done when: a UI Automation walk reads the tooltip text for a bad area.",
+          "Cover it in `tests/drive_map_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L drivemap` passes, and fails when a bad range is drawn as read."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L drivemap` passes and the map for a fixture with bad areas draws them where the map file says.",
+        "commit": "feature: a map of the drive showing read, unread and bad areas"
+      },
+      {
+        "title": "Resume a Stopped Copy",
+        "intro": "A copy can be paused or can end by a crash, a reboot or a lost drive, and it continues from its map. The user sees which map was found, which drive it belongs to and how much is already read, and chooses to continue. Resuming never reads a finished range again.",
+        "surface": {
+          "fidelity": "the Pause button and the resume prompt on the Copy screen, against `DESIGN.md` section 2.",
+          "job": "a person stops a copy and later continues it without reading the good areas again. Consumer: the engine's reads, counted by a test.",
+          "treatment": "a prompt naming the drive, the image and the amount already read, with Continue and Start over beside it. Cheaper substitute that fails the checkpoint: always starting from zero, or resuming without telling the user which map was used."
+        },
+        "build": [
+          "Write Pause and the resume prompt in `src/ui/CopyView.cpp`. Done when: Pause ends the copy at the next block and the prompt appears on the next start.",
+          "Wire the prompt to `Resume` in `src/core/RescueMap.cpp`. Done when: Continue resumes and Start over asks before it discards a map."
+        ],
+        "items": [
+          "Wire Pause in `src/ui/CopyView.cpp` to stop after the block in flight and save the map. Done when: after Pause the map on disk equals the engine's state. Cheaper substitute: killing the read thread, which can leave the map behind the image.",
+          "On Start, look for a map beside the image and show a prompt naming the drive, the image and the bytes already read. Done when: a fixture with a map shows the prompt with those three values.",
+          "Refuse a map that does not match the chosen source, by name. Done when: a map from another drive shows the reason and offers no Continue.",
+          "Ask before Start over discards a map, naming what is lost. Done when: declining keeps the map and the image unchanged.",
+          "Cover pause, crash and lost-drive resumes in `tests/resume_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L resume` passes, and fails when a resumed run re-reads a finished range."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L resume` passes: a paused, a crashed and a lost-drive run each continue with no finished range read again.",
+        "commit": "feature: pause a copy and resume it from its map"
+      },
+      {
+        "title": "Most Important Area First",
+        "intro": "A person can ask for one partition, or the file system's own records, to be read before the rest, so the most useful part of the drive is safe first. This changes the order inside pass 1 and adds no reads, and the rest of the drive is still copied afterwards.",
+        "surface": {
+          "fidelity": "the priority choice in the Copy screen's header, against `DESIGN.md` section 2.",
+          "job": "a person gets the partition they care about, or the file system's records, copied before the rest. Consumer: the order of reads in the engine's log.",
+          "treatment": "a list of the drive's partitions and a choice for the file system's own records, with the chosen area marked on the map. Cheaper substitute that fails the checkpoint: a choice that is saved but does not change the read order."
+        },
+        "build": [
+          "Read the partition layout and the file system's record location in `src/core/Priority.cpp`. Done when: a fixture drive lists its partitions and the location of its records.",
+          "Order pass 1 by the chosen area in `src/core/PassPlan.cpp`. Done when: the log shows the chosen area read first and the rest afterwards."
+        ],
+        "items": [
+          "Implement `ReadLayout` in `src/core/Priority.cpp` using `IOCTL_DISK_GET_DRIVE_LAYOUT_EX` and the file system's first sector, to give each partition's range and, for NTFS, the range of the master file table. Done when: a fixture drive yields its partitions and its table range. Cheaper substitute: guessing ranges from sizes.",
+          "Add a priority list to `src/core/PassPlan.cpp` so pass 1 reads the chosen ranges first and then the rest. Done when: a fixture log shows every priority read before the first non-priority read, and the whole drive is still copied.",
+          "Show the choice in `src/ui/CopyView.cpp` and mark the chosen area on the drive map. Done when: choosing a partition marks it and the engine receives its range. Cheaper substitute: a text box for offsets.",
+          "Prove the choice adds no reads. Done when: a fixture run with a priority makes the same number of reads as one without, quoted.",
+          "Cover it in `tests/priority_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L priority` passes, and fails when the priority list is ignored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L priority` passes: the chosen area is read first, the rest follows, and the read count is unchanged.",
+        "commit": "feature: read a chosen partition or the file system's records first"
+      },
+      {
+        "title": "Proof the Source Is Never Written",
+        "intro": "The promise that the source is only read is shown, not just stated. A search proves no write path exists, a test proves a fixture source is byte-identical after a run, and every report says how many reads and how many writes the source received.",
+        "surface": {
+          "fidelity": "the proof line in the end report on the Copy screen, against `DESIGN.md` section 2.",
+          "job": "a person sees that the source drive received reads only. Consumer: the counts in the report, compared with the source wrapper's own counts.",
+          "treatment": "one line in the end report with the number of reads and the number of writes sent to the source. Cheaper substitute that fails the checkpoint: a sentence that says read only with no count behind it."
+        },
+        "build": [
+          "Count every request sent to the source in `src/core/SourceReader.cpp` and put the counts in the report. Done when: a fixture run reports its reads and zero writes.",
+          "Add the search and the hash check in `scripts/check-source-readonly.ps1` and `tests/readonly_test.cpp`. Done when: both fail when a write call to the source is added."
+        ],
+        "items": [
+          "Count the reads and any other request the source receives in `src/core/SourceReader.cpp`, with no write counter that could be nonzero. Done when: the report shows N reads and 0 writes for a fixture run. Cheaper substitute: a counter that is never incremented.",
+          "Write `scripts/check-source-readonly.ps1` to search `src/` for `GENERIC_WRITE`, `WriteFile`, `IOCTL_DISK_SET` and the other write calls on the source handle. Done when: it exits 0 on the tree and exits 1 naming the line when one is added.",
+          "Wrap the fixture source so a test fails on any request that is not a read, then compare its bytes with a hash taken before the run. Done when: `tests/readonly_test.cpp` passes and the hash is equal after the run.",
+          "Show the proof line in the end report in `src/ui/CopyView.cpp`. Done when: the Copy screen shows the counts after a fixture run.",
+          "Run the script in `scripts/check-all.ps1`. Done when: the gate fails on a tree with a write call."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L readonly` passes, `pwsh scripts/check-source-readonly.ps1` exits 0, and both fail when a write to the source is added.",
+        "commit": "feature: show proof that the source drive is only read"
+      }
+    ],
+    "no_reverse": "the tool never writes to the drive it copies; the image is a new file on another drive and can simply be deleted",
+    "verification": [
+      "A run against fixture sources with unreadable ranges and a vanishing drive passes, with the pass order, the map, the resume and the refused destinations each shown in a quoted result.",
+      "No write path to the source exists, proven by search, and a fixture source is byte-identical after a run.",
+      "On a real machine, with a spare drive as the source, the tool copies, pauses, resumes and reports in light and dark, by keyboard alone."
+    ]
+  }
+}

@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **97 of 199 sections complete (49%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **97 of 185 sections complete (52%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -313,20 +313,6 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T02 §4` | Editing, with a reverse                           |   8   |
 | [ ] | `D05 T02 §5` | Search across hives                               |   5   |
 | [ ] | `D05 T02 §6` | Backup, restore, and `.reg` exchange              |   7   |
-| [ ] | `D05 T04 §4` | Boot Time Analyzer                                |   6   |
-| [ ] | `D05 T04 §5` | Why Is This Denied                                |   6   |
-| [ ] | `D05 T04 §6` | Pending Reboot Inspector                          |   5   |
-| [ ] | `D05 T04 §7` | Activation and Network Share Diagnostics          |   6   |
-| [ ] | `D05 T05 §1` | The recovery engine, read-only by design          |   9   |
-| [ ] | `D05 T05 §2` | Undelete                                          |   6   |
-| [ ] | `D05 T05 §3` | Erase verification                                |   8   |
-| [ ] | `D05 T05 §4` | Rescue imaging                                    |  15   |
-| [ ] | `D05 T06 §1` | Shadow Copy Browser                               |   7   |
-| [ ] | `D05 T06 §2` | Windows Disk Space                                |   7   |
-| [ ] | `D05 T06 §3` | Wi-Fi Diagnostics                                 |   8   |
-| [ ] | `D05 T06 §4` | Profile Manager                                   |   7   |
-| [ ] | `D05 T06 §5` | Icon Cache and Default Apps Repair                |   6   |
-| [ ] | `D05 T06 §6` | Resource History and USB Device History           |   7   |
 | [ ] | `D05 T06 §7` | Credential, Display, and Connection Viewers       |   8   |
 | [ ] | `D05 T07 §1` | Update Blocker and Update History                 |   7   |
 | [ ] | `D05 T07 §2` | Shell Extension Bisector and Explorer Performance |   7   |
@@ -337,6 +323,22 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T07 §7` | Network Configuration Tools                       |   7   |
 | [ ] | `D05 T07 §8` | Files, Boot, Audio, and Inventory                 |  11   |
 | [ ] | `D05 T07 §9` | Printing, Search, and Scheduled Tasks             |   6   |
+
+> **Moved:** `D05 T06 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ShadowBrowser` repository (`D:\Resolute_Bin\ShadowBrowser`) by its own plan.
+> **Moved:** `D05 T06 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/WindowsDiskSpace` repository (`D:\Resolute_Bin\WindowsDiskSpace`) by its own plan.
+> **Moved:** `D05 T06 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/WiFiDiagnostics` repository (`D:\Resolute_Bin\WiFiDiagnostics`) by its own plan.
+> **Moved:** `D05 T06 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ProfileManager` repository (`D:\Resolute_Bin\ProfileManager`) by its own plan.
+> **Moved:** `D05 T06 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/IconCacheRepair` and `rizonesoft/DefaultAppsRepair` repositories (under `D:\Resolute_Bin`), each by its own plan.
+> **Moved:** `D05 T06 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ResourceHistory` and `rizonesoft/USBHistory` repositories (under `D:\Resolute_Bin`), each by its own plan.
+
+> **Moved:** `D05 T04 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BootTimeAnalyzer` repository (`D:\Resolute_Bin\BootTimeAnalyzer`) by its own plan.
+> **Moved:** `D05 T04 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/WhyIsThisDenied` repository (`D:\Resolute_Bin\WhyIsThisDenied`) by its own plan.
+> **Moved:** `D05 T04 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PendingRebootInspector` repository (`D:\Resolute_Bin\PendingRebootInspector`) by its own plan.
+> **Moved:** `D05 T04 §7` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ActivationDiagnostics` and `rizonesoft/ShareDiagnostics` repositories (under `D:\Resolute_Bin`), each by its own plan.
+> **Moved:** `D05 T05 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/Undelete` repository (`D:\Resolute_Bin\Undelete`) by its own plan.
+> **Moved:** `D05 T05 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/Undelete` repository (`D:\Resolute_Bin\Undelete`) by its own plan.
+> **Moved:** `D05 T05 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/EraseVerification` repository (`D:\Resolute_Bin\EraseVerification`) by its own plan.
+> **Moved:** `D05 T05 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RescueImaging` repository (`D:\Resolute_Bin\RescueImaging`) by its own plan.
 
 > **Moved:** `D05 T03 §7` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BatteryHealth`, `rizonesoft/BootOptions` and `rizonesoft/FileAssociationRepair` repositories (under `D:\Resolute_Bin`), each by its own plan.
 > **Moved:** `D05 T03 §8` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PolicyInspector` and `rizonesoft/AttributeRepair` repositories (under `D:\Resolute_Bin`), each by its own plan.

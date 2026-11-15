@@ -15,14 +15,14 @@
     "social_muted": "#D5DAFB"
   },
   "icon": {
-    "idea": "A crescent moon with a small sun beside it: sleep and wake.",
+    "idea": "A screen with a crescent moon on it: a computer asleep.",
     "points": [
-      "Free-standing with no tile: a crescent with a rayed disc at its upper right.",
-      "The moon is Periwinkle and the sun is Periwinkle light.",
-      "The small drawing, used below 40 pixels, enlarges the sun and keeps four rays."
+      "Free-standing with no tile: a rounded screen on a short stand.",
+      "The screen and stand are Periwinkle and the crescent moon Periwinkle light.",
+      "The small drawing below 40 pixels drops the stand and enlarges the moon."
     ],
-    "large": "<path d=\"M40 14 A30 30 0 1 0 58 66 A24 24 0 1 1 40 14 Z\" fill=\"#6366F1\" stroke=\"#6366F1\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"66\" cy=\"34\" r=\"11\" fill=\"#C7D2FE\"/><path d=\"M66 12 V16 M66 52 V56 M44 34 H48 M84 34 H88 M51 19 L54 22 M78 46 L81 49 M81 19 L78 22\" fill=\"none\" stroke=\"#C7D2FE\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
-    "small": "<path d=\"M40 14 A30 30 0 1 0 58 66 A24 24 0 1 1 40 14 Z\" fill=\"#6366F1\" stroke=\"#6366F1\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"66\" cy=\"34\" r=\"13\" fill=\"#C7D2FE\"/><path d=\"M66 10 V13 M66 55 V58 M87 34 H90 M44 34 H46\" fill=\"none\" stroke=\"#C7D2FE\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+    "large": "<rect x=\"8\" y=\"14\" width=\"80\" height=\"56\" rx=\"10\" fill=\"#6366F1\"/><path d=\"M34 84 H62\" fill=\"none\" stroke=\"#6366F1\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M50 26 A17 17 0 1 0 64 52 A14 14 0 1 1 50 26 Z\" fill=\"#C7D2FE\" stroke=\"#C7D2FE\" stroke-width=\"2\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<rect x=\"6\" y=\"14\" width=\"84\" height=\"66\" rx=\"12\" fill=\"#6366F1\"/><path d=\"M50 26 A22 22 0 1 0 70 62 A18 18 0 1 1 50 26 Z\" fill=\"#C7D2FE\" stroke=\"#C7D2FE\" stroke-width=\"2\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
   },
   "window": {
     "sections": [

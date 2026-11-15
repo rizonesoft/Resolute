@@ -1,0 +1,249 @@
+{
+  "name": "ActivationDiagnostics",
+  "slug": "activationdiagnostics",
+  "display": "Activation Diagnostics",
+  "job": "it shows the Windows and Office licence state in plain words, names the channel and any grace period, and explains an activation error code, without ever showing or changing a product key or activating anything.",
+  "tagline": "Is Windows activated, and what does that error code mean",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Gold",
+    "light": "#FDE047",
+    "dark": "#CA8A04",
+    "social_ground": "#2A2106",
+    "social_muted": "#F4E7AE"
+  },
+  "icon": {
+    "idea": "A rosette seal with a tick: genuine and activated.",
+    "points": [
+      "Free-standing with no tile: a disc with two ribbon tails below it.",
+      "The seal is Gold and the tick is Gold light.",
+      "The small drawing, used below 40 pixels, shortens the tails and thickens the tick."
+    ],
+    "large": "<path d=\"M34 58 L24 88 L48 76 L72 88 L62 58 Z\" fill=\"#CA8A04\" stroke=\"#CA8A04\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"48\" cy=\"40\" r=\"30\" fill=\"#CA8A04\"/><path d=\"M35 40 L45 50 L62 31\" fill=\"none\" stroke=\"#FDE047\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M34 60 L28 86 L48 76 L68 86 L62 60 Z\" fill=\"#CA8A04\" stroke=\"#CA8A04\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"48\" cy=\"42\" r=\"33\" fill=\"#CA8A04\"/><path d=\"M33 42 L44 53 L64 31\" fill=\"none\" stroke=\"#FDE047\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Licence",
+        "A one-sentence verdict, then one row per licensed product"
+      ],
+      [
+        "Error codes",
+        "Type or paste a code, read what it means and what to try"
+      ],
+      [
+        "Activity",
+        "What the tool read and copied, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees in one sentence whether Windows is activated, and sees each licensed product with its state in words, its channel and when a grace period ends.",
+    "primary": "Refresh",
+    "secondary": "Copy summary",
+    "rows": [
+      [
+        "Windows",
+        "Activated, In grace period, Not genuine or Not activated, with its channel"
+      ],
+      [
+        "Office, when installed",
+        "The same states, one row per Office product"
+      ],
+      [
+        "Other licensed products",
+        "The same states, one row each"
+      ],
+      [
+        "Grace period",
+        "The date it ends, shown on the row it belongs to"
+      ]
+    ],
+    "status": "Windows is activated (Retail), 1 product read",
+    "notes": [
+      "The first line above the rows is one sentence in plain words, for example \"Windows is activated.\" or \"Windows is not activated: see the Error codes section.\"",
+      "Each row shows an icon and a word for its state (Activated, In grace period, Not genuine, Not activated, Needs attention), never colour alone, then its channel and, when a grace period is running, the date it ends.",
+      "Refresh is the primary action: it reads the licence state again and the rows update from that read, not from an assumption.",
+      "Copy summary puts the verdict and the rows on the clipboard as plain text. It never contains a product key or any characters of one, and there is no option to add them.",
+      "There is no Undo, because the tool changes nothing, and no Activate, Change key or Show key button anywhere in the window.",
+      "The status bar says the verdict and how many products were read. A product whose state could not be read shows as Could not be read, with the reason, and is never guessed.",
+      "The tool needs no elevation: it only reads, and it starts and works as a standard user."
+    ],
+    "cut": "The tool is new and has no earlier window, so nothing is cut from one. It also has no menus, splash, animations or donate strip, and the plan builds none of them: the window is the suite's sidebar tool window and nothing else."
+  },
+  "readme": {
+    "lead": "Find out whether Windows is activated, and what an activation error code means.",
+    "what": [
+      "Activation Diagnostics reads the licence state of Windows and, where it is installed, Office, and says it in plain words: whether each product is activated, which channel it came from (Retail, OEM, Volume MAK or Volume KMS), and when a grace period ends. It reads what Windows itself reports and changes nothing.",
+      "Type or paste an activation error code such as 0xC004F074 and it says what the code means and what to try next. A code it does not know is reported as not known, never guessed. It never shows, reads out, exports or changes a product key, and it never activates anything: a test searches the source to prove it."
+    ],
+    "new_intro": "Activation Diagnostics has no earlier version. This is what it is built to do.",
+    "new": [
+      [
+        "One sentence first.",
+        "The Licence section opens with a verdict in words, then one row per product."
+      ],
+      [
+        "Channel and grace period.",
+        "Each row names the channel and, when a grace period is running, the date it ends."
+      ],
+      [
+        "Error codes explained.",
+        "A table of common activation codes gives the meaning and the next step, and says so when a code is unknown."
+      ],
+      [
+        "No keys, no activation.",
+        "The tool cannot show, export or set a key and cannot activate; the source is searched to prove it."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Activation Diagnostics ships as a complete, standalone C++ tool that reads the Windows and Office licence state, turns it into a one-sentence verdict and a plain-words row per product with its channel and grace period, explains common activation error codes and says honestly when a code is unknown, and never reads out, shows, exports or changes a product key or activates anything, proven by a search of the source.",
+    "current_state": "Nothing exists yet. There is no AutoIt original and no code: this is a new tool, so there is no `reference/au3/` folder and no baseline to measure. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T04-s7.md` (19 lines), the plan section that grouped this tool with a network share diagnostics tool; only the activation half is taken (`docs/origin/resolute-D05-T04-s7.md:11-13`). The SDK's framework and repair contract are planned in Resolute-SDK and not built, and the tool consumes the framework only; it changes nothing, so it never consumes the repair contract.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T04-s7.md`: the plan section this tool came from; its first three items (`:11-13`) are the activation requirements, its share diagnostics items are not this tool's.",
+      "The Windows licensing facilities read, not modified: the `SoftwareLicensingProduct` and `SoftwareLicensingService` WMI classes (`LicenseStatus`, `GracePeriodRemaining`, `Description`), and the Software Licensing API calls `SLGetWindowsInformation` and `SLIsGenuineLocal`.",
+      "`slmgr /dlv` as the report Windows itself gives, read by a person on a test machine to compare with the tool's rows, and never run or parsed by the tool."
+    ],
+    "outcome": [
+      "`ActivationDiagnostics.exe` shows a one-sentence verdict and one row per licensed product with its state in words, its channel and its grace-period end, on machines in each state.",
+      "A typed or pasted activation error code is explained from a data table with the next step, and an unknown code says it is not known.",
+      "A search of the source proves no code path reads out, shows, exports or sets a product key, or activates anything, and the window works in light and dark by keyboard alone."
+    ],
+    "adjacency_rationale": "The list is the Licence screen, where a person reads the verdict and each product. Reporting is the Activity section and the Copy summary action, and audit is the Activity section too. Settings are the framework's pages. Permissions do not apply: the tool only reads and needs no elevation. Reverse does not apply, because the tool changes nothing and there is nothing to put back.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "verification": [
+      "A search of `src/` for every key-reading, key-setting and activation call in `tests/no_key_tokens.txt` finds none, and the search fails when one is planted.",
+      "Machines in each licence state (activated, grace period, not genuine, not activated, an Office product present and absent) are driven and the rows match what `slmgr /dlv` reports for the same machine.",
+      "On a real machine the tool shows the verdict, explains a code, copies a summary with no key in it, and opens Windows Activation settings, in light and dark, by keyboard alone."
+    ],
+    "engine": {
+      "title": "Licence and Error Code Engine",
+      "intro": "The tool's whole core, independent of any window: reading the licence state, channel and grace period of each installed Windows and Office product, turning the status into a small set of plain-words verdicts, and a data table of activation error codes with their meaning and next step. It only reads. No function in it reads any part of a product key, sets or exports one, or activates anything.",
+      "needs": "windows-host",
+      "build": [
+        "Implement the read and the verdicts in `src/core/Licence.cpp`, `src/core/Verdict.h` and `src/core/Channel.cpp` against a provider the tests can replace. Done when: the unit tests pass against a fixture provider that returns each licence state.",
+        "Declare the error code table in `src/core/ErrorTable.h` and the lookup in `src/core/ErrorCodes.cpp`. Done when: every listed code returns its meaning and next step and an unknown code returns the not-known answer."
+      ],
+      "items": [
+        "Declare in `src/core/Verdict.h` the mapping from `LicenseStatus` 0 to 6 (unlicensed, licensed, initial grace, additional grace, non-genuine grace, notification, extended grace) to a small set of plain words: Activated, In grace period, Not genuine, Not activated, Needs attention. Done when: a test covers each value 0 to 6 and an out-of-range value, which returns Could not be read and never a guess.",
+        "Implement `ReadProducts()` in `src/core/Licence.cpp` reading `SoftwareLicensingProduct` for Windows and returning for each product its name, `LicenseStatus`, `Description` and `GracePeriodRemaining`, through a provider interface the tests replace. The class's `PartialProductKey` property is never selected or filtered on, so a product counts as present when its `LicenseStatus` is not 0 (unlicensed), and when none is the Windows row comes from `src/core/Genuine.cpp`. Done when: a fixture provider with one product in each state returns one row each. Cheaper substitute: running `slmgr /dlv` and parsing its text, which is localised and is Windows' report, not a read.",
+        "Read the same class for Office products in `ReadProducts()` and return an empty list, not an error, when none is installed. Done when: fixtures with Office present and absent return the right row count and the absent case shows no error row.",
+        "Implement `ParseChannel()` in `src/core/Channel.cpp` turning the `Description` text into Retail, OEM, Volume MAK, Volume KMS or Unrecognised with the original text kept. Done when: a test with one description per channel and one unknown description returns the five expected answers.",
+        "Turn `GracePeriodRemaining` (minutes) into an end date from a clock passed in, in `src/core/Licence.cpp`. Done when: a fixed clock and a fixture of 1440 minutes returns the date one day on, and a product with no grace period returns none.",
+        "Cross-check the Windows row against `SLIsGenuineLocal` and `SLGetWindowsInformation` in `src/core/Genuine.cpp`, and show Needs attention with the two readings named when they disagree. Done when: a fixture where WMI says licensed and the API says not genuine returns Needs attention naming both. Cheaper substitute: trusting one source and ignoring the other, which hides a mismatch.",
+        "Implement `Summarise()` in `src/core/Verdict.h` producing the one-sentence verdict from the rows, worst state first. Done when: a test with Windows activated and one Office product in grace returns a sentence that says so, and with no rows returns Could not be read.",
+        "Declare in `src/core/ErrorTable.h` the data table of activation error codes, each with its meaning and next step, covering at least `0xC004F074`, `0xC004C003`, `0x803F7001`, `0xC004F213`, `0xC004F050`, `0xC004C008` and `0x8007232B`, and implement `Explain(code)` in `src/core/ErrorCodes.cpp` accepting upper or lower case, with or without `0x`. Done when: a test explains every listed code and returns the not-known answer for `0x12345678`, which names no cause.",
+        "Cover every path in `tests/licence_test.cpp` and `tests/errorcode_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L licence` passes, and fails when one status word in `src/core/Verdict.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L licence` passes for every licence state, every channel, the grace end and every table code, and fails when one declared word is changed.",
+      "commit": "core: the licence state, channel and grace period read, and the error code table"
+    },
+    "enhancements": [
+      {
+        "title": "Explain an Error Code",
+        "intro": "The Error codes section: a person types or pastes a code and reads what it means and what to try, taken from the engine's data table. A code the table does not hold gets an honest answer that it is not known, with how to find it, and never a guessed cause.",
+        "surface": {
+          "fidelity": "the Error codes section, against `DESIGN.md` section 2.",
+          "job": "a person who has an activation error code reads what it means and what to try. Consumer: the engine's table, read back through the rendered section.",
+          "treatment": "the meaning in plain words and one next step, with the code echoed in normal form. Cheaper substitute that fails the checkpoint: showing the raw code or a web search link, which the person already has and cannot act on."
+        },
+        "build": [
+          "Build the Error codes screen in `src/ui/ErrorCodesView.cpp` from the SDK's controls. Done when: typing `0xC004F074` shows its meaning and next step.",
+          "Cover it in `tests/errorview_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L errorview` passes."
+        ],
+        "items": [
+          "Build `src/ui/ErrorCodesView.cpp` with one text entry, the meaning and the next step. Done when: each code in `src/core/ErrorTable.h` shows both texts in the rendered section. Cheaper substitute: a private text box, which the contract forbids.",
+          "Accept a pasted code with spaces, a missing `0x`, lower case, or surrounding text such as `Error code: 0xC004F074`, and echo the normal form. Done when: five spellings of one code show one explanation.",
+          "Show for an unknown code that it is not in the table, one line on where Windows shows the full text of a code, and no cause. Done when: `0x12345678` shows that line and no meaning. Cheaper substitute: a generic \"licensing error\" explanation, which is a guess presented as an answer.",
+          "Start the entry from the last code the Licence section found, when it found one. Done when: a fixture machine reporting `0xC004F074` opens the section with that code in the entry.",
+          "Cover the section in `tests/errorview_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L errorview` passes, and fails when a table meaning is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L errorview` passes: every table code is explained in the rendered section and an unknown code says it is not known.",
+        "commit": "feature: type a code, read what it means and what to try"
+      },
+      {
+        "title": "Open Windows Activation Settings",
+        "intro": "The tool never fixes anything itself. The place where a person fixes activation is Windows' own Activation page in Settings, so the tool offers a button that opens it and does nothing else.",
+        "surface": {
+          "fidelity": "the button and its result in the Licence section, against `DESIGN.md` section 2.",
+          "job": "a person who sees Not activated goes to the place where Windows lets them fix it. Consumer: the Windows Settings Activation page, opened.",
+          "treatment": "one button labelled Open Activation settings that opens `ms-settings:activation`. Cheaper substitute that fails the checkpoint: running `slmgr /ato` or any activation call, which activates from inside the tool and breaks the binding rule."
+        },
+        "build": [
+          "Add the button in `src/ui/LicenceView.cpp`. Done when: pressing it opens the Activation page of Windows Settings.",
+          "Cover it in `tests/opensettings_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L opensettings` passes."
+        ],
+        "items": [
+          "Add `OpenActivationSettings()` in `src/core/Launch.cpp` that opens `ms-settings:activation` through the shell and nothing else, with the target passed to a launcher the test can replace. Done when: a test with a fake launcher records exactly `ms-settings:activation`. Cheaper substitute: starting `slmgr` or `cscript`, which would be an activation tool.",
+          "Show the button in `src/ui/LicenceView.cpp`, next to the verdict when it is Not activated, Not genuine or In grace period, and hidden when everything is Activated. Done when: fixtures in each state show or hide it correctly.",
+          "Record the open in the Activity section as one line. Done when: after a press the Activity list shows one line naming the Settings page.",
+          "Cover it in `tests/opensettings_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L opensettings` passes, and fails when the target string is changed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L opensettings` passes: the launcher is asked for `ms-settings:activation` only, and the button shows only when something is not activated.",
+        "commit": "feature: a button to Windows' own Activation settings"
+      },
+      {
+        "title": "Copy a Summary for Support",
+        "needs": "sdk-framework",
+        "intro": "Copy summary puts the verdict, each product with its state, channel and grace-period end, and the last error code found, on the clipboard as plain text a support person can read. It never contains a product key or any characters of one, and has no option to add them.",
+        "surface": {
+          "fidelity": "the Copy summary action, against `DESIGN.md` section 2.",
+          "job": "a person gives support the licence facts without any credential in them. Consumer: the clipboard text, read back.",
+          "treatment": "plain text lines with no key characters at all. Cheaper substitute that fails the checkpoint: a screenshot or a copy of `slmgr /dlv` output, which carries key characters."
+        },
+        "build": [
+          "Build the summary text in `src/core/Summary.cpp`. Done when: a fixture machine produces the same text on every run.",
+          "Wire Copy summary in `src/ui/LicenceView.cpp`. Done when: the clipboard holds the text."
+        ],
+        "items": [
+          "Implement `BuildSummary(rows)` in `src/core/Summary.cpp`, producing the verdict, one line per product and the last error code, from rows that hold no key data. Done when: a test asserts the text equals the expected fixture text and the row type has no field for a key. Cheaper substitute: stripping key-like text from the finished summary, which can miss one.",
+          "Keep key data out of every row type, log line and Activity record by never reading it. Done when: a test with a fixture provider that offers a key-like value finds it in no row, log line, Activity record or summary.",
+          "Add the Copy summary button in `src/ui/LicenceView.cpp` with no checkbox or option for key data. Done when: the window has no control that mentions a key and a copy holds no key characters.",
+          "Put the text on the clipboard through the framework's clipboard call and say so in the status bar. Done when: Ctrl+V into a text editor pastes the summary and the status bar says Summary copied.",
+          "Cover it in `tests/summary_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes, and fails when key-like fixture data reaches the summary."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes: the summary has no key characters and no log or Activity line has any.",
+        "commit": "feature: copy a support summary that never carries a key"
+      },
+      {
+        "title": "Proof It Never Touches a Key",
+        "intro": "The binding rule of the tool, made checkable: a test that searches the source for any key-reading, key-setting, key-exporting or activation call and fails when it finds one. The rule is recorded in `docs/no-key-rule.md`, and the search itself is the proof the plan section asked for.",
+        "surface": {
+          "fidelity": "the test's own output, against `docs/no-key-rule.md`.",
+          "job": "a maintainer proves the tool cannot read out, show, set or export a product key and cannot activate. Consumer: the test run over `src/`.",
+          "treatment": "a failing test that names the file, line and token it found. Cheaper substitute that fails the checkpoint: a review comment saying the code is clean, which proves nothing once the code changes."
+        },
+        "build": [
+          "Write the token list in `tests/no_key_tokens.txt` and the search in `tests/no_key_test.cpp`. Done when: the test walks `src/` and reports every hit by file, line and token.",
+          "Record the rule in `docs/no-key-rule.md`. Done when: the file states the rule and the token list, and says no part of a key is read, with no exception."
+        ],
+        "items": [
+          "List in `tests/no_key_tokens.txt` the tokens that mean reading, setting, exporting or using a key or activating: `PartialProductKey`, `DigitalProductId`, `BackupProductKeyDefault`, `OA3xOriginalProductKey`, `InstallProductKey`, `ClearProductKeyFromRegistry`, `SLInstallProofOfPurchase`, `SLUninstallProofOfPurchase`, `SLActivateProduct`, `SLGetPKeyInformation`, `DoActivation`, `/ipk`, `/ato`, `/upk`, `/cpky` and `slmgr`. Done when: the file holds every one with a one-line reason.",
+          "Implement `tests/no_key_test.cpp` walking every file under `src/` and failing with the file, line and token on a hit, with no file allowed any token. Done when: the test passes on the tree and fails naming a hit for `PartialProductKey` planted in `src/core/Licence.cpp`. Cheaper substitute: a one-off grep run by hand, which is not repeatable.",
+          "Add a self-test: a fixture source file under `tests/fixtures/no_key/` holding one token, which the search must report. Done when: the test fails if the search finds nothing in the fixture, so a broken search cannot pass.",
+          "Write `docs/no-key-rule.md` stating the rule, the token list's path and that there is no allowed place for any part of a key. Done when: the file names `tests/no_key_test.cpp` as the proof and the README links it.",
+          "Run the search in the label `nokey`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L nokey` passes and is part of the release gate."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L nokey` passes on the tree, and fails when a token is planted in `src/` and when the fixture hit is not found.",
+        "commit": "proof: a search of the source that no key is read, set or exported"
+      }
+    ],
+    "no_reverse": "the tool reads the licence state and changes nothing; it never reads, shows or sets a product key"
+  }
+}

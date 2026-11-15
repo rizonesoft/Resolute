@@ -1,0 +1,241 @@
+{
+  "name": "Undelete",
+  "slug": "undelete",
+  "display": "Undelete",
+  "job": "it finds deleted files on a drive, says plainly how likely each one is to come back, and recovers the ones you choose to a different physical drive, never writing to the drive it reads.",
+  "tagline": "Get deleted files back, without touching the drive they were on",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Teal",
+    "light": "#5EEAD4",
+    "dark": "#0D9488",
+    "social_ground": "#06261F",
+    "social_muted": "#BFEBE3"
+  },
+  "icon": {
+    "idea": "A bin with a return arrow on it: back out of the bin.",
+    "points": [
+      "Free-standing, with no tile behind it: a tapered bin with a lid and a handle.",
+      "The bin is Teal and the return arrow is Teal light.",
+      "The small drawing, below 40 pixels, drops the handle and thickens the arrow."
+    ],
+    "large": "<path d=\"M18 28 H78 M38 28 V18 H58 V28\" fill=\"none\" stroke=\"#0D9488\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M26 34 H70 L66 84 H30 Z\" fill=\"#0D9488\" stroke=\"#0D9488\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M60 66 H44 A9 9 0 0 1 44 48 H54\" fill=\"none\" stroke=\"#5EEAD4\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M52 41 L61 48 L52 55 Z\" fill=\"#5EEAD4\" stroke=\"#5EEAD4\" stroke-width=\"2\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<path d=\"M16 26 H80\" fill=\"none\" stroke=\"#0D9488\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M24 32 H72 L68 86 H28 Z\" fill=\"#0D9488\" stroke=\"#0D9488\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M62 68 H44 A10 10 0 0 1 44 48 H52\" fill=\"none\" stroke=\"#5EEAD4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M50 38 L62 48 L50 58 Z\" fill=\"#5EEAD4\" stroke=\"#5EEAD4\" stroke-width=\"2\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Found files",
+        "The drive scanned, and each deleted file found with its size, when it was deleted if known, and its chance of recovery"
+      ],
+      [
+        "Recover",
+        "Where to save the chosen files, which is never the drive they are read from, and the progress of the recovery"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person who deleted something sees which files can come back, how likely each one is, and recovers the chosen ones to another drive.",
+    "primary": "Recover",
+    "secondary": "Scan drive",
+    "rows": [
+      [
+        "File whose clusters are all still free",
+        "Good chance"
+      ],
+      [
+        "File with some clusters in use again",
+        "Partly overwritten"
+      ],
+      [
+        "File whose clusters are all in use again",
+        "Little chance"
+      ],
+      [
+        "File on a solid state drive",
+        "Chance uncertain, the content may already be zeros"
+      ]
+    ],
+    "status": "12 deleted files found, 7 with a good chance",
+    "notes": [
+      "The header names the drive being scanned and holds Scan drive. Before the first scan, one sentence on the screen says that using the drive after a deletion reduces what can be recovered, so it is read where the person acts and not in a document.",
+      "Each deleted file is one row with its name, size, when it was deleted if the file system kept that, and its chance of recovery as an icon and a word: Good chance, Partly overwritten or Little chance. A partly overwritten file is never shown as recoverable.",
+      "Recover works on the rows ticked. It is disabled until a save location is chosen on the Recover screen, and the Recover screen refuses any location on the physical drive being read, by name, before anything is written.",
+      "Progress on the Recover screen is per file, and each file is read back after it is written. A file that failed is named with its reason, and the others are not reported as failed with it.",
+      "When the tool is not elevated, Scan drive is refused by name in one sentence, nothing is opened, and an Activity line records the refusal.",
+      "There is no Undo. A recovered file is a new file on another drive and is deleted like any other; the source drive was never written.",
+      "The status bar says how many deleted files were found and how many have a good chance, in words."
+    ],
+    "cut": "Undelete is new and has no earlier window, so nothing is cut from one. It has no menu bar, splash screen, animation or donate strip: the sidebar holds the sections, the log is the Activity section, and settings and About are the framework's pages."
+  },
+  "readme": {
+    "lead": "Undelete finds files you deleted from a drive and recovers them to a different drive, without writing to the drive it reads.",
+    "what": [
+      "It scans a drive for deleted files, lists each one with its size, when it was deleted if known, and its chance of coming back in plain words, and recovers the ones you choose. It reads NTFS, FAT and exFAT drives. It must run as administrator, because reading a drive directly needs that right, and it says so by name when it does not.",
+      "It saves only to a different physical drive from the one it reads, because saving to the source would overwrite the data being recovered. It is honest about limits: a file whose space has been reused is partly gone, and a solid state drive that has trimmed deleted space usually returns zeros."
+    ],
+    "new_intro": "Undelete is a new tool of the suite, with no earlier version, built on these rules.",
+    "new": [
+      [
+        "Read-only by design.",
+        "The recovery engine opens the drive without write access and has no code path that can write to it."
+      ],
+      [
+        "A different drive, always.",
+        "A save location on the drive being read is refused by name before anything is written."
+      ],
+      [
+        "The chance, before you commit.",
+        "Each file shows whether its space is still free, partly reused or gone, and a partly overwritten file is never listed as recoverable."
+      ],
+      [
+        "Checked after writing.",
+        "Each recovered file is read back, and a failure is reported per file."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: engine, window, features, release",
+    "goal": "Undelete ships as a complete, standalone C++ tool: it finds deleted files on an NTFS, FAT or exFAT drive through a recovery engine that is read-only by design, states per file how likely recovery is, recovers the chosen files only to a different physical drive, reads each one back after writing, and never writes to the drive it reads, proven by a test and not by a promise.",
+    "current_state": "Nothing exists yet: there is no AutoIt original and nothing is ported. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and two plan sections under `docs/origin/`: the recovery engine (section 1, 34 lines) and the Undelete tool (section 2, 19 lines). The recovery engine is planned in this tool's origin and is built here first, then proposed to Resolute-SDK as a shared library for the two sibling tools that will consume it, Erase Verification and Rescue Imaging. The SDK's framework, repair contract and chart control, which this tool partly consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T05-s1.md`: the recovery engine section, read-only by design, with its clean-room rule and the specifications it is written from.",
+      "`docs/origin/resolute-D05-T05-s2.md`: the Undelete section, with the per-file recoverability rule, the filters and the verified recovery.",
+      "`tests/fixtures/volumes/`: small FAT, exFAT and NTFS volume images with known deleted files, made in the engine section, so every check runs with no physical disk."
+    ],
+    "outcome": [
+      "`Undelete.exe` scans a volume, lists its deleted files with a chance of recovery per file, and recovers the chosen ones to a destination proven to be a different physical drive, each read back after writing.",
+      "The engine opens a volume with read access only, holds no write path to it, and a test proves both; an unelevated scan is refused by name and opens nothing.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Found files screen, where a person sees every deleted file and its chance of recovery. Reporting and audit are the Activity section: each scan and each recovered or failed file is a line. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated scan is refused by name before any volume is opened. Reverse does not apply: the tool never writes to the drive it reads, and a recovered file is a new file on another drive that can simply be deleted.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Read-Only Recovery Engine",
+      "intro": "The tool's whole system effect, independent of any window: reading a volume without write access, finding deleted entries on NTFS, FAT and exFAT, estimating the chance of recovery for each, and writing recovered files only to a destination on a different physical drive. It is built here first and proposed to Resolute-SDK as a shared library for Erase Verification and Rescue Imaging, so it takes no dependency on this tool's window. It is written from published file system documentation, not from another tool's source.",
+      "needs": "windows-host",
+      "build": [
+        "Write the volume reader, the two scanners and the chance estimate under `src/core/`, with the destination writer in its own file. Done when: a headless run over each fixture image in `tests/fixtures/volumes/` lists its deleted entries and a chance for each.",
+        "Write `tests/engine_test.cpp` against the fixture images with no physical disk. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes for NTFS, FAT and exFAT."
+      ],
+      "items": [
+        "Write `docs/engine-sources.md` naming the specifications the engine is written from (the published NTFS on-disk documentation, the FAT32 specification and the exFAT specification), the formats supported, and a clean-room statement: who implemented the engine, dated, and that they did not open `samples/Undelete/`. Done when: each format cites its specification by title and the statement names the implementer and the date.",
+        "Create small FAT, exFAT and NTFS volume images with known files written and then deleted, with `scripts/make-fixtures.ps1`, committed under `tests/fixtures/volumes/` with a list of what each holds. Done when: each image lists its deleted files and, for NTFS, includes one whose clusters were reused by a later file, one whose clusters are untouched and one small enough to be resident in its record.",
+        "Implement `OpenVolumeReadOnly(path)` in `src/core/VolumeReader.cpp`: `CreateFileW` on `\\\\.\\X:` with `GENERIC_READ` only and no write member on the reader type. Done when: a test with an injected open function sees `GENERIC_READ` and no other access bit, and the reader header declares no write, truncate or control-code method. Cheaper substitute: a write path guarded by a flag, which is one mistake from destroying the data being recovered.",
+        "Refuse `Scan` by name in `src/core/Elevation.cpp` when the process is not elevated, at the call and before any volume is opened, with one activity record. Done when: an unelevated test run reports `Undelete needs administrator rights to read a drive` and the injected open function was never called. Cheaper substitute: letting `CreateFileW` fail with access denied.",
+        "Implement `ScanNtfs()` in `src/core/NtfsScan.cpp`: read the boot sector and the master file table, apply each record's update-sequence fixups, keep records whose in-use flag is clear, and take the name, size, times and data runs from the `$FILE_NAME` and `$DATA` attributes, holding resident data in the record. Done when: the NTFS fixture returns exactly its known deleted files with names, sizes and run lists, and a record with a corrupt fixup is skipped with a note, not read.",
+        "Implement `ScanFat()` and `ScanExFat()` in `src/core/FatScan.cpp`: FAT directory entries whose first byte is `0xE5`, joined with their long-name entries, and exFAT file entry sets whose in-use bit is clear. Done when: the FAT and exFAT fixtures return exactly their known deleted files, and FAT entries state that the cluster chain is assumed contiguous because FAT clears it on deletion.",
+        "Implement `EstimateChance(entry)` in `src/core/Chance.cpp`: read the volume's allocation bitmap, return Good chance when every cluster of the file is free, Partly overwritten when some are in use, Little chance when all are in use or no run remains, and add the note that a solid state drive with trim usually returns zeros. Done when: the three fixture files return the three values and a partly overwritten fixture is never returned as Good chance. Cheaper substitute: listing every entry as recoverable and letting the person find out afterwards.",
+        "Implement `RecoverFile(entry, destination)` in `src/core/DestinationWriter.cpp`, the only file in the engine that writes: resolve the source and the destination to physical disk numbers with `IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS`, refuse by name before creating anything when they share a physical drive, then write the file and read it back against what was read from the source. Done when: a destination on the source volume and a destination on another volume of the same physical disk are both refused by name, a destination on a different disk recovers the fixture file byte for byte, and a failed write is reported for that file alone. Cheaper substitute: comparing drive letters, which lets a second partition of the same disk through.",
+        "Cover every path in `tests/engine_test.cpp`, including the unelevated, same-drive and partly overwritten cases. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when a fixture entry's chance is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes for NTFS, FAT and exFAT, including the unelevated, same-physical-drive and partly overwritten cases, and fails when a fixture entry's chance is changed.",
+      "commit": "core: a read-only recovery engine, recovering only to another drive"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Deep Scan by File Signature",
+        "intro": "When a file's record is gone, the name and the run list are gone with it, but the bytes may still be on the drive. A deep scan reads the free space for the start of known file types from a table of signatures and recovers what follows as a new file with a generated name. It is read-only like the rest of the engine and says that a carved file has no name or date and may be incomplete if it was fragmented.",
+        "surface": {
+          "fidelity": "the Deep scan option and the carved rows of the Found files screen, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person looking for a file whose record is gone can still find it. Consumer: the carved rows, compared with the fixture's known file.",
+          "treatment": "carved rows marked as found by signature, with a generated name, no date and a chance stated in words. Cheaper substitute that fails the checkpoint: listing carved files as if they had a record, which hides that the name is invented and the content may be partial."
+        },
+        "build": [
+          "Write the signature table as data in `resources/signatures.json` and the carver in `src/core/Carver.cpp`. Done when: a fixture volume with a deleted file whose record was overwritten is found by its signature.",
+          "Add the Deep scan option to `src/ui/FoundFilesView.cpp`. Done when: the option starts a carve and its rows appear in the list."
+        ],
+        "items": [
+          "Declare the signatures (a type, the starting bytes, an end marker where the type has one and a size limit where it does not) as data in `resources/signatures.json`. Done when: adding a type needs no change to `src/core/Carver.cpp` and a test loads every entry.",
+          "Implement `Carve(reader, freeRanges)` in `src/core/Carver.cpp` over the clusters the allocation bitmap reports free, reading through the read-only reader only. Done when: the fixture volume returns its known carved file with the right length, and the carver's source holds no call that is not a read.",
+          "Mark carved rows in `src/ui/FoundFilesView.cpp` as found by signature with a generated name, no date and a chance in words, through the SDK's list. Done when: a carved row shows an icon and a word and states that its name is generated. Cheaper substitute: rows indistinguishable from record-based ones.",
+          "Run the carve without freezing the window and let it be cancelled. Done when: a driven test scrolls the list and presses cancel during a carve and the window stays responsive.",
+          "Cover it in `tests/carve_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L carve` passes, and fails when a signature is removed from the table."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L carve` passes: the fixture's record-less file is found by signature, carved rows state that their names are generated, and the engine check still passes.",
+        "commit": "feature: deep scan finds files whose record is gone"
+      },
+      {
+        "title": "Preview Before Recovering",
+        "intro": "A person can see whether a file is the one they want before choosing where to save it. Pictures and text are shown from the source drive into memory, never written to a temporary file, so the preview cannot disturb what is being recovered.",
+        "surface": {
+          "fidelity": "the preview pane of the Found files screen, against `sdk/DESIGN.md` section 16.",
+          "job": "a person confirms a file is the right one before recovering it. Consumer: the pane, compared with the fixture file's content.",
+          "treatment": "a picture or the first lines of text shown from memory, and a sentence saying there is no preview when the type is not one the tool shows or the content reads as zeros. Cheaper substitute that fails the checkpoint: writing the file to a temporary folder to open it, which writes data during recovery."
+        },
+        "build": [
+          "Read a file's content for preview in `src/core/Preview.cpp` through the read-only reader into memory. Done when: a test previews a fixture picture and text file and creates no file.",
+          "Show it in `src/ui/PreviewPane.cpp`. Done when: selecting a row shows the preview or the no-preview sentence."
+        ],
+        "items": [
+          "Implement `ReadForPreview(entry, limit)` in `src/core/Preview.cpp` returning bytes in memory, from the read-only reader only. Done when: a test confirms no file is created in the temp folder or the destination during a preview.",
+          "Decode pictures in memory with the system's imaging library in `src/ui/PreviewPane.cpp` and show text as plain text. Done when: a fixture JPEG and a fixture text file show correctly and a corrupt picture shows the no-preview sentence. Cheaper substitute: saving the bytes to a file first.",
+          "Say when the content is all zeros, which is what a solid state drive with trim usually returns, instead of showing a blank picture. Done when: a zero-filled fixture shows that sentence and its row keeps its chance word.",
+          "Cover it in `tests/preview_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L preview` passes, and fails when a preview writes a file."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L preview` passes: a picture and a text file preview correctly, a zero-filled file says so, and no file is written during any preview.",
+        "commit": "feature: preview a deleted file without writing anything"
+      },
+      {
+        "title": "Filter by Type, Size and Date",
+        "intro": "A scan can find thousands of entries, most of them system leftovers. Filters narrow the list by name, type, size, date deleted and chance of recovery, so a person finds the one file they lost. Clearing the filters restores the full list. This is the filtering of the shared list, applied to the scan result; it changes no engine output.",
+        "surface": {
+          "fidelity": "the filter bar of the Found files screen, against `sdk/DESIGN.md` section 16.",
+          "job": "a person finds one file among many. Consumer: the list, compared with the engine's entries.",
+          "treatment": "a filter bar over the list with the count of shown and total rows, and a clear action that restores every row. Cheaper substitute that fails the checkpoint: a filter that removes rows from the engine's result, so clearing it cannot bring them back."
+        },
+        "build": [
+          "Write the filter predicate in `src/core/Filter.cpp` over name, type, size, date and chance. Done when: each filter narrows a fixture result and clearing restores it.",
+          "Add the filter bar to `src/ui/FoundFilesView.cpp` through the SDK's list. Done when: a scan of many entries stays scrollable and responsive while filtered."
+        ],
+        "items": [
+          "Implement `Filter` in `src/core/Filter.cpp` as a predicate over a copy of the entry list. Done when: a test applies each of name, type, size, date and chance, and the unfiltered list is unchanged after clearing.",
+          "Add the filter bar to `src/ui/FoundFilesView.cpp` with the count of shown and total rows in words. Done when: typing in the name filter changes the rows and the count, and clearing restores both. Cheaper substitute: a private list control.",
+          "Keep a row's tick state when it is filtered out and back in. Done when: a test ticks a row, filters it away and back, and it is still ticked.",
+          "Cover it in `tests/filter_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L filter` passes, and fails when clearing leaves a row out."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L filter` passes: each filter narrows the fixture list, clearing restores it, and ticked rows survive filtering.",
+        "commit": "feature: filter found files by name, type, size, date and chance"
+      },
+      {
+        "title": "Proof the Source Is Never Written",
+        "intro": "The tool's central promise is tested and not only stated. A test proves that the engine opens volumes without write access and that no write call exists anywhere that can reach a source volume, and a second test proves a fixture volume is byte for byte the same after a scan and a recovery.",
+        "build": [
+          "Write `tests/source_untouched_test.cpp` checking the access bits of every open and the source text of the engine. Done when: it fails when a write call or a write access bit is added to the reader.",
+          "Write the fixture hash check in the same file. Done when: a full scan and recovery leave each fixture image's hash unchanged."
+        ],
+        "items": [
+          "Add a check that the source files of `src/core/` other than `src/core/DestinationWriter.cpp` contain no `WriteFile`, `WriteFileEx`, `SetEndOfFile`, `DeviceIoControl` write control code or write access bit. Done when: adding `WriteFile` to `src/core/VolumeReader.cpp` fails the test. Cheaper substitute: a code review comment, which is not a test.",
+          "Check that `src/core/DestinationWriter.cpp` refuses a path that names a volume (`\\\\.\\`) or a drive root, so it cannot be given a source. Done when: both are refused by name in a test.",
+          "Hash each fixture image before and after a full scan, a deep scan and a recovery. Done when: the hashes are equal, and the test fails when a write to the image is injected. Cheaper substitute: checking the file's modified time, which a write can leave unchanged.",
+          "Register the test under the label `proof` and the plan's gates. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L proof` passes and is part of `scripts/check-all.ps1`."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L proof` passes: no write call or write access reaches a source volume, and every fixture image has the same hash after scanning and recovery.",
+        "commit": "test: prove the engine never writes to the drive it reads"
+      }
+    ],
+    "no_reverse": "the tool never writes to the drive it reads; a recovered file is a new file on another drive and can simply be deleted",
+    "verification": [
+      "Every fixture image under `tests/fixtures/volumes/` lists its known deleted files with the expected chance, headlessly, and no file from `samples/Undelete/` appears in the build, proven by search.",
+      "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L proof` passes: the engine opens volumes with read access only, holds no write call outside the destination writer, and leaves every fixture image unchanged.",
+      "On a real machine with a second physical drive, the tool refuses a save location on the scanned drive by name, recovers a deleted file to the other drive that matches the original, and refuses to scan when not elevated, in light and dark, by keyboard alone."
+    ]
+  }
+}

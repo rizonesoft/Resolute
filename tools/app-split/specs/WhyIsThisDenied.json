@@ -1,0 +1,255 @@
+{
+  "name": "WhyIsThisDenied",
+  "slug": "whyisthisdenied",
+  "display": "Why Is This Denied",
+  "job": "it explains, for a chosen file, folder or registry key and a chosen account, exactly why Windows refuses access, naming the permission entry, owner, integrity level, attribute or policy responsible, and changes nothing.",
+  "tagline": "Find out exactly why Windows says access denied",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Crimson",
+    "light": "#FDA4AF",
+    "dark": "#BE123C",
+    "social_ground": "#2E0913",
+    "social_muted": "#F7CDD4"
+  },
+  "icon": {
+    "idea": "A shield with a question mark: a protection, and the question why.",
+    "points": [
+      "Free-standing with no tile: a shield with a rounded point.",
+      "The shield is Crimson and the question mark is Crimson light.",
+      "The small drawing, below 40 pixels, thickens the question mark."
+    ],
+    "large": "<path d=\"M48 10 L80 22 V46 C80 66 66 80 48 88 C30 80 16 66 16 46 V22 Z\" fill=\"#BE123C\" stroke=\"#BE123C\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M38 38 A10 10 0 1 1 48 50 V56\" fill=\"none\" stroke=\"#FDA4AF\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"48\" cy=\"70\" r=\"5\" fill=\"#FDA4AF\"/>",
+    "small": "<path d=\"M48 10 L80 22 V46 C80 66 66 80 48 88 C30 80 16 66 16 46 V22 Z\" fill=\"#BE123C\" stroke=\"#BE123C\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M36 38 A12 12 0 1 1 48 52 V56\" fill=\"none\" stroke=\"#FDA4AF\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"48\" cy=\"71\" r=\"7\" fill=\"#FDA4AF\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Answer",
+        "The item and the account, a one-sentence verdict, and each rule that applies with what it is, where it comes from and whether it allows or denies"
+      ],
+      [
+        "Permissions",
+        "The whole permission list of the item, in the order Windows evaluates it"
+      ],
+      [
+        "Activity",
+        "Each explanation the tool gave, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person who is told access is denied sees which single rule is responsible, in plain words, and which other rules were checked.",
+    "primary": "Explain",
+    "secondary": "Choose an item",
+    "rows": [
+      [
+        "Explicit deny entry",
+        "Denies, or Not present"
+      ],
+      [
+        "Allow entry",
+        "Allows, or Not present"
+      ],
+      [
+        "Owner",
+        "Allows, or Does not apply"
+      ],
+      [
+        "Integrity level",
+        "Denies, or Does not apply"
+      ],
+      [
+        "Attribute or policy",
+        "Denies, or Does not apply"
+      ]
+    ],
+    "status": "Denied: 1 rule decides, 4 others checked",
+    "notes": [
+      "The header names the item and the account, then one sentence gives the verdict: allowed, or denied and by which rule. The sentence is the first thing read and is also the first thing a screen reader announces.",
+      "Each rule that applies is a row with what it is, where it comes from (the item itself, a parent folder, the owner, the integrity label, an attribute) and whether it allows or denies, shown with an icon and a word, never colour alone. The rule that decides is marked as the deciding one.",
+      "Explain is the accent button and reads the item again each time it is pressed. Choose an item opens the file, folder or registry key picker, and the account defaults to the signed-in user.",
+      "When the permission list cannot be read, the screen says so in words and names the Windows error, then shows what could still be read, such as attributes and the owner. It never shows an empty list as if the item had no rules.",
+      "The tool never changes anything and has no Undo. Where a rule could be changed, the row says what would change it and, when the suite's Ownership tool is installed, offers to open that tool.",
+      "The status bar states the outcome in words, for example the number of rules that decide and the number checked, and changes with every explanation."
+    ],
+    "cut": "There is no earlier window to take features from: the tool is new. The suite's usual extras are not built here: no menus beyond the framework's, no splash, no animations and no donate strip, and each is recorded as cut in the plan. The window has no Undo because the tool changes nothing."
+  },
+  "readme": {
+    "lead": "Find out exactly why Windows says access denied.",
+    "what": [
+      "Choose a file, folder or registry key and an account, and Why Is This Denied reads the item's owner, its permission entries, its integrity label and its attributes, works out what that account can really do, and finds the one entry or condition that decides the outcome. It then says so in plain words, with each rule that applies listed beside it.",
+      "It only explains. It never changes a permission, an owner or an attribute. When something has to change, it says what would change it, and a permission is changed in the suite's Ownership tool."
+    ],
+    "new_intro": "Why Is This Denied is new to Resolute, so there is no earlier version. What it does:",
+    "new": [
+      [
+        "It names the rule.",
+        "Instead of listing a permission table, it states which entry, owner, integrity level, attribute or policy refuses the access."
+      ],
+      [
+        "It checks any account.",
+        "Pick a user or group and see its effective access, not only the signed-in user's."
+      ],
+      [
+        "It looks past permissions.",
+        "A file in use, the read-only attribute, encryption, a protected folder and share permissions over the network are checked too."
+      ],
+      [
+        "It handles registry keys.",
+        "The same explanation works for a registry key."
+      ],
+      [
+        "It writes nothing.",
+        "The tool has no write path, and a test searches for one."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Why Is This Denied ships as a complete, standalone C++ tool that, for a chosen file, folder or registry key and a chosen account, reads the item's security descriptor and conditions without changing anything, works out the account's effective access, finds the one entry or condition that decides the outcome and states it in plain words with every rule that applies, honestly saying so when the descriptor itself cannot be read.",
+    "current_state": "Nothing exists yet: there is no AutoIt original, no C++ code and no reference material, because the tool is new to the suite. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T04-s5.md`, the plan section as it stood in the Resolute repository. That section asks for seven checks (ownership, an explicit deny entry, inherited permissions, integrity level, a policy restriction, an edition limitation and an in-use lock), one named cause, a statement of what would change it, and no write path; it also says to consume other tools' logic, which this plan replaces with the tool's own read-only code because a tool never depends at runtime on another tool. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T04-s5.md`: the plan section this tool began as, with its fidelity, job, treatment and checkpoint.",
+      "Windows' own documentation of access checks: the order in which deny and allow entries are evaluated, `GetNamedSecurityInfo`, the Authz functions `AuthzInitializeResourceManager`, `AuthzInitializeContextFromSid` and `AuthzAccessCheck`, and mandatory integrity labels.",
+      "`DESIGN.md`: the tool's identity and its window's sections, and `sdk/DESIGN.md`, the suite's contract."
+    ],
+    "outcome": [
+      "`WhyIsThisDenied.exe` takes an item and an account and states the one deciding rule in a sentence, with each rule that applies listed as what it is, where it comes from and whether it allows or denies.",
+      "Every mechanism is covered by a fixture that produces the right attribution, an unreadable descriptor is reported as unreadable, and a search of the source proves the tool has no write path.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Answer screen, where each rule that applies is a row, and the Permissions screen holds the whole list in evaluation order. Reporting and audit are the Activity section, the trail of what was explained. Settings are the framework's pages. Permissions do not apply as a gate: the tool needs only the right to read a descriptor, and when that right is missing it says so in the answer instead of asking for elevation. Reverse does not apply, because the tool changes nothing; a permission is changed in the Ownership tool.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Access Explanation Engine",
+      "intro": "The tool's whole core: reading an item's owner, permission entries, integrity label and attributes, working out the effective access of a chosen account, finding the one entry or condition that decides the outcome, and stating it in plain words. It reads only, and it is honest when it cannot read the descriptor itself.",
+      "needs": "windows-host",
+      "build": [
+        "Implement the reading and the access evaluation in `src/core/SecurityReader.cpp` and `src/core/EffectiveAccess.cpp`. Done when: the unit tests pass against disposable files and folders.",
+        "Implement the verdict and its wording in `src/core/Verdict.cpp`. Done when: a fixture blocked by one rule names that rule in one sentence."
+      ],
+      "items": [
+        "Read an item's owner, group, permission list and integrity label with `GetNamedSecurityInfoW` in `src/core/SecurityReader.cpp`, asking for only the read rights it needs. Done when: a test on a disposable folder returns every entry with its type, trustee, mask and whether it is inherited. Cheaper substitute: shelling out to `icacls`, which returns text and cannot be tested against a fixture.",
+        "Report an unreadable descriptor as unreadable in `src/core/SecurityReader.cpp`, naming the Windows error and what could still be read. Done when: a fixture where the caller lacks the right to read permissions returns a result marked unreadable with the owner and attributes still filled, and no empty entry list. Cheaper substitute: treating failure as an item with no entries, which says the item is open to everyone.",
+        "Order the entries as Windows evaluates them in `src/core/EffectiveAccess.cpp`: in stored order, explicit before inherited, deny before allow, flagging a list that is not in that canonical order. Done when: a fixture with a deny entry stored after an allow entry reports the order Windows uses and the flag.",
+        "Compute an account's effective access with `AuthzInitializeResourceManager`, `AuthzInitializeContextFromSid` and `AuthzAccessCheck` in `src/core/EffectiveAccess.cpp`, then find the first entry that decides each refused right by walking the ordered entries against the account's groups. Done when: a test for a user and a group each gets the granted mask Authz returns and the deciding entry, and the two agree. Cheaper substitute: matching only the account's own name against the entries, which misses every group it belongs to.",
+        "Compare the item's mandatory integrity label with the account's integrity level in `src/core/Integrity.cpp`, including the no-write-up, no-read-up and no-execute-up policy bits. Done when: a fixture labelled High refuses write to a Medium account and names the label, the level and the policy bit.",
+        "Read the owner and name it in `src/core/Owner.cpp`, flagging TrustedInstaller and SYSTEM and stating that an owner can always read and change permissions unless an owner rights entry removes it. Done when: a fixture owned by another account reports that owner, and a TrustedInstaller fixture says what that means.",
+        "Compose the verdict in `src/core/Verdict.cpp`: one deciding rule named in one plain sentence, every other rule that applies listed with what it is, where it comes from and whether it allows or denies, and several causes ordered by the order they would need resolving. Done when: a deny-entry fixture, an integrity fixture and a two-cause fixture each produce the expected sentence and order. Cheaper substitute: listing every mechanism without naming the responsible one, which is the table the user has already looked at.",
+        "Prove the tool has no write path in `tests/no_write_test.cpp`: a search of `src/` finds none of the Windows calls that change a descriptor, a file, an attribute or the registry, and every handle is opened for read rights only. Done when: the test passes, and fails when `SetNamedSecurityInfoW` is added to a source file. Cheaper substitute: a comment saying the tool is read only.",
+        "Cover every path with a fixture per mechanism in `tests/explain_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes, and fails when a fixture's expected rule is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes: a deny-entry fixture, an integrity fixture, an unreadable-descriptor fixture and a two-cause fixture each give the expected answer, and the no-write test fails when a write call is added.",
+      "commit": "core: name the one rule that refuses access, reading only"
+    },
+    "enhancements": [
+      {
+        "title": "Check Another Account",
+        "intro": "The tool starts with the signed-in user. This section lets a person pick any user or group and see that account's effective access to the same item, which is what an administrator asks when someone else reports a denial.",
+        "needs": "sdk-framework",
+        "surface": {
+          "fidelity": "the account picker in the Answer header, against `sdk/DESIGN.md` section 11.",
+          "job": "a person sees what a chosen account can do with the item. Consumer: the verdict, read back for that account.",
+          "treatment": "the framework's picker, with the chosen account named in the header and the answer re-read for it. Cheaper substitute that fails the checkpoint: a text box taking an account name, which cannot tell a user from a group and accepts a typo."
+        },
+        "build": [
+          "Add account resolution in `src/core/Account.cpp`. Done when: a name, a group name and a SID each resolve to one SID or a named error.",
+          "Add the picker to `src/ui/AnswerView.cpp`. Done when: choosing an account re-runs the explanation for it."
+        ],
+        "items": [
+          "Resolve a user, group, well-known name or SID string to a SID with `LookupAccountNameW` and `ConvertStringSidToSidW` in `src/core/Account.cpp`. Done when: each form resolves in a test and an unknown name returns a named error.",
+          "Offer the framework's account picker in `src/ui/AnswerView.cpp`, defaulting to the signed-in user. Done when: choosing another account changes the header and re-reads the answer. Cheaper substitute: a private dialog, which the contract forbids.",
+          "Say plainly when an account's groups cannot be read, for example a domain account with no reachable controller. Done when: a test with an unreachable domain shows the answer marked as computed without group membership.",
+          "Cover it in `tests/account_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L account` passes, and fails when the group list is ignored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L account` passes for a user, a group and an unknown account, and the explanation for a chosen account differs from the signed-in user's on a fixture that allows only a group.",
+        "commit": "feature: explain access for any chosen account"
+      },
+      {
+        "title": "Registry Keys Too",
+        "intro": "A registry key has the same kind of security descriptor as a file, and its denials read the same way. This section lets the tool explain a key with the engine unchanged.",
+        "surface": {
+          "fidelity": "the item chooser and the Answer header for a registry key, against `DESIGN.md` section 2.",
+          "job": "a person who cannot open or change a registry key sees which rule refuses. Consumer: the verdict for a key, read back.",
+          "treatment": "the same rows and sentence as for a file, with registry rights named in words (read value, set value, create subkey). Cheaper substitute that fails the checkpoint: showing file rights names for a key, which are wrong for it."
+        },
+        "build": [
+          "Read a key's descriptor through the same reader in `src/core/SecurityReader.cpp`. Done when: a disposable key returns its entries.",
+          "Name registry rights in `src/core/Rights.cpp`. Done when: every registry access bit has a plain name."
+        ],
+        "items": [
+          "Accept a registry path such as `HKLM\\SOFTWARE\\Vendor` in `src/core/Item.cpp` and read it with `GetNamedSecurityInfoW` as a registry key. Done when: a disposable key returns owner, entries and label.",
+          "Map registry access bits to plain words in `src/core/Rights.cpp`, with the generic mapping for keys. Done when: a test names every bit of a key's mask and none is shown as a number.",
+          "Let the item chooser in `src/ui/AnswerView.cpp` take a key as well as a file or folder. Done when: pasting a key path explains it. Cheaper substitute: a second screen for keys, which duplicates the Answer screen.",
+          "Cover it in `tests/registry_test.cpp` with a disposable key under `HKCU`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L registry` passes, and fails when a deny entry on the key is not reported."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L registry` passes: a key with a deny entry names that entry, and rights are shown in registry words.",
+        "commit": "feature: explain registry keys with the same engine"
+      },
+      {
+        "title": "Beyond Permissions",
+        "intro": "A permission list is only one reason Windows refuses. This section adds the others that produce the same message: a file in use, the read-only attribute, encryption, a protected folder and share permissions over the network. Each is checked and, when responsible, named.",
+        "surface": {
+          "fidelity": "the extra rows of the Answer screen, against `DESIGN.md` section 2.",
+          "job": "a person is told when the cause is not a permission at all. Consumer: the rows, read back against the item's real state.",
+          "treatment": "one row per condition, shown with an icon and a word, naming the process that holds a file in use. Cheaper substitute that fails the checkpoint: a single line saying other causes may apply, which names none."
+        },
+        "build": [
+          "Implement the checks in `src/core/Conditions.cpp`. Done when: a fixture for each condition is attributed correctly.",
+          "Show them as rows in `src/ui/AnswerView.cpp`. Done when: a fixture blocked by a lock names the holding process."
+        ],
+        "items": [
+          "Detect the read-only attribute and a hidden or system attribute in `src/core/Conditions.cpp` with `GetFileAttributesW`. Done when: a read-only fixture is named as the cause of a refused write, with the attribute.",
+          "Find the process holding a file in use with the Restart Manager functions (`RmStartSession`, `RmRegisterResources`, `RmGetList`) in `src/core/Conditions.cpp`. Done when: a fixture held open by a test process names that process and its id. Cheaper substitute: reporting only that the sharing was violated, which does not name who holds it.",
+          "Detect an encrypted file (EFS) in `src/core/Conditions.cpp` and say that only the account that encrypted it, or a recovery agent, can open it. Done when: an encrypted fixture on a volume that supports it is reported, and a volume that does not is reported as not applicable.",
+          "Detect Controlled Folder Access protection in `src/core/Conditions.cpp` by reading the Defender configuration, and say plainly when it cannot be read. Done when: a protected-folder fixture is named, and an unreadable configuration is stated as unknown, not as absent.",
+          "For a network path, read the share's permissions with `NetShareGetInfo` level 502 and state that the share and the file permissions both apply and the stricter wins. Done when: a fixture share that denies a group is named as the cause even though the file allows it.",
+          "Cover the conditions in `tests/conditions_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L conditions` passes, and fails when the lock holder is not named."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L conditions` passes: a lock fixture names the holding process, a read-only fixture names the attribute, and a two-cause fixture lists both in the order they would need resolving.",
+        "commit": "feature: name the causes that are not permissions"
+      },
+      {
+        "title": "Open in Ownership",
+        "intro": "The tool only explains, so resolving a denial is a hand-off. When the suite's Ownership tool is installed, a button opens it for the item so the permission is changed there. The tool never changes anything itself, and it works the same when Ownership is absent.",
+        "surface": {
+          "fidelity": "the hand-off button on a row, against `sdk/DESIGN.md` section 11.",
+          "job": "a person who has learned the cause goes straight to the tool that can change it. Consumer: the launched Ownership tool, started with the item.",
+          "treatment": "a button that appears on a row whose rule Ownership can change, labelled with what it will do, and a sentence saying what would change the rule when Ownership is not installed. Cheaper substitute that fails the checkpoint: a button that always shows and does nothing when the tool is missing."
+        },
+        "build": [
+          "Locate the installed Ownership tool in `src/core/Handoff.cpp`. Done when: an installed fixture is found and a missing one is reported as missing.",
+          "Wire the button in `src/ui/AnswerView.cpp`. Done when: pressing it starts Ownership with the item's path."
+        ],
+        "items": [
+          "Find the Ownership executable in `src/core/Handoff.cpp` from the suite's registered install location, never by a copy of its code. Done when: a fixture with it present returns its path and one without returns a named absence.",
+          "Start Ownership with the item's path through `CreateProcessW` in `src/core/Handoff.cpp`, passing no write request. Done when: a test with a stand-in executable receives the path on its command line. Cheaper substitute: changing the permission here, which breaks the rule that this tool has no write path.",
+          "Show the button only on rows Ownership can change, and for other rows say what would change them. Done when: an integrity row shows a sentence and no button, and an owner row shows the button when Ownership is installed.",
+          "Cover it in `tests/handoff_test.cpp`, and re-run `tests/no_write_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes and the no-write test still passes."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes with Ownership present and absent, and the no-write test still passes.",
+        "commit": "feature: hand the item to Ownership to change it there"
+      }
+    ],
+    "no_reverse": "the tool explains and changes nothing; a permission is changed in the Ownership tool",
+    "verification": [
+      "A fixture per mechanism produces the correct attribution, a deny-entry fixture and a lock fixture name the right cause, and a two-cause fixture lists both in resolution order.",
+      "A search of `src/` finds no call that writes a descriptor, a file, an attribute or the registry, and `tests/no_write_test.cpp` fails when one is added.",
+      "On a real machine the tool explains a denied file, a denied folder and a denied registry key for the signed-in user and for another account, in light and dark, by keyboard alone."
+    ]
+  }
+}

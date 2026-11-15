@@ -57,6 +57,8 @@ track: P3
 
 ## 1. Shadow Copy Browser
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ShadowBrowser` repository (`D:\Resolute_Bin\ShadowBrowser`) by its own plan.
+
 Windows keeps Volume Shadow Copies containing previous versions of a user's files, and the built-in Previous Versions tab is unreliable and frequently empty on machines where snapshots plainly exist. The data is there; the interface is not.
 
 **Fidelity:** the snapshot list and the file browser, against `DESIGN.md` and `docs/captures/house-style/`.
@@ -65,17 +67,19 @@ Windows keeps Volume Shadow Copies containing previous versions of a user's file
 **Chrome:** consume the framework and the shared virtualized list. Read the same store as `D05 T03 §1` rather than a second enumerator.
 **Needs:** Windows host (build/test)
 
-- [ ] List every shadow copy with its volume, date, and origin, in `extensions/ShadowBrowser/`. Done when: a machine with snapshots lists them all and one with none says so rather than rendering empty.
-- [ ] Mount a snapshot read-only and browse it. Done when: a snapshot's directory tree renders and no write path to the snapshot exists, proven by search.
-- [ ] Retrieve a file to a destination the user chooses. Done when: the retrieved content matches the snapshot copy byte for byte, and an existing destination file is never silently overwritten.
-- [ ] Compare a snapshot copy against the live file. Done when: a changed file shows that it differs and an unchanged one shows that it does not.
-- [ ] Never delete a snapshot. Done when: this tool has no delete path at all, proven by search, because deleting the wrong snapshot destroys the only copy of something.
-- [ ] Report honestly when shadow copies are disabled. Done when: the surface says so, explains the consequence, and points at `D05 T03 §1` to enable protection.
-- [ ] Commit: `"shadow browser: open what previous versions will not"`
+- [ ] ~~List every shadow copy with its volume, date, and origin, in `extensions/ShadowBrowser/`. Done when: a machine with snapshots lists them all and one with none says so rather than rendering empty.~~ -> `rizonesoft/ShadowBrowser`
+- [ ] ~~Mount a snapshot read-only and browse it. Done when: a snapshot's directory tree renders and no write path to the snapshot exists, proven by search.~~ -> `rizonesoft/ShadowBrowser`
+- [ ] ~~Retrieve a file to a destination the user chooses. Done when: the retrieved content matches the snapshot copy byte for byte, and an existing destination file is never silently overwritten.~~ -> `rizonesoft/ShadowBrowser`
+- [ ] ~~Compare a snapshot copy against the live file. Done when: a changed file shows that it differs and an unchanged one shows that it does not.~~ -> `rizonesoft/ShadowBrowser`
+- [ ] ~~Never delete a snapshot. Done when: this tool has no delete path at all, proven by search, because deleting the wrong snapshot destroys the only copy of something.~~ -> `rizonesoft/ShadowBrowser`
+- [ ] ~~Report honestly when shadow copies are disabled. Done when: the surface says so, explains the consequence, and points at `D05 T03 §1` to enable protection.~~ -> `rizonesoft/ShadowBrowser`
+- [ ] Commit: ~~`"shadow browser: open what previous versions will not"`~~ -> `rizonesoft/ShadowBrowser`
 
-**Test checkpoint:** A machine with snapshots lists them with volume, date, and origin; one without says so. A snapshot browses and no write path to it exists, proven by search. A retrieved file matches byte for byte and never silently overwrites. The tool has no snapshot delete path, proven by search.
+**Test checkpoint:** Moved with the section. The `rizonesoft/ShadowBrowser` repository's plan carries it.
 
 ## 2. Windows Disk Space
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/WindowsDiskSpace` repository (`D:\Resolute_Bin\WindowsDiskSpace`) by its own plan.
 
 Not a disk analyser. Those exist and are good. This answers the different question: **why is Windows itself consuming eighty gigabytes**, which no file-size treemap explains because the space is spread across component stores, caches, and reserved regions.
 
@@ -85,17 +89,19 @@ Not a disk analyser. Those exist and are good. This answers the different questi
 **Chrome:** consume the framework and the repair contract for anything it removes.
 **Needs:** Windows host (build/test)
 
-- [ ] Measure each category in `extensions/WindowsDiskSpace/`: component store, hibernation file, page file, `Windows.old`, Reserved Storage, delivery optimisation cache, and update cache. Done when: each renders with a size verified against an independent measurement.
-- [ ] Explain each in plain words, with what is lost by removing it. Done when: `Windows.old` states that removing it ends the ability to roll back the last feature update, on the surface, before the user commits.
-- [ ] State the deadline where one exists. Done when: `Windows.old` shows the date Windows will remove it automatically.
-- [ ] Make each removal a repair-contract item with an honest reversibility answer. Done when: every category declares whether it can be undone, and most honestly declare that they cannot.
-- [ ] Use the supported mechanism for each category rather than deleting files directly. Done when: the component store uses the documented cleanup path and this section names what was used per category.
-- [ ] Measure the space actually recovered. Done when: before and after figures are reported and match the reclaimed total.
-- [ ] Commit: `"windows disk space: explain what windows is holding"`
+- [ ] ~~Measure each category in `extensions/WindowsDiskSpace/`: component store, hibernation file, page file, `Windows.old`, Reserved Storage, delivery optimisation cache, and update cache. Done when: each renders with a size verified against an independent measurement.~~ -> `rizonesoft/WindowsDiskSpace`
+- [ ] ~~Explain each in plain words, with what is lost by removing it. Done when: `Windows.old` states that removing it ends the ability to roll back the last feature update, on the surface, before the user commits.~~ -> `rizonesoft/WindowsDiskSpace`
+- [ ] ~~State the deadline where one exists. Done when: `Windows.old` shows the date Windows will remove it automatically.~~ -> `rizonesoft/WindowsDiskSpace`
+- [ ] ~~Make each removal a repair-contract item with an honest reversibility answer. Done when: every category declares whether it can be undone, and most honestly declare that they cannot.~~ -> `rizonesoft/WindowsDiskSpace`
+- [ ] ~~Use the supported mechanism for each category rather than deleting files directly. Done when: the component store uses the documented cleanup path and this section names what was used per category.~~ -> `rizonesoft/WindowsDiskSpace`
+- [ ] ~~Measure the space actually recovered. Done when: before and after figures are reported and match the reclaimed total.~~ -> `rizonesoft/WindowsDiskSpace`
+- [ ] Commit: ~~`"windows disk space: explain what windows is holding"`~~ -> `rizonesoft/WindowsDiskSpace`
 
-**Test checkpoint:** Every category renders with a size verified independently. `Windows.old` states the rollback consequence and its automatic removal date on the surface. Each removal is a declared contract item with an honest reversibility answer. Recovered space is measured before and after and matches the reported total.
+**Test checkpoint:** Moved with the section. The `rizonesoft/WindowsDiskSpace` repository's plan carries it.
 
 ## 3. Wi-Fi Diagnostics
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/WiFiDiagnostics` repository (`D:\Resolute_Bin\WiFiDiagnostics`) by its own plan.
 
 `ComIntRep` repairs the network stack and never touches the radio. This covers the layer beneath it, including the single most searched Windows networking task: recovering the key for a network the machine already knows.
 
@@ -105,18 +111,20 @@ Not a disk analyser. Those exist and are good. This answers the different questi
 **Chrome:** consume the framework, its elevation guard, and its logging.
 **Needs:** Windows host (build/test)
 
-- [ ] List saved networks with their security type, band, and last connection, in `extensions/WiFiDiagnostics/`. Done when: the list matches what the system reports for the same machine.
-- [ ] **Gate the key reveal behind the framework's elevation guard**, at the reveal itself. Done when: an unelevated reveal is refused by name and no key is read.
-- [ ] **Log every reveal, one line, naming the network.** Done when: a driven reveal produces exactly one line and the line names the network but never the key.
-- [ ] **Refuse bulk export.** Done when: the tool reveals one network at a time on explicit request, has no export-all path, proven by search, and this section records the rule.
-- [ ] Report signal quality, band, and channel for the current connection. Done when: all three render and a machine with no wireless adapter says so rather than rendering empty.
-- [ ] Diagnose why a connection fails, across authentication, DHCP, DNS, and driver state. Done when: a fixture failure in each category is attributed correctly and names the failing step.
-- [ ] Hand off to `ComIntRep` when the fault is above the radio. Done when: the hand-off works and carries what was already diagnosed.
-- [ ] Commit: `"wifi diagnostics: the layer below the network stack"`
+- [ ] ~~List saved networks with their security type, band, and last connection, in `extensions/WiFiDiagnostics/`. Done when: the list matches what the system reports for the same machine.~~ -> `rizonesoft/WiFiDiagnostics`
+- [ ] ~~**Gate the key reveal behind the framework's elevation guard**, at the reveal itself. Done when: an unelevated reveal is refused by name and no key is read.~~ -> `rizonesoft/WiFiDiagnostics`
+- [ ] ~~**Log every reveal, one line, naming the network.** Done when: a driven reveal produces exactly one line and the line names the network but never the key.~~ -> `rizonesoft/WiFiDiagnostics`
+- [ ] ~~**Refuse bulk export.** Done when: the tool reveals one network at a time on explicit request, has no export-all path, proven by search, and this section records the rule.~~ -> `rizonesoft/WiFiDiagnostics`
+- [ ] ~~Report signal quality, band, and channel for the current connection. Done when: all three render and a machine with no wireless adapter says so rather than rendering empty.~~ -> `rizonesoft/WiFiDiagnostics`
+- [ ] ~~Diagnose why a connection fails, across authentication, DHCP, DNS, and driver state. Done when: a fixture failure in each category is attributed correctly and names the failing step.~~ -> `rizonesoft/WiFiDiagnostics`
+- [ ] ~~Hand off to `ComIntRep` when the fault is above the radio. Done when: the hand-off works and carries what was already diagnosed.~~ -> `rizonesoft/WiFiDiagnostics`
+- [ ] Commit: ~~`"wifi diagnostics: the layer below the network stack"`~~ -> `rizonesoft/WiFiDiagnostics`
 
-**Test checkpoint:** The saved-network list matches the system's for the same machine. An unelevated reveal is refused by name with no key read. A driven reveal writes exactly one log line naming the network and not the key. No export-all path exists, proven by search. A fixture failure in each diagnostic category is attributed correctly.
+**Test checkpoint:** Moved with the section. The `rizonesoft/WiFiDiagnostics` repository's plan carries it.
 
 ## 4. Profile Manager
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ProfileManager` repository (`D:\Resolute_Bin\ProfileManager`) by its own plan.
 
 Removing a Windows user profile correctly means the folder, the `ProfileList` registry entry, and the SID all going together. Doing it wrong leaves a machine that silently creates a temporary profile at every logon, which is one of the more miserable Windows failures to diagnose.
 
@@ -126,19 +134,21 @@ Removing a Windows user profile correctly means the folder, the `ProfileList` re
 **Chrome:** consume the framework and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] List every profile in `extensions/ProfileManager/` with its account, SID, path, size, and last use. Done when: the list matches `ProfileList` and the profile directory, compared entry by entry.
-- [ ] Identify orphans: a profile whose account no longer exists. Done when: a fixture orphan is flagged with its reasoning and a live profile is not.
-- [ ] Make removal atomic across folder, registry entry, and SID. Done when: a fixture removal takes all three, and a removal that cannot complete takes none, proven by interrupting it.
-- [ ] Capture prior state through the repair contract before removing. Done when: the record names the profile path, the registry entry, and the SID.
-- [ ] Refuse to remove a profile in use, or the last administrator. Done when: both are refused by name and nothing changes.
-- [ ] State plainly that the user's files go with it. Done when: the confirmation names the profile path and its size, and declining performs nothing.
-- [ ] Commit: `"profile manager: remove a profile without breaking logon"`
+- [ ] ~~List every profile in `extensions/ProfileManager/` with its account, SID, path, size, and last use. Done when: the list matches `ProfileList` and the profile directory, compared entry by entry.~~ -> `rizonesoft/ProfileManager`
+- [ ] ~~Identify orphans: a profile whose account no longer exists. Done when: a fixture orphan is flagged with its reasoning and a live profile is not.~~ -> `rizonesoft/ProfileManager`
+- [ ] ~~Make removal atomic across folder, registry entry, and SID. Done when: a fixture removal takes all three, and a removal that cannot complete takes none, proven by interrupting it.~~ -> `rizonesoft/ProfileManager`
+- [ ] ~~Capture prior state through the repair contract before removing. Done when: the record names the profile path, the registry entry, and the SID.~~ -> `rizonesoft/ProfileManager`
+- [ ] ~~Refuse to remove a profile in use, or the last administrator. Done when: both are refused by name and nothing changes.~~ -> `rizonesoft/ProfileManager`
+- [ ] ~~State plainly that the user's files go with it. Done when: the confirmation names the profile path and its size, and declining performs nothing.~~ -> `rizonesoft/ProfileManager`
+- [ ] Commit: ~~`"profile manager: remove a profile without breaking logon"`~~ -> `rizonesoft/ProfileManager`
 
 **Freeze check:** What a removal deletes is frozen once shipped, because it takes a user's files. Evidence is a fixture profile removed and compared against its recorded state, entry by entry.
 
-**Test checkpoint:** The profile list matches `ProfileList` and the profile directory entry by entry. A fixture orphan is flagged with reasoning; a live profile is not. An interrupted removal takes nothing, proven by interrupting it. A profile in use and the last administrator are both refused by name. The confirmation names path and size.
+**Test checkpoint:** Moved with the section. The `rizonesoft/ProfileManager` repository's plan carries it.
 
 ## 5. Icon Cache and Default Apps Repair
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/IconCacheRepair` and `rizonesoft/DefaultAppsRepair` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 Two small tools for two classic annoyances whose fixes are obscure enough that people reinstall Windows over them.
 
@@ -148,16 +158,18 @@ Two small tools for two classic annoyances whose fixes are obscure enough that p
 **Chrome:** consume the framework and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Rebuild the icon and thumbnail caches in `extensions/IconCacheRepair/`, restarting Explorer as part of the operation. Done when: a machine with a deliberately corrupted cache renders correct icons afterwards, captured before and after.
-- [ ] Warn that Explorer will restart, and what that closes. Done when: the warning appears before the user commits.
-- [ ] Repair default apps and protocol handlers in `extensions/DefaultAppsRepair/`, covering `http`, `https`, `mailto`, and the common file types. Done when: a deliberately broken handler is repaired and verified by reading it back.
-- [ ] Capture prior handlers before changing them. Done when: undo restores each handler to exactly what it was, asserted.
-- [ ] Repair only what is broken, not everything. Done when: a handler the user deliberately set to a third-party application is left alone unless explicitly selected.
-- [ ] Commit: `"icon cache and default apps: two obscure fixes made obvious"`
+- [ ] ~~Rebuild the icon and thumbnail caches in `extensions/IconCacheRepair/`, restarting Explorer as part of the operation. Done when: a machine with a deliberately corrupted cache renders correct icons afterwards, captured before and after.~~ -> `rizonesoft/IconCacheRepair`
+- [ ] ~~Warn that Explorer will restart, and what that closes. Done when: the warning appears before the user commits.~~ -> `rizonesoft/IconCacheRepair`
+- [ ] ~~Repair default apps and protocol handlers in `extensions/DefaultAppsRepair/`, covering `http`, `https`, `mailto`, and the common file types. Done when: a deliberately broken handler is repaired and verified by reading it back.~~ -> `rizonesoft/IconCacheRepair`
+- [ ] ~~Capture prior handlers before changing them. Done when: undo restores each handler to exactly what it was, asserted.~~ -> `rizonesoft/IconCacheRepair`
+- [ ] ~~Repair only what is broken, not everything. Done when: a handler the user deliberately set to a third-party application is left alone unless explicitly selected.~~ -> `rizonesoft/IconCacheRepair`
+- [ ] Commit: ~~`"icon cache and default apps: two obscure fixes made obvious"`~~ -> `rizonesoft/IconCacheRepair`
 
-**Test checkpoint:** A corrupted icon cache renders correctly after repair, captured before and after, with the Explorer restart warned about beforehand. A broken protocol handler is repaired and verified by read-back, and undo restores it exactly. A deliberately chosen third-party handler is left alone.
+**Test checkpoint:** Moved with the section. The `rizonesoft/IconCacheRepair` repository's plan carries it.
 
 ## 6. Resource History and USB Device History
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ResourceHistory` and `rizonesoft/USBHistory` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 Two tools answering questions about the past. Windows records both and surfaces neither.
 
@@ -167,15 +179,15 @@ Two tools answering questions about the past. Windows records both and surfaces 
 **Chrome:** consume the framework. Neither tool changes the system, so neither consumes the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Record process CPU, disk, and memory over time in `extensions/ResourceHistory/`, at an interval the user controls. Done when: a recorded period renders per process and the recorder's own cost is measured and quoted.
-- [ ] Make the recorder optional and off by default. Done when: it is enabled explicitly, its storage is bounded, and disabling it stops all recording.
-- [ ] Answer the question the tool exists for. Done when: selecting a time range names what was consuming the machine during it.
-- [ ] List every USB device ever connected in `extensions/USBHistory/`, with description, serial where present, and first and last connection. Done when: a machine's list is cross-checked against its registry entries.
-- [ ] Explain what the record can and cannot establish. Done when: the surface states that a device with no serial cannot be distinguished from another of the same model.
-- [ ] Neither tool writes to the system. Done when: neither has a write path, proven by search.
-- [ ] Commit: `"resource and usb history: what windows records and hides"`
+- [ ] ~~Record process CPU, disk, and memory over time in `extensions/ResourceHistory/`, at an interval the user controls. Done when: a recorded period renders per process and the recorder's own cost is measured and quoted.~~ -> `rizonesoft/ResourceHistory`
+- [ ] ~~Make the recorder optional and off by default. Done when: it is enabled explicitly, its storage is bounded, and disabling it stops all recording.~~ -> `rizonesoft/ResourceHistory`
+- [ ] ~~Answer the question the tool exists for. Done when: selecting a time range names what was consuming the machine during it.~~ -> `rizonesoft/ResourceHistory`
+- [ ] ~~List every USB device ever connected in `extensions/USBHistory/`, with description, serial where present, and first and last connection. Done when: a machine's list is cross-checked against its registry entries.~~ -> `rizonesoft/ResourceHistory`
+- [ ] ~~Explain what the record can and cannot establish. Done when: the surface states that a device with no serial cannot be distinguished from another of the same model.~~ -> `rizonesoft/ResourceHistory`
+- [ ] ~~Neither tool writes to the system. Done when: neither has a write path, proven by search.~~ -> `rizonesoft/ResourceHistory`
+- [ ] Commit: ~~`"resource and usb history: what windows records and hides"`~~ -> `rizonesoft/ResourceHistory`
 
-**Test checkpoint:** A recorded period renders per process, with the recorder's own cost measured and quoted. The recorder is off by default, bounded, and stops fully when disabled. Selecting a range names the consumer. The USB list is cross-checked against registry entries. Neither tool has a write path, proven by search.
+**Test checkpoint:** Moved with the section. The `rizonesoft/ResourceHistory` repository's plan carries it.
 
 ## 7. Credential, Display, and Connection Viewers
 

@@ -1,0 +1,253 @@
+{
+  "name": "ShareDiagnostics",
+  "slug": "sharediagnostics",
+  "display": "Share Diagnostics",
+  "job": "it tests a network share path such as \\\\server\\folder one step at a time, from name resolution to the share itself, and names the step that fails with what to try, changing nothing on the computer.",
+  "tagline": "Find out why a shared folder will not open",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Cobalt",
+    "light": "#93C5FD",
+    "dark": "#2563EB",
+    "social_ground": "#0B1B3F",
+    "social_muted": "#C9DAF8"
+  },
+  "icon": {
+    "idea": "A folder on a network line: a shared folder.",
+    "points": [
+      "Free-standing with no tile: a folder with a line below it, joined by a short stem.",
+      "The folder and the joint are Cobalt, and the line is Cobalt light.",
+      "The small drawing, used below 40 pixels, thickens the line and the stem."
+    ],
+    "large": "<path d=\"M10 20 H36 L44 28 H86 V62 H10 Z\" fill=\"#2563EB\" stroke=\"#2563EB\" stroke-width=\"5\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M48 62 V76 M22 82 H74\" fill=\"none\" stroke=\"#93C5FD\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"48\" cy=\"82\" r=\"8\" fill=\"#2563EB\"/>",
+    "small": "<path d=\"M10 18 H36 L44 26 H86 V60 H10 Z\" fill=\"#2563EB\" stroke=\"#2563EB\" stroke-width=\"5\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M48 60 V78 M18 82 H78\" fill=\"none\" stroke=\"#93C5FD\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"48\" cy=\"82\" r=\"9\" fill=\"#2563EB\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Check",
+        "The share path in the header, a one-sentence verdict, and each test as a row with its name, its result and what it found"
+      ],
+      [
+        "This computer",
+        "The local settings that affect sharing: network profile, services, protocol versions"
+      ],
+      [
+        "Activity",
+        "What the tool tested, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person types a share path, presses one button and learns which step stops it from opening and what to try.",
+    "primary": "Run checks",
+    "secondary": "Copy summary",
+    "rows": [
+      [
+        "Name resolution",
+        "Found or Not found"
+      ],
+      [
+        "Route and file-sharing port",
+        "Reachable or Blocked"
+      ],
+      [
+        "Protocol version",
+        "Agreed, or Only an old version offered"
+      ],
+      [
+        "Sign-in",
+        "Accepted or Refused"
+      ],
+      [
+        "Share",
+        "Opened or Not opened"
+      ]
+    ],
+    "status": "Stopped at Protocol version: the server offers only SMB1",
+    "notes": [
+      "The header shows the share path being tested, an edit box that takes a path such as `\\\\server\\folder`, and under it a one-sentence verdict in words.",
+      "Each test is a row with an icon and a word for its result (Passed, Failed, Not reached, Skipped) and one line of what it found. The first test that explains the failure is marked and the tests after it show Not reached.",
+      "Run checks is the accent button and runs the tests in order, each within its time limit; a test still running shows a progress word, and the button turns into Stop while the run lasts.",
+      "Copy summary puts the path, the verdict and every row's result on the clipboard as plain text, with no password and no other secret in it.",
+      "The tool only tests: it asks for no elevation, changes no setting and stores no password. A sign-in test that needs credentials asks for them for that run only and discards them.",
+      "The status bar reads the verdict in words, for example the step it stopped at and what it found, and the failing row's detail offers a button that opens the Windows setting where the fix is made."
+    ],
+    "cut": "There is no source window to compare with, because the tool is new. The window has no menus, no splash, no animation beyond the framework's own and no donate strip: these are not part of the suite's tool window and are not planned. Anything the suite's older tools carried that a reader might expect here is recorded as cut in the plan."
+  },
+  "readme": {
+    "lead": "Find out why a shared folder will not open, and what to try.",
+    "what": [
+      "Share Diagnostics takes a network share path such as `\\\\server\\folder` and tests each step Windows takes to reach it, in order: finding the server by name, reaching it, the file-sharing port, the protocol version, the sign-in and the share itself. It stops at the first step that explains the failure and says in plain words what it found and what to try.",
+      "It only tests. It changes no setting, stores no password and needs no administrator rights. It also shows the computer's own settings that affect sharing, such as the network profile, the workstation service and which protocol versions are on."
+    ],
+    "new_intro": "Share Diagnostics is a new tool of the suite, written in C++ from the start, so nothing is ported.",
+    "new": [
+      [
+        "One test per step.",
+        "Name resolution, route, port 445, protocol version, sign-in and share are separate rows, so a failure is attributed to a step and not reported as a general error."
+      ],
+      [
+        "Error codes in words.",
+        "The Windows error code of a real connection attempt is translated into a cause and an action, and an unknown code says so."
+      ],
+      [
+        "Old devices named.",
+        "When a server offers only the old SMB1 protocol that current Windows switches off, the tool says so and lists the safe choices."
+      ],
+      [
+        "The fix is one click away.",
+        "A failing row can open the Windows setting where the fix is made, and nothing is changed for the user."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Share Diagnostics ships as a complete, standalone C++ tool: given a share path it runs an ordered list of tests (name resolution, route, the file-sharing port, protocol version, sign-in, the share), stops at the first that explains the failure, names the step with what to try, translates the Windows error code of a real connection attempt into words, and changes no setting and keeps no password.",
+    "current_state": "Nothing exists yet. This is a new tool: there is no AutoIt original, no `reference/au3/` folder and no code in any language. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T04-s7.md`, the plan section as it stood in the Resolute repository (19 lines), which also describes an activation diagnostics tool that is not part of this one. That section asks for a diagnosis across name resolution, the protocol version negotiated, credentials, network discovery and the firewall, with each result naming the failing step and an action. The rest comes from Windows itself: DNS, LLMNR and NetBIOS name resolution, TCP port 445, SMB dialect negotiation (SMB1 is off by default on current Windows, so old NAS devices fail), guest access blocked by default, `WNetAddConnection2` and its error codes (53, 67, 5, 86, 1326, 1219), a Public network profile that turns discovery and sharing off, the LanmanWorkstation service, cached credentials in Credential Manager, and clock skew breaking Kerberos. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T04-s7.md`: the plan section for this tool; take only what concerns network shares, not the activation half.",
+      "`DESIGN.md`: the tool's identity and the sections of its window, with `sdk/DESIGN.md`, the suite's contract.",
+      "Windows itself: a real share, a share that does not exist, a server that is off, a server with SMB1 only and a refused sign-in, on a test machine, as the fixtures the checks are driven against."
+    ],
+    "outcome": [
+      "`ShareDiagnostics.exe` runs the declared checks in order for a given path, each within its time limit, stops at the first that explains the failure, and names that step with an action, proven against a fixture failure in each category.",
+      "The Windows error code of a real connection attempt is shown as a cause and an action, an unknown code says so, and the tool changes no setting and keeps no password, proven by a search and a test.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Check screen, where each test is a row with its result. Reporting and audit are the Activity section, which records each run's path, verdict and failing step without any password. Settings are the framework's pages. Permissions do not apply: every test runs as the current user and the tool asks for no elevation. Reverse does not apply, because the tool changes nothing; the Windows setting a fix would need is opened for the user, who makes the change.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Share Check Engine",
+      "intro": "The tool's core, independent of any window: an ordered list of checks declared as data, each with a time limit and a plain-words result, run in order and stopped at the first that explains the failure, plus the translation of a real connection attempt's Windows error code into words. It tests only: it stores no password and changes no setting.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the checks and the error table as data in `src/core/Checks.h`. Done when: every check names its id, its time limit, its plain-words results and the action for each failure, once.",
+        "Implement the runner and the real tests in `src/core/Runner.cpp` and `src/core/Probes.cpp`, with the network calls behind an interface the tests can replace. Done when: `tests/runner_test.cpp` passes against fixture probes."
+      ],
+      "items": [
+        "Parse a share path in `src/core/SharePath.cpp` into server, share and the rest, accepting `\\\\server\\folder`, an address and a name with spaces, and refusing anything else by name. Done when: a table test covers each form and each refusal. Cheaper substitute: passing the raw text on to the network call, which fails with a code the user cannot read.",
+        "Declare the ordered checks in `src/core/Checks.h` as data (name resolution, route, port 445, protocol version, sign-in, share), each with a time limit and its result and action words. Done when: reordering or editing a check changes the run with no change to `src/core/Runner.cpp`, shown by a test. Cheaper substitute: the sequence written as code in the runner, which cannot be inspected or tested as a list.",
+        "Implement name resolution in `src/core/Probes.cpp` through the system resolver and say which route answered (DNS, LLMNR or NetBIOS) when it can be told. Done when: a fixture of a known name, an unknown name and a name that times out each give their own result and action. Cheaper substitute: a call to `ping`, which tests the route and the name together.",
+        "Implement the route test and the port test: a connection to TCP port 445 of the resolved address within the time limit, reported as reachable, refused or timed out. Done when: a local listener, a closed port and a dropped address each give a different result. Cheaper substitute: treating a blocked echo request as a dead route, which many healthy servers also give.",
+        "Implement the protocol version test: negotiate with the server and report the dialect it agreed, or that it offers only SMB1. Done when: a fixture server answering with SMB1 only reports that and names the old version, and one answering SMB3 reports the dialect.",
+        "Make a real connection attempt with `WNetAddConnection2` in `src/core/Probes.cpp` for the sign-in and share tests, with no password written to disk or the log, and translate the code through the table in `src/core/ErrorTable.cpp` (53, 67, 5, 86, 1326, 1219 and the others declared). Done when: each declared code yields its cause and its action and an unknown code says it is unknown. Cheaper substitute: showing the raw code, which the user already has and cannot act on.",
+        "Run the checks in order in `src/core/Runner.cpp`, enforce each time limit, stop at the first check that explains the failure, mark the rest Not reached and return the verdict sentence. Done when: a fixture failing at each of the six steps stops there and names that step and an action. Cheaper substitute: running every check and reporting the first failure afterwards, which delays the answer behind timeouts.",
+        "Prove it changes nothing and keeps no password: a test lists the registry and file writes of a full run and finds none, and a search of `src/` finds no password stored. Done when: both pass. Cheaper substitute: stating it in the README only.",
+        "Cover the engine in `tests/runner_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when one check's order or one error code's action is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes for a fixture failure at every step, an unknown error code and the no-writes test, and fails when a check's order or an error action is changed.",
+      "commit": "core: ordered share checks that stop at the failing step and say what to try"
+    },
+    "enhancements": [
+      {
+        "title": "Explain the Error Code",
+        "intro": "A connection attempt ends in a Windows error code the user cannot act on. This section keeps the table of connection errors as data, each with the cause in plain words and what to try, and shows it beside the failing row.",
+        "surface": {
+          "fidelity": "the failing row's detail on the Check screen, against `DESIGN.md` section 2.",
+          "job": "a person reads why the connection failed and what to try, not a number. Consumer: the code from a real connection attempt, looked up in the table.",
+          "treatment": "the code kept small beside a sentence of cause and a sentence of action. Cheaper substitute that fails the checkpoint: showing the raw code, which the user already has and cannot act on."
+        },
+        "build": [
+          "Write the table in `src/core/ErrorTable.cpp` from a data file. Done when: each code has a cause and an action, and an unknown code says it is not known.",
+          "Show it in the failing row in `src/ui/CheckView.cpp`. Done when: a driven failure shows the sentence and the code."
+        ],
+        "items": [
+          "Declare the codes 53, 67, 5, 86, 1326 and 1219 with cause and action in `src/core/ErrorTable.cpp` (network path not found, network name not found, access denied, wrong password, sign-in failure, conflicting connections with other credentials). Done when: a test finds each with both texts. Cheaper substitute: the system's message text alone, which names no step and no action.",
+          "Add the codes a share failure meets beyond those six, each with a reason it belongs, such as 1203, 1231, 1244, 2250 and 1272, which the plan section's causes (credentials, guest access blocked, discovery) lead to. Done when: every code in the table is shown in a fixture and none is a guess. Cheaper substitute: a long table copied from the web without a fixture.",
+          "Say so plainly when a code is not in the table, with the number and one sentence, and never guess a cause. Done when: a fixture with an unknown code shows that and no cause.",
+          "Show the cause and the action in the failing row of `src/ui/CheckView.cpp`, the code in small text. Done when: a driven failure of each declared code shows its sentences. Cheaper substitute: a message box, which leaves the page.",
+          "Cover it in `tests/errortable_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L errors` passes, and fails when one code loses its action."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L errors` passes for every declared code and an unknown one, and fails when an action is removed.",
+        "commit": "feature: connection errors explained in plain words"
+      },
+      {
+        "title": "Old Device Check",
+        "intro": "Many old NAS devices and printers offer only SMB1, which current Windows switches off, so the connection fails with a code that does not say why. This section recognises that case and says what the safe choices are, without changing anything.",
+        "surface": {
+          "fidelity": "the Protocol version row and its detail, against `DESIGN.md` section 2.",
+          "job": "a person learns that the device is too old for this Windows and what the safe choices are. Consumer: the dialects the server offers, read from a real negotiation.",
+          "treatment": "a plain statement that the server offers only the old version, followed by the safe choices in order: update the device, set the device to a newer version, or use another route. Cheaper substitute that fails the checkpoint: advising to turn SMB1 back on as the first choice, which weakens the computer."
+        },
+        "build": [
+          "Report the dialects offered in `src/core/Probes.cpp`. Done when: a fixture with SMB1 only is told apart from one with SMB2 or SMB3.",
+          "Write the choices in `src/core/OldDevice.cpp` and show them in `src/ui/CheckView.cpp`. Done when: the failing row lists them in order."
+        ],
+        "items": [
+          "Read the server's offered dialects in `src/core/Probes.cpp` and separate no answer from an answer with only SMB1. Done when: three fixtures (SMB1 only, SMB2 or SMB3, no answer) give three different results.",
+          "Write the safe choices in `src/core/OldDevice.cpp`: update the device's firmware, set the device to the newest version it offers, replace the device, and as the last resort the Windows SMB1 client feature with its risk stated. Done when: a test finds the four in that order, with the risk written beside the last.",
+          "Read whether the SMB1 client feature is on, on this computer, without changing it. Done when: a fixture with it off and one with it on each show the matching sentence. Cheaper substitute: assuming it is off, which is wrong on a machine where someone turned it on.",
+          "Show the result in the failing row of `src/ui/CheckView.cpp` and in the This computer section. Done when: a driven SMB1-only fixture shows the statement and the choices.",
+          "Cover it in `tests/olddevice_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L olddevice` passes, and fails when the first choice becomes turning SMB1 on."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L olddevice` passes for the SMB1-only, newer and no-answer fixtures and the order of the choices, and fails when the order changes.",
+        "commit": "feature: say when a server offers only the old protocol and what to do"
+      },
+      {
+        "title": "Local Settings Check",
+        "intro": "Some failures are on this computer, not at the server. This section reads the settings that affect sharing and shows them in the This computer section, so the person sees a Public network profile, a stopped workstation service or a clock that is off by minutes (which breaks Kerberos) without going to look for them.",
+        "surface": {
+          "fidelity": "the This computer section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person sees the local settings that stop sharing and which of them matter now. Consumer: the network profile, the services, the protocol versions and the clock, each read from Windows.",
+          "treatment": "one row per setting with an icon and a word (On, Off, Public, Private, Stopped) and a sentence of why it matters. Cheaper substitute that fails the checkpoint: a list of values with no statement of which one explains the failure."
+        },
+        "build": [
+          "Read the settings in `src/core/LocalSettings.cpp`. Done when: each value is read from Windows and a fixture replaces it in a test.",
+          "Show them in `src/ui/ThisComputerView.cpp`. Done when: each row shows its state and why it matters."
+        ],
+        "items": [
+          "Read the network profile of each connected network (Public, Private, Domain) in `src/core/LocalSettings.cpp` and say that Public turns discovery and file sharing off. Done when: a fixture with each profile shows its sentence.",
+          "Read the state of the LanmanWorkstation service, the Function Discovery services and the SMB client protocol versions that are on. Done when: a fixture with a stopped service and one with SMB1 off show it.",
+          "Read stored credentials for the server in Credential Manager by name only, never the password, and the setting that blocks guest access. Done when: a fixture shows that a saved sign-in exists for the server and no test or log holds a password. Cheaper substitute: reading the credential's secret to compare it, which handles a password.",
+          "Compare the computer's clock with the server's where it can be read and say when the difference could break Kerberos sign-in. Done when: a fixture with a large difference shows the warning and one with none shows nothing.",
+          "Show every setting in `src/ui/ThisComputerView.cpp`, and in the Check screen when a setting explains the failure. Done when: a driven run with a Public profile marks that row as the likely cause.",
+          "Cover it in `tests/localsettings_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L local` passes, and fails when a setting is read as the wrong state."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L local` passes for each profile, service, protocol, credential and clock fixture, and fails when a state is misread.",
+        "commit": "feature: the local settings that stop sharing, read and explained"
+      },
+      {
+        "title": "Open the Right Windows Setting",
+        "intro": "Knowing the cause is not enough if the person must hunt for where to fix it. A failing row offers a button that opens the Windows page where that fix is made. The tool never makes the change itself.",
+        "surface": {
+          "fidelity": "the button in a failing row, against `DESIGN.md` section 2.",
+          "job": "a person gets to the place where the fix is made in one click. Consumer: the Windows page opened, read back from the launched process or page.",
+          "treatment": "a button named for the page it opens, for example Open network settings or Open Credential Manager, shown only on a row that has such a page. Cheaper substitute that fails the checkpoint: an instruction to find the setting by hand, which leaves the hunt to the person."
+        },
+        "build": [
+          "Declare which failure opens which page in `src/core/Fixes.h`. Done when: each action names its page once.",
+          "Show the button in `src/ui/CheckView.cpp` and open the page. Done when: a driven failure opens the right page."
+        ],
+        "items": [
+          "Declare in `src/core/Fixes.h` the pages: the network profile page, Network and Sharing settings, Credential Manager, the Services list for LanmanWorkstation, Optional Features for the SMB client, and Date and Time. Done when: each failure kind names at most one page and a test lists them.",
+          "Open a page with the system's URI or launcher in `src/core/Fixes.cpp` and nothing else. Done when: a test with a replaced launcher records the page asked for and the tool wrote nothing. Cheaper substitute: running a script that sets the value, which changes the computer without the person.",
+          "Show the button only on a row that has a page, in `src/ui/CheckView.cpp`, named for the page. Done when: a row with no fix shows no button and a row with one shows it.",
+          "Say in the row's detail what to change on that page. Done when: each button's page has a sentence naming the setting and the value to set, from the same data.",
+          "Cover it in `tests/fixes_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L fixes` passes, and fails when a failure kind opens the wrong page."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L fixes` passes for every declared page and the no-change check, and fails when a failure opens the wrong page.",
+        "commit": "feature: a failing row opens the Windows page where the fix is made"
+      }
+    ],
+    "no_reverse": "the tool tests and explains; it changes no setting and keeps no password",
+    "verification": [
+      "A fixture failure in each category (name resolution, route, port, protocol version, sign-in, share) is attributed to its step with an action, and an unknown error code says so.",
+      "A search of `src/` and a run-time write list prove no password is stored and no setting is changed.",
+      "On a real machine the tool tests a working share, a missing name, a closed port, an SMB1-only device and a wrong password, in light and dark, by keyboard alone."
+    ]
+  }
+}

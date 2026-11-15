@@ -117,6 +117,8 @@ Nobody else can build this. It exists only because every tool in this suite writ
 
 ## 4. Boot Time Analyzer
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BootTimeAnalyzer` repository (`D:\Resolute_Bin\BootTimeAnalyzer`) by its own plan.
+
 Task Manager grades startup apps "High", "Medium", or "Low" and says nothing about drivers or services. Real boot tracing exists but is developer-grade. In between is where every user with a slow machine actually lives.
 
 **Fidelity:** the boot timeline and the contributor list, against `DESIGN.md`.
@@ -125,16 +127,18 @@ Task Manager grades startup apps "High", "Medium", or "Low" and says nothing abo
 **Chrome:** consume the framework, and the autoruns enumerators for anything it offers to disable.
 **Needs:** Windows host (build/test)
 
-- [ ] Report total boot time and its phases from the records Windows keeps. Done when: figures render for the last several boots and are compared against an independent measurement.
-- [ ] Attribute time to specific services, drivers, and startup applications. Done when: a deliberately slowed fixture service is identified as a contributor with a figure.
-- [ ] State plainly what cannot be measured without deeper tracing. Done when: the limits are on the surface, so a user is not misled into thinking the list is exhaustive.
-- [ ] Offer to disable a contributor through the autoruns manager's contract items rather than implementing disabling here. Done when: the offer routes to that tool's item and the undo is that tool's.
-- [ ] Show boot time over time, so a user can tell whether it is getting worse. Done when: a history renders and a machine with one recorded boot says so.
-- [ ] Commit: `"boot analyzer: attribute slow startup with real numbers"`
+- [ ] ~~Report total boot time and its phases from the records Windows keeps. Done when: figures render for the last several boots and are compared against an independent measurement.~~ -> `rizonesoft/BootTimeAnalyzer`
+- [ ] ~~Attribute time to specific services, drivers, and startup applications. Done when: a deliberately slowed fixture service is identified as a contributor with a figure.~~ -> `rizonesoft/BootTimeAnalyzer`
+- [ ] ~~State plainly what cannot be measured without deeper tracing. Done when: the limits are on the surface, so a user is not misled into thinking the list is exhaustive.~~ -> `rizonesoft/BootTimeAnalyzer`
+- [ ] ~~Offer to disable a contributor through the autoruns manager's contract items rather than implementing disabling here. Done when: the offer routes to that tool's item and the undo is that tool's.~~ -> `rizonesoft/BootTimeAnalyzer`
+- [ ] ~~Show boot time over time, so a user can tell whether it is getting worse. Done when: a history renders and a machine with one recorded boot says so.~~ -> `rizonesoft/BootTimeAnalyzer`
+- [ ] Commit: ~~`"boot analyzer: attribute slow startup with real numbers"`~~ -> `rizonesoft/BootTimeAnalyzer`
 
-**Test checkpoint:** Boot time and phases render for the last several boots, compared against an independent measurement. A deliberately slowed fixture service is identified with a figure. The measurement limits are stated on the surface. Disabling routes to the autoruns manager's contract item, proven by search showing no disable logic here.
+**Test checkpoint:** Moved with the section. The `rizonesoft/BootTimeAnalyzer` repository's plan carries it.
 
 ## 5. Why Is This Denied
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/WhyIsThisDenied` repository (`D:\Resolute_Bin\WhyIsThisDenied`) by its own plan.
 
 Windows says access is denied, or that a setting is managed, and then refuses to say why. Six different mechanisms can produce that, and no tool checks all six.
 
@@ -144,16 +148,18 @@ Windows says access is denied, or that a setting is managed, and then refuses to
 **Chrome:** consume the ownership logic, the file-lock logic from `D05 T03 §5`, and the policy logic from `D05 T03 §8`. Implement none of them again.
 **Needs:** Windows host (build/test)
 
-- [ ] Check each mechanism for a given target: ownership, an explicit deny entry, inherited permissions, integrity level, a policy restriction, an edition limitation, and an in-use lock. Done when: all seven are checked and a fixture for each produces the correct attribution.
-- [ ] Name the responsible mechanism rather than listing all of them. Done when: a fixture blocked by a deny entry names that, and one blocked by a lock names the holding process.
-- [ ] Say what would change it, and whether this suite can do it. Done when: each explanation names the tool and action that would resolve it, or states plainly that it cannot be resolved.
-- [ ] Handle the case where more than one mechanism applies. Done when: a fixture blocked by two mechanisms reports both in the order they would need resolving.
-- [ ] Change nothing. Done when: this tool has no write path at all, proven by search, and resolution is always a hand-off to the owning tool.
-- [ ] Commit: `"why is this denied: name the mechanism, not the symptom"`
+- [ ] ~~Check each mechanism for a given target: ownership, an explicit deny entry, inherited permissions, integrity level, a policy restriction, an edition limitation, and an in-use lock. Done when: all seven are checked and a fixture for each produces the correct attribution.~~ -> `rizonesoft/WhyIsThisDenied`
+- [ ] ~~Name the responsible mechanism rather than listing all of them. Done when: a fixture blocked by a deny entry names that, and one blocked by a lock names the holding process.~~ -> `rizonesoft/WhyIsThisDenied`
+- [ ] ~~Say what would change it, and whether this suite can do it. Done when: each explanation names the tool and action that would resolve it, or states plainly that it cannot be resolved.~~ -> `rizonesoft/WhyIsThisDenied`
+- [ ] ~~Handle the case where more than one mechanism applies. Done when: a fixture blocked by two mechanisms reports both in the order they would need resolving.~~ -> `rizonesoft/WhyIsThisDenied`
+- [ ] ~~Change nothing. Done when: this tool has no write path at all, proven by search, and resolution is always a hand-off to the owning tool.~~ -> `rizonesoft/WhyIsThisDenied`
+- [ ] Commit: ~~`"why is this denied: name the mechanism, not the symptom"`~~ -> `rizonesoft/WhyIsThisDenied`
 
-**Test checkpoint:** All seven mechanisms are checked, with a fixture per mechanism producing the correct attribution. A deny-entry fixture and a lock fixture each name the right cause. Each explanation names the resolving tool or states that it cannot be resolved. A two-mechanism fixture reports both in resolution order. The tool has no write path, proven by search.
+**Test checkpoint:** Moved with the section. The `rizonesoft/WhyIsThisDenied` repository's plan carries it.
 
 ## 6. Pending Reboot Inspector
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PendingRebootInspector` repository (`D:\Resolute_Bin\PendingRebootInspector`) by its own plan.
 
 Windows demands a restart, the user restarts, and Windows demands a restart again. The flags that cause this are scattered, obscure, and sometimes stale.
 
@@ -163,15 +169,17 @@ Windows demands a restart, the user restarts, and Windows demands a restart agai
 **Chrome:** consume the framework and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Check every source of a pending restart, including pending file rename operations, component servicing, and update state. Done when: each source is listed here with its location, and a fixture for each is detected.
-- [ ] Name what set each flag where the system records it. Done when: a fixture flag renders with its origin, and one with no recorded origin says so.
-- [ ] Distinguish a genuine pending operation from a stale flag. Done when: the distinction is made on evidence, and this section records how.
-- [ ] Offer to clear only the stale ones, as a repair-contract item. Done when: clearing is undoable, and a genuine pending operation is refused with the reason.
-- [ ] Commit: `"pending reboot: name what is demanding a restart"`
+- [ ] ~~Check every source of a pending restart, including pending file rename operations, component servicing, and update state. Done when: each source is listed here with its location, and a fixture for each is detected.~~ -> `rizonesoft/PendingRebootInspector`
+- [ ] ~~Name what set each flag where the system records it. Done when: a fixture flag renders with its origin, and one with no recorded origin says so.~~ -> `rizonesoft/PendingRebootInspector`
+- [ ] ~~Distinguish a genuine pending operation from a stale flag. Done when: the distinction is made on evidence, and this section records how.~~ -> `rizonesoft/PendingRebootInspector`
+- [ ] ~~Offer to clear only the stale ones, as a repair-contract item. Done when: clearing is undoable, and a genuine pending operation is refused with the reason.~~ -> `rizonesoft/PendingRebootInspector`
+- [ ] Commit: ~~`"pending reboot: name what is demanding a restart"`~~ -> `rizonesoft/PendingRebootInspector`
 
-**Test checkpoint:** Every pending-restart source is listed with its location and detected against a fixture. A fixture flag renders with its origin. Stale and genuine are distinguished on stated evidence. Clearing a stale flag is undoable; clearing a genuine one is refused with the reason.
+**Test checkpoint:** Moved with the section. The `rizonesoft/PendingRebootInspector` repository's plan carries it.
 
 ## 7. Activation and Network Share Diagnostics
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ActivationDiagnostics` and `rizonesoft/ShareDiagnostics` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 Two small tools, grouped because each is a single explanatory surface over one opaque system facility.
 
@@ -181,14 +189,14 @@ Two small tools, grouped because each is a single explanatory surface over one o
 **Chrome:** consume the framework. Neither tool changes anything, so neither consumes the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Report the activation state, licence type, and any grace period. Done when: all three render and a machine in each state is driven.
-- [ ] Decode activation error codes into plain words with a likely cause. Done when: a fixture set of common codes each render an explanation, and an unknown code says so rather than guessing.
-- [ ] Never handle, display, or store a product key. Done when: this section records that as a rule and a search proves no key is read or written. Cheaper substitute that fails the checkpoint: displaying the key as a convenience, which turns a diagnostic into a credential leak.
-- [ ] Diagnose a failing share connection across its real causes: name resolution, the protocol version negotiated, credentials, network discovery, and the firewall. Done when: a fixture failure in each category is attributed correctly.
-- [ ] Say which step failed and what would change it. Done when: each result names the failing step and an action, rather than reporting that the connection failed.
-- [ ] Commit: `"activation and share diagnostics: decode the opaque failures"`
+- [ ] ~~Report the activation state, licence type, and any grace period. Done when: all three render and a machine in each state is driven.~~ -> `rizonesoft/ActivationDiagnostics`
+- [ ] ~~Decode activation error codes into plain words with a likely cause. Done when: a fixture set of common codes each render an explanation, and an unknown code says so rather than guessing.~~ -> `rizonesoft/ActivationDiagnostics`
+- [ ] ~~Never handle, display, or store a product key. Done when: this section records that as a rule and a search proves no key is read or written. Cheaper substitute that fails the checkpoint: displaying the key as a convenience, which turns a diagnostic into a credential leak.~~ -> `rizonesoft/ActivationDiagnostics`
+- [ ] ~~Diagnose a failing share connection across its real causes: name resolution, the protocol version negotiated, credentials, network discovery, and the firewall. Done when: a fixture failure in each category is attributed correctly.~~ -> `rizonesoft/ActivationDiagnostics`
+- [ ] ~~Say which step failed and what would change it. Done when: each result names the failing step and an action, rather than reporting that the connection failed.~~ -> `rizonesoft/ActivationDiagnostics`
+- [ ] Commit: ~~`"activation and share diagnostics: decode the opaque failures"`~~ -> `rizonesoft/ActivationDiagnostics`
 
-**Test checkpoint:** Activation state, licence type, and grace period render across driven machines. Common error codes each decode; an unknown one says so. No product key is read or written, proven by search. A fixture share failure in each category is attributed correctly and names the failing step with an action.
+**Test checkpoint:** Moved with the section. The `rizonesoft/ActivationDiagnostics` repository's plan carries it.
 
 ## Verification
 

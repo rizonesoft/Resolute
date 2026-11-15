@@ -1,0 +1,250 @@
+{
+  "name": "PendingRebootInspector",
+  "slug": "pendingrebootinspector",
+  "display": "Pending Reboot Inspector",
+  "job": "it says whether Windows is waiting for a restart, which component asked for it and which files are queued to be replaced or deleted at the next start, and can clear one stuck entry with the prior state recorded.",
+  "tagline": "Is Windows waiting for a restart, and what asked for it",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Cyan",
+    "light": "#67E8F9",
+    "dark": "#0891B2",
+    "social_ground": "#06242C",
+    "social_muted": "#BFE9F1"
+  },
+  "icon": {
+    "idea": "A restart arrow with clock hands inside: a restart that is waiting.",
+    "points": [
+      "Free-standing with no tile: an open ring ending in an arrowhead.",
+      "The ring and arrowhead are Cyan and the clock hands Cyan light.",
+      "The small drawing below 40 pixels thickens the ring and the hands."
+    ],
+    "large": "<path d=\"M76 40 A30 30 0 1 0 78 56\" fill=\"none\" stroke=\"#0891B2\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M84 22 L82 46 L60 38 Z\" fill=\"#0891B2\" stroke=\"#0891B2\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M48 34 V50 L58 56\" fill=\"none\" stroke=\"#67E8F9\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M76 40 A30 30 0 1 0 78 56\" fill=\"none\" stroke=\"#0891B2\" stroke-width=\"14\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M86 20 L83 48 L58 38 Z\" fill=\"#0891B2\" stroke=\"#0891B2\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M48 32 V50 L58 56\" fill=\"none\" stroke=\"#67E8F9\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Reasons",
+        "A one-line verdict, then each pending restart reason as a row: what asked, where that is recorded, and since when if known"
+      ],
+      [
+        "Queued files",
+        "Each file operation waiting for the next start: from, to or delete"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees at once whether Windows is waiting for a restart and which component asked for it, and can clear an entry that is left over from a restart that already happened.",
+    "primary": "Refresh",
+    "secondary": "Clear entry",
+    "rows": [
+      [
+        "Windows Update",
+        "Restart required, or Clear"
+      ],
+      [
+        "Component servicing",
+        "Restart pending, or Clear"
+      ],
+      [
+        "Queued file operations",
+        "Queued with a count, or Clear"
+      ],
+      [
+        "Computer name or domain",
+        "Rename or join pending, or Clear"
+      ],
+      [
+        "Installer",
+        "In progress or left over, or Clear"
+      ]
+    ],
+    "status": "2 reasons for a restart, 5 files queued",
+    "notes": [
+      "The top of Reasons is one sentence: a restart is pending and the main reason, or nothing is waiting for a restart. Each row below it is one signal with an icon and a word (Pending, Clear, Unreadable), never colour alone.",
+      "A row names what asked for the restart, the registry key or value or interface where Windows records it, and since when when Windows records a time, or says that no time is recorded.",
+      "Refresh is the accent button: it reads every source again and the rows update from that read, not from an assumption.",
+      "Clear entry is enabled only for a selected row that is clearable. For a servicing or Windows Update row it is refused with the reason in one sentence: only a restart resolves it. For any other row it names the entry, shows the evidence that it is stale, and asks for confirmation before it records the prior state and removes it.",
+      "A signal the tool cannot read is shown as Unreadable with the reason, never as Clear, so a missing right does not look like a machine with nothing pending.",
+      "Queued files lists each pair from `PendingFileRenameOperations` as from and to, or from and Delete, in the order Windows will process them.",
+      "When the tool is not run as an administrator it says so by name at the top of Reasons and refuses to clear anything. The status bar states the counts in words, for example \"2 reasons for a restart, 5 files queued\"."
+    ],
+    "cut": "This is a new tool, so there is no earlier window to cut from. The window has no menu bar, splash, animation or donate strip: it is the suite's sidebar window with the sections above, and what it shows is each signal named in words, never a dump of registry values set in a box. This is recorded in the plan."
+  },
+  "readme": {
+    "lead": "Find out whether Windows is waiting for a restart, and what asked for it.",
+    "what": [
+      "Windows records a pending restart in several unrelated places: the Windows Update and servicing keys, a queue of file renames and deletes, a pending computer rename or domain join, and an installer that believes it is still running. Pending Reboot Inspector reads all of them, tells you in one sentence whether a restart is pending, and names each component that asked for one, where Windows records it and since when when that is known. It also lists every file queued to be replaced or deleted at the next start.",
+      "Sometimes an installer keeps refusing to run because of a restart that already happened and left an entry behind. The tool can clear that one entry. It records the prior state first, reads the result back, refuses to clear a Windows Update or servicing signal because only a restart resolves it, and refuses by name when it is not run as an administrator."
+    ],
+    "new_intro": "This tool is new in the suite and is written in C++ from the start.",
+    "new": [
+      [
+        "Every source in one place.",
+        "One table of known signals is read each time, so a new source is one new row of data."
+      ],
+      [
+        "The queue decoded.",
+        "The files waiting to be replaced or deleted are shown as from and to, not as a block of raw registry text."
+      ],
+      [
+        "A stuck entry you can clear, and take back.",
+        "The prior value is recorded before the change and can be restored."
+      ],
+      [
+        "One executable.",
+        "It runs on its own and is also bundled with the Resolute launcher."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "New tool: signal reader, window, undo, explain, restart, summary",
+    "goal": "Pending Reboot Inspector ships as a complete, standalone C++ tool that reads every known pending-restart signal on a Windows machine, says in one sentence whether a restart is pending and which component asked for it, decodes the files queued for the next start, and clears one chosen stale signal with its prior value recorded and the result read back, while refusing to clear a servicing signal and refusing by name when it is not elevated.",
+    "current_state": "Nothing exists yet: there is no C++ code, no AutoIt original and no reference material. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits and `docs/origin/resolute-D05-T04-s6.md`, the tool's plan section from the Resolute repository, which is 18 lines and lists four checklist items (check every source, name what set each flag, distinguish genuine from stale, offer to clear only the stale ones). The sources are Windows's own: the `PendingFileRenameOperations` value (and `PendingFileRenameOperations2`) under `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager`, the `RebootPending`, `RebootInProgress` and `PackagesPending` keys under `HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing`, the `RebootRequired` key under `HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update`, a pending computer rename (the `ActiveComputerName` and `ComputerName` values differing under `HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName`), a pending domain join (`JoinDomain` and `AvoidSpnSet` under `HKLM\\SYSTEM\\CurrentControlSet\\Services\\Netlogon`), the `UpdateExeVolatile` value under `HKLM\\SOFTWARE\\Microsoft\\Updates`, the `InProgress` key under `HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Installer`, and the Configuration Manager client's own check, `DetermineIfRebootPending` in the `CCM_ClientUtilities` class of the `ROOT\\ccm\\ClientSDK` namespace, which exists only on a managed machine. These locations come from general knowledge of Windows and have not been confirmed on a machine for this plan: the first engine item records each on a real machine. The SDK's framework, repair contract and chart control, which this tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T04-s6.md`: the plan section as it stood in the Resolute repository, with its four checklist items and its test checkpoint.",
+      "`DESIGN.md`: the tool's identity and the sections of its window, and `sdk/DESIGN.md`, the contract every surface answers to.",
+      "The Windows locations named above, read on a real machine with and without elevation, and on one machine managed by Configuration Manager if one is available."
+    ],
+    "outcome": [
+      "`PendingRebootInspector.exe` reads every signal in its source table, names the component that asked for each restart with where and since when Windows records it, and decodes each queued file operation as from and to or delete.",
+      "One chosen stale signal can be cleared with its prior value recorded and the result read back; a servicing signal is refused with the reason that only a restart resolves it, and every action is refused by name when the tool is not elevated.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Reasons screen, where each pending restart reason is a row and Queued files is its neighbour. Reporting and audit are the Activity section, which records each read and each clear. Settings are the framework's pages. Permissions anchor on the engine, where clearing an entry is refused by name when the process is not elevated. Reverse means restoring the exact value or key that was removed, from the record made before the clear, and is anchored on the undo section.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Restart Signals and Clearing",
+      "intro": "The tool's whole system effect: reading every known pending-restart signal through one table of sources declared as data, decoding the queued file operations, deciding on stated evidence whether a signal is stale, and clearing one chosen signal with its prior value recorded. It is independent of any window, and every Windows call sits behind an interface the tests can replace with a fixture. A signal is stale when Windows has restarted since it was recorded: for a registry key the key's last write time is earlier than the last boot time, and for an installer the key is present with no installer process running. Where Windows records no time the signal is treated as genuine.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the signal sources as data in `src/core/Sources.h`. Done when: each source (kind, hive, path, value or key, what asked, whether it is clearable) is one row stated once.",
+        "Implement the reader, the queue decoder and the clearer in `src/core/PendingReader.cpp` behind a source interface the tests can replace. Done when: the unit tests pass against fixtures with no real machine state."
+      ],
+      "items": [
+        "Record each source of `src/core/Sources.h` on a real machine in `docs/sources.md`: its location, what sets it, whether it holds a time, and how it was seen to appear and disappear. Done when: every row of the table has a recorded observation naming the Windows build, and a row not confirmed on a machine says so.",
+        "Implement `ReadSignals()` in `src/core/PendingReader.cpp` walking the table and returning for each signal its kind, what asked, where it is recorded, since when (the key's last write time, or no time recorded) and its state (pending, clear or unreadable with the reason). Done when: a fixture with one source set per kind detects each of them, and a fixture with an unreadable key returns unreadable, not clear.",
+        "Implement `ReadConfigMgrSignal()` calling `DetermineIfRebootPending` in `ROOT\\ccm\\ClientSDK` and returning not applicable when the namespace does not exist. Done when: a fixture namespace reporting a pending restart adds that signal and a machine without the client adds none.",
+        "Implement `DecodeQueuedFiles()` reading the `PendingFileRenameOperations` multi-string as pairs, treating an empty second string as a delete and a leading `!` on the destination as replace if present, and stripping the `\\??\\` prefix. Done when: a fixture with a rename, a delete and a replace decodes to three entries in the stored order, and an odd-length value is returned as a named decode error.",
+        "Implement `IsStale(signal)` returning stale or genuine with the evidence it used (key last write time against the last boot time, or no installer process running). Done when: a fixture key written before the boot time is stale, one written after is genuine, and one with no time recorded is genuine with that stated.",
+        "Implement `ClearSignal(signal)` that records the signal's prior value or key through the repair contract, removes only that one value or key, reads it back and returns a mismatch as signal, expected and found. Done when: a fixture that ignores the removal gets the mismatch named and a fixture that honours it leaves every other signal unchanged. Cheaper substitute: removing every pending flag at once, or checking only the return code of the delete.",
+        "Refuse `ClearSignal` for a Component Based Servicing signal or a Windows Update signal with the reason \"only a restart resolves it\", and for a genuine signal with the evidence that it is genuine, before any write. Done when: a test of each returns the refusal with its reason and the fixture is unchanged. Cheaper substitute: clearing on request, which can leave a half-applied update permanently unfinished.",
+        "Refuse `ClearSignal` by name when the process is not elevated, before any write, with one activity record. Done when: an unelevated test run reports the refusal naming the action and the fixture is unchanged. Cheaper substitute: letting the delete fail with access denied halfway through.",
+        "Cover every path in `tests/signals_test.cpp` with fixture sources. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L signals` passes, and fails when one source is dropped from the table."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L signals` passes, including the unreadable, servicing-refused, genuine-refused and unelevated cases, and fails when a source is dropped from the table.",
+      "commit": "core: read every pending-restart signal and clear one stale entry with its prior value recorded"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Undo a Cleared Entry",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Clearing an entry that turns out to be needed can leave an installer half finished. Before any clear, the exact prior value or key is recorded, so Undo puts back what was there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back the entry the tool cleared. Consumer: the registry value or key, compared with the record.",
+          "treatment": "the recorded prior value restored with its type and read back. Cheaper substitute that fails the checkpoint: an undo that writes a generic restart flag, which is not what was there before."
+        },
+        "build": [
+          "Record the prior value through the repair contract in `src/core/PendingReader.cpp`. Done when: a record exists on disk before the first removal.",
+          "Wire Undo in `src/ui/ReasonsView.cpp`. Done when: clear then undo leaves the signal as it was."
+        ],
+        "items": [
+          "Record the signal's prior value, its type and its location through the repair contract's restore record before `ClearSignal` removes it. Done when: a test finds the record on disk before the removal is made. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement `UndoClear(record)` restoring the value with its original type and reading it back. Done when: clear then undo of a multi-string queue, a key and a plain value each leave the fixture equal to before, asserted.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one clear.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: clearing a queue, a key and a value and then undoing each leaves the fixture as it was.",
+        "commit": "feature: undo puts a cleared restart entry back as it was"
+      },
+      {
+        "title": "Explain Each Reason",
+        "intro": "Each row gets one plain sentence saying what the reason means and whether restarting is the only fix, so a person knows whether the entry can be cleared or has to be waited out. The sentences are data tied to the source table, never typed into the view.",
+        "surface": {
+          "fidelity": "the explanation under each row of Reasons, against `DESIGN.md` section 2.",
+          "job": "a person reads what a reason means and what to do about it. Consumer: the sentence, compared with the source it explains.",
+          "treatment": "one sentence naming the component and saying either that only a restart resolves it or that the entry can be cleared when it is stale. Cheaper substitute that fails the checkpoint: the registry path shown as the explanation, which names a location and not a meaning."
+        },
+        "build": [
+          "Add an explanation to each row of `src/core/Sources.h`. Done when: every source has a sentence and a field saying whether restarting is the only fix.",
+          "Show it under each row in `src/ui/ReasonsView.cpp`. Done when: selecting a row shows its sentence."
+        ],
+        "items": [
+          "Add to each source in `src/core/Sources.h` an explanation sentence and a `restartOnly` flag that agrees with whether `ClearSignal` refuses it. Done when: a test fails when a source has no sentence or when its flag disagrees with the clearer.",
+          "Say in the sentence whether the signal looks stale on the evidence of `IsStale`, stating the evidence. Done when: a stale fixture and a genuine fixture give different sentences, each naming its evidence.",
+          "Show the sentence under the selected row in `src/ui/ReasonsView.cpp`, selectable and copyable. Done when: Ctrl+C on it puts its text on the clipboard.",
+          "Cover it in `tests/explain_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes, and fails when a source's sentence is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes for every source and for the stale and genuine fixtures.",
+        "commit": "feature: each reason says what it means and whether only a restart fixes it"
+      },
+      {
+        "title": "Restart Now",
+        "intro": "When the honest fix is a restart, the tool offers it. It names what is pending and what unsaved work a restart can lose, asks for confirmation, and only then asks Windows to restart. It never restarts without that confirmation.",
+        "surface": {
+          "fidelity": "the Restart now action and its confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person restarts to resolve the reasons Windows lists. Consumer: the restart request, issued only after confirmation.",
+          "treatment": "a confirmation listing the pending reasons and a Cancel that is the default. Cheaper substitute that fails the checkpoint: a restart on a single click, which can lose unsaved work."
+        },
+        "build": [
+          "Request the restart in `src/core/Restart.cpp` through the Windows shutdown interface with a reason. Done when: a fixture shutdown interface receives one restart request with the reason text.",
+          "Add the action and its confirmation to `src/ui/ReasonsView.cpp`. Done when: no request is made until the confirmation is accepted."
+        ],
+        "items": [
+          "Write `RequestRestart()` in `src/core/Restart.cpp` that checks the process holds the shutdown right, asks for a restart with the pending reasons as the reason text, and returns a named refusal when the right is missing. Done when: a fixture interface records one request with its text, and a missing right returns the refusal without a request. Cheaper substitute: running `shutdown.exe /r`, which cannot be replaced for a test.",
+          "Show a confirmation through the framework's message surface naming each pending reason, with Cancel as the default. Done when: accepting makes one request and cancelling makes none. Cheaper substitute: a private dialog.",
+          "Show Restart now only while a pending reason exists and say in the Activity record that a restart was requested. Done when: a clear fixture shows no action and a pending fixture shows it, and one Activity line exists after a request.",
+          "Cover it in `tests/restart_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restart` passes, and fails when a request is made before the confirmation."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restart` passes: one request after an accepted confirmation, none after a cancel or a missing right.",
+        "commit": "feature: restart now, after a confirmation naming what is pending"
+      },
+      {
+        "title": "Copy a Summary for Support",
+        "intro": "One action puts a plain-text summary of the machine's restart state on the clipboard: the verdict, each reason with where it is recorded and since when, and the queued files. It is for pasting into a support request, and it contains no secrets and no user data beyond file paths the queue already names.",
+        "surface": {
+          "fidelity": "the Copy summary action, against `DESIGN.md` section 2.",
+          "job": "a person gives support the whole restart picture in one paste. Consumer: the clipboard text, compared with the rows.",
+          "treatment": "plain text, one reason per line, with the Windows build and the time of the read at the top. Cheaper substitute that fails the checkpoint: a screenshot, which cannot be searched or pasted into a ticket as text."
+        },
+        "build": [
+          "Build the summary text in `src/core/Summary.cpp` from the signals and the queue. Done when: the same inputs always give the same text.",
+          "Add the action to `src/ui/ReasonsView.cpp`. Done when: it puts the text on the clipboard."
+        ],
+        "items": [
+          "Write `BuildSummary(signals, queue, buildInfo)` in `src/core/Summary.cpp` giving the verdict, one line per reason with its location and time, and the queued files. Done when: a fixture gives an exact expected text, and a clear fixture says that nothing is pending.",
+          "Add Copy summary to `src/ui/ReasonsView.cpp` placing the text on the clipboard. Done when: pasting after the action gives the text of the fixture.",
+          "Cover it in `tests/summary_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes, and fails when a reason is omitted from the text."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes for the pending and clear fixtures.",
+        "commit": "feature: copy a plain-text summary for support"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine, the reasons and queued files the tool shows match the registry values and keys and the Configuration Manager check for the same moment, and each reason names what asked and where it is recorded.",
+      "A stale entry is cleared, read back, undone and read back again on a real machine, a servicing signal is refused with its reason, and an unelevated run refuses by name.",
+      "The window works in light and dark at 100 and 150 percent, by keyboard alone."
+    ]
+  }
+}
