@@ -18,7 +18,7 @@ track: F1
 > <!-- claim: exists resolute_au3/SDK/Concrete/ReBar/ReBar.au3 -->
 > <!-- claim: lines resolute_au3/SDK/Concrete/ReBar/ReBar.au3 = 1556 -->
 > <!-- claim: count "ReBar Framework" resolute_au3/SDK/Concrete/ReBar/ReBar.au3 = 4 -->
-> <!-- claim: count "Res_HiDpi=N" resolute_au3/SDK/Concrete/*/*.au3 = 14 -->
+> **Note 2026-11-15:** the fourteen-script `Res_HiDpi=N` count above was measured on 2026-09-16 and is no longer re-measured here: each AutoIt tool is leaving for its own repository (`docs/plans/2026-11-15-app-split.md`), so the count in this tree falls with every move. The measurement stands as recorded.
 
 ## Inputs
 

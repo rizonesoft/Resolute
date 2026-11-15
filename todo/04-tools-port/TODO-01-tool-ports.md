@@ -58,6 +58,8 @@ track: P2
 
 ## 1. Vertical Slice: Ownership End to End
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/Ownership` repository (`D:\Resolute_Bin\Ownership`) by its own plan.
+
 `Ownership` is roughly 77 lines of real logic on top of 1,556 lines of framework, which makes it the cheapest possible proof that the framework and the repair contract actually work together on a real product. If the architecture is wrong, it is wrong here, cheaply.
 
 **Fidelity:** the Ownership main window and its result list, against `docs/captures/house-style/` and a pre-change capture of the shipped build.
@@ -96,26 +98,26 @@ track: P2
 6. **Prove the refusal** unelevated. Done when: an unelevated install or uninstall is refused by name, the four `HKCR` subtrees are unchanged, and one log line records it, plus the elevated success leg (**Groomed 2026-09-23:** this read "a deny-ACE fixture", a file-permission case the tool never meets).
 7. **Record what the slice proved** before porting anything else. Done when: this section states which framework and contract assumptions are now evidence, so `§2` starts from fact.
 
-- [ ] Capture the shipped AutoIt `Ownership` first: a driven run against the fixture tree with its effects and window recorded. Done when: the baseline is committed.
+- [ ] ~~Capture the shipped AutoIt `Ownership` first: a driven run against the fixture tree with its effects and window recorded. Done when: the baseline is committed.~~ -> `rizonesoft/Ownership`
   -> XREF: D00 T02 §2 -- the disposable file tree this runs against, which reads back owner SIDs and DACL entry counts for exactly this comparison
 
   **What the fixture store gives this section, and what it does not**, recorded 2026-09-17 when `D00 T02 §2` shipped: `FileTreeFixture` creates a tree this process owns, with declared ACLs, and reads the owner back as a SID string, which is the before-and-after comparison this port needs. It runs **unelevated**. What it does not solve is taking ownership of an object owned by somebody else, which needs `SeTakeOwnershipPrivilege`; that half of this section needs its own arrangement rather than assuming the fixtures cover it.
-- [ ] Port the tool to `extensions/Ownership/` as framework plus repair contract plus its own items, and nothing else. Done when: it builds as its own standalone executable and the source contains no settings, log, localization, or loop code.
-- [ ] Prove parity: both implementations run against the same fixture tree and the parity driver reports no difference. Done when: the parity report is quoted and shows zero differing fields.
+- [ ] ~~Port the tool to `extensions/Ownership/` as framework plus repair contract plus its own items, and nothing else. Done when: it builds as its own standalone executable and the source contains no settings, log, localization, or loop code.~~ -> `rizonesoft/Ownership`
+- [ ] ~~Prove parity: both implementations run against the same fixture tree and the parity driver reports no difference. Done when: the parity report is quoted and shows zero differing fields.~~ -> `rizonesoft/Ownership`
   -> XREF: D00 T02 §4 -- the parity instrument this inherits, and the section that deferred the first cross-implementation pair to this item
 
   **This item inherits work, recorded 2026-09-17 when `D00 T02 §4` shipped.** That section built the record format, the snapshot driver and the field-by-field comparison, and **deliberately did not produce the first cross-implementation pair**, because doing so was circular: no C++ `Ownership` existed, and `§4` is listed among this section's own unmet dependencies. It also could not be driven, since no AutoIt tool in the suite parses a command line, and running one writes `HKCR` on the developer's machine.
 
   **So the first AutoIt-side parity record is this item's to produce**, and the first item of this section is where it is captured. The instrument is already proven against real registry and filesystem state, so what remains here is running it around two implementations rather than building it. The snapshot is taken from **outside** the run, which is why an AutoIt binary that exposes nothing needs no cooperation to be measured.
-- [ ] Prove the reverse: installing the context-menu entry followed by undo leaves `HKCR` exactly as it was, compared key by key and value by value. **Corrected 2026-09-17:** this said "restores every path's owner and ACL", which is not what the tool touches. Done when: the assertion compares the four `HKCR` subtrees before and after, including the `\command` string, and a `RegistryFixture` gives it a disposable target.
-- [ ] Prove the refusal: an unelevated install or uninstall is refused by name with nothing written. Done when: the four `HKCR` subtrees read unchanged after the refusal, one log line records it, and the elevated leg succeeds (**Groomed 2026-09-23:** this read "a deny-ACE fixture produces the refusal and the batch counts reconcile", a file-permission case the tool never meets).
-- [ ] Account for the surface: every control is working or deferred to a named section. Done when: the account is written and each deferral resolves.
-- [ ] Record what the slice proved and what it did not. Done when: this section states which framework and contract assumptions are now evidence rather than intention.
-- [ ] Commit: `"ownership: port to the framework and the repair contract"`
+- [ ] ~~Prove the reverse: installing the context-menu entry followed by undo leaves `HKCR` exactly as it was, compared key by key and value by value. **Corrected 2026-09-17:** this said "restores every path's owner and ACL", which is not what the tool touches. Done when: the assertion compares the four `HKCR` subtrees before and after, including the `\command` string, and a `RegistryFixture` gives it a disposable target.~~ -> `rizonesoft/Ownership`
+- [ ] ~~Prove the refusal: an unelevated install or uninstall is refused by name with nothing written. Done when: the four `HKCR` subtrees read unchanged after the refusal, one log line records it, and the elevated leg succeeds (**Groomed 2026-09-23:** this read "a deny-ACE fixture produces the refusal and the batch counts reconcile", a file-permission case the tool never meets).~~ -> `rizonesoft/Ownership`
+- [ ] ~~Account for the surface: every control is working or deferred to a named section. Done when: the account is written and each deferral resolves.~~ -> `rizonesoft/Ownership`
+- [ ] ~~Record what the slice proved and what it did not. Done when: this section states which framework and contract assumptions are now evidence rather than intention.~~ -> `rizonesoft/Ownership`
+- [ ] Commit: ~~`"ownership: port to the framework and the repair contract"`~~ -> `rizonesoft/Ownership`
 
 **Freeze check:** What `Ownership` writes to `HKCR` does not change, **including the exact `\command` string**, because that string is what eventually runs against a user's files and a change to it changes what happens to them. **Corrected 2026-09-17:** this read "what `Ownership` grants on takeover" against a file tree fixture, and the tool grants nothing at run time. Evidence is the parity report showing zero differing fields against the shipped AutoIt build over the four `HKCR` subtrees.
 
-**Test checkpoint:** The parity driver reports zero differing fields between the C++ and AutoIt implementations on the same fixture tree, quoted. Install followed by undo leaves the four `HKCR` subtrees as they were, asserted. An unelevated install is refused by name with nothing written, plus the elevated leg (**Groomed 2026-09-23:** this checkpoint named file ACLs and a deny-ACE path). The rendered window is compared against the pre-change capture.
+**Test checkpoint:** Moved with the section. The `rizonesoft/Ownership` repository's plan carries it.
 
 ## 2. The Remaining Frozen Tools: ComIntRep and PixRepair
 

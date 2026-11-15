@@ -19,7 +19,7 @@ track: W1
 
 ## Inputs
 
-- [`resolute_au3/SDK/Concrete/Ownership/Ownership.au3`](../../resolute_au3/SDK/Concrete/Ownership/Ownership.au3) -- the vertical-slice tool, and the first thing the parity driver runs against
+- `reference/au3/src/Ownership.au3` in the `rizonesoft/Ownership` repository (moved there 2026-11-15, `docs/plans/2026-11-15-app-split.md`) -- the vertical-slice tool, and the first thing the parity driver runs against
 - -> XREF: [`00-workspace/TODO-01 §5`](./TODO-01-toolchain-and-gates.md) -- the combined gate that runs this harness once it exists
 - -> XREF: [`01-framework/TODO-01 §1`](../01-framework/TODO-01-framework-core.md) -- the framework whose behavior these assertions cover
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- every port cites the parity driver this file builds
