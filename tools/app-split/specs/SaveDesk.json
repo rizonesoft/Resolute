@@ -1,0 +1,244 @@
+{
+  "name": "SaveDesk",
+  "slug": "savedesk",
+  "display": "SaveDesk",
+  "job": "it saves the position of every desktop icon as a layout for the current screen resolution and monitor arrangement, and puts the icons back exactly when Windows scrambles them.",
+  "tagline": "Save where your desktop icons are, and put them back",
+  "frozen": false,
+  "elevated": false,
+  "au3": [
+    "SaveDesk"
+  ],
+  "hue": {
+    "name": "Yellow",
+    "light": "#FDE047",
+    "dark": "#CA8A04",
+    "social_ground": "#2A2206",
+    "social_muted": "#F3E6A8"
+  },
+  "icon": {
+    "idea": "A screen with its icons in place.",
+    "points": [
+      "Free-standing with no tile: a rounded screen on a stand.",
+      "The screen and stand are Yellow, and the three icons on it are Yellow light.",
+      "The small drawing, used below 40 pixels, shows two larger icons and no stand."
+    ],
+    "large": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M48 68 V80 M34 82 H62\" stroke=\"#CA8A04\" stroke-width=\"7\"/></g><rect x=\"10\" y=\"16\" width=\"76\" height=\"52\" rx=\"8\" fill=\"#CA8A04\"/><rect x=\"20\" y=\"26\" width=\"11\" height=\"11\" rx=\"2.5\" fill=\"#FDE047\"/><rect x=\"37\" y=\"26\" width=\"11\" height=\"11\" rx=\"2.5\" fill=\"#FDE047\"/><rect x=\"20\" y=\"43\" width=\"11\" height=\"11\" rx=\"2.5\" fill=\"#FDE047\"/>",
+    "small": "<rect x=\"8\" y=\"20\" width=\"80\" height=\"56\" rx=\"10\" fill=\"#CA8A04\"/><rect x=\"20\" y=\"32\" width=\"17\" height=\"17\" rx=\"4\" fill=\"#FDE047\"/><rect x=\"45\" y=\"32\" width=\"17\" height=\"17\" rx=\"4\" fill=\"#FDE047\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Layouts",
+        "One row per saved layout: its resolution, its date and how many icons it holds"
+      ],
+      [
+        "Automatic saving",
+        "When the tool saves a layout without being asked"
+      ],
+      [
+        "Activity",
+        "What the tool saved and restored, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every saved layout with its resolution, date and icon count, picks one without opening it, and puts the desktop back to it with one button.",
+    "primary": "Restore",
+    "secondary": "Save now",
+    "rows": [
+      [
+        "Layout for the current screen",
+        "Saved and matching, or Saved and differs from the desktop now"
+      ],
+      [
+        "Layout for another resolution",
+        "Saved, not current"
+      ],
+      [
+        "Layout for another monitor arrangement",
+        "Saved, not current"
+      ],
+      [
+        "Newest layout",
+        "Saved automatically, or Saved by hand"
+      ]
+    ],
+    "status": "3 layouts saved, current screen matches one",
+    "notes": [
+      "Each layout is a row showing its resolution, its date and its icon count, with an icon and a word for its state (matching the current screen, differs from the desktop, or not current), so a person with several can choose one without opening it.",
+      "Restore is the accent button and acts on the selected row; with no row selected it acts on the layout that matches the current resolution and monitor arrangement, and is disabled with a tooltip when there is none.",
+      "Save now saves the desktop as it is, as a layout for the current resolution and monitor arrangement, and asks before replacing an existing layout for the same screen.",
+      "After a restore the result is shown in words: how many icons were put back, which saved icons are no longer on the desktop and which desktop icons were not in the layout. Those are reported, never moved to a guessed place.",
+      "A warning row appears when the desktop has Auto arrange icons or Align icons to grid switched on, because either one stops icons holding the restored positions.",
+      "The status bar states the count of saved layouts and whether the current screen has one. No action needs elevation, so there is no refusal state.",
+      "Delete asks first, and names the layout by its resolution and date."
+    ],
+    "cut": "The research tool's window had a Duplicate button, a combo for how unknown icons are placed (top left, bottom right, a custom position, ask per icon, off screen), an Install DCI and Uninstall DCI pair for a desktop right-click menu, a Create Shortcut on Save checkbox, command line switches, a tray menu and an About button. This window has none of them: unknown icons are reported and not placed, there is no desktop menu integration or per-layout shortcut, and the tray, the About page and settings come from the framework. Each cut is recorded in `docs/inventory.md` with its reason."
+  },
+  "readme": {
+    "lead": "SaveDesk saves where your desktop icons are and puts them back.",
+    "what": [
+      "When Windows changes the screen resolution, you dock or undock a laptop, or a crash restarts the shell, desktop icons often end up piled in a corner or in the wrong order. SaveDesk records the position of every icon as a layout, keyed by the screen resolution and the monitor arrangement, so there is a layout for each screen setup you use.",
+      "To put things back, pick a layout and press Restore. SaveDesk moves each icon to its recorded position. Icons added or removed since the layout was saved are reported by name and are not moved to a guessed place."
+    ],
+    "new_intro": "SaveDesk is a new tool, written for Resolute.",
+    "new": [
+      [
+        "A layout per screen setup.",
+        "Layouts are keyed by resolution and monitor arrangement, so a docked desk and an undocked laptop each keep their own."
+      ],
+      [
+        "A list you can read.",
+        "Each saved layout shows its resolution, its date and its icon count, so you can choose one without opening it."
+      ],
+      [
+        "Honest restores.",
+        "Icons that have been added or removed since the save are listed in the result instead of being placed by guesswork."
+      ],
+      [
+        "A restore you can undo.",
+        "The layout that was on the desktop before a restore is kept, so a restore can be reversed."
+      ]
+    ]
+  },
+  "reference": {
+    "note": "The material sits at `reference/au3/SaveDesk/` and is third-party research, not a Rizonesoft original: the Icon Configuration Utility (ICU) v5.0 by Karsten Funk, an AutoIt desktop icon saver, with a sample layout and the WinAPIEx library by Yashied, all under `[Research]/`. SaveDesk is a new build and nothing in this folder is copied; it was read only to learn how the problem is solved."
+  },
+  "plan": {
+    "scope": "A new build: baseline of Windows, engine, round trip, window, features",
+    "goal": "SaveDesk ships as a complete, standalone C++ tool that saves the name and position of every desktop icon as a layout keyed by the screen resolution and monitor arrangement, restores a layout so that every icon returns to its recorded position, reports icons added or removed since the save instead of guessing, lists the saved layouts so one can be chosen without opening it, and can undo a restore. It is a new build, not a port: there is no Rizonesoft original to match, so its proof is how Windows itself behaves, measured on a real machine, and the tool's own round trip.",
+    "current_state": "Nothing exists in C++. The repository holds third-party research under `reference/au3/SaveDesk/[Research]/`: ICU v5.0, an AutoIt tool by Karsten Funk (`ICU - Icon Configuration Utility v5.au3`, 2,042 lines, with two obfuscated copies of 2,387 lines each, a 73-line x86/x64 wrapper, a 50-line `ZZZ_DllOpen_PostProcessor.au3` that rewrites DllOpen calls, and `Desktop.ico`), the WinAPIEx 3.8 library by Yashied (`WinAPIEx.au3`, 37,560 lines, plus a link file to its forum page), and an executable-side sample (`ICU.ini`, 61 bytes, and `001_Venom.icf`, a saved layout of 72 lines recorded at `Resolution=1366x768`). ICU finds the desktop's `SysListView32` through `Progman` or a `WorkerW` window (`ICU - Icon Configuration Utility v5.au3:1386-1408`), reads each icon's name and position (`:1303-1360`), and saves one INI file per layout with a `[Desktop]` line per icon, the key being the URI-encoded name, path and type and the value `x:y` (`:826-845`). Its resolution key is the virtual screen width and height only (`:800`), so it does not tell two monitor arrangements of the same size apart. It is licensed Creative Commons by-nc-sa 3.0 (`:11`), which is why nothing is copied. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built. Nothing has yet been measured on a real machine about where Windows keeps icon positions or what a resolution change does to them.",
+    "inputs": [
+      "`reference/au3/SaveDesk/[Research]/ICU_v5.0_-_Source/ICU - Icon Configuration Utility v5.au3`: third-party research, read to learn how the desktop's icons are found, read and moved. Not copied.",
+      "`reference/au3/SaveDesk/[Research]/ICU_v5.0_-_Exe/ICU/001_Venom.icf` and `ICU.ini`: a sample layout file and settings file, read to see what a saved layout holds. Not a format the tool uses.",
+      "`docs/origin/resolute-D05-T01-s4.md`: the plan section, which records that SaveDesk is new development with no Rizonesoft source behind it."
+    ],
+    "outcome": [
+      "`SaveDesk.exe` saves a layout, survives a resolution change and restores every icon to its recorded position, asserted position by position and captured.",
+      "Saved layouts are listed by resolution, date and icon count and can be told apart without opening them; icons added or removed since a save are reported by name; a restore can be undone.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Layouts screen, where a person finds a layout by its resolution, date and icon count. Reporting and audit are the Activity section, which records what was saved and restored and which icons the last restore could not place. Settings are the framework's pages. Permissions do not apply: the tool reads and moves the current user's own desktop icons and asks for no elevation. Reverse anchors on the Undo a Restore section, where the layout on the desktop before a restore is kept and put back on request.",
+    "baseline_items": [
+      "Find where Windows keeps the desktop's icon positions: snapshot `HKCU\\Software\\Microsoft\\Windows\\Shell\\Bags` on a real machine, move one desktop icon, log off and on, and snapshot again. Done when: `docs/baseline/icon-positions-store.json` lists every key and value that changed, with its type and size, and states whether the positions are stored per resolution.",
+      "Record what a resolution change does to the icons: read every icon's name and position through the shell, change the resolution to a second setting, read again, change back and read a third time. Done when: `docs/baseline/resolution-change.json` holds the three readings side by side with the two resolutions, and states which icons moved and whether they returned.",
+      "Record what Auto arrange icons and Align icons to grid do to a restore, and what a monitor arrangement change does: move one icon with each setting on and off, and change the arrangement of a second display. Done when: `docs/baseline/arrange-and-monitors.json` states, for each setting, whether a set position held, and lists the monitor rectangles before and after."
+    ],
+    "inventory_items": [
+      "Record the windows and controls of the research tool in `docs/inventory.md`: the layout list with its columns Name, Date, Resolution and Move unknown Icons (`ICU - Icon Configuration Utility v5.au3:211`), the Save, Restore, Delete, Duplicate and About buttons (`:200-204`), the Create Shortcut on Save checkbox (`:229`), the Auto Arrange and Align to Grid warning checkboxes (`:241`, `:244`), the Install DCI and Uninstall DCI buttons (`:252`, `:254`), the save dialog with its unknown-icon combo (`:623`) and the tray menu (`:189-192`). Done when: every control-creation call is listed with a verdict of taken as an idea, cut, or remapped to the framework.",
+      "Record how the research tool does the job in `docs/inventory.md`: finding the desktop list (`:1386-1408`), reading names and positions (`:1303-1360`), writing one `x:y` per URI-encoded name, path and type (`:842`), keying a layout by virtual screen width and height (`:800`), restoring by looking each current icon up by name (`:995-1000`), and placing icons not in the layout by one of five rules, including `9999, 9999` off screen (`:1006-1023`). Done when: each behaviour states what the C++ tool will take as an idea, what it does differently, and why.",
+      "Record the research files in `docs/inventory.md`: `001_Venom.icf` (keys `Type`, `Date`, `Timestamp`, `Resolution`, `Unknown_Icon_Handling`, then `[Desktop]`), `ICU.ini` (`Version`, `Default_Unknown_Icon_Handling`), the obfuscated copies, the wrapper, the post-processor and `WinAPIEx.au3`. Done when: every file is described by what it is and what it shows, and the timestamp encoding (`:792`) is noted as not used.",
+      "Record provenance and licence in `docs/inventory.md`: the author and the Creative Commons by-nc-sa 3.0 notice (`ICU - Icon Configuration Utility v5.au3:9-11`), the credit to Ascend4nt in the handle function (`:1369-1385`) and the author line of `WinAPIEx.au3`. Done when: the file states that nothing is copied, that the tool is written from the baseline under `docs/baseline/`, and that this research licence is not one the GPL v3 tool can take code under."
+    ],
+    "engine": {
+      "title": "Desktop Layout Engine",
+      "intro": "The tool's whole system effect, independent of any window: reading every desktop icon's name and position, saving them as a layout keyed by the resolution and monitor arrangement, and restoring a layout exactly. Icons added or removed since a save are reported, never placed by guesswork. The engine is written from the baseline under `docs/baseline/`, not from the research code.",
+      "needs": "windows-host",
+      "build": [
+        "Read the desktop's icons and the screen setup in `src/core/Desktop.cpp`, and define the layout record in `src/core/Layout.h`. Done when: a test lists every icon of a fixture desktop with its name and position, and the current resolution and monitor rectangles.",
+        "Store, match and restore layouts in `src/core/LayoutStore.cpp` and `src/core/Restore.cpp` against a store folder the tests can redirect. Done when: a saved layout is restored and every position reads back equal."
+      ],
+      "items": [
+        "Define in `src/core/Layout.h` the record of a layout: each icon's name, kind and position, the resolution, the monitor rectangles, the date and the icon count, with a schema version. Done when: a test writes and reads one record and every field compares equal. Cheaper substitute: keying a layout by virtual screen width and height alone (`ICU - Icon Configuration Utility v5.au3:800`), which cannot tell two monitor arrangements of one size apart.",
+        "Implement `ReadDesktop()` in `src/core/Desktop.cpp` returning every icon's name and position, from the interface `docs/baseline/icon-positions-store.json` shows Windows uses, and the current monitors from `GetSystemMetrics` and `EnumDisplayMonitors`. Done when: the count and the positions match what Explorer shows on a real desktop. Cheaper substitute: reading the list view of a fixture window, which proves nothing about the real desktop.",
+        "Identify an icon by its name and its folder of origin (the user's desktop or the shared desktop) and not by its index. Done when: a test that reorders the icons between save and restore still puts each one back. Cheaper substitute: restoring by index, as the research tool does for its current list (`ICU - Icon Configuration Utility v5.au3:995-1000`), which breaks when the list order changes.",
+        "Implement `Save(name)` in `src/core/LayoutStore.cpp` writing the layout atomically (temporary file, then rename) into the store folder and reading it back before reporting success. Done when: a test that cuts the write halfway leaves the previous layout intact, and a corrupted write is reported by file name. Cheaper substitute: writing in place, which leaves half a layout after a crash.",
+        "Implement `FindFor(screen)` choosing the saved layout whose resolution and monitor arrangement equal the current ones. Done when: a fixture with three layouts returns the right one for each of three screens and none for a fourth, and does not fall back to the nearest.",
+        "Implement `Restore(layout)` in `src/core/Restore.cpp` moving each icon that is both in the layout and on the desktop to its recorded position, and returning the restored count, the icons in the layout but no longer on the desktop (missing) and the icons on the desktop but not in the layout (new), each by name. Done when: a test with one icon added and one removed reports exactly those two by name and moves neither to a guessed place. Cheaper substitute: placing unknown icons in a corner or off screen (`ICU - Icon Configuration Utility v5.au3:1006-1023`) or restoring to a grid, which is a tidy-up and not a restore.",
+        "Read every position back after a restore and report each icon whose position differs from the layout. Done when: a test that blocks one move gets that icon named in the result. Cheaper substitute: trusting the return code of the move call.",
+        "Detect Auto arrange icons and Align icons to grid before a restore and report them as the reason positions may not hold (as the research tool warns, `ICU - Icon Configuration Utility v5.au3:143-160`). Done when: a fixture with each setting on reports it in the result, and one with both off reports none.",
+        "Cover every path in `tests/layout_test.cpp` with a fixture desktop and a store folder in a temporary directory. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L layout` passes, and fails when the restore skips one icon."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L layout` passes, including the added-icon, removed-icon, reordered-icon and interrupted-write cases, and fails when the restore skips one icon.",
+      "commit": "core: save and restore desktop icon layouts per screen, reporting what changed"
+    },
+    "parity_items": [
+      "Write `tests/roundtrip_test.cpp`: save a layout, move every icon to a new position, restore, and compare every icon's position with the saved one. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L parity` passes with zero differing icons, and fails naming the icon when one restored position is changed. Cheaper substitute: comparing a sample of icons or comparing against a grid, which would pass a tidy-up.",
+      "Repeat the round trip across a real resolution change: save at one resolution, change to another, save a second layout, change back, scramble, restore the first and compare, then restore the second. Done when: `tests/roundtrip_test.cpp` reports both layouts restoring position by position, and a capture of the desktop before and after is committed under `docs/baseline/`."
+    ],
+    "enhancements": [
+      {
+        "title": "Undo a Restore",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A restore moves every icon, so the layout that was on the desktop just before it is kept and Undo puts it back. The record is the SDK repair contract's restore record, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo action and its result, against `DESIGN.md` section 2.",
+          "job": "a person who restored the wrong layout puts the desktop back as it was a moment before. Consumer: the desktop's icon positions, compared with the record.",
+          "treatment": "the recorded layout restored icon by icon, with the same result report as a restore. Cheaper substitute that fails the checkpoint: an undo that restores the newest saved layout, which is not what was on the desktop before."
+        },
+        "build": [
+          "Record the desktop as it is, before each restore, through the repair contract in `src/core/Restore.cpp`. Done when: a record exists on disk before the first icon moves.",
+          "Wire Undo in `src/ui/LayoutsView.cpp`. Done when: restore then undo leaves every icon where it was before the restore."
+        ],
+        "items": [
+          "Read the desktop's icons and write the repair contract's restore record to disk before any icon is moved. Done when: a test finds the record on disk before the first move. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement `Undo()` in `src/core/Restore.cpp` restoring that record with the same engine call and result report as a restore. Done when: restore then undo leaves every icon at its position before the restore, asserted for each icon.",
+          "Disable Undo with a tooltip when there is nothing to undo, and clear the record once it has been used. Done when: a first run shows it disabled, one restore enables it, and one undo disables it again.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one icon is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: restore then undo leaves every icon as it was before the restore.",
+        "commit": "feature: undo a restore from the layout kept before it"
+      },
+      {
+        "title": "Automatic Save on Change",
+        "needs": "sdk-framework",
+        "intro": "Windows scrambles icons at the moment the resolution or the monitor arrangement changes, so a layout is saved just before the change takes effect and a person never has to remember to save. This is the Automatic saving section, and its options are declared to the framework.",
+        "surface": {
+          "fidelity": "the Automatic saving section, against `DESIGN.md` section 2 and `sdk/DESIGN.md`.",
+          "job": "a person has a current layout for every screen setup they use without saving by hand. Consumer: the layout list and the stored layouts.",
+          "treatment": "one switch with a sentence saying exactly when the tool saves, and the saved layouts appearing in the list marked as saved automatically. Cheaper substitute that fails the checkpoint: a timer that saves every few minutes, which saves the scrambled desktop over the good layout."
+        },
+        "build": [
+          "Watch for display changes in `src/core/DisplayWatcher.cpp`. Done when: a simulated resolution change calls the save once, with the layout of the screen that is being left.",
+          "Show the switch in `src/ui/AutomaticSavingView.cpp`. Done when: the setting is read back from the framework's settings file after a restart."
+        ],
+        "items": [
+          "Implement `DisplayWatcher` in `src/core/DisplayWatcher.cpp` listening for `WM_DISPLAYCHANGE` and the monitor arrangement changing, and saving the layout of the screen setup being left before anything else touches it. Done when: a test with a simulated change saves exactly one layout, keyed by the previous resolution and arrangement. Cheaper substitute: saving after the change, which saves the scrambled positions.",
+          "Never overwrite a layout with a desktop that has just been scrambled: save only when the desktop has not changed screen setup since it was last read. Done when: a test of two changes in a row saves the first layout once and does not replace it with the second.",
+          "Mark automatic layouts in the list with the word Automatic and keep at most one per screen setup, replacing only an automatic one. Done when: a layout saved by hand for the same screen is never replaced by an automatic save, asserted.",
+          "Build `src/ui/AutomaticSavingView.cpp` with the on and off switch and one sentence on what triggers a save, with the setting persisted by the framework. Done when: the switch reads back from the framework's settings file after a restart. Cheaper substitute: a private settings file.",
+          "Cover it in `tests/autosave_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L autosave` passes, and fails when the save happens after the change."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L autosave` passes: a simulated resolution change saves the layout being left and never replaces a layout saved by hand.",
+        "commit": "feature: save the layout when the resolution or monitors change"
+      },
+      {
+        "title": "Restore From the Notification Area",
+        "needs": "sdk-framework",
+        "intro": "After a resolution change the main window may be the last thing a person wants to open, so the notification area icon offers Restore for the current screen directly. The icon and menu come from the framework's tray support, added to Resolute-SDK first if it lacks them.",
+        "surface": {
+          "fidelity": "the notification area icon and its menu, against `sdk/DESIGN.md`.",
+          "job": "a person restores the layout for the current screen in two clicks without opening the window. Consumer: the desktop's icon positions after the click.",
+          "treatment": "a menu with Restore for this screen, one entry per saved layout, Save now and Open SaveDesk, each in words. Cheaper substitute that fails the checkpoint: a menu entry that opens the window and leaves the restore to the person."
+        },
+        "build": [
+          "Add the tray icon and menu through the framework in `src/ui/TrayMenu.cpp`. Done when: the icon appears and its menu lists the saved layouts.",
+          "Bind each entry to the engine. Done when: choosing Restore for this screen restores that layout and reports the result."
+        ],
+        "items": [
+          "Create `src/ui/TrayMenu.cpp` using the framework's notification area support, with Restore for this screen, one entry per saved layout (resolution and date), Save now and Open SaveDesk. Done when: the menu lists exactly the layouts in the store. Cheaper substitute: a private `Shell_NotifyIcon` wrapper, which the contract forbids.",
+          "Make Restore for this screen call `FindFor` and `Restore` and show the result as a notification in words (restored, missing and new counts). Done when: choosing it on a scrambled fixture desktop restores it and the notification states the counts.",
+          "Disable Restore for this screen with a tooltip when no layout matches the current screen. Done when: a screen with no saved layout shows it disabled and says why.",
+          "Cover it in `tests/tray_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L tray` passes, and fails when an entry restores the wrong layout."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L tray` passes: the menu lists the stored layouts and Restore for this screen restores the matching one.",
+        "commit": "feature: restore a layout from the notification area"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A walk of `reference/au3/SaveDesk/[Research]/` finds every file and behaviour in `docs/inventory.md` with what the tool takes from it and what it does not, and a search of `src/` finds nothing copied from it.",
+      "`tests/roundtrip_test.cpp` reports zero differing icons for save, scramble and restore, within one resolution and across a real resolution change.",
+      "On a real machine the tool saves, lists, restores, reports added and removed icons and undoes a restore, in light and dark, by keyboard alone."
+    ]
+  },
+  "research": true
+}

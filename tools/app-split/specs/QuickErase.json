@@ -1,0 +1,229 @@
+{
+  "name": "QuickErase",
+  "slug": "quickerase",
+  "display": "QuickErase",
+  "job": "it erases files and folders so they cannot be recovered, picks the method that suits each drive's media type, and reports what was erased, by which method and what it cannot establish.",
+  "tagline": "Erase files for good, and know what that means on your drive",
+  "frozen": false,
+  "elevated": false,
+  "au3": [
+    "QuickErase"
+  ],
+  "hue": {
+    "name": "Lime",
+    "light": "#84CC16",
+    "dark": "#4D7C0F",
+    "social_ground": "#1A2408",
+    "social_muted": "#DCEFB5"
+  },
+  "icon": {
+    "idea": "A page going into a shredder and coming out in strips.",
+    "points": [
+      "The drawing is free-standing, with no tile behind it and rounded ends on every part.",
+      "The shredder bar is Lime; the page above it and the strips below it are Lime light.",
+      "The small drawing, used below 40 pixels, has three thicker strips and no page."
+    ],
+    "large": "<rect x=\"30\" y=\"10\" width=\"36\" height=\"20\" rx=\"4\" fill=\"#84CC16\"/><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M18 40 H78\" stroke=\"#4D7C0F\" stroke-width=\"16\"/></g><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M26 58 V82\" stroke=\"#84CC16\" stroke-width=\"9\"/><path d=\"M41 58 V72\" stroke=\"#84CC16\" stroke-width=\"9\"/><path d=\"M55 58 V82\" stroke=\"#84CC16\" stroke-width=\"9\"/><path d=\"M70 58 V70\" stroke=\"#84CC16\" stroke-width=\"9\"/></g>",
+    "small": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M19 34 H77\" stroke=\"#4D7C0F\" stroke-width=\"20\"/></g><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M26 58 V80\" stroke=\"#84CC16\" stroke-width=\"13\"/><path d=\"M48 58 V70\" stroke=\"#84CC16\" stroke-width=\"13\"/><path d=\"M70 58 V80\" stroke=\"#84CC16\" stroke-width=\"13\"/></g>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Erase",
+        "The files and folders queued for erasing, each with its drive type and the method that will be used"
+      ],
+      [
+        "Methods",
+        "The overwrite patterns for magnetic drives, the firmware erase for solid state, and the rule that refuses multi-pass overwrites on solid state"
+      ],
+      [
+        "History",
+        "Each past erase with its result report: what was erased, by which method and what could not be established"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person queues files and folders, sees for each one what kind of drive it is on and which erase method will be used and why, and erases only after a confirmation that names what will be destroyed and says it cannot be undone.",
+    "primary": "Erase",
+    "secondary": "Add files",
+    "rows": [
+      [
+        "Quarterly accounts.xlsx",
+        "On a magnetic drive: overwrite, 3 passes"
+      ],
+      [
+        "Scans (folder, 41 files)",
+        "On a magnetic drive: overwrite, 1 pass"
+      ],
+      [
+        "Backup keys.txt",
+        "On a solid-state drive: 1 pass only, more passes refused"
+      ],
+      [
+        "Old notes.docx",
+        "Drive type unknown: treated as solid state, and says so"
+      ]
+    ],
+    "status": "4 queued, 2 GB in total, nothing erased yet",
+    "notes": [
+      "Each queued row shows an icon and a word for its drive type (magnetic, solid state, unknown) and a second line naming the method that will be used and why, so the method is never a surprise.",
+      "The primary action, Erase, is disabled until something is queued. Add files and a drop onto the window both queue items, as the prototype's drop target did for one file (`QuickErace.au3:70`, `:81`, `:98`), now for many files and folders.",
+      "Erase always opens a confirmation first. It names the count, the total size and the paths, states that erasing cannot be undone, and states what a single-file erase cannot reach (shadow copies, journals, previously allocated blocks). Declining performs nothing. The prototype asked only when its warning option was on (`:290`); this tool always asks.",
+      "A multi-pass pattern on a solid-state or unknown drive shows as refused on its row, with the reason (extra passes wear the drive and add no erasure) and an explicit override that is logged. The row never silently runs the passes.",
+      "The result of each erase says which method was used and why, and never says \"securely erased\" without saying what it cannot establish. The prototype's \"should be bye-bye now!\" (`:317`) is not kept.",
+      "Whole-drive firmware erase is not a queue item: it is a separate action in the Methods section, confirmed by typing the drive's name.",
+      "The status bar states the queue in words, for example \"4 queued, 2 GB in total, nothing erased yet\". The tool does not need elevation to start; a drive-level action that needs it is refused by name at the action."
+    ],
+    "cut": "The prototype's window had a 148 by 230 pixel form with an eraser icon as the only drop target (`QuickErace.au3:70-82`), a File menu with Options and Close and a Help menu with About (`:73-78`), a 150.ani animation shown while erasing (`:68`, `:309`), a separate Options dialog (`:360`), an always-on-top option (`:363`), a separate About dialog with a drive-space bar, social icons and a donate link (`:621-693`), and a licence label for the old \"No Nonsense\" licence (`:646`). All of these are cut: the sections replace the dialogs, the framework supplies Settings and About, and the cuts are recorded in the plan's inventory section."
+  },
+  "readme": {
+    "lead": "QuickErase erases files and folders so they cannot be recovered, and tells you honestly what that means on the drive they were on.",
+    "what": [
+      "You add files and folders. QuickErase finds out whether each one sits on a magnetic drive or a solid-state drive and picks the method to match: overwriting on magnetic drives, and the drive's own firmware erase (ATA Secure Erase or NVMe Sanitize) for a whole solid-state drive. It asks first, names what will be destroyed, and says that erasing cannot be undone.",
+      "Overwriting a file on a solid-state drive is unreliable, because wear levelling writes new data to a different physical block and leaves the old one where no read can reach it, and every extra pass wears the drive. QuickErase refuses a multi-pass overwrite on solid state unless you override it, and every result says what was erased, by which method and what could not be established."
+    ],
+    "new_intro": "The AutoIt version overwrote one dropped file with the pattern you chose, whatever drive it was on. The C++ version is different in these ways.",
+    "new": [
+      [
+        "Method by media type.",
+        "Each file's drive is detected as magnetic, solid state or unknown, and the method follows from it. The twelve overwrite patterns of the original are kept unchanged for magnetic drives."
+      ],
+      [
+        "Firmware erase for whole drives.",
+        "A whole solid-state drive is erased with ATA Secure Erase or NVMe Sanitize, confirmed by typing the drive's name."
+      ],
+      [
+        "No silent wear.",
+        "A multi-pass overwrite on solid state is refused with its reason, and an override is recorded in the log."
+      ],
+      [
+        "An honest result.",
+        "The report names the method and why, verifies the final pass, and lists what cannot be established, such as remapped sectors, wear-levelled blocks and copies the file system holds elsewhere."
+      ],
+      [
+        "Files and folders, many at once.",
+        "The original erased one dropped file at a time; the queue takes files and folders and shows each one's drive type and method before anything is destroyed."
+      ]
+    ]
+  },
+  "reference": {
+    "note": "The prototype sits at `reference/au3/QuickErase/` (a folder inside `reference/au3/`, not the usual `src/`, `shipped/`, `dist/` shape) and its script's file name is misspelled `QuickErace.au3`; the port corrects the spelling. The folder holds the script, `Quick Erase Readme!.rtf` and `Themes/150.ani` only: the script includes `UDF\\SecureFileDelete.au3` (`QuickErace.au3:23`), which did not come with it, so the overwrite loop itself is not in this folder, and an old build of the program sits untracked under `local/untracked-QuickErase/`."
+  },
+  "plan": {
+    "scope": "The whole port: baseline, media engine, window, firmware, release",
+    "goal": "QuickErase ships as a complete, standalone C++ tool that erases files and folders by the method that suits each drive's media type: the twelve overwrite patterns of the AutoIt prototype, unchanged, on magnetic drives with the final pass verified; the drive's own firmware erase (ATA Secure Erase or NVMe Sanitize) for whole solid-state drives; and a refusal of any multi-pass overwrite on solid state without an explicit override. It always asks first, says that erasing cannot be undone, and reports what it did and what it cannot establish.",
+    "current_state": "Nothing exists in C++. The repository holds the AutoIt prototype under `reference/au3/QuickErase/`: `QuickErace.au3` (723 lines, 23,864 bytes), `Quick Erase Readme!.rtf` (52,422 bytes) and `Themes/150.ani` (390,658 bytes), the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The script is a drop target for one file: it reads five settings from an `.ini` (`QuickErace.au3:59-63`), chooses one of twelve patterns by name (`:102-271`), asks for confirmation only when its warning option is on (`:290-305`), and hands the file and the pattern to `_SecureFileDelete` (`:313`), which lives in `UDF\\SecureFileDelete.au3` and is not in the folder. It has no media detection, no firmware erase and no verification of its own, and it reports success with \"should be bye-bye now!\" (`:317`). Its rename and set-times options are read, shown and saved (`:62-63`, `:382-385`, `:508-524`) but never passed to the erase call, which hardcodes three true values (`:313`). It has no Explorer context-menu entry. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`reference/au3/QuickErase/QuickErace.au3`: the prototype being ported; its pattern table (`:102-271`) and pass counts (`:557-593`) are the specification of the overwrite patterns.",
+      "`docs/origin/resolute-D05-T01-s3.md`: the plan section as it stood in the Resolute repository, including the decision to choose the method by media type.",
+      "`reference/au3/QuickErase/Quick Erase Readme!.rtf`: the prototype's own readme, read for what it promised users."
+    ],
+    "outcome": [
+      "`QuickErase.exe` detects each target's media type, overwrites on magnetic drives with the twelve patterns unchanged and a verified final pass, runs a firmware erase on a whole solid-state drive after the drive's name is typed, and refuses a multi-pass overwrite on solid state without an override.",
+      "Every erase is confirmed first with the count, the total size and the paths and a plain statement that it cannot be undone, and every result states the method used, why, and what cannot be established; the words \"securely erased\" never appear without that qualification.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Erase screen, where a person sees every queued item with its drive type and method. Reporting is the History section, where each result report is kept, and audit is the Activity section, which records each erase and each override. Settings are the framework's pages. Permissions do not anchor on a section: the tool starts unelevated and a drive-level action that needs a right the user lacks is refused by name at that action. Reverse does not apply: erasing is the one thing this tool does and it cannot be undone, so the plan puts its weight on confirmation and on saying so.",
+    "baseline_items": [
+      "Run the untracked old build under `reference/au3/local/untracked-QuickErase/` on a disposable machine against fixture files on a virtual disk, one file per pattern, and record what it does. Done when: `docs/baseline/effects.json` lists, per pattern, whether the file is gone, its name and times afterwards, the bytes left in its freed clusters, and the text the window showed (`QuickErace.au3:312-318`).",
+      "Transcribe the twelve patterns from the script into `docs/baseline/patterns.json`, with the line each comes from (`QuickErace.au3:103-269`), each pass marked fixed byte or random byte, and the pass count shown in the Options dialog (`:557-593`). Done when: the file lists twelve patterns, and a reader can check every pass against its cited line.",
+      "Capture the confirmation text and the settings file the prototype wrote (`QuickErace.au3:293-298`, `:520-524`) with the warning option on and off. Done when: `docs/baseline/confirm.json` holds both confirmation texts and `docs/baseline/QuickErase.ini` holds the file as written."
+    ],
+    "inventory_items": [
+      "Record the windows and controls in `docs/inventory.md`: the main form (`QuickErace.au3:70`), the File and Help menus (`:73-78`), the eraser icon and drop target (`:80-81`), the status box (`:82`), the Options dialog with its twelve pattern radios and two checkboxes (`:360-390`) and the About dialog (`:621-677`). Done when: every control-creation call in the file is listed with its window and purpose.",
+      "Record the strings and the pattern names: each of the twelve names as stored in the `.ini` (`QuickErace.au3:102-271`) and as shown in the dialog (`:369-380`), the confirmation text (`:293-298`) and the status messages (`:315`, `:317`). Done when: every string is marked keep, reword or cut, and the \"bye-bye\" wording is marked cut with the reason.",
+      "Record the behaviours: the drop of one file (`QuickErace.au3:98-111`), the random byte drawn once per random pass (`:120`), the complement pass (`:167`), the unused rename and set-times options (`:313`, `:508-518`), the single-instance guard (`:56`) and the absent elevation request (`:13`). Done when: every behaviour is listed, and the points where the missing `UDF\\SecureFileDelete.au3` hides the real loop (`:23`, `:313`) are named as unknown.",
+      "Record settings, update and shipped files: the five `.ini` keys (`QuickErace.au3:59-63`), the registry path defined but never used (`:36`), the animation (`:68`), the readme and the licence label (`:646`). Done when: every key and file is marked keep, cut or remapped, and no Explorer context-menu entry is claimed because the script has none."
+    ],
+    "engine": {
+      "title": "Media Detection and Erase Engine",
+      "intro": "The tool's core, independent of any window: finding out whether a target sits on a magnetic, solid-state or unknown drive, choosing the method from that, overwriting with the twelve declared patterns and verifying the final pass, and refusing a multi-pass overwrite on solid state without an override. Media detection comes first, because the correct method depends on it.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the patterns as data in `src/core/Patterns.h` and detect media in `src/core/Media.cpp`. Done when: the twelve patterns match `docs/baseline/patterns.json` and each media type is reported by a driven run.",
+        "Implement method choice, overwrite with verification and the refusal in `src/core/Erase.cpp` against a fixture root the tests can redirect. Done when: the unit tests pass against a disposable folder on a virtual disk."
+      ],
+      "items": [
+        "Declare in `src/core/Patterns.h` the twelve patterns as data (name, passes, each pass a fixed byte, a random byte or the complement of an earlier random byte), citing `QuickErace.au3:103-269`: Quick and British HMG IS5 Baseline (1 pass), Russian GOST P50739-95 (2), British HMG IS5 Enhanced, US Army AR380-95, DoD 5220.22-M and DoD 5220.22-M-E (3 each), DoD 5220.22-M-ECE, Canadian RCMP TSSIT OPS-II, German VSITR and Bruce Schneier (7 each) and PAYNE-3163H (23). Done when: a test compares every fixed byte and every random or complement slot with `docs/baseline/patterns.json`, and fails when one byte is changed.",
+        "Implement `DetectMedia(volume)` in `src/core/Media.cpp` returning magnetic, SATA solid state, NVMe or unknown, from the volume's storage properties (seek penalty and bus type) read through `DeviceIoControl`. Done when: a driven run on one drive of each kind reports the right type, and an undeterminable drive is reported as unknown. Cheaper substitute: guessing from the drive letter or the drive's model name, which assumes what it should measure.",
+        "Implement `ChooseMethod(media, pattern, override)` in `src/core/Method.cpp` returning overwrite, firmware erase or refuse, with the reason as text that the surface shows. Done when: a table test over every media type and every pattern returns the expected method and a non-empty reason, and unknown media is treated like solid state and says so.",
+        "Implement `OverwriteFile(path, pattern)` in `src/core/Overwrite.cpp`: write each pass over the file's whole length, flush it with `FlushFileBuffers`, read the final pass back and compare it, then rename the file, reset its times and delete it. Done when: a test on a fixture file finds its final bytes equal to the final pass, and a forced write failure returns the path and pass that failed. Cheaper substitute: checking only the return code of `WriteFile`, which proves nothing reached the file.",
+        "Implement the refusal in `src/core/Method.cpp`: a pattern of more than one pass on solid state or unknown media returns refuse, with the explanation that extra passes add wear without adding erasure, unless the caller passes an explicit override, which is written to the activity record. Done when: a test shows the refusal, shows the override running and logged, and shows a one-pass pattern never refused. Cheaper substitute: running the requested passes silently, which costs the drive life and achieves nothing.",
+        "Add `src/core/Scope.cpp`: every erase runs under a root, and a path that resolves outside it (including through a reparse point) is refused by name before any write. Done when: a test inside a fixture root erases a file under it and refuses one outside it, with the outside file unchanged. Cheaper substitute: comparing path strings, which a junction defeats.",
+        "Add `src/core/Queue.cpp`: expand folders into files, and report the count, total size and paths of everything queued. Done when: a fixture tree of known size reports the same count and size, and an empty folder queues nothing and says so.",
+        "Cover every path in `tests/erase_test.cpp`, with a fixture on a virtual disk for the media cases. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L erase` passes, and fails when one pattern byte or one refusal rule is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L erase` passes, including the final-pass verification, the solid-state refusal with its override and the outside-the-root refusal, and fails when one declared pattern byte is changed.",
+      "commit": "core: media detection, method by media type, verified overwrite"
+    },
+    "parity_items": [
+      "Add `tests/fixtures/baseline/` as a copy step from `docs/baseline/` at configure time. Done when: the parity test reads the committed baseline and no path is typed into a tracked build file.",
+      "Compare each of the twelve patterns with the baseline for the effect on a fixture file. Done when: the test covers every pattern in `docs/baseline/patterns.json` and `docs/baseline/effects.json`, and the one deliberate difference (the honest result text instead of \"bye-bye\") is recorded in `docs/parity.md`."
+    ],
+    "enhancements": [
+      {
+        "title": "Firmware Erase for Whole Drives",
+        "needs": "attended",
+        "intro": "On a whole solid-state drive the right erase is the drive's own: ATA Secure Erase or NVMe Sanitize, because an overwrite from outside lands in different physical blocks than the ones holding the old data. It is destructive to the whole drive and has no reverse, so it is confirmed by typing the drive's name and it refuses the drive that holds Windows. When the drive refuses or does not support it, that is a named outcome, never a quiet fallback to overwriting.",
+        "surface": {
+          "fidelity": "the typed confirmation, against `sdk/DESIGN.md` section 11, in the Methods section.",
+          "job": "a person erases a whole solid-state drive by its own firmware and knows exactly which drive and what it cannot undo. Consumer: the drive, read back after the action.",
+          "treatment": "a confirmation that names the drive, its size and its bus type, says there is no reverse, and enables the button only when the drive's name is typed exactly. Cheaper substitute that fails the checkpoint: a Yes and No box, which can be answered without reading it."
+        },
+        "build": [
+          "Implement ATA Secure Erase and NVMe Sanitize in `src/core/FirmwareErase.cpp` behind an interface the tests can fake. Done when: each path runs against a fake device and reports its named outcome.",
+          "Add the typed confirmation in `src/ui/MethodsView.cpp`. Done when: the button stays disabled until the drive's name is typed exactly."
+        ],
+        "items": [
+          "Implement the ATA path in `src/core/FirmwareErase.cpp`: issue the security erase through `IOCTL_ATA_PASS_THROUGH` and read back the drive's security state. Done when: a test with a fake device records the command sequence, and an attended run on a spare drive ends with the drive reporting the erase complete. Cheaper substitute: shelling out to a vendor tool, which cannot be tested or named in the result.",
+          "Implement the NVMe path in `src/core/FirmwareErase.cpp`: issue Sanitize through `IOCTL_STORAGE_PROTOCOL_COMMAND` and poll its status until it ends. Done when: a test with a fake device covers started, in progress, completed and failed, and an attended run on a spare NVMe drive completes.",
+          "Return a named outcome for each way it can end in `src/core/FirmwareErase.cpp`: completed, not supported, refused by the drive (for example a frozen security state), and failed. Done when: each outcome has a test and none of them starts an overwrite. Cheaper substitute: falling back to overwriting when the drive refuses, which silently gives a weaker erase than the one chosen.",
+          "Refuse the drive that holds the running Windows or any queued file, by name, before any command is sent. Done when: a test with the system drive as the target is refused and the fake device saw no command.",
+          "Add the typed confirmation in `src/ui/MethodsView.cpp` through the framework's message surface, naming the drive and stating there is no reverse. Done when: a driven test shows the button disabled for a wrong name and enabled for the exact name, and a capture shows the no-reverse sentence.",
+          "Cover it in `tests/firmware_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L firmware` passes, and fails when the refusal of the system drive is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L firmware` passes for both command paths, every named outcome and the system-drive refusal, and one attended run on a spare drive ends with the drive's own completion status.",
+        "commit": "feature: firmware erase for whole solid-state drives, typed confirmation"
+      },
+      {
+        "title": "Honest Result Report",
+        "intro": "A shredder that says it succeeded is making a claim it often cannot back. After each erase the tool reports what was erased, by which method and why, whether the final pass was read back, and what it cannot establish: remapped sectors and wear-levelled blocks on solid state, and copies the file system may hold elsewhere such as shadow copies, journals and previously allocated blocks. The same limits are stated before the user commits, and the words \"securely erased\" never appear without them.",
+        "surface": {
+          "fidelity": "the confirmation and the History section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 11.",
+          "job": "a person knows what the tool did and what it could not guarantee, before and after. Consumer: the report, read back against the erase that produced it.",
+          "treatment": "a confirmation naming count, total size and paths with the no-reverse statement and the limits, then a result per item with method, reason, verification and limits in words. Cheaper substitute that fails the checkpoint: a single line saying the files were erased, which claims more than was established."
+        },
+        "build": [
+          "Write the report record in `src/core/ErasureReport.cpp`. Done when: each erase produces one record with method, reason, verification and limits.",
+          "Show the confirmation and the records in `src/ui/EraseView.cpp` and `src/ui/HistoryView.cpp`. Done when: the confirmation names count, size and paths and History lists the records."
+        ],
+        "items": [
+          "Write `src/core/ErasureReport.cpp`: one record per item with the method, the reason it was chosen, the pattern and passes, whether the final pass was read back, the outcome and the list of things that cannot be established for that media. Done when: a test erases a fixture file and finds a record with every field set. Cheaper substitute: building the text in the window, which lets the log and the screen disagree.",
+          "Build the confirmation in `src/ui/EraseView.cpp` through the framework's message surface: the count, the total size and the paths, the statement that erasing cannot be undone, and the limits of single-file erasure (shadow copies, journals, previously allocated blocks). Done when: a driven test finds all of it, and declining performs nothing, asserted on the fixture. Cheaper substitute: a generic \"Are you sure?\", which names nothing.",
+          "Keep the wording honest in `resources/strings.en`: the words \"securely erased\" are never used on their own. Done when: a test scans every user-facing string and fails when that phrase appears without its qualification.",
+          "Show each record in `src/ui/HistoryView.cpp`, newest first, with the method and its reason in words. Done when: after two erases the list shows two records and Ctrl+C on one copies its text.",
+          "Record an override of the solid-state refusal in the report and in the activity record, from one call. Done when: a test with the override finds it in both and a test without it finds neither.",
+          "Cover it in `tests/report_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L report` passes, and fails when the limits are dropped from a record."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L report` passes: the confirmation names count, size, paths and the no-reverse statement, each record states method, reason, verification and limits, and no string says \"securely erased\" unqualified.",
+        "commit": "feature: confirmation and result report that say what was and was not established"
+      }
+    ],
+    "no_reverse": "erasing is the one thing this tool does and it cannot be undone; every erase asks first and says so",
+    "verification": [
+      "A walk of `reference/au3/QuickErase/QuickErace.au3` finds every piece in `docs/inventory.md` with its home, and the twelve patterns match `docs/baseline/patterns.json`.",
+      "Each media type is detected on a driven run, the surface states the method used and why, a multi-pass request on solid state is refused with its explanation, and the override is logged.",
+      "On a real machine the tool queues, confirms, erases and reports on a fixture tree and never outside it, in light and dark, by keyboard alone."
+    ]
+  }
+}

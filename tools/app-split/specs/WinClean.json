@@ -1,0 +1,256 @@
+{
+  "name": "WinClean",
+  "slug": "winclean",
+  "display": "WinClean",
+  "job": "it finds temporary files, caches and event logs that Windows left behind, shows what each cleanup would remove and how much space it would free, and removes only what was ticked.",
+  "tagline": "Clean out what Windows left behind, and see how much first",
+  "frozen": false,
+  "elevated": true,
+  "au3": [
+    "WinClean"
+  ],
+  "hue": {
+    "name": "Cyan",
+    "light": "#67E8F9",
+    "dark": "#0891B2",
+    "social_ground": "#082530",
+    "social_muted": "#BFE9F2"
+  },
+  "icon": {
+    "idea": "A drop of water with a highlight: washed clean.",
+    "points": [
+      "Free-standing with no tile: a rounded drop.",
+      "The drop is Cyan, with a curved Cyan light highlight inside it.",
+      "The small drawing, used below 40 pixels, thickens the highlight."
+    ],
+    "large": "<path d=\"M48 10 C62 30 76 44 76 60 A28 28 0 0 1 20 60 C20 44 34 30 48 10 Z\" fill=\"#0891B2\" stroke=\"#0891B2\" stroke-width=\"4\" stroke-linejoin=\"round\"/><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M34 60 A14 14 0 0 0 48 74\" stroke=\"#67E8F9\" stroke-width=\"6\"/></g>",
+    "small": "<path d=\"M48 10 C62 30 76 44 76 60 A28 28 0 0 1 20 60 C20 44 34 30 48 10 Z\" fill=\"#0891B2\" stroke=\"#0891B2\" stroke-width=\"4\" stroke-linejoin=\"round\"/><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M33 60 A15 15 0 0 0 48 75\" stroke=\"#67E8F9\" stroke-width=\"10\"/></g>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Clean",
+        "One row per cleanup, with what it found and the space it would free"
+      ],
+      [
+        "Schedule",
+        "When the ticked cleanups run by themselves"
+      ],
+      [
+        "History",
+        "Each past cleanup and the space it freed"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees what each cleanup would remove and how much space it would free, ticks the ones to run and removes them with one button.",
+    "primary": "Clean",
+    "secondary": "Scan again",
+    "rows": [
+      [
+        "Recent documents",
+        "Found, Nothing found or Removed"
+      ],
+      [
+        "Temporary files",
+        "Found, Nothing found or Removed"
+      ],
+      [
+        "Windows event logs",
+        "Found, Nothing found or Saved and cleared"
+      ],
+      [
+        "Recycle Bin",
+        "Found, Nothing found or Removed"
+      ],
+      [
+        "Browser caches",
+        "Found, Nothing found or Skipped, browser open"
+      ]
+    ],
+    "status": "3 cleanups found, 2 ticked, 1.2 GB would be freed",
+    "notes": [
+      "Each cleanup is one row with a tick box, an icon and a word for its state (Found, Nothing found, Removed, Skipped), the number of files and the space it would free.",
+      "The window scans when it opens and again on Scan again, and the scan only measures: nothing is removed until Clean is pressed.",
+      "Clean removes only the ticked rows. Before it starts, a confirmation names the count, the total size and the rows, and says which cleanups can be put back and which cannot.",
+      "A row whose files can be put back says so in a word; a row that cannot be put back says that too, before the user commits.",
+      "A cleanup that cannot run, because a program holds its files or the process is not elevated, shows Skipped with the reason, and the rest still run.",
+      "Without elevation the window opens, scans what it can, names the cleanups it cannot touch and refuses Clean by name.",
+      "The status bar reads the rows in words: how many cleanups were found, how many are ticked and the space they would free, then the space actually freed after a run."
+    ],
+    "cut": "The AutoIt window had a plain two-pane form (`EvBeGone.au3:94-225`): a checkbox list, Analyze and Go! buttons, a progress bar, a monospace results box and an information strip with an icon. It also had an exit handler that wrote a home page setting (`:243`), a tray menu option (`:25`) and bundled sounds and a cursor theme. The list, the two buttons and the results are replaced by the Clean section's rows and header buttons, the progress bar and results box by the status bar and Activity, and the sounds, the animated cursor and the home page setting are cut. Each cut is recorded in the plan, in `docs/inventory.md`."
+  },
+  "readme": {
+    "lead": "WinClean shows what Windows left behind, how much space it takes, and removes only what you tick.",
+    "what": [
+      "WinClean looks at the places Windows and its programs fill up: recent document lists, temporary folders, caches and event logs. It scans first and shows each cleanup with the number of files it found and the space it would free. Nothing is removed during a scan.",
+      "When you press Clean, it removes only the cleanups you ticked and tells you how much space it freed. Where a cleanup can be put back, it says so before it runs. Where it cannot, it says that instead."
+    ],
+    "new_intro": "The C++ version keeps the AutoIt tool's idea of scanning before cleaning and adds what the original lacked.",
+    "new": [
+      [
+        "Every cleanup measures first.",
+        "A scan reports files and bytes per cleanup without removing anything, and the numbers freed after a run come from what was actually removed."
+      ],
+      [
+        "Cleanups are declared data.",
+        "Each one states what it looks at, how it measures, how it removes and whether it can be put back, as an item of the suite's repair contract."
+      ],
+      [
+        "Preview before removal.",
+        "Open a row to see the files it would remove, with their sizes, before you press Clean."
+      ],
+      [
+        "Event logs saved before clearing.",
+        "Each event log can be saved to a file before it is cleared."
+      ],
+      [
+        "Scheduled cleaning.",
+        "Choose which cleanups run on a schedule and read what each run freed in History."
+      ]
+    ]
+  },
+  "reference": {
+    "note": "The prototype sits at `reference/au3/WinClean/` and its main script is `EvBeGone.au3` (582 lines). Only the Recent Documents cleanup is live in it; the other candidates are commented out (`EvBeGone.au3:108-150`), and it has no event log or service code. The folder holds 277 files: 6 are the tool's own scripts and settings (`EvBeGone.au3`, `WinPower.ini`, `UDF/Resources.au3`, `UDF/SecureDelete.au3`, `UDF/Services.au3`, `UDF/Utilities.au3`), 34 are its icons, sounds and cursor theme, and 237 are bundled material (234 files of the WinAPIEx library under `UDF/WinAPIEx/` and 3 of Notepad2 under `Bin/`). It is a flat sample folder, with no `src/`, `shipped/` or `dist/`."
+  },
+  "plan": {
+    "scope": "The whole port: build, baseline, engine, window, features, release",
+    "goal": "WinClean ships as a complete, standalone C++ tool: it declares each cleanup as data and as an item of the SDK's repair contract, scans without removing anything, shows what each cleanup would remove and how much space it would free, removes only what was ticked, says honestly which cleanups can be put back, and runs chosen cleanups on a schedule with a history.",
+    "current_state": "Nothing exists in C++. The repository holds the AutoIt prototype under `reference/au3/WinClean/` (277 files, of which 6 are the tool's own scripts and settings, 34 its icons, sounds and cursor theme and 237 bundled WinAPIEx and Notepad2 material), the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The main script `EvBeGone.au3` is 582 lines and performs one cleanup: it resolves the user's Recent folder from the Shell Folders key (`EvBeGone.au3:59-74`), measures it (`:369-411`) and deletes its files (`:473-491`), without a confirmation or a preview. Its candidate list of about forty other cleanups, among them Windows log files, Recycle Bin and temporary files, is commented out (`:108-150`). It runs as administrator (`:5`), has no event log code and calls no service function: `UDF/Services.au3` (249 lines, start, stop, pause, resume and start mode through WMI, `:89-249`) is not included by it, and its one include `UDF/SecureDelete.au3` holds only `_IsDir` and `_GetDir`. The plan promotes the service helpers into the SDK. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`reference/au3/WinClean/EvBeGone.au3`: the prototype being ported, and `reference/au3/WinClean/UDF/Services.au3`, the service helpers the plan promotes into the SDK.",
+      "`docs/origin/resolute-D05-T01-s3.md`: the plan section as it stood in Resolute, of which only the WinClean parts apply.",
+      "`reference/au3/WinClean/WinPower.ini` and `reference/au3/WinClean/Resources/`: the settings file and the icons the prototype shipped with, kept as a record."
+    ],
+    "outcome": [
+      "Every cleanup is a declared item with its roots, its measure, its removal and its reversibility, and a scan reports files and bytes for each without removing anything.",
+      "Clean removes only the ticked cleanups after a confirmation that names count, size and rows, and reports the space actually freed, read back from the file system.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Clean screen, where each cleanup is a row with what it found and the space it would free. Reporting and audit are the Activity section, the trail of what a scan and a run did, and History, which holds the space freed by each run. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated removal is refused by name before anything is touched. Reverse is honest and partial: files sent to the Recycle Bin can be put back, an event log is saved to a file before it is cleared, and a cleanup with neither says so before it runs.",
+    "baseline_items": [
+      "Run the shipped AutoIt tool from the prototype build on a disposable machine with a known set of files in the Recent folder, press Analyze, and record the text of its results box. Done when: `docs/baseline/analyze.txt` holds the output and `docs/baseline/recent-before.json` lists every file in the folder with its size.",
+      "Press Go! with Recent Documents ticked and list the folder again. Done when: `docs/baseline/recent-after.json` shows which files were removed and which were left, and whether empty sub-folders remain (`EvBeGone.au3:473-491` removes files only).",
+      "Record where the tool writes its log and what it contains, including the line it writes after a run (`EvBeGone.au3:464`). Done when: `docs/baseline/log.txt` holds one real run's log or states that none was written."
+    ],
+    "inventory_items": [
+      "Record the window and controls in `docs/inventory.md`: the main window (`EvBeGone.au3:94`), the checkbox list (`:96`), Analyze and Go! (`:213-216`), the progress bar (`:217`), the results box (`:218`), the information strip (`:220-222`) and its description text (`:306-329`). Done when: every control-creation call in the file is listed with its purpose and its verdict.",
+      "Record the strings and the cleanup list: the live Recent Documents entry (`:108`), each commented candidate (`:109-150`) and its group (`:157-164`). Done when: every cleanup name is marked live, candidate to port or cut, with its reason.",
+      "Record the behaviours: the Recent folder lookup (`:59-74`), the fixed drive list (`:77-86`), the scan (`:369-411`), the run (`:414-471`), the single delete (`:493-521`), the log (`:556-573`), the error box (`:575-583`) and the empty Windows XP branches (`:65-68`, `:432-435`). Done when: every file system read and write is listed and the cancel behaviour (`:427`) is stated.",
+      "Record settings, logging and the ship list: `WinPower.ini`, the logging keys read from `CIntRep.ini` (`:50-51`), the service helpers in `UDF/Services.au3` and each bundled file. Done when: every key, log line and shipped file is marked keep, cut or remapped, and the service helpers are marked promoted into the SDK."
+    ],
+    "engine": {
+      "title": "Cleanup Engine and Contract Items",
+      "intro": "The tool's whole system effect: declared cleanups that scan without removing, and a run that removes only what was ticked. Each cleanup is data and an item of the SDK's repair contract, so it inherits diagnose and undo where an undo exists. The prototype performs one cleanup, Recent Documents, and its other candidates are only a commented list (`reference/au3/WinClean/EvBeGone.au3:108-150`), so temporary folders, caches and event logs are new work, chosen here from that list and from what Windows keeps.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the cleanups as data in `src/core/Cleanups.h`. Done when: each cleanup states its roots, its measure, its removal and its reversibility once, and a test lists them.",
+        "Implement scan, run and the refusal rules in `src/core/Scanner.cpp` and `src/core/Runner.cpp` against a fixture root the tests can redirect. Done when: the unit tests pass against a disposable tree."
+      ],
+      "items": [
+        "Declare in `src/core/Cleanups.h` each cleanup as a row of what it looks at, how it measures, how it removes and whether anything can be put back, starting with Recent Documents (`EvBeGone.au3:59-74`, `:431-439`). Done when: the header holds one row per cleanup chosen from the candidate list (`EvBeGone.au3:108-150`) and the event logs, and a test fails when a row has no reversibility stated. Cheaper substitute: a list of names with the paths in the removal code, which hides what a cleanup touches.",
+        "Implement `Scan()` in `src/core/Scanner.cpp` measuring each ticked or unticked cleanup by file count and exact bytes without removing anything, as the prototype's analyze does (`EvBeGone.au3:369-411`) but without rounding each file to a tenth of a kilobyte (`:395`). Done when: a fixture tree of known files reports the exact count and byte total and the tree is unchanged after the scan. Cheaper substitute: estimating from the folder's reported size.",
+        "Make the scan skip junctions and symbolic links instead of descending into them, which the prototype's recursion by directory attribute does not do (`EvBeGone.au3:384`). Done when: a fixture with a junction to a folder outside the root counts nothing from outside and removes nothing from it.",
+        "Implement `Run(selection)` in `src/core/Runner.cpp` removing only the ticked cleanups, in order, stopping at the next cleanup when cancelled as the prototype does (`EvBeGone.au3:423-431`). Done when: a fixture with two ticked and one unticked cleanup leaves the unticked tree untouched. Cheaper substitute: removing every cleanup and unticking in the report.",
+        "Count what was freed from what was actually removed, read back after the removal, and not from what was found before the delete is attempted (`EvBeGone.au3:484-486`). Done when: a fixture with one locked file reports it as skipped with its name and the freed total excludes it.",
+        "Send files to the Recycle Bin where the cleanup is declared reversible, using the prototype's unused recycle option as the design (`EvBeGone.au3:493-500`), and delete permanently where it is not. Done when: a reversible fixture row leaves its files in the Recycle Bin and an irreversible row says so in its record.",
+        "Refuse `Run` by name when the process is not elevated and a ticked cleanup needs it, before any removal, with one activity record, where the prototype asked for administrator at launch (`EvBeGone.au3:5`). Done when: an unelevated test run reports the refusal and the fixture is unchanged. Cheaper substitute: letting a delete fail with access denied halfway through.",
+        "Let a cleanup declare a service it needs stopped, and stop and restart it through the SDK's service primitives (the start, stop, pause, resume and start-mode set promoted from `UDF/Services.au3:89-249`), restarting it even when the removal fails. Done when: a test with a fake service control stops it, removes, and finds it running again after a forced failure. Cheaper substitute: a private service helper in the tool, which the plan forbids.",
+        "Cover every path in `tests/cleanup_test.cpp` against a fixture root. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L cleanup` passes, and fails when a row of `Cleanups.h` is changed to remove a folder it did not declare."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L cleanup` passes, including the scan-removes-nothing, locked-file and unelevated cases, and fails when a declared cleanup is changed.",
+      "commit": "core: cleanups declared as data, a scan that removes nothing, a run that removes only what was ticked"
+    },
+    "parity_items": [
+      "Add `tests/fixtures/baseline/` as a copy step from `docs/baseline/` at configure time. Done when: the parity test reads the committed baseline and no path is typed into a tracked build file.",
+      "Compare the Recent Documents cleanup against the baseline's before and after lists, and record each deliberate difference (exact bytes, junctions skipped, empty folders) in `docs/parity.md`. Done when: the test passes for the files removed and the file lists each difference with its reason."
+    ],
+    "enhancements": [
+      {
+        "title": "Preview Before Removal",
+        "intro": "The prototype removes a folder's files without showing which, and its results box shows only a total per cleanup (`reference/au3/WinClean/EvBeGone.au3:357-365`). Here each row opens into the list of files the cleanup would remove, with their sizes, from the same scan that measured it, so the preview and the run cannot disagree.",
+        "surface": {
+          "fidelity": "the file list under a Clean row, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person sees exactly which files a cleanup would remove and how large each is before pressing Clean. Consumer: the list, compared with what the run removes.",
+          "treatment": "a sorted list of paths and sizes opened from the row, from the scan's own result. Cheaper substitute that fails the checkpoint: a second walk of the folder for the preview, which can differ from what the run removes."
+        },
+        "build": [
+          "Keep the scan's file list in `src/core/Scanner.cpp` and return it with the totals. Done when: the totals equal the sum of the list.",
+          "Show the list in `src/ui/CleanView.cpp`. Done when: opening a row lists its files with sizes, largest first."
+        ],
+        "items": [
+          "Return each scan's files with their sizes from `Scan()` in `src/core/Scanner.cpp`, not only totals. Done when: a test shows the byte total equals the sum of the listed sizes.",
+          "Make `Run()` remove the scanned list and nothing else, refusing a file that was not in it. Done when: a file added after the scan is left alone and named as new. Cheaper substitute: rescanning at run time, which removes what the user never saw.",
+          "Show the list in `src/ui/CleanView.cpp` through the SDK's list control, with the path, the size and the sort by size. Done when: a driven test opens a row and reads its files through UI Automation.",
+          "Cap the list's drawn rows for a large cleanup while keeping the full list for the run, saying how many are not drawn. Done when: a fixture with a large count draws the cap and the run still removes all of them.",
+          "Cover it in `tests/preview_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L preview` passes, and fails when the run removes a file that was not listed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L preview` passes: the list equals what the run removes, and a file added after the scan is left alone.",
+        "commit": "feature: preview the files a cleanup would remove"
+      },
+      {
+        "title": "Event Log Backup Before Clearing",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Clearing an event log removes its history, and the prototype has no event log code at all. Before a log is cleared, it is saved to a file, so a cleanup that cannot otherwise be put back leaves a copy. The saved file is a copy to open and read, not a way to write the entries back into the live log, and the surface says so. The record is the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the event log rows and the saved-copy result, against `DESIGN.md` section 2.",
+          "job": "a person clears event logs and keeps a copy of each. Consumer: the saved file, opened and read back.",
+          "treatment": "each log's saved file path shown on its row after the run, and the log cleared only after the file is read back. Cheaper substitute that fails the checkpoint: clearing first and saving afterwards, which saves an empty log."
+        },
+        "build": [
+          "Save each log before it is cleared, through the repair contract, in `src/core/EventLogs.cpp`. Done when: a record of the saved file exists before the first log is cleared.",
+          "Show the saved path on the row in `src/ui/CleanView.cpp`. Done when: after a run each cleared log shows where its copy is."
+        ],
+        "items": [
+          "Enumerate the event logs and measure each by its size in `src/core/EventLogs.cpp`, through the Windows Event Log API. Done when: a test with a fake log source lists each log with its size and removes nothing.",
+          "Export each log to a file in a folder chosen in settings before clearing it, and read the file back to check it opens. Done when: a test finds the file on disk, non-empty, before the log is cleared. Cheaper substitute: clearing and reporting success without a copy.",
+          "Refuse to clear a log whose export failed, naming the log and the reason. Done when: a forced export failure leaves the log intact and the row shows Skipped with the reason.",
+          "Record each saved file through the repair contract's restore record, so Undo reveals it and the surface says plainly that it cannot be written back into the live log. Done when: Undo on a cleared log opens its folder, and the text states what it cannot do.",
+          "Cover it in `tests/eventlog_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L eventlog` passes, and fails when a log is cleared before its export."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L eventlog` passes: every cleared log has a saved copy read back, and a failed export leaves its log intact.",
+        "commit": "feature: save each event log before clearing it"
+      },
+      {
+        "title": "Scheduled Cleaning and History",
+        "needs": "sdk-framework",
+        "intro": "The prototype ran only when a person pressed a button. The Schedule section lets the ticked cleanups run by themselves on a schedule the person sets, and History keeps what each run freed. A scheduled run uses the same engine and the same confirmation rules as a run by hand: it only runs cleanups the person ticked for it, and writes the same records.",
+        "surface": {
+          "fidelity": "the Schedule and History sections, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person chooses which cleanups run on a schedule and reads what each past run freed. Consumer: the scheduled task and the history list, read back.",
+          "treatment": "a schedule form that names the cleanups it will run and when, and a list of past runs with the date, the cleanups and the space freed. Cheaper substitute that fails the checkpoint: a scheduled task that runs everything, which removes what the person never chose."
+        },
+        "build": [
+          "Create and remove the scheduled task from `src/core/Schedule.cpp`, naming the cleanups it runs. Done when: the task exists in the Task Scheduler with those cleanups and is gone after removal.",
+          "Show the form and the past runs in `src/ui/ScheduleView.cpp` and `src/ui/HistoryView.cpp`. Done when: a run adds one line to History."
+        ],
+        "items": [
+          "Add `src/core/Schedule.cpp` creating one scheduled task that starts `WinClean.exe` with the chosen cleanup ids, read back after creation. Done when: a test finds the task with its arguments and the arguments name only the chosen cleanups. Cheaper substitute: a task that runs the whole tool without a selection.",
+          "Refuse a scheduled cleanup that is not declared reversible or saved first, unless the person ticked it for the schedule after a confirmation naming it. Done when: a fixture with an irreversible cleanup is refused without that tick.",
+          "Write one history record per run in `src/core/History.cpp` with the time, the cleanups and the bytes actually freed. Done when: a test run adds exactly one record and its total equals the Run's.",
+          "Build `src/ui/ScheduleView.cpp` and `src/ui/HistoryView.cpp` from the SDK's controls. Done when: a driven test sets a schedule and finds it in the Task Scheduler, and a run appears in History.",
+          "Cover it in `tests/schedule_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L schedule` passes, and fails when the task runs a cleanup that was not chosen."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L schedule` passes: the task runs only the chosen cleanups and each run adds one History record.",
+        "commit": "feature: scheduled cleaning with a history"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A walk of `reference/au3/WinClean/EvBeGone.au3` finds every piece in `docs/inventory.md` with its home, and the service helpers are marked promoted into the SDK.",
+      "The Recent Documents parity check reports its differences from the baseline, each with a reason, and a scan removes nothing on a fixture tree, asserted.",
+      "On a real machine the tool scans, previews, cleans only the ticked rows, reports the space freed, and runs a schedule, in light and dark, by keyboard alone."
+    ]
+  }
+}

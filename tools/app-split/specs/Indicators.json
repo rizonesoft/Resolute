@@ -1,0 +1,247 @@
+{
+  "name": "Indicators",
+  "slug": "indicators",
+  "display": "Indicators",
+  "job": "it shows the state of the Caps Lock, Num Lock and Scroll Lock keys in the notification area and on screen, and notices a change as it happens.",
+  "tagline": "See your lock keys at a glance",
+  "frozen": false,
+  "elevated": false,
+  "au3": [
+    "Indicators"
+  ],
+  "hue": {
+    "name": "Rose",
+    "light": "#FDA4AF",
+    "dark": "#E11D48",
+    "social_ground": "#2D0F18",
+    "social_muted": "#F7C9D2"
+  },
+  "icon": {
+    "idea": "A keyboard key with its light on.",
+    "points": [
+      "Free-standing with no tile: a rounded key.",
+      "The key's skirt is Rose and its top Rose light, with a small light on the front edge.",
+      "The small drawing below 40 pixels enlarges the light and drops the skirt's detail."
+    ],
+    "large": "<rect x=\"12\" y=\"18\" width=\"72\" height=\"62\" rx=\"12\" fill=\"#E11D48\"/><rect x=\"22\" y=\"22\" width=\"52\" height=\"40\" rx=\"8\" fill=\"#FDA4AF\"/><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M43 71 H53\" stroke=\"#FDA4AF\" stroke-width=\"6\"/></g>",
+    "small": "<rect x=\"10\" y=\"16\" width=\"76\" height=\"66\" rx=\"13\" fill=\"#E11D48\"/><rect x=\"21\" y=\"21\" width=\"54\" height=\"36\" rx=\"8\" fill=\"#FDA4AF\"/><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M40 70 H56\" stroke=\"#FDA4AF\" stroke-width=\"10\"/></g>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Indicators",
+        "Each indicator as a row with its state now and where it is shown"
+      ],
+      [
+        "Appearance",
+        "How the notification area icon looks, and where and for how long the on-screen notice appears"
+      ],
+      [
+        "Activity",
+        "What the tool noticed and did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees at a glance which lock keys are on, and where each one is shown.",
+    "primary": "Apply",
+    "secondary": "Test",
+    "rows": [
+      [
+        "Caps Lock",
+        "On or Off"
+      ],
+      [
+        "Num Lock",
+        "On or Off"
+      ],
+      [
+        "Scroll Lock",
+        "On or Off"
+      ],
+      [
+        "Notification area",
+        "Shown as one icon or one per indicator"
+      ],
+      [
+        "On-screen notice",
+        "On or Off"
+      ]
+    ],
+    "status": "Caps Lock on, 2 off",
+    "notes": [
+      "Each indicator is one row. Its state is shown with an icon and a word (On or Off), read from Windows when the screen opens and kept current while it is open.",
+      "Each row also says where that indicator is shown: the notification area, the on-screen notice, both or neither.",
+      "Apply saves the changes made on the Indicators and Appearance screens and shows the result at once. It is disabled while nothing has changed. The AutoIt Apply button was enabled by a test that compared the saved setting with the file instead of with the checkbox (`Indicators.au3:172`), so it was enabled when nothing had changed.",
+      "Test shows the notification area icon and the on-screen notice as they would look for a change, without touching a key and without changing any setting. Nothing is written to the system, so there is no undo.",
+      "The status bar sums the state in words, for example \"Caps Lock on, 2 off\".",
+      "There is no confirmation and no refusal: the tool needs no elevation, as the AutoIt original did not (`Indicators.au3:10`)."
+    ],
+    "cut": "The AutoIt tool had no main window: only a tray menu (Preferences, About, Close, `Indicators.au3:53-59`), a Preferences dialog with one checkbox (`:136-167`) and an About dialog (`:227-314`). The About dialog's donate icon (`:244`), five social icons (`:287-301`), the Doors-suite announcement (`:271`) and its drive-space code (`:277-284`, partly commented out) are cut, as are its own tray menu and dialogs, which the sidebar window and the framework's pages replace. Each cut is recorded in the plan's inventory section."
+  },
+  "readme": {
+    "lead": "Indicators shows whether Caps Lock, Num Lock and Scroll Lock are on, in the notification area and on screen.",
+    "what": [
+      "Indicators reads the state of the three lock keys from Windows and shows it where you can see it without looking at the keyboard. One icon in the notification area can show all three together, or each key can have its own icon.",
+      "It notices a change as soon as it happens and can show a brief notice on screen. You choose where the notice appears and how long it stays. The tool only reads keyboard state: it changes nothing on your system."
+    ],
+    "new_intro": "The AutoIt version lived only in the notification area. The C++ version keeps that and adds:",
+    "new": [
+      [
+        "A window.",
+        "One list shows each indicator, its state now and where it is shown."
+      ],
+      [
+        "Icon choice.",
+        "One icon for all three keys, as before, or one icon per key."
+      ],
+      [
+        "On-screen notice.",
+        "A brief notice when a lock key changes, placed and timed by you, and still when your system asks for reduced motion."
+      ],
+      [
+        "Quicker and lighter.",
+        "A change is noticed when it happens, without checking the keys over and over."
+      ]
+    ]
+  },
+  "reference": {
+    "note": "The prototype sits at `reference/au3/Indicators/` in a flat layout: its main script is `Indicators.au3`, its one include is `UDF/CoreFunctions.au3`, and `Resources/` holds 17 icons (eight state icons `00.ico` to `07.ico`, the application icon and eight About and menu icons). There is no `src/`, `shipped/`, `update/` or `dist/`; the only build is `local/untracked-Indicators/Indicators.exe`, which is not tracked."
+  },
+  "plan": {
+    "scope": "The whole port: build, engine, window, features, release",
+    "goal": "Indicators ships as a complete, standalone C++ tool: it reads the Caps Lock, Num Lock and Scroll Lock states from Windows, notices a change within a moment without polling harder than needed, shows the state in the notification area as one combined icon or one icon per key, shows a brief on-screen notice if asked, starts with Windows if asked, and lists each indicator and where it is shown in the suite's sidebar window.",
+    "current_state": "Nothing exists in C++. The repository holds the AutoIt prototype under `reference/au3/Indicators/` (`Indicators.au3`, 349 lines, and `UDF/CoreFunctions.au3`, 46 lines, 19 files in all with 17 icons), the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The prototype is a tray-only script with no main window: it reads three keys with `_WinAPI_GetKeyState` (Num Lock `0x90`, Scroll Lock `0x91`, Caps Lock `0x14`, `Indicators.au3:214-224`), combines them into a 3-bit value (`:87-99`), re-reads every 250 ms (`:69`) and sets one of eight tray icons and tooltips only when the value changes (`:101-130`). Its one setting is a Startup-folder shortcut (`:146`, `:199-211`). It requests no elevation (`:10`). The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built. The only built AutoIt copy, `reference/au3/local/untracked-Indicators/Indicators.exe`, is not tracked.",
+    "inputs": [
+      "`reference/au3/Indicators/Indicators.au3`: the tool being ported, with `reference/au3/Indicators/UDF/CoreFunctions.au3` for its title and version helpers.",
+      "`reference/au3/Indicators/Resources/`: the 17 icons, kept as a record; the C++ tool's icons are new drawings.",
+      "`reference/au3/local/untracked-Indicators/Indicators.exe`: the one built copy, which the baseline run uses."
+    ],
+    "outcome": [
+      "`Indicators.exe` reports the same lock-key states as Windows for all eight combinations, and its combined tray icon uses the same tooltip words as the AutoIt original (`Indicators.au3:106-124`).",
+      "A change is noticed within a moment and without a fast poll; the tray icons, the on-screen notice and the start-with-Windows choice work and are read back.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Indicators screen, where each key is a row with its state and where it is shown. Reporting and audit are the Activity section, which lists each change the tool noticed and each notice it showed. Settings are the framework's pages, with the tool's own Appearance screen beside them. Permissions do not apply: the tool needs no elevation and writes nothing a user lacks the right to write. Reverse does not apply either: the tool only reads keyboard state, and its two settings (icon mode and start with Windows) are switched back by the same control.",
+    "baseline_items": [
+      "Run `reference/au3/local/untracked-Indicators/Indicators.exe` and toggle Caps Lock, Num Lock and Scroll Lock through all eight combinations. Done when: `docs/baseline/states.json` lists, for each combination, the tray tooltip text and a capture of the tray icon (`Indicators.au3:103-128`).",
+      "Record what the tool does at start and on return to no key on. Done when: `docs/baseline/start.json` states which icon and tooltip show at start with all keys off (`Indicators.au3:65-66`, `:48`, `:101`) and which show after returning to none (`:125-127`), with a reading of whether `_WinAPI_GetKeyState` returns the toggle bit only.",
+      "Tick and untick the Start checkbox in Preferences and record the Startup folder. Done when: `docs/baseline/startup.json` shows the `Indicators.lnk` shortcut created and deleted (`Indicators.au3:199-211`) and whether Apply is enabled at each step (`:172-176`)."
+    ],
+    "inventory_items": [
+      "Record the windows and controls in `docs/inventory.md`: the tray menu (`Indicators.au3:53-59`), the Preferences dialog (`:140`) with its checkbox (`:145`) and OK, Cancel and Apply buttons (`:153-155`), and the About dialog (`:237`) with every label and icon (`:243-301`). Done when: every control-creation call in the file is listed with its window and purpose.",
+      "Record the strings: the eight tray tooltips (`Indicators.au3:106-127`), the menu texts (`:53-59`), the dialog titles (`:140`, `:237`) and the hardcoded copyright years that disagree (`:8`, `:250`). Done when: every string says whether it is kept, remapped to the framework or cut.",
+      "Record the behaviours: the three key reads (`Indicators.au3:214-224`), the 3-bit combination (`:87-99`), the 250 ms re-read (`:69`), the change-only update (`:101`, `:130`), the Startup shortcut (`:146`, `:199-211`) and the `asInvoker` level (`:10`). Done when: every read and write in the file is listed with its source line.",
+      "Record settings, logging, update and the ship list. Done when: the absence of any settings file, log and update check in the prototype is stated, and each shipped icon in `reference/au3/Indicators/Resources/` is marked keep as a record or cut."
+    ],
+    "engine": {
+      "title": "Indicator State Engine",
+      "intro": "The tool's whole system effect: reading each indicator's state from Windows, noticing a change within a moment of it happening without polling harder than needed, and declaring the indicators as data so one more is a row and not new code. The engine only reads: it writes nothing to the system.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the indicators as data in `src/core/Indicators.h`. Done when: the three keys are stated once, each with its virtual-key code and the line of `Indicators.au3` it comes from.",
+        "Implement reading, snapshot and change detection in `src/core/KeyState.cpp` and `src/core/ChangeWatcher.cpp` against a reader the tests can replace. Done when: the unit tests pass without a keyboard."
+      ],
+      "items": [
+        "Declare in `src/core/Indicators.h` one row per indicator: Caps Lock `0x14`, Num Lock `0x90`, Scroll Lock `0x91`, each with its display name and the AutoIt tooltip word, citing `Indicators.au3:214-224` and `:106-124`. Done when: the header holds the three rows and a test adds a fourth fixture row and sees it read and reported with no `.cpp` edit.",
+        "Implement `ReadState(const IndicatorDef&)` in `src/core/KeyState.cpp` with `GetKeyState` on the row's virtual-key code, behind a reader interface. Done when: a test with a fake reader returns on and off for each of the three rows, and a test with the real reader returns the same as `GetKeyState` called directly (`Indicators.au3:215`).",
+        "Implement `Snapshot()` returning every row's state and the combined value (Num Lock 1, Scroll Lock 2, Caps Lock 4) as in `Indicators.au3:87-99`. Done when: a test over all eight combinations equals `docs/baseline/states.json`.",
+        "Implement `ChangeWatcher` in `src/core/ChangeWatcher.cpp` re-reading on keyboard input (`RegisterRawInputDevices` with `RIDEV_INPUTSINK`) plus one slow safety re-read that is never faster than the 250 ms of `Indicators.au3:69`. Done when: a test with a fake clock counts the reads over an idle minute and finds none faster than that, and a simulated toggle is reported within one message-loop turn. Cheaper substitute: a timer of a few milliseconds, which polls harder than needed.",
+        "Report only differences, as `Indicators.au3:101` and `:130` do: one change record of row, was, now and time through one callback. Done when: ten identical snapshots give zero records and one toggle gives exactly one.",
+        "Handle the first reading: report the starting state of every row without treating it as a change. Done when: a test that starts with Caps Lock on shows the row on with no change record, and a start with all keys off shows the none state, which the AutoIt original left as its startup icon (`Indicators.au3:48`, `:65`, `:101`).",
+        "Expose the combined tooltip words of `Indicators.au3:104-127` as a function of the snapshot. Done when: all eight combinations return the eight AutoIt tooltips, with \"Num - Caps - Scroll\" for all three and the application title for none.",
+        "Cover every path in `tests/indicators_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L indicators` passes, and fails when one virtual-key code in `Indicators.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L indicators` passes for the eight combinations, the idle read count and the fourth-row fixture, and fails when one declared virtual-key code is changed.",
+      "commit": "core: the indicator state engine, declared as data and notified on change"
+    },
+    "parity_items": [
+      "Add `tests/fixtures/baseline/` as a copy step from `docs/baseline/` at configure time. Done when: the parity test reads the committed baseline and no path is typed into a tracked build file.",
+      "Compare all eight combinations and the start state. Done when: the test covers `states.json` and `start.json`, and each difference is either fixed or recorded in `docs/parity.md` as deliberate."
+    ],
+    "enhancements": [
+      {
+        "title": "Notification Area Icons",
+        "needs": "sdk-framework",
+        "intro": "The AutoIt tool shows one combined icon in the notification area, one of eight (`Indicators.au3:103-128`). Here the user chooses: that one combined icon, or one icon per indicator. The icons are new drawings in the Rose identity, not the AutoIt icons.",
+        "surface": {
+          "fidelity": "the notification area icons and the Appearance screen, against `DESIGN.md` section 2.",
+          "job": "a person sees each lock key's state from the notification area. Consumer: the rendered icons and tooltips, read back.",
+          "treatment": "each state shown by the icon's shape and a tooltip word, never by colour alone. Cheaper substitute that fails the checkpoint: one fixed icon that never changes, which shows nothing."
+        },
+        "build": [
+          "Draw and manage the icons in `src/ui/TrayIcons.cpp` with `Shell_NotifyIconW`. Done when: the icon changes when a lock key does.",
+          "Offer the choice on the Appearance screen in `src/ui/AppearanceView.cpp`. Done when: switching mode adds or removes the per-indicator icons at once."
+        ],
+        "items": [
+          "Implement the combined mode in `src/ui/TrayIcons.cpp`: one icon for the 3-bit value with the tooltip words of `Indicators.au3:104-127`, updated with `NIM_MODIFY` only when the value changes. Done when: all eight combinations show the eight tooltips and an unchanged value makes no call. Cheaper substitute: redrawing the icon on every read.",
+          "Implement the per-indicator mode: one icon for each row that is on or always, as the user chooses, from the row list in `src/core/Indicators.h`. Done when: adding a fixture row adds an icon with no UI edit.",
+          "Recreate every icon when Explorer restarts, on the `TaskbarCreated` message. Done when: a driven test that restarts Explorer finds the icons back.",
+          "Draw the icons at 16, 20, 24 and 32 pixels for the system's scale. Done when: captures at 100 and 150 percent are committed to `docs/captures/` and each state reads at a glance in light and dark taskbars.",
+          "Persist the mode through the framework's settings and read it back after a restart. Done when: a changed mode survives a restart in a driven test.",
+          "Cover it in `tests/tray_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L tray` passes, and fails when a state maps to the wrong icon."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L tray` passes for both modes and the Explorer restart, and the captures show all eight combined states.",
+        "commit": "feature: notification area icons, combined or one per indicator"
+      },
+      {
+        "title": "On-Screen Notice on Change",
+        "needs": "sdk-framework",
+        "intro": "The AutoIt tool had no on-screen notice. Here a brief notice appears when a lock key changes, positioned and timed by the user, and honouring the system's reduced motion setting. It is off until the user turns it on.",
+        "surface": {
+          "fidelity": "the notice and the Appearance screen, against `sdk/DESIGN.md` motion and overlay rules, in light and dark at 100 and 150 percent.",
+          "job": "a person sees a lock key change without looking at the tray. Consumer: the rendered notice, read back.",
+          "treatment": "the key's name and the new state in words, an icon, and no focus taken. Cheaper substitute that fails the checkpoint: a message box, which takes focus and interrupts typing."
+        },
+        "build": [
+          "Show the notice from `src/ui/Notice.cpp` as a topmost window that never takes focus. Done when: a change shows it above other windows while typing continues in the active window.",
+          "Let the user set position and duration on the Appearance screen in `src/ui/AppearanceView.cpp`. Done when: both values persist and Test shows the result."
+        ],
+        "items": [
+          "Create `src/ui/Notice.cpp`: a window with `WS_EX_NOACTIVATE`, `WS_EX_TOPMOST` and `WS_EX_TRANSPARENT` drawn through the SDK's UI library, naming the key and its state. Done when: a toggled lock key shows it and the foreground window keeps focus. Cheaper substitute: `MessageBoxW`.",
+          "Add position (a corner or the centre of the monitor with the pointer) and duration settings, declared to the framework. Done when: each is persisted and read back after a restart.",
+          "Honour reduced motion: read `SPI_GETCLIENTAREAANIMATION` and show and hide without a fade or slide when animation is off. Done when: a driven test with the setting off finds no animation frames.",
+          "Show one notice at a time and replace it when another key changes before it ends. Done when: two toggles within the duration leave one visible notice showing the latest state.",
+          "Make Test on the Indicators screen show the notice with the saved position and duration without reading a key. Done when: pressing Test shows it and writes no setting.",
+          "Cover it in `tests/notice_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L notice` passes, and fails when the notice takes focus."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L notice` passes, the notice never takes focus, and it does not animate when reduced motion is on.",
+        "commit": "feature: an on-screen notice when a lock key changes"
+      },
+      {
+        "title": "Start With Windows",
+        "intro": "The AutoIt Preferences dialog had one option: start the tool when Windows starts, done with a shortcut in the Startup folder (`Indicators.au3:146`, `:199-211`). Here it is the same effect and a clearer control: a setting that adds or removes the per-user Startup shortcut and shows the true state when the screen opens.",
+        "surface": {
+          "fidelity": "the Start With Windows control on the Appearance screen, against `sdk/DESIGN.md`.",
+          "job": "a person has the tool running after sign-in without starting it. Consumer: the Startup folder, read back.",
+          "treatment": "a switch whose position is read from the Startup folder each time the screen opens, not from a remembered value. Cheaper substitute that fails the checkpoint: a stored flag that can disagree with the folder."
+        },
+        "build": [
+          "Create and delete the shortcut in `src/core/Startup.cpp` against a folder the tests can redirect. Done when: the unit tests pass against a disposable folder.",
+          "Bind the switch in `src/ui/AppearanceView.cpp`. Done when: it reflects the folder on open."
+        ],
+        "items": [
+          "Implement `SetStartWithWindows(bool)` in `src/core/Startup.cpp` creating or deleting `Indicators.lnk` in the current user's Startup folder through `IShellLink`, as `Indicators.au3:199-211` does. Done when: a test under a disposable folder finds the shortcut after enable and none after disable. Cheaper substitute: a `Run` registry value, which is a different effect from the original and not what the baseline recorded.",
+          "Read the state from the folder with `IsStartWithWindows()` and show it when the screen opens. Done when: a shortcut added by hand shows the switch on after the next open.",
+          "Read the shortcut back after writing and report a mismatch in the Activity list. Done when: a test that blocks the write finds one failed record naming the folder.",
+          "Match the baseline: the shortcut's name, target and working folder equal `docs/baseline/startup.json`. Done when: a test compares them field by field.",
+          "Cover it in `tests/startup_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L startup` passes, and fails when the shortcut target is changed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L startup` passes, and the switch always matches what is in the Startup folder.",
+        "commit": "feature: start with Windows through the Startup folder"
+      }
+    ],
+    "no_reverse": "the tool only reads and shows keyboard and system state; it changes nothing",
+    "verification": [
+      "A walk of `reference/au3/Indicators/Indicators.au3` finds every piece in `docs/inventory.md` with its home.",
+      "The parity check reports zero unexplained differences against the AutoIt build for all eight combinations and the start state.",
+      "On a real machine the tool reads each lock key, notices a toggle, shows the icons and the notice, and starts with Windows, in light and dark, by keyboard alone."
+    ]
+  }
+}

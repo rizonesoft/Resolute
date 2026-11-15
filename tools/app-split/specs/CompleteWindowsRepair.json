@@ -1,0 +1,256 @@
+{
+  "name": "CompleteWindowsRepair",
+  "slug": "completewindowsrepair",
+  "display": "Complete Windows Repair",
+  "job": "it repairs Windows problems that no other Resolute tool owns, checks each repair's result by reading the system back, and can undo the last run.",
+  "tagline": "Windows repairs that check their own work and can be undone",
+  "frozen": false,
+  "elevated": true,
+  "au3": [
+    "ComWinRep",
+    "WinPower"
+  ],
+  "hue": {
+    "name": "Red",
+    "light": "#F87171",
+    "dark": "#DC2626",
+    "social_ground": "#2B1010",
+    "social_muted": "#F5C6C6"
+  },
+  "icon": {
+    "idea": "A toolbox: every repair in one box.",
+    "points": [
+      "Free-standing, with no tile behind it and rounded corners.",
+      "The body is Red and the lid is Red light, with a handle and a latch.",
+      "The small drawing, used below 40 pixels, drops the latch and thickens the handle."
+    ],
+    "large": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M36 34 V25 A4 4 0 0 1 40 21 H56 A4 4 0 0 1 60 25 V34\" stroke=\"#DC2626\" stroke-width=\"7\"/></g><rect x=\"12\" y=\"34\" width=\"72\" height=\"46\" rx=\"9\" fill=\"#DC2626\"/><path d=\"M21 34 H75 A9 9 0 0 1 84 43 V52 H12 V43 A9 9 0 0 1 21 34 Z\" fill=\"#F87171\"/><rect x=\"42\" y=\"46\" width=\"12\" height=\"13\" rx=\"3\" fill=\"#DC2626\"/>",
+    "small": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M34 34 V24 A4 4 0 0 1 38 20 H58 A4 4 0 0 1 62 24 V34\" stroke=\"#DC2626\" stroke-width=\"10\"/></g><rect x=\"10\" y=\"34\" width=\"76\" height=\"46\" rx=\"10\" fill=\"#DC2626\"/><path d=\"M20 34 H76 A10 10 0 0 1 86 44 V54 H10 V44 A10 10 0 0 1 20 34 Z\" fill=\"#F87171\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Repairs",
+        "One row per repair, each with its state, ticked to run"
+      ],
+      [
+        "Diagnose",
+        "A read-only check of every repair, changing nothing"
+      ],
+      [
+        "History",
+        "Past runs and what each one changed, with undo"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which Windows repairs are needed, runs the ones they tick, and sees each result checked.",
+    "primary": "Repair",
+    "secondary": "Undo last run",
+    "rows": [
+      [
+        "Windows Update",
+        "Healthy, Needs repair or Repaired"
+      ],
+      [
+        "WMI repository",
+        "Healthy, Needs repair or Repaired"
+      ],
+      [
+        "System files",
+        "Not checked, Clean or Damaged"
+      ],
+      [
+        "Store and UWP apps",
+        "Healthy, Needs repair or Repaired"
+      ],
+      [
+        "Font registrations",
+        "Healthy, Needs repair or Repaired"
+      ]
+    ],
+    "status": "3 healthy, 2 need repair",
+    "notes": [
+      "Each row shows an icon and a word for its state: Healthy, Needs repair, Repaired, Failed or Not checked. The state comes from the repair's own diagnose step, not from the last click.",
+      "Each row also says whether the repair can be undone, and what to do instead when it cannot.",
+      "Repair runs every ticked row in order. Before the first change the tool offers a Windows restore point, and a run without one happens only when the person declines.",
+      "Undo last run restores what the last run recorded, and is disabled with a tooltip when there is nothing to undo.",
+      "A repair that needs a restart says so in its row and in the status bar, and never restarts the computer on its own.",
+      "The status bar counts rows by state in words, for example \"3 healthy, 2 need repair\".",
+      "When the tool is not running elevated it says so on the first screen and refuses to run a repair, instead of failing part way through."
+    ],
+    "cut": "The AutoIt window had a File, Help and Debug menu, a splash screen, a donate strip shown on exit, an animated globe while a repair ran, an impact column, a process priority combo with a power icon, an About dialog of its own and a language flag set (`ComWinRep/WinRepair.au3:509-511`, `:627`, `:1939-1942`, `Localization.au3:75`). Menus, splash, donate strip, animations and the private About dialog are cut: the suite's window, Settings and About pages replace them. The priority combo is cut because a repair has no use for a changed process priority. Each cut is recorded in the plan with its reason."
+  },
+  "readme": {
+    "lead": "Windows repairs that check their own work and can be undone.",
+    "what": [
+      "Complete Windows Repair is the suite's general repair tool for Windows problems that have no tool of their own. Each repair diagnoses the problem, fixes it, reads the system back to check the fix, and says whether it can be undone. It repairs Windows Update, the WMI repository, damaged system files, Store and UWP app registrations and font registrations.",
+      "It is a fallback by design. A Windows repair goes to the tool whose subject it is: network repairs are ComIntRep's, drive repairs are Drive Repair's, and Windows Search, the print spooler, audio and component-store cleanup have their own tools. A repair lands here only when no such tool exists."
+    ],
+    "new_intro": "The C++ version replaces a repair loop written by hand for each repair with one run loop over declared repairs.",
+    "new": [
+      [
+        "Every repair checks its own work.",
+        "Each repair has a diagnose step before and a verify step after, so a row turns Repaired only when the system reads back healthy."
+      ],
+      [
+        "Undo the last run.",
+        "What a run changed is recorded before it is changed, and one button puts it back."
+      ],
+      [
+        "A restore point first.",
+        "The tool offers a Windows restore point before the first change of a run."
+      ],
+      [
+        "Store and UWP re-registration.",
+        "A damaged Store app or Store registration is diagnosed and re-registered from its own package."
+      ],
+      [
+        "Font registration repair.",
+        "Fonts on disk and fonts in the registry are compared, and the registry is made to match."
+      ]
+    ]
+  },
+  "reference": {
+    "note": "The folder holds `reference/au3/ComWinRep` (the Complete Windows Repair prototype, whose main script is `ComWinRep/WinRepair.au3`, 1.0.0.339 per `:33`) and `reference/au3/WinPower` (the older tool, main script `WinPower/WinPower.au3`) as moved, with each tool's script at its folder root and no `src/`, `shipped/` or `dist/` split. `~Samples` under `ComWinRep` is third-party sample material kept only as reference: nothing in the port reads or copies it."
+  },
+  "plan": {
+    "scope": "Repair library: build, engine, window, undo, release",
+    "goal": "Complete Windows Repair ships as a complete, standalone C++ tool: the Windows repairs that have no tool of their own are declared as data, each with a diagnose, a repair, a verify and an honest statement of whether it can be undone, one run loop runs them through the SDK's repair contract after offering a restore point, and the last run can be undone.",
+    "current_state": "Nothing exists in C++. The repository holds the AutoIt prototypes under `reference/au3/`: `ComWinRep/WinRepair.au3` (2,028 lines) with `UDF/Localization.au3` (249 lines), and `WinPower/WinPower.au3` (349 lines) with two module stubs of 14 and 24 lines. The prototype's list has 13 dispatched rows (`WinRepair.au3:1082-1109`), of which 10 are network repairs that ComIntRep owns, and only Windows Update is implemented here: `_RepairWindowsUpdate` (`:1587-1721`) and `_ClearUpdateHistory` (`:1556-1584`). Five rows are empty functions (`:1724-1746`), and the prototype requests the highest available level (`:40`). WinPower holds `_RepairFontRegistrations` (`WinPower.au3:229-239`), which only starts a `FontReg.exe` that is not in the folder, and `_RebuildWMI` (`:258-290`). The repository also holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. No distribution build came with the prototypes. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`reference/au3/ComWinRep/WinRepair.au3` and `reference/au3/ComWinRep/UDF/Localization.au3`: the prototype being ported, with its row texts and impact labels.",
+      "`reference/au3/WinPower/WinPower.au3`: the font registration repair and the WMI rebuild the plan says to reuse.",
+      "`docs/origin/resolute-D05-T01-s2.md`: the plan text, including the routing rule and the list of repairs other tools own."
+    ],
+    "outcome": [
+      "`CompleteWindowsRepair.exe` declares each repair it offers as one data item with diagnose, repair, verify and reversibility, and runs them all through one loop on the SDK's repair contract.",
+      "Windows Update, WMI, system file, Store and UWP and font registration repairs each diagnose and verify against the real system state, and each says whether it can be undone; the last run can be undone.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Repairs screen, where a person finds a repair by what it fixes. Reporting and audit are the Activity section, which is what a run did and the trail a support reader checks. Settings are the framework's pages. Permissions anchor on the engine, where a run is refused by name when the process is not elevated, before any change. Reverse anchors on the Undo the Last Run section: it restores what the repair contract recorded before the run, and a repair that cannot be undone says so on its row and names what to do instead.",
+    "baseline_items": [
+      "Snapshot the `wuauserv` and `BITS` service configuration, the folders `SoftwareDistribution\\Download`, `SoftwareDistribution\\DataStore` and `System32\\CatRoot2`, and the `WindowsUpdate` policy and `Auto Update` values on a disposable machine, run the prototype's Windows Update repair (`WinRepair.au3:1587-1721`) elevated, and snapshot again. Done when: `docs/baseline/windows-update.json` lists every service setting, folder and value that differs, with its type and data, and names the build that ran.",
+      "Do the same for the WMI rebuild (`WinPower.au3:258-290`) and the system file scan (`WinRepair.au3:1016-1023`). Done when: `docs/baseline/wmi.json` shows what happened to `System32\\wbem\\Repository` and the three services, and `docs/baseline/sfc.json` records the command and its exit code.",
+      "Record the font registration state around `FontReg.exe` (`WinPower.au3:31`, `:233`). Done when: `docs/baseline/fonts.json` holds the `Fonts` registry key before and after, or says in one line that `FontReg.exe` was not available and the baseline is the source only."
+    ],
+    "inventory_items": [
+      "Record the windows and controls in `docs/inventory.md`: the main window and its menus (`WinRepair.au3:509-511`), the repair list with its three columns and group view (`:567-617`), the power combo (`:622-629`), the system file and restore health buttons (`:631-634`), the process buttons (`:638-645`), the two progress bars (`:647-650`), the log tab (`:652-661`) and the WinPower tree and description box (`WinPower.au3:170-226`). Done when: every control-creation call in both scripts is listed with its window and purpose.",
+      "Record the strings: the repair names, impact labels and notes (`Localization.au3:178-248`), the hardcoded messages (`WinRepair.au3:1590-1718`) and the language pack sections read. Done when: every string names its pack key or says why it is hardcoded.",
+      "Record the repairs and decide each: the 13 dispatched rows (`WinRepair.au3:1082-1109`), the unreachable `_RepairWorkGroups` (`:1749-1760`), the list row `Register Windows System Dlls` with no dispatch case (`Localization.au3:210`), the Internet Explorer repair (`WinRepair.au3:1231-1553`), the empty stubs (`:1724-1746`) and WinPower's three functions. Done when: each is marked declared item, moved to ComIntRep, or rejected with its reason, and `_ResetTcpipAll` (`WinPower.au3:242-254`) is marked moved to ComIntRep.",
+      "Record settings, logging, update and the ship list: the `.ini` keys (`WinRepair.ini`, `Doors/WinRepair.ini`), `WinRepair.sni`, the elevation level (`WinRepair.au3:40`) and the single-instance guard (`:413`). Done when: every key, log line and shipped file is marked keep, cut or remapped."
+    ],
+    "engine": {
+      "title": "Repair Items and Run Loop",
+      "intro": "The tool's whole system effect: the repairs it owns declared as data, one run loop that offers a restore point, diagnoses, repairs and verifies each ticked item through the SDK's repair contract, and a refusal by name when the process is not elevated. The prototype wrote one hand-built function per repair (`WinRepair.au3:1114-1760`); here none of them has a loop of its own.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the repairs as data in `src/core/RepairItems.h`. Done when: every repair is stated once with its diagnose, repair, verify and reversible fields, and the line of the prototype it comes from.",
+        "Implement the run loop in `src/core/RepairRun.cpp` against a system root the tests can redirect. Done when: the unit tests pass against a fixture and the routing test of this section passes."
+      ],
+      "items": [
+        "Declare in `src/core/RepairItems.h` one item per repair (`windows-update`, `wmi-repository`, `system-files`) with id, name, impact, diagnose, repair, verify and a `reversible` field that is true, partly or false, citing `WinRepair.au3:1587-1721`, `WinPower.au3:258-290` and `WinRepair.au3:1016-1023`. Done when: the header holds all three and no repair has code outside its item. Cheaper substitute: one function per repair with its own loop, which is how the prototype wrote them (`WinRepair.au3:1114-1760`).",
+        "Implement `RunRepairs(items, options)` in `src/core/RepairRun.cpp` as the only loop: offer a restore point, then for each ticked item diagnose, repair, verify, and record one activity entry. Done when: a fixture with two broken items ends with both read back healthy and two entries. Cheaper substitute: marking an item Repaired when the repair step returns, which skips verify.",
+        "Offer a Windows restore point before the first change, as `ComWinRep/Docs/_SystemRestore.txt` advises, through `SRSetRestorePointW` in `src/core/RestorePoint.cpp`. Done when: a run with the offer accepted creates a restore point named for the tool and a declined offer runs without one and logs that. Cheaper substitute: a button that opens the System Restore dialog, which creates nothing.",
+        "Declare `windows-update`: stop `wuauserv` and `BITS`, rename `SoftwareDistribution\\Download`, `SoftwareDistribution\\DataStore` and `System32\\CatRoot2` to `.Old` (`WinRepair.au3:1567-1572`), reset the service security descriptors and start types (`:1612-1626`), clear the policy values (`:1684-1700`), write the `Auto Update` defaults (`:1703-1707`) and start the services. Done when: after a fixture run the diagnose reads the services running, the start type automatic and the policy values absent. Cheaper substitute: the prototype's inner calls to the Winsock, proxy and firewall repairs (`:1656-1658`), which are network repairs ComIntRep owns.",
+        "Declare `wmi-repository`: stop `winmgmt` and its dependents, rename `System32\\wbem\\Repository` to a dated backup and start the services again (`WinPower.au3:262-288`). Done when: the verify runs a WMI query and gets a result, and the backup exists. Cheaper substitute: deleting the folder as `DirRemove` does (`WinPower.au3:266`), which leaves no way back.",
+        "Declare `system-files`: run `sfc /scannow` and read its result and exit code (`WinRepair.au3:1020`). Done when: the item reports Clean or Damaged from the scan result and states on its row that it cannot be undone. Cheaper substitute: starting a visible console window and reporting success, as the prototype does.",
+        "Refuse a run by name when the process is not elevated, before any change, with one activity record. Done when: an unelevated test run reports the refusal and the fixture is unchanged. Cheaper substitute: letting the first service call fail with access denied halfway through.",
+        "Write `tests/routing_test.cpp` asserting that no item id belongs to a repair another tool owns (network, drives, Windows Search and indexing, print spooler, audio, component-store cleanup). Done when: the test fails when an item named `flush-dns` is added, naming the owner, and the plan's `D07 T01 §3` check is named in its comment.",
+        "Cover every path in `tests/repair_test.cpp` with a fixture root. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L repair` passes, and fails when one verify step is made to always pass."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L repair` passes, including the unelevated, declined restore point and routing cases, and fails when a verify step is weakened.",
+      "commit": "core: declared repairs on one run loop, verified and refused when unelevated"
+    },
+    "parity_items": [
+      "Add `tests/fixtures/baseline/` as a copy step from `docs/baseline/` at configure time. Done when: the parity test reads the committed baseline and no path is typed into a tracked build file.",
+      "Compare the Windows Update and WMI effects with `docs/baseline/windows-update.json` and `docs/baseline/wmi.json`, and record the deliberate differences in `docs/parity.md`. Done when: the rename of the WMI folder instead of its deletion (`WinPower.au3:266`) and the dropped network calls (`WinRepair.au3:1656-1658`) are the only differences listed."
+    ],
+    "enhancements": [
+      {
+        "title": "Undo the Last Run",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "The prototype had no way back. Before a run changes anything, the prior state of what each ticked repair will touch is recorded, so Undo restores what was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists. A repair that cannot be undone says so and names what to do instead.",
+        "surface": {
+          "fidelity": "the Undo last run button, the History section and each row's reversibility word, against `DESIGN.md` section 2.",
+          "job": "a person puts back what the last run changed. Consumer: the services, folders, registry values and fonts the run touched, compared with the record.",
+          "treatment": "the recorded prior state restored item by item, each row saying Undone or Cannot be undone with the reason. Cheaper substitute that fails the checkpoint: an undo that re-runs the repair in reverse order from names alone, which is not what was there before."
+        },
+        "build": [
+          "Record the prior state through the repair contract in `src/core/RepairRun.cpp`. Done when: a record exists on disk before the first change of a run.",
+          "Wire Undo last run and History in `src/ui/RepairsView.cpp` and `src/ui/HistoryView.cpp`. Done when: a run then undo leaves the fixture as it was."
+        ],
+        "items": [
+          "Record the prior state of each ticked item through the repair contract's restore record before its repair step. Done when: a test finds the record on disk before the first value is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement undo for each reversible item: the `.Old` folders renamed back (`WinRepair.au3:1567-1572`), the service descriptors and start types and the policy values restored, the WMI backup put back. Done when: run then undo on the fixture leaves services, folders and values equal to before, asserted.",
+          "Mark each item's reversibility on its row as Undoable, Partly or Cannot be undone, and for the last two state what to do instead (the restore point for `system-files`, and the BITS queue reset at `WinRepair.au3:1680`). Done when: no row is blank and a test fails when an item lacks the field.",
+          "Show past runs in `src/ui/HistoryView.cpp` with their records and an Undo on the last. Done when: after two runs the list shows two and Undo is enabled only on the newest.",
+          "Disable Undo last run with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one run.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: a fixture run then undo leaves the services, folders and values as they were.",
+        "commit": "feature: undo puts back what the last run changed"
+      },
+      {
+        "title": "Store and UWP Re-registration",
+        "intro": "A repair the plan assigns to this tool because no topical tool owns it: re-registering the Store and the packaged apps from their own manifests. The prototype has nothing for it, so this repair is new, built on the repair contract from the start. Re-registration rewrites package registration only; it never removes an app or its data.",
+        "surface": {
+          "fidelity": "the Store and UWP apps row and its detail, against `DESIGN.md` section 2.",
+          "job": "a person whose Store or an app will not start repairs it without reinstalling. Consumer: the package status read back from Windows.",
+          "treatment": "a row that names each damaged package, then re-registers and reads each status back. Cheaper substitute that fails the checkpoint: one command that re-registers every package and reports success without reading any status."
+        },
+        "build": [
+          "Declare the item in `src/core/RepairItems.h` and implement it in `src/core/StoreApps.cpp`. Done when: diagnose lists packages whose status is not Ok.",
+          "Show the damaged packages in `src/ui/RepairsView.cpp`. Done when: the row names each package."
+        ],
+        "items": [
+          "Implement diagnose in `src/core/StoreApps.cpp`: list the installed packages for the current user and report each whose package status is not Ok. Done when: a fixture with one damaged package names it and a healthy fixture reports none. Cheaper substitute: assuming the Store is damaged when it fails to open once.",
+          "Implement repair in `src/core/StoreApps.cpp`: register each damaged package again from its install location manifest. Done when: after a fixture run the damaged package reads Ok.",
+          "Implement verify in `src/core/StoreApps.cpp` by reading the status again and failing the item when any package is still not Ok. Done when: a fixture where one package stays damaged leaves the row Failed and names it.",
+          "State the reversibility honestly in `src/core/RepairItems.h`: the item is Cannot be undone and the row says registration only is rewritten, no app data is touched, and the restore point covers a bad outcome. Done when: the row shows that text and `tests/storeapps_test.cpp` asserts the field.",
+          "Cover it in `tests/storeapps_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L storeapps` passes, and fails when verify is skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L storeapps` passes for the damaged and healthy fixtures, and fails when verify is skipped.",
+        "commit": "feature: Store and UWP re-registration as a repair item"
+      },
+      {
+        "title": "Font Registration Repair",
+        "intro": "WinPower's repair keeps the Windows font registry consistent: it registers fonts that are not registered and removes stale registrations for fonts no longer present (`WinPower.au3:175-176`). The prototype only started a separate `FontReg.exe` (`:233`) that is not in the folder, so the port does the comparison itself. This repair can be undone, because what it adds and removes is recorded.",
+        "surface": {
+          "fidelity": "the Font registrations row and its detail, against `DESIGN.md` section 2.",
+          "job": "a person whose fonts are missing or listed twice repairs the registry to match the fonts on disk. Consumer: the `Fonts` registry key compared with the fonts folder.",
+          "treatment": "a row that counts unregistered and stale entries before and after. Cheaper substitute that fails the checkpoint: starting an external executable and reporting success."
+        },
+        "build": [
+          "Declare the item in `src/core/RepairItems.h` and implement it in `src/core/FontRegistry.cpp`. Done when: diagnose counts unregistered fonts and stale entries.",
+          "Show the counts in `src/ui/RepairsView.cpp`. Done when: the row shows them before and after a run."
+        ],
+        "items": [
+          "Implement diagnose in `src/core/FontRegistry.cpp`: compare the fonts in the Windows fonts folder with the values under `HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts`. Done when: a fixture with one unregistered file and one stale value reports one of each.",
+          "Implement repair in `src/core/FontRegistry.cpp`: register each unregistered font and delete each stale value, recording every change for undo. Done when: after a fixture run both counts are zero and the record lists the changes. Cheaper substitute: shelling out to `FontReg.exe` (`WinPower.au3:233`), which cannot be redirected for a test and is not shipped.",
+          "Implement verify in `src/core/FontRegistry.cpp` by running diagnose again. Done when: a fixture where a stale value cannot be deleted leaves the row Failed and names it.",
+          "Cover it in `tests/fonts_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L fonts` passes, and fails when a stale value is left behind."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L fonts` passes for the unregistered, stale and clean fixtures, and undo restores both.",
+        "commit": "feature: font registration repair, compared and verified"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A walk of `reference/au3/ComWinRep/WinRepair.au3` and `reference/au3/WinPower/WinPower.au3` finds every piece in `docs/inventory.md` with its home.",
+      "Every declared repair has a diagnose, a verify and a reversibility field, and the routing test finds no repair another tool owns.",
+      "On a real machine the tool offers a restore point, repairs, verifies and undoes, in light and dark, by keyboard alone."
+    ]
+  }
+}

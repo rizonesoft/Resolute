@@ -1,0 +1,241 @@
+{
+  "name": "UUIDGen",
+  "slug": "uuidgen",
+  "display": "UUIDGen",
+  "job": "it makes UUIDs (also called GUIDs) in the version and format a person needs, one or many at a time, ready to copy, and checks a pasted UUID.",
+  "tagline": "Make UUIDs in the version and format you need",
+  "frozen": false,
+  "elevated": false,
+  "au3": [
+    "UUIDGen"
+  ],
+  "hue": {
+    "name": "Fuchsia",
+    "light": "#E879F9",
+    "dark": "#C026D3",
+    "social_ground": "#2A0D30",
+    "social_muted": "#F3CDF8"
+  },
+  "icon": {
+    "idea": "An identity badge on a clip.",
+    "points": [
+      "Free-standing with no tile: a rounded card.",
+      "The card is Fuchsia; its clip, photo square and lines are Fuchsia light.",
+      "The small drawing below 40 pixels has a larger photo square and two thicker lines."
+    ],
+    "large": "<rect x=\"14\" y=\"24\" width=\"68\" height=\"56\" rx=\"9\" fill=\"#C026D3\"/><rect x=\"38\" y=\"12\" width=\"20\" height=\"18\" rx=\"5\" fill=\"#E879F9\"/><rect x=\"24\" y=\"40\" width=\"20\" height=\"24\" rx=\"4\" fill=\"#E879F9\"/><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M54 44 H72 M54 54 H72 M54 64 H64\" stroke=\"#E879F9\" stroke-width=\"6\"/></g>",
+    "small": "<rect x=\"14\" y=\"24\" width=\"68\" height=\"56\" rx=\"9\" fill=\"#C026D3\"/><rect x=\"38\" y=\"12\" width=\"20\" height=\"18\" rx=\"5\" fill=\"#E879F9\"/><rect x=\"24\" y=\"40\" width=\"22\" height=\"26\" rx=\"4\" fill=\"#E879F9\"/><g fill=\"none\" stroke-linecap=\"round\"><path d=\"M56 46 H70 M56 60 H66\" stroke=\"#E879F9\" stroke-width=\"8\"/></g>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Generate",
+        "The UUIDs just made as rows, with the version, the count and the format chosen in the header"
+      ],
+      [
+        "Formats",
+        "The ways a UUID can be written, each shown on the same sample, and a field to check a pasted UUID"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person makes UUIDs in the version and format they need and copies them with one action.",
+    "primary": "Generate",
+    "secondary": "Copy all",
+    "rows": [
+      [
+        "UUID row 1",
+        "Version 4, not yet copied"
+      ],
+      [
+        "UUID row 2",
+        "Version 4, copied"
+      ],
+      [
+        "UUID row 3",
+        "Version 7, copied"
+      ],
+      [
+        "UUID row 4",
+        "Nil UUID"
+      ]
+    ],
+    "status": "4 UUIDs, version 4, lower case with hyphens",
+    "notes": [
+      "Each row is one generated UUID in the chosen format, in a monospace face, with its version named in words and an icon, and a second icon and word when it has been copied.",
+      "The header names the version (4, 7 or nil), the count and the format chosen, and changing any of them changes the next Generate, not the rows already made.",
+      "Generate is the accent button and replaces the rows with new ones; Copy all puts every row on the clipboard, one per line, and the status bar says how many were copied.",
+      "Changing the format re-writes the rows already shown from the same 16 bytes, so a person can switch between braces and no braces without making a new UUID, as the original's Braces checkbox did (`UUIDGen.au3:116-123`).",
+      "An option in the framework's settings, on by default as the original's was (`UUIDGen.au3:150`, `UUIDGen.ini:3`), copies the result to the clipboard after every Generate (`UUIDGen.au3:60`, `:107-109`).",
+      "The status bar reads the rows in words, for example the count, the version and the format; there is nothing to confirm because nothing is changed on the system.",
+      "A row can be selected and copied alone with Ctrl+C; keyboard access replaces the original's global Alt+G, Alt+C and Alt+B hotkeys (`UUIDGen.au3:70-72`)."
+    ],
+    "cut": "The original's window had a fixed 430 by 220 pixel form (`UUIDGen.au3:43`) with an explanatory paragraph about what a UUID is (`:47-49`), a single input box, a custom About dialog with a drive-space bar and a home-page link (`:159-210`), and three system-wide hotkeys that fired in any program (`:70-72`). This window has none of them: the paragraph is cut, About is the framework's page, the hotkeys are replaced by keyboard access inside the window, and each cut is recorded in the plan. The original has no menus, splash, animations or donate strip in its script; `Resources/Donate.jpg` ships in the folder but no line of the script refers to it."
+  },
+  "readme": {
+    "lead": "Make UUIDs in the version and format you need.",
+    "what": [
+      "UUIDGen makes UUIDs, which some systems call GUIDs. It makes version 4 (random), version 7 (ordered by time) and the nil UUID, one at a time or many at once, and writes each as lower or upper case, with or without hyphens, in braces, or as a C++ GUID initialiser.",
+      "Every UUID is shown as a row you can copy alone or all together. The tool only makes text for you to copy: it changes nothing on your system."
+    ],
+    "new_intro": "The AutoIt version made one version 4 UUID at a time and offered one option, braces. The C++ version does more.",
+    "new": [
+      [
+        "Versions.",
+        "Version 4, version 7 and the nil UUID, from the system's cryptographic random source."
+      ],
+      [
+        "Formats.",
+        "Lower or upper case, with or without hyphens, in braces, or as a C++ GUID initialiser."
+      ],
+      [
+        "Bulk generation.",
+        "Many UUIDs at once, shown in the list or written straight to a file."
+      ],
+      [
+        "Copy and export.",
+        "Copy one, copy all, or save the list as text or CSV."
+      ],
+      [
+        "Validate a pasted UUID.",
+        "Paste one and see its version, its variant and, for version 7, the time it holds."
+      ]
+    ]
+  },
+  "reference": {
+    "note": "The prototype sits at `reference/au3/UUIDGen/` (one folder deeper than the usual `src/` shape): its main script is `UUIDGen.au3` (209 lines), beside `UUIDGen.ini`, `Readme!.rtf`, `Resources/` (icon and an unused donate picture) and `Distributions/0.2.6.265/`, which holds the shipped zip. There is no `dist/`; a driven run uses that zip or the untracked executable under `local/`."
+  },
+  "plan": {
+    "scope": "The whole port: build, baseline, engine, window, features, release",
+    "goal": "UUIDGen ships as a complete, standalone C++ tool and as the proof of the suite's intake contract: it makes version 4, version 7 and nil UUIDs in every format a developer asks for, one or many at a time, copies or saves them, and validates a pasted UUID, while consuming the SDK framework only and changing nothing on the system.",
+    "current_state": "Nothing exists in C++. The repository holds the AutoIt prototype under `reference/au3/UUIDGen/` (`UUIDGen.au3`, 209 lines), the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The prototype makes one UUID per press by calling `UuidCreate` in `Rpcrt4.dll` on a 16-byte structure (`UUIDGen.au3:127-130`) and writes the bytes as upper-case hexadecimal groups with hyphens (`:133-138`) using AutoIt's `Hex`, which I take to be upper case from the AutoIt documentation and the baseline run confirms. It offers one format option, braces (`:59`, `:116-123`), and an automatic copy option (`:60`, `:107-109`), both saved to `UUIDGen.ini` in the script folder (`:148-156`). It has one 430 by 220 pixel form, three buttons (`:50-52`), one input box (`:56`), a custom About dialog (`:159-210`) and three global hotkeys (`:70-72`); it has no versions, no count, no file output, no validation and no language pack. It requests no elevation and writes only its own `.ini`. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built. The plan's origin section is `docs/origin/resolute-D05-T01-s1.md`.",
+    "inputs": [
+      "`reference/au3/UUIDGen/UUIDGen.au3`: the prototype being ported, and `reference/au3/UUIDGen/UUIDGen.ini`, its two saved options.",
+      "`reference/au3/UUIDGen/Distributions/0.2.6.265/UUIDGen-026265.zip`: the shipped build the baseline run uses.",
+      "`docs/origin/resolute-D05-T01-s1.md`: the intake contract section this tool proves, and the effort baseline it records."
+    ],
+    "outcome": [
+      "`UUIDGen.exe` makes version 4, version 7 and nil UUIDs in the formats of the engine, one or many at a time, with the shapes the baseline of the AutoIt version shows.",
+      "A person copies one row or all, saves a list as text or CSV, and pastes a UUID to see its version, variant and, for version 7, its time.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file, conformant on the intake contract."
+    ],
+    "adjacency_rationale": "The list is the Generate screen, where the UUIDs just made are the rows. Reporting and audit are the Activity section, one line per generation or copy. Settings are the framework's pages, which hold the default version, format and automatic copy. Permissions do not apply: the tool needs no right the user lacks and writes only text to the clipboard or to a file the user names. Reverse does not apply: the tool makes text for the user to copy and changes nothing on the system, so there is nothing to put back.",
+    "baseline_items": [
+      "Unpack `reference/au3/UUIDGen/Distributions/0.2.6.265/UUIDGen-026265.zip` into a scratch folder, start `UUIDGen.exe`, press Generate 100 times and save each input value. Done when: `docs/baseline/generated.txt` holds 100 lines and records the case, the hyphen positions and the version nibble of each.",
+      "Tick and untick the braces box and the automatic copy box, close the window and read the `.ini`. Done when: `docs/baseline/ini.txt` shows the `Braces` and `AutoCopy` values written for each state (`UUIDGen.au3:153-156`), including whether an unticked box writes 4 or 0."
+    ],
+    "inventory_items": [
+      "Record the windows and controls in `docs/inventory.md`: the main form (`UUIDGen.au3:43`), icon (`:45`), description label (`:47-49`), Generate, Copy and About buttons (`:50-52`), the input (`:56`), the Braces and auto copy checkboxes (`:59-60`) and the About dialog and its controls (`:168-191`). Done when: every control-creation call in the file is listed with its window and purpose.",
+      "Record the strings and the cut hotkeys: every literal in the file, and the three global hotkeys (`:70-72`) with their verdict. Done when: every string names the pack key that will carry it or says why it is cut.",
+      "Record the behaviours: `UuidCreate` (`:130`), the byte layout and hexadecimal output (`:127-138`), the braces toggle (`:116-123`), copy (`:112-114`), the error path where a failed call leaves no value (`:131-143`, including the unused constants at `:38-41`) and the single exit that saves settings (`:92-95`). Done when: every call to the system in the file is listed and each is marked kept, replaced or cut.",
+      "Record settings, the version resource and the ship list: `UUIDGen.ini` keys (`:149-155`), the directives at `:2-14` and the files of the distribution zip. Done when: every key, field and shipped file is marked keep, cut or remapped."
+    ],
+    "engine": {
+      "title": "UUID Generation Engine",
+      "intro": "The tool's core, independent of any window: making UUIDs of version 4 (random, from the system's cryptographic random source), version 7 (time ordered) and the nil UUID, writing each in the formats a developer needs, and reading a pasted UUID back to name its version. Nothing here touches the registry, the file system or the network.",
+      "needs": "windows-host",
+      "build": [
+        "Implement the UUID type, the generators and the formatter in `src/core/Uuid.h` and `src/core/Uuid.cpp`. Done when: the unit tests pass for every version and format.",
+        "Implement the parser and validator in `src/core/UuidParse.cpp`. Done when: the unit tests accept every format the formatter writes and refuse a malformed string by name."
+      ],
+      "items": [
+        "Declare in `src/core/Uuid.h` a 16-byte `Uuid` value type with the textual layout of the prototype's structure (`UUIDGen.au3:127`, `:133-138`): four, two, two and eight bytes written as 8-4-4-4-12 hexadecimal digits. Done when: a test builds a `Uuid` from 16 known bytes and the text equals the expected string.",
+        "Implement `MakeV4()` filling 16 bytes from `BCryptGenRandom` with the system-preferred provider and setting the version nibble to 4 and the variant bits to 10. Done when: a test over 10,000 results finds every version nibble 4 and every variant bit pair 10, and no result repeats. Cheaper substitute: `rand()` or `std::mt19937`, which are not cryptographic, or calling `UuidCreate` as the prototype does (`UUIDGen.au3:130`), which leaves the source of randomness to the platform.",
+        "Implement `MakeV7(time_ms)` putting the 48-bit Unix millisecond time first, the version nibble 7 and the variant bits 10, and random bits for the rest, with a counter so two calls in one millisecond still sort in order. Done when: a test of 1,000 calls in one millisecond finds them strictly increasing as text. Cheaper substitute: random bits after the time with no ordering rule, which can sort wrongly inside a millisecond.",
+        "Implement `Nil()` returning 16 zero bytes. Done when: a test finds `00000000-0000-0000-0000-000000000000` for the default format.",
+        "Implement `Format(const Uuid&, Format)` for lower case, upper case, hyphens or none, braces, and a C++ GUID initialiser of the form `{ 0x........, 0x....., 0x....., { 0x.., ... } }`. Done when: a test checks every combination of case, hyphens and braces for one fixed `Uuid`, and compares the initialiser with the one Windows' `StringFromGUID2` text would give for the same bytes.",
+        "Implement `Parse(std::string_view)` accepting every format `Format` writes and returning the version, the variant and, for version 7, the Unix millisecond time, or an error naming what is wrong (length, a non-hex digit, a misplaced hyphen or brace). Done when: a round trip over every format returns the same `Uuid`, and a test that deletes one digit gets the length named. Cheaper substitute: a regular expression that returns only true or false, which cannot say what is wrong.",
+        "Return an error value and never an empty string when the random source fails, which the prototype's path can do silently (`UUIDGen.au3:131-143`). Done when: a test with a failing random source returns the error and no row is made.",
+        "Cover every path in `tests/uuid_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L uuid` passes, and fails when the version nibble of `MakeV4` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L uuid` passes, including the version and variant bit checks, the version 7 ordering case and the failing random source, and fails when one version nibble is changed.",
+      "commit": "core: version 4, version 7 and nil UUIDs, formatted and parsed"
+    },
+    "parity_items": [
+      "Add `tests/fixtures/baseline/` as a copy step from `docs/baseline/` at configure time. Done when: the parity test reads the committed `generated.txt` and `ini.txt` and no path is typed into a tracked build file.",
+      "Compare shape, not values, because every UUID is random: the C++ version 4 output in the AutoIt shape (upper case, hyphens, no braces) must match the baseline's group lengths, hyphen positions, version nibble and variant. Done when: the test reports each differing property by name, and the one deliberate difference, the default case, is recorded."
+    ],
+    "enhancements": [
+      {
+        "title": "Bulk Generation",
+        "intro": "The AutoIt version made one UUID per press. This section makes many at once, with a count in the header, into the list or straight to a file, with a hard upper bound so one press cannot fill the disk or the memory.",
+        "surface": {
+          "fidelity": "the Generate screen's count control and its rows, against `sdk/DESIGN.md` section 16 and `DESIGN.md` section 2.",
+          "job": "a person makes a hundred or a thousand UUIDs in one press and gets them as rows or as a file. Consumer: the rows and the file, read back.",
+          "treatment": "a count in the header, a progress statement in the status bar for large counts, and a file option that writes one UUID per line. Cheaper substitute that fails the checkpoint: a loop that presses Generate many times and shows only the last result."
+        },
+        "build": [
+          "Add `MakeMany(count, version, format)` in `src/core/Bulk.cpp`. Done when: a test asks for a count and gets exactly that many distinct values in the chosen format.",
+          "Add the count control and the to-file choice in `src/ui/GenerateView.cpp`. Done when: the rows and the file hold the same UUIDs for one press."
+        ],
+        "items": [
+          "Implement `MakeMany(count, version, format)` in `src/core/Bulk.cpp` and refuse a count of 0 or above a stated maximum by name. Done when: a test of the minimum, the maximum and one above each get the right result.",
+          "Add a count to the header of `src/ui/GenerateView.cpp` and show the rows in a virtualised list so a large count does not build a control per row. Done when: the largest count shows rows without a visible pause, and the status bar says how many were made. Cheaper substitute: adding a control per row, which stalls on a large count.",
+          "Add a to-file choice writing one UUID per line through the framework's save dialog and an atomic write (a temporary file then a rename). Done when: a test finds the file complete with exactly the count of lines, and a failed write leaves no partial file. Cheaper substitute: writing straight to the chosen name, which leaves a partial file when the write fails.",
+          "Cover it in `tests/bulk_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L bulk` passes, and fails when `MakeMany` returns one value too few."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L bulk` passes for the minimum, maximum and over-limit counts and for the file with exactly the requested lines.",
+        "commit": "feature: many UUIDs at once, into the list or a file"
+      },
+      {
+        "title": "Copy and Export",
+        "intro": "The prototype copied one value to the clipboard (`UUIDGen.au3:112-114`), by button or automatically after Generate (`:107-109`). This section copies one row or all, and saves the list as text or CSV, so a result can leave the tool in the shape the next program expects.",
+        "surface": {
+          "fidelity": "the Copy all button, the row copy and the save dialog, against `sdk/DESIGN.md` section 11 and `DESIGN.md` section 2.",
+          "job": "a person gets the UUIDs out of the tool as clipboard text, a text file or a CSV file. Consumer: the clipboard and the file, read back.",
+          "treatment": "Copy all as a secondary button, row copy on Ctrl+C, and a save choice for text or CSV through the framework's dialog, with a status line saying what was copied or saved. Cheaper substitute that fails the checkpoint: copying only the first row, which hides the rest."
+        },
+        "build": [
+          "Add the clipboard and export writers in `src/core/Export.cpp`. Done when: the tests find the text, CSV and clipboard output exactly as expected.",
+          "Wire Copy all, row copy and Save in `src/ui/GenerateView.cpp`. Done when: each calls the writers and the status bar says what happened."
+        ],
+        "items": [
+          "Implement `ToText(rows)` and `ToCsv(rows)` in `src/core/Export.cpp`: text one UUID per line, CSV with a header row (`index,uuid,version,format`) and a stated line ending. Done when: a test compares both outputs with fixed files for three rows.",
+          "Implement the automatic copy option from `UUIDGen.ini` `AutoCopy` (`UUIDGen.au3:107-109`) as a framework setting and import the old key. Done when: with the option on, one Generate leaves the new rows on the clipboard, read back. Cheaper substitute: setting the clipboard on a timer, which can copy a stale value.",
+          "Copy all puts every row on the clipboard as `ToText` and the status bar says how many. Done when: a test finds the clipboard text equals `ToText` of the rows, in Unicode text format.",
+          "Save to a file through the framework's save dialog with an atomic write, as text or CSV by the extension chosen. Done when: a test finds the file complete, and a failed write leaves no partial file.",
+          "Cover it in `tests/export_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes, and fails when one CSV column is dropped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes: copy all, text and CSV each read back equal to the rows.",
+        "commit": "feature: copy one or all, save as text or CSV"
+      },
+      {
+        "title": "Validate a Pasted UUID",
+        "intro": "The prototype could only make a UUID. This section reads one back: paste a UUID in any format the tool writes and see its version, its variant and, for version 7, the time it holds, or what is wrong with it.",
+        "surface": {
+          "fidelity": "the validation field on the Formats screen, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person pastes a UUID and learns what it is or why it is not one. Consumer: the result line, read back against the parser.",
+          "treatment": "a paste field with the result beneath it in words: the version, the variant, the time for version 7 in local and UTC, or the reason it is not valid. Cheaper substitute that fails the checkpoint: a check mark or a cross with no reason."
+        },
+        "build": [
+          "Add the result type in `src/core/UuidParse.cpp` carrying version, variant, time and the error. Done when: the tests find each field for each version.",
+          "Add the paste field and the result line in `src/ui/FormatsView.cpp`. Done when: a pasted version 7 UUID shows its time and a bad one shows its reason."
+        ],
+        "items": [
+          "Extend `Parse` in `src/core/UuidParse.cpp` to return the variant by name (the RFC 4122 variant, the reserved variants) and, for version 7, the time as a Unix millisecond value. Done when: a test gives a fixed version 7 value and gets its exact time.",
+          "Build the paste field in `src/ui/FormatsView.cpp` that re-reads on every change and writes the result in words beneath it, with the error read from the engine. Done when: a pasted valid UUID in each of the formats shows its version and a pasted bad one shows the reason. Cheaper substitute: validating only on a button press, which leaves a stale result under a changed field.",
+          "Show the version 7 time in local time and UTC with the date, in the system's date format. Done when: a fixed value shows the expected UTC time and the local one for a test time zone.",
+          "Cover it in `tests/validate_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L validate` passes, and fails when the variant of one fixed value is misnamed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L validate` passes for a valid value in every format, for version 4 and version 7, and for each malformed case with its reason.",
+        "commit": "feature: validate a pasted UUID and name its version and time"
+      }
+    ],
+    "no_reverse": "the tool makes text for the user to copy; it changes nothing on the system",
+    "verification": [
+      "A walk of `reference/au3/UUIDGen/UUIDGen.au3` finds every piece in `docs/inventory.md` with its home.",
+      "The parity check reports every property of the AutoIt shape matched, and the one deliberate difference recorded.",
+      "On a real machine the tool makes each version in each format, copies, saves and validates, in light and dark, by keyboard alone, and passes the intake contract's conformance check with the elapsed effort recorded."
+    ]
+  }
+}

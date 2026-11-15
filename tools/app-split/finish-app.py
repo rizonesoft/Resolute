@@ -252,6 +252,9 @@ def plan_md(s: dict) -> tuple[str, list[str]]:
     name, exe, p, win = s["display"], s["name"], s["plan"], s["window"]
     frozen = bool(s.get("frozen"))
     port = bool(s.get("au3"))
+    # A tool built from research material, not ported from an original of its own (SaveDesk): the baseline measures
+    # Windows, and the proof is the tool's own round trip.
+    research = bool(s.get("research"))
     first = win["sections"][0][0]
     ctest = "sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug"
     fr_ref = "Nothing under `reference/au3/` changes, checked with `git status --short reference`." if frozen else None
@@ -278,16 +281,21 @@ def plan_md(s: dict) -> tuple[str, list[str]]:
         commit="build: an empty window on the pinned SDK, standalone")
 
     if port:
-        add("AutoIt Baseline Captured", "§1", phase=1, needs="windows-host, attended", freeze=fr_ref,
-            intro=f"The shipped AutoIt tool is the only source of truth for what {name} does. This section runs it once, around a snapshot of everything it touches, and commits what it did, before any C++ imitates it.",
-            build=["Unpack `reference/au3/` `dist/` into a scratch folder and drive the original around a before and after snapshot. Done when: the record of its effect is committed under `docs/baseline/`.",
-                   "Capture its windows at 100 percent for the surface inventory. Done when: the captures are committed with their provenance."],
-            items=p["baseline_items"] + ["Capture each window of the original to `docs/baseline/` with a provenance file naming the build, the machine and the scale. Done when: every window the inventory of §3 names has a capture.",
-                                         "Record in `docs/baseline/README.md` exactly how the run was made, so it can be repeated. Done when: the file names the executable, its build number, the fixture and every step."],
-            checkpoint="`git ls-files docs/baseline` lists the effect record, the captures and `README.md`, and the record names every change the run made.",
-            commit="baseline: what the shipped AutoIt tool does, recorded from a real run")
-        add("Inventory With Shared-Layer Map", "§2", phase=1, needs="none", freeze=fr_ref,
-            intro="Everything the AutoIt tool is, with `file:line`, and every piece mapped to the SDK's framework, the SDK's repair contract, or this tool's own code. The section is done when a walk of the source finds nothing unaccounted.",
+        add("Windows Behaviour Measured" if research else "AutoIt Baseline Captured", "§1", phase=1, needs="windows-host, attended", freeze=fr_ref,
+            intro=(f"There is no original of {name} to reproduce: the material under `reference/au3/` is research. What has to be known before any C++ is written is how Windows itself behaves, so this section measures that on a real machine and commits what it found."
+                   if research else f"The shipped AutoIt tool is the only source of truth for what {name} does. This section runs it once, around a snapshot of everything it touches, and commits what it did, before any C++ imitates it."),
+            build=(["Measure the behaviour on a real machine and record it under `docs/baseline/`. Done when: each measurement names the Windows build and the steps taken.",
+                    "Record how each measurement was made in `docs/baseline/README.md`. Done when: another person could repeat it from the file."]
+                   if research else
+                   ["Unpack `reference/au3/` `dist/` into a scratch folder and drive the original around a before and after snapshot. Done when: the record of its effect is committed under `docs/baseline/`.",
+                    "Capture its windows at 100 percent for the surface inventory. Done when: the captures are committed with their provenance."]),
+            items=p["baseline_items"] + ([] if research else ["Capture each window of the original to `docs/baseline/` with a provenance file naming the build, the machine and the scale. Done when: every window the inventory of §3 names has a capture.",
+                                         "Record in `docs/baseline/README.md` exactly how the run was made, so it can be repeated. Done when: the file names the executable, its build number, the fixture and every step."]),
+            checkpoint=("`git ls-files docs/baseline` lists every measurement and `README.md`, and each measurement names the Windows build it was taken on."
+                        if research else "`git ls-files docs/baseline` lists the effect record, the captures and `README.md`, and the record names every change the run made."),
+            commit="baseline: how Windows behaves, measured" if research else "baseline: what the shipped AutoIt tool does, recorded from a real run")
+        add("Research Notes and Shared-Layer Map" if research else "Inventory With Shared-Layer Map", "§2", phase=1, needs="none", freeze=fr_ref,
+            intro="What the research material shows and what this tool takes from it as ideas, never as code, with every planned piece mapped to the SDK's framework, the SDK's repair contract, or this tool's own code." if research else "Everything the AutoIt tool is, with `file:line`, and every piece mapped to the SDK's framework, the SDK's repair contract, or this tool's own code. The section is done when a walk of the source finds nothing unaccounted.",
             build=["Write `docs/inventory.md` from a line-by-line walk of the source under `reference/au3/`. Done when: every window, control, string, behaviour, setting and shipped file is recorded with its verdict.",
                    "Map each piece to its home. Done when: no piece maps to two homes and no shared piece maps to the tool."],
             items=p["inventory_items"] + ["Map every inventoried piece in `docs/inventory.md` to the framework, the repair contract or tool code: settings, logging, localization, update, elevation, Preferences, About, crash handling and single instance to the framework. Done when: no piece has two homes. Cheaper substitute: an inventory of the windows without the behaviours, which is a screenshot list, not a port plan.",
@@ -299,15 +307,16 @@ def plan_md(s: dict) -> tuple[str, list[str]]:
     engine_n = add(eng["title"], base, phase=2, needs=eng.get("needs", "windows-host"), intro=eng["intro"], build=eng["build"], items=eng["items"],
                    checkpoint=eng["checkpoint"], commit=eng["commit"], freeze="The fixtures under `tests/fixtures/` that state the original's effect do not change in this section." if frozen else None)
     if port:
-        add("Parity Against the AutoIt Original", f"§{engine_n}", phase=2, needs="windows-host, attended",
+        add("Round Trip Proven" if research else "Parity Against the AutoIt Original", f"§{engine_n}", phase=2, needs="windows-host, attended",
             freeze="The baseline under `docs/baseline/` does not change; a difference is fixed in the C++ tool." if frozen else None,
-            intro=f"The C++ {name} and the AutoIt original run against the same fixture and their effects are compared field by field. Every difference is fixed in the C++ tool or recorded as a deliberate change with its reason.",
+            intro=(f"With no original to compare with, the proof is {name}'s own round trip: what it reads, it writes back exactly, compared field by field against the measurements of §2."
+                   if research else f"The C++ {name} and the AutoIt original run against the same fixture and their effects are compared field by field. Every difference is fixed in the C++ tool or recorded as a deliberate change with its reason."),
             build=["Write `tests/parity_test.cpp` comparing the engine's effect with the committed baseline. Done when: it reports every differing field by name.",
                    "Fix differences until it reports zero. Done when: the report is quoted in the commit message."],
             items=p["parity_items"] + ["Write `tests/parity_test.cpp`: run the engine against the fixture and compare its record with `docs/baseline/` field by field. Done when: `" + ctest + " -L parity` passes, and fails naming the field when one value in the engine is changed.",
                                        "Record every deliberate difference in `docs/parity.md` with its reason. Done when: the file lists each, or says there is none. Cheaper substitute: loosening the comparison, which hides the difference instead of deciding it."],
             checkpoint=f"`{ctest} -L parity` passes with zero differing fields, quoted, and fails when one engine value is changed.",
-            commit="parity: the C++ tool does what the AutoIt original does")
+            commit="proof: the tool's round trip is exact" if research else "parity: the C++ tool does what the AutoIt original does")
     after = f"§{len(secs)}"
     rows = ", ".join(f"{a} ({b})" for a, b in win["rows"])
     win_n = add(f"Window and {first} Screen", after, phase=3, needs="windows-host, display-session", freeze=fr_parity,
