@@ -1,0 +1,247 @@
+{
+  "name": "ConnectionViewer",
+  "slug": "connectionviewer",
+  "display": "Connection Viewer",
+  "job": "it lists every active network connection and listening port on this PC with the program that owns each one, the program's path and its publisher with its signature state, and changes nothing.",
+  "tagline": "See what your PC is connected to, and which program is doing it",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Sea green",
+    "light": "#5EEAD4",
+    "dark": "#0D9488",
+    "social_ground": "#06261F",
+    "social_muted": "#BFEBE3"
+  },
+  "icon": {
+    "idea": "An up arrow and a down arrow: traffic out and in.",
+    "points": [
+      "Free-standing with no tile: two thick arrows side by side with rounded ends.",
+      "The up arrow is Sea green and the down arrow is Sea green light.",
+      "The small drawing, used below 40 pixels, thickens both arrows."
+    ],
+    "large": "<path d=\"M30 82 V22 M12 38 L30 18 L48 38\" fill=\"none\" stroke=\"#0D9488\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M66 14 V74 M48 58 L66 78 L84 58\" fill=\"none\" stroke=\"#5EEAD4\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M28 84 V20 M10 38 L28 16 L46 38\" fill=\"none\" stroke=\"#0D9488\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M68 12 V76 M50 58 L68 80 L86 58\" fill=\"none\" stroke=\"#5EEAD4\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Connections",
+        "Each connection as a row: program, remote address and name, port, state, publisher"
+      ],
+      [
+        "Listening",
+        "Ports this machine is waiting on, and which program is waiting"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees what their machine is talking to, which program is doing it and who published that program.",
+    "primary": "Refresh",
+    "secondary": "Copy list",
+    "rows": [
+      [
+        "Established",
+        "Connected now, with the remote address, name and port"
+      ],
+      [
+        "Waiting",
+        "Closing, timing out or opening: a state in words, not a fault"
+      ],
+      [
+        "Unsigned",
+        "The program has no valid signature, shown with an icon and the word Unsigned"
+      ],
+      [
+        "Needs elevation",
+        "The program's path could not be read without administrator rights"
+      ]
+    ],
+    "status": "Connections and unsigned programs counted, with the rows that needed elevation",
+    "notes": [
+      "Each row shows its state with an icon and a word: Established, Waiting, Unsigned, Needs elevation. Colour is never the only signal.",
+      "Refresh reads the connection tables again and replaces the rows from that read. A timer option in Settings refreshes on an interval the user sets, and can be turned off.",
+      "Remote names fill in after the row appears. A row shows the address first and the name when the lookup returns, or the address alone when it times out.",
+      "A row that needs administrator rights to name its program's path says so on the row. The tool never asks for elevation and never hides such a row.",
+      "Copy list puts the visible rows on the clipboard as text. Nothing is written anywhere else.",
+      "The status bar counts connections and unsigned programs in words, and says how many rows needed elevation.",
+      "Selecting a row shows its full path and the signer's name in a details strip, selectable and copyable."
+    ],
+    "cut": "There is no earlier window: this tool is new, so nothing is cut from a predecessor. The suite's menus, splash, animations and donate strip are not part of the Sidebar window and the plan does not build them. The tool offers no way to close, block or change a connection, because it reads and changes nothing."
+  },
+  "readme": {
+    "lead": "Connection Viewer shows every network connection on your PC and the program behind each one.",
+    "what": [
+      "Each row names the program that owns a connection, the remote address and name, the port, the connection state, the program's path and its publisher. A program with no valid signature is marked with an icon and a word, so an unfamiliar program stands out. A second section lists the ports your machine is waiting on and which program is waiting.",
+      "It only reads. It reads the connection tables Windows keeps and changes nothing on your system. A few system programs cannot be inspected without administrator rights: the tool says which rows those are instead of guessing."
+    ],
+    "new_intro": "Connection Viewer is a new tool in the suite, not a port. It is built for the C++ suite from the start.",
+    "new": [
+      [
+        "Program behind every connection.",
+        "Each connection is matched to its owning process, its path and its publisher."
+      ],
+      [
+        "Signature state at a glance.",
+        "Unsigned and unknown programs are marked with an icon and a word and can be listed first."
+      ],
+      [
+        "Names without waiting.",
+        "Remote names are looked up in the background with a time limit, so the list never freezes."
+      ],
+      [
+        "Honest about limits.",
+        "Rows that need administrator rights to resolve say so on the row."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The new tool: build, engine, window, features, release",
+    "goal": "Connection Viewer ships as a complete, standalone C++ tool that lists every active TCP and UDP connection and every listening port, names the owning program with its path and publisher and signature state, resolves remote names without blocking the window, refreshes on a timer the user controls, says which rows needed elevation, and writes nothing to the system.",
+    "current_state": "Nothing exists yet: there is no AutoIt original and no code. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and one plan section as it stood in the Resolute repository (`docs/origin/resolute-D05-T06-s7.md`, which also covers a credential viewer and a display information tool, neither of which belongs here). That section asks for active connections with the owning process, its path and its publisher, a known connection resolving to the right process with its signature state shown, no write path, and no second startup enumerator. The tool is designed from the plan section and from what Windows offers: `GetExtendedTcpTable` and `GetExtendedUdpTable` with the owning process id, `QueryFullProcessImageName`, `WinVerifyTrust` and the signer's name. The SDK's framework and chart control are planned in Resolute-SDK and not built. The suite's startup enumerators are built in the Startup Manager tool and proposed to Resolute-SDK, and are not yet available here.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T06-s7.md`: the plan section this tool comes from. Take only what concerns connections.",
+      "`DESIGN.md`: the tool's identity and its window's sections, with `sdk/DESIGN.md`, the suite's contract.",
+      "The Windows documentation for `GetExtendedTcpTable`, `GetExtendedUdpTable`, `QueryFullProcessImageNameW`, `WinVerifyTrust` and `GetNameInfoW`, which are the only sources of truth for the engine."
+    ],
+    "outcome": [
+      "`ConnectionViewer.exe` lists every TCP and UDP connection over IPv4 and IPv6 with its owning program, path, publisher and signature state, and a known connection resolves to the right process.",
+      "Remote names are resolved off the interface thread with a time limit, the list refreshes on a timer the user controls, and rows that could not be resolved without elevation say so.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and nothing in the tool can write to the system, proven by search."
+    ],
+    "adjacency_rationale": "The list is the Connections screen, with Listening as the second list. Reporting and audit are the Activity section, which records each refresh and each lookup that timed out. Settings are the framework's pages, including the refresh interval. Permissions do not apply: the tool reads the connection tables as an ordinary user and reports the rows it could not resolve instead of asking for rights. Reverse does not apply: the tool reads the connection table and changes nothing, so there is nothing to put back.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Connection Table Engine",
+      "intro": "The tool's whole system effect, which is reading: the TCP and UDP tables with their owning processes, resolving each process to its path and publisher, resolving remote names without blocking, and refreshing on a timer. It never writes to the system. Where a process cannot be opened without elevation, the row says so and the engine goes on.",
+      "needs": "windows-host",
+      "build": [
+        "Implement the table reads and the process resolution in `src/core/ConnectionTable.cpp` and `src/core/ProcessInfo.cpp`. Done when: the unit tests pass against fixture tables and one live read finds this test process's own connection.",
+        "Implement signing, name resolution and the refresh timer in `src/core/Publisher.cpp`, `src/core/NameResolver.cpp` and `src/core/Refresher.cpp`. Done when: the tests for a signed file, an unsigned file and a slow lookup pass."
+      ],
+      "items": [
+        "Read the TCP table with `GetExtendedTcpTable` (`TCP_TABLE_OWNER_PID_ALL`) for `AF_INET` and `AF_INET6` in `src/core/ConnectionTable.cpp`, retrying while it returns `ERROR_INSUFFICIENT_BUFFER` because the table can grow between the size call and the read. Done when: a test that opens a loopback listener and a connection finds both rows with this process's id, ports converted from network byte order.",
+        "Read the UDP table with `GetExtendedUdpTable` (`UDP_TABLE_OWNER_PID`) for both families and mark UDP rows as having no connection state and no remote address. Done when: a test that binds a UDP socket finds its row with this process's id and no state.",
+        "Map each TCP state value to words in `src/core/ConnectionState.cpp`: Closed, Listening, SYN sent, SYN received, Established, FIN wait 1, FIN wait 2, Close wait, Closing, Last ACK, Time wait, Delete TCB. Done when: a test covers all twelve values and an unknown value returns the number in words. Cheaper substitute: showing the raw number, which tells a user nothing.",
+        "Split the rows into Connections (every row with a remote endpoint) and Listening (TCP rows in the Listening state and every bound UDP row) in `src/core/ConnectionTable.cpp`. Done when: a fixture with one listener, one established connection and one UDP socket gives one Listening row for the TCP listener, one for the UDP socket, and one Connections row.",
+        "Resolve a process id to its full path in `src/core/ProcessInfo.cpp` with `OpenProcess` (`PROCESS_QUERY_LIMITED_INFORMATION`) and `QueryFullProcessImageNameW`, name the process 0 and 4 as System, and when the open fails with access denied fall back to the executable name from `CreateToolhelp32Snapshot` and mark the row Needs elevation. Done when: a test resolves this process's own path exactly and a fixture of an unopenable id returns the name with the elevation mark. Cheaper substitute: leaving the path blank, which hides why.",
+        "Read the publisher in `src/core/Publisher.cpp` with `WinVerifyTrust` (`WINTRUST_ACTION_GENERIC_VERIFY_V2`, no revocation network check) and take the signer's name from the provider data, trying the file's own signature first and the catalogue signature second so system files are not shown as unsigned. Done when: a test gives a signer name for a system executable, for a Microsoft-signed file and the word Unsigned for an unsigned fixture. Cheaper substitute: reading only the embedded signature, which marks every catalogue-signed system file as unsigned.",
+        "Resolve remote names in `src/core/NameResolver.cpp` with `GetNameInfoW` on worker threads, a per-lookup time limit, a cache by address, and results that arrive after the limit discarded without touching a row that has gone. Done when: a test with a lookup forced to take longer than the limit returns the address alone within the limit and the interface thread is never blocked. Cheaper substitute: calling `GetNameInfoW` on the interface thread, which freezes the window on a slow resolver.",
+        "Add `src/core/Refresher.cpp`: one read of everything, repeated on an interval the caller sets or not at all, never overlapping a read still running. Done when: a test with a 50 millisecond interval and a slow read starts no second read until the first ends, and an interval of off reads only on request.",
+        "Cover every path in `tests/connections_test.cpp`, and prove no write path exists: a search of `src/` finds no registry write, file write outside the log and settings, process control or firewall call. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L connections` passes and the search is part of the test."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L connections` passes, including the loopback connection, the unopenable process and the slow lookup, and a search of `src/` finds no write to the system.",
+      "commit": "core: connection tables, owning programs, publishers and names, read only"
+    },
+    "enhancements": [
+      {
+        "title": "Unsigned and Unknown First",
+        "intro": "A user looking for something unexpected wants the programs with no valid signature, or whose signer could not be read, at the top. They are flagged with an icon and the word Unsigned or Unknown, never by colour alone.",
+        "surface": {
+          "fidelity": "the Connections list and its sort and flag, against `DESIGN.md` section 2 and `sdk/DESIGN.md`.",
+          "job": "a person sees which connections belong to programs nobody vouches for. Consumer: the rendered list, read back against the engine's signature state.",
+          "treatment": "an icon and the words Unsigned or Unknown on the row, with those rows sortable to the top. Cheaper substitute that fails the checkpoint: tinting the row red, which fails for people who cannot tell the colours apart."
+        },
+        "build": [
+          "Add the signature flag and the sort in `src/ui/ConnectionsView.cpp`. Done when: the flag shows an icon and a word on each flagged row.",
+          "Add the sort order to the engine's row model in `src/core/RowModel.cpp`. Done when: the test orders unsigned, then unknown, then signed."
+        ],
+        "items": [
+          "Add a signature state of Signed, Unsigned or Unknown to each row in `src/core/RowModel.cpp`, Unknown meaning the file could not be read. Done when: a fixture of one of each gives the three states.",
+          "Sort flagged rows first in `src/core/RowModel.cpp` while keeping the order within each group stable. Done when: a test with six rows lists the unsigned ones, then the unknown ones, then the signed ones, each group in its prior order.",
+          "Show the flag in `src/ui/ConnectionsView.cpp` as an icon and a word through the framework's list control. Done when: a UI Automation walk reads the word on each flagged row. Cheaper substitute: a colour change on the row, which is invisible to a screen reader.",
+          "Cover it in `tests/flag_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L flag` passes, and fails when an unsigned row is sorted below a signed one."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L flag` passes and a captured list shows the icon and the word on every flagged row.",
+        "commit": "feature: unsigned and unknown programs flagged and listed first"
+      },
+      {
+        "title": "Group by Program",
+        "intro": "A browser can hold dozens of connections. Grouping puts each program's connections under one heading with a count, so the question 'what is this program talking to' has one answer on screen.",
+        "surface": {
+          "fidelity": "the Connections list in grouped mode, against `DESIGN.md` section 2 and `sdk/DESIGN.md`.",
+          "job": "a person sees one program and all its connections together. Consumer: the rendered list, read back against the engine's rows.",
+          "treatment": "a heading per program with its path, publisher and count, the rows under it, and a toggle between grouped and flat. Cheaper substitute that fails the checkpoint: sorting by the program column, which repeats the program on every row and shows no count."
+        },
+        "build": [
+          "Group rows by process in `src/core/RowModel.cpp`. Done when: a test with three programs gives three groups with the right counts.",
+          "Show the groups in `src/ui/ConnectionsView.cpp` with a toggle. Done when: the toggle switches between grouped and flat without losing the selection."
+        ],
+        "items": [
+          "Group rows by process id and path in `src/core/RowModel.cpp`, so two programs with the same name stay separate. Done when: a fixture with two different paths named `app.exe` gives two groups.",
+          "Show each group's heading with the program, publisher, signature word and connection count in `src/ui/ConnectionsView.cpp`. Done when: the heading counts match the rows under it for a live read.",
+          "Add the grouped and flat toggle, with the choice kept by the framework's settings. Done when: the choice is read back after a restart. Cheaper substitute: a private settings file.",
+          "Cover it in `tests/group_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L group` passes, and fails when a group's count is wrong."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L group` passes and the grouped list's counts equal the flat list's rows.",
+        "commit": "feature: connections grouped under the program that owns them"
+      },
+      {
+        "title": "Starts by Itself",
+        "needs": "sdk-framework",
+        "intro": "A user who sees an unfamiliar program wants to know whether it also launches at sign-in. The tool asks the suite's shared startup enumerators, built in the Startup Manager tool and proposed to Resolute-SDK, and shows the answer on the row. It never enumerates startup entries itself. The section waits on the framework and on those enumerators reaching the SDK.",
+        "surface": {
+          "fidelity": "the Starts by Itself column and detail, against `DESIGN.md` section 2 and `sdk/DESIGN.md`.",
+          "job": "a person sees whether a program also starts by itself, and where. Consumer: the rendered row, read back against the shared enumerators' answer.",
+          "treatment": "the words Starts by itself, with the kind of entry (registry, folder, task, service), or Not a startup entry, as an icon and words in the details strip and an optional column. Cheaper substitute that fails the checkpoint: reading the Run registry keys in this tool, which is a second enumerator."
+        },
+        "build": [
+          "Ask the shared enumerators in `src/core/StartupLookup.cpp` through the SDK's interface. Done when: a test with a fake enumerator maps a path to its entries.",
+          "Show the answer in `src/ui/ConnectionsView.cpp`. Done when: a row for a known startup program says Starts by itself."
+        ],
+        "items": [
+          "Write `src/core/StartupLookup.cpp` that takes a program path and returns the startup entries the SDK's enumerators report for it, compared by full path ignoring case. Done when: a test with a fake enumerator returning one entry gives that entry, and a path with none gives Not a startup entry.",
+          "Prove no second enumerator exists: a search of `src/` finds no read of a Run key, a Startup folder, a scheduled task list or a service list. Done when: the search is part of `tests/startup_lookup_test.cpp` and passes. Cheaper substitute: a private reader for the Run keys, which is the second enumerator the plan forbids.",
+          "Show the answer in `src/ui/ConnectionsView.cpp` as an icon and words, with the entry's kind and location in the details strip. Done when: a row for a program with a fixture entry names the kind and location.",
+          "Say Unknown when the enumerators fail or are not available, with the reason. Done when: a test with a failing enumerator shows Unknown and one Activity record. Cheaper substitute: showing Not a startup entry, which is a wrong answer given as a certain one.",
+          "Cover it in `tests/startup_lookup_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L startup` passes, and fails when the lookup compares only file names."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L startup` passes, and a search of `src/` finds no startup enumeration of this tool's own.",
+        "commit": "feature: a row says whether its program starts by itself, from the shared enumerators"
+      },
+      {
+        "title": "Open the Program's Folder",
+        "intro": "From a row, a person opens the folder holding the program with the file selected, to look at it in Explorer. This starts Explorer and changes nothing.",
+        "surface": {
+          "fidelity": "the row's action and its disabled state, against `DESIGN.md` section 2 and `sdk/DESIGN.md`.",
+          "job": "a person goes from a connection to the program's file in one step. Consumer: the Explorer window that opens, selecting the file.",
+          "treatment": "an action on the row and in the details strip, disabled with the reason in its tooltip when the path is unknown. Cheaper substitute that fails the checkpoint: copying the path only, which leaves the person to find it."
+        },
+        "build": [
+          "Add the action in `src/ui/ConnectionsView.cpp`. Done when: it is enabled only for a row with a known path.",
+          "Open the folder in `src/core/ShellOpen.cpp` with the file selected. Done when: a driven test sees Explorer select the file."
+        ],
+        "items": [
+          "Write `src/core/ShellOpen.cpp` opening Explorer with the file selected through `SHOpenFolderAndSelectItems`. Done when: a test with a fixture file opens a window that selects it. Cheaper substitute: starting `explorer.exe` with a command string built by hand, which breaks on paths with spaces or commas.",
+          "Disable the action with the reason in its tooltip for a row with no readable path, such as one that needs elevation. Done when: such a row shows it disabled with the reason and a UI Automation walk reads the reason.",
+          "Make it reachable by keyboard from a selected row. Done when: the keystroke opens the folder with no mouse.",
+          "Cover it in `tests/shell_open_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L folder` passes, and fails when the action is enabled for a row with no path."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L folder` passes and the action opens the right folder for a live row.",
+        "commit": "feature: open the program's folder from a connection row"
+      }
+    ],
+    "no_reverse": "the tool reads the connection table and changes nothing",
+    "verification": [
+      "A live run on a real machine with a browser open shows its connections under the right program, with its publisher and signature state, and the listening ports with their programs.",
+      "A search of `src/` finds no write to the system and no startup enumerator of the tool's own, and a row for a process that cannot be opened says it needs elevation.",
+      "The tool lists, resolves names without freezing, refreshes on its timer and copies the list, in light and dark, by keyboard alone."
+    ]
+  }
+}

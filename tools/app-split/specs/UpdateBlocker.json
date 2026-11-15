@@ -1,0 +1,252 @@
+{
+  "name": "UpdateBlocker",
+  "slug": "updateblocker",
+  "display": "Update Blocker",
+  "job": "it stops one chosen Windows update from installing, keeps it stopped after the events that undo a plain hide, and says plainly when Windows installs an update regardless.",
+  "tagline": "Stop one Windows update, and have it stay stopped",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Stop red",
+    "light": "#FCA5A5",
+    "dark": "#DC2626",
+    "social_ground": "#2E0B0B",
+    "social_muted": "#F8D2D2"
+  },
+  "icon": {
+    "idea": "The update arrow with a stop sign inside it: an update, stopped.",
+    "points": [
+      "Free-standing with no tile: an open ring ending in an arrowhead, with a disc at its centre.",
+      "The ring is Stop red, the disc is Stop red light with a Stop red bar across it.",
+      "The small drawing below 40 pixels thickens the ring and enlarges the disc."
+    ],
+    "large": "<path d=\"M76 40 A30 30 0 1 0 78 56\" fill=\"none\" stroke=\"#DC2626\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M84 22 L82 46 L60 38 Z\" fill=\"#DC2626\" stroke=\"#DC2626\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"48\" cy=\"50\" r=\"15\" fill=\"#FCA5A5\"/><path d=\"M40 50 H56\" fill=\"none\" stroke=\"#DC2626\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M76 40 A30 30 0 1 0 78 56\" fill=\"none\" stroke=\"#DC2626\" stroke-width=\"14\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M86 20 L83 48 L58 38 Z\" fill=\"#DC2626\" stroke=\"#DC2626\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"48\" cy=\"50\" r=\"17\" fill=\"#FCA5A5\"/><path d=\"M39 50 H57\" fill=\"none\" stroke=\"#DC2626\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Updates",
+        "Each available update as a row with its title, KB number, size, date and state"
+      ],
+      [
+        "Blocked",
+        "Each block with when it was set and when it was last re-asserted"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every update Windows offers, blocks one, and sees whether it is waiting, blocked or cannot be blocked.",
+    "primary": "Block",
+    "secondary": "Unblock",
+    "rows": [
+      [
+        "Cumulative update",
+        "Waiting"
+      ],
+      [
+        "Feature update",
+        "Waiting"
+      ],
+      [
+        "Driver update",
+        "Blocked"
+      ],
+      [
+        ".NET update",
+        "Blocked"
+      ],
+      [
+        "Security intelligence update",
+        "Cannot be blocked"
+      ]
+    ],
+    "status": "1 waiting, 2 blocked, 1 cannot be blocked",
+    "notes": [
+      "Each update is one row with its title, KB number, size and date, and its state shown with an icon and a word: waiting, blocked, or cannot be blocked.",
+      "Block is the accent button and acts on the selected row. It reads the update back from Windows Update and the row changes only when Windows reports the update hidden.",
+      "Unblock sits beside it and reverses the last block, read back the same way. It is disabled, with a tooltip, when the selected update is not blocked.",
+      "An update Windows installs regardless shows as cannot be blocked, with one sentence saying why, and its Block button is disabled. It never shows as blocked.",
+      "A confirmation before a block names the update, its KB number, and says that a block is not a pause and does not switch Windows Update off.",
+      "The status bar counts the rows by state in words, for example \"1 waiting, 2 blocked, 1 cannot be blocked\".",
+      "Block and Unblock refuse by name when the tool is not elevated, before anything is changed, and the refusal appears in Activity."
+    ],
+    "cut": "There is no source window to cut from, because nothing is ported. The window has no menus, splash, animations or donate strip, and no page of its own for settings or About: those come from the framework. The history of installed updates described in the plan section the tool came from is a separate tool and is not part of this one."
+  },
+  "readme": {
+    "lead": "Stop one Windows update, and have it stay stopped.",
+    "what": [
+      "Update Blocker lists the updates Windows offers and lets you block one. A block is read back from Windows Update, so a row says blocked only when Windows agrees. It does not switch Windows Update off as a whole, and it is not a pause.",
+      "Microsoft's old hiding tool hid an update once, and the update came back after a feature update or a change in update metadata. Update Blocker records each block by KB number and asserts it again after those events. An update Windows installs regardless is reported as not blockable instead of appearing blocked."
+    ],
+    "new_intro": "Update Blocker is a new tool, not a port of an older one.",
+    "new": [
+      [
+        "It lists what Windows Update reports.",
+        "Each available update shows its title, KB number, size, date and state."
+      ],
+      [
+        "A block stays.",
+        "The block is re-asserted after a feature update or a change in update metadata, matched by KB number when the update returns under a new identity."
+      ],
+      [
+        "It tells the truth.",
+        "An update that cannot be blocked is shown as such, with the reason, and never as blocked."
+      ],
+      [
+        "It can be undone.",
+        "Unblock reverses a block and reads the result back."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Update Blocker ships as a complete, standalone C++ tool: it lists the updates Windows Update offers, blocks one chosen update with the state read back, records the block by KB number, re-asserts it after the events that historically undo a hide, reports honestly an update that cannot be blocked, and can unblock what it blocked.",
+    "current_state": "Nothing exists yet. The repository holds the chosen identity direction in this plan, the kits and one plan section under `docs/origin/` (`resolute-D05-T07-s1.md`, 20 lines), which also describes an update history tool that this tool does not take. There is no AutoIt original and no `reference/au3/` folder: nothing is ported. The section states the need: Microsoft retired the tool that did this, `wushowhide`, which hid an update once, and hidden updates reappear. The tool is built on the Windows Update Agent COM API: `IUpdateSession` and `IUpdateSearcher` with the criteria `IsInstalled=0`, and `IUpdate.IsHidden`, which is what hiding sets. An update is identified by its update id and revision number, and its KB article ids are separate. A superseding update has a new identity, so a hide does not carry over to it. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s1.md`: the plan section this tool came from, of which only blocking and listing apply.",
+      "The Windows Update Agent COM API (`IUpdateSession`, `IUpdateSearcher`, `IUpdate`, `IUpdateIdentity`) and the Windows Update policies named in the plan, read on a real Windows machine.",
+      "`sdk/DESIGN.md` and the SDK's repair contract, which the window and the reverse consume once they exist."
+    ],
+    "outcome": [
+      "`UpdateBlocker.exe` lists the available updates as Windows Update reports them, blocks one with the hidden state read back, and unblocks it with the same read-back.",
+      "A block is recorded by KB number and asserted again after a feature update or a change in update metadata; an update Windows installs regardless is reported as cannot be blocked.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Updates screen, where a person finds an update by its title and KB number and sees its state. Reporting and audit are the Activity section, which records each list, block, unblock and re-assertion. Settings are the framework's pages, including the option to re-assert at sign-in. Permissions anchor on the engine, where an unelevated block is refused by name. Reverse means Unblock: the recorded block is undone and the update state read back, which restores the update to the waiting list.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Update Block Engine",
+      "intro": "The tool's whole system effect, independent of any window: listing available updates through the Windows Update Agent, hiding one with the state read back, recording the block by KB number, re-asserting it, and classifying what cannot be blocked. Every action is refused by name when the process is not elevated.",
+      "needs": "windows-host",
+      "build": [
+        "Wrap the Windows Update Agent behind an interface in `src/core/UpdateSource.h` with a real and a fake implementation. Done when: the engine's unit tests run against the fake and one driven test runs against the real agent.",
+        "Implement list, block, status and the block record in `src/core/Blocker.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L blocker` passes."
+      ],
+      "items": [
+        "Implement `ListUpdates()` in `src/core/UpdateSource.cpp` creating an `IUpdateSession`, searching `IsInstalled=0` through `IUpdateSearcher` and returning title, KB article ids, `MaxDownloadSize`, `LastDeploymentChangeTime`, update id, revision number and `IsHidden` for each. Done when: on one real machine the list matches the titles and KB numbers Windows Update shows for it. Cheaper substitute: parsing `wmic qfe` or `Get-WindowsUpdate` output, which lists installed updates and not the available ones.",
+        "Implement `Block(updateId)` in `src/core/Blocker.cpp` setting `IUpdate.IsHidden` to true. Done when: a driven test on the real agent shows the update hidden in a fresh search. Cheaper substitute: writing the hidden state to a file the tool keeps, which Windows Update never reads.",
+        "Read the state back after every block and unblock by searching again and comparing `IsHidden` for the same update id and revision, returning expected and found. Done when: a fake that ignores the write gets a named mismatch and the row does not become blocked. Cheaper substitute: trusting the return code of the write.",
+        "Record each block by KB number in `src/core/BlockRecord.cpp` with the update id, revision, title, the time it was set and the time it was last re-asserted, written atomically. Done when: a test restarts the engine and finds the record, and an interrupted write leaves the previous record intact. Cheaper substitute: keeping the record in memory or only by update id, which cannot match an update returning under a new identity.",
+        "Implement `Status()` returning each update as waiting, blocked or cannot be blocked. Done when: a fixture with one hidden, one visible and one mandatory update reports exactly those three states.",
+        "Classify an update as cannot be blocked in `src/core/Blockability.cpp` when `IUpdate.IsMandatory` is true, or when a block read back as hidden is installed anyway on the next search, and name the reason. Done when: a fixture update that installs after a hide is reported as cannot be blocked with its reason. Cheaper substitute: treating every hidden update as blocked.",
+        "Refuse `Block` and `Unblock` by name when the process is not elevated, before any change, with one activity record. Done when: an unelevated test run reports the refusal and the fake's state is unchanged. Cheaper substitute: letting the agent fail with access denied after the update list was read.",
+        "Cover the engine in `tests/blocker_test.cpp` against the fake agent. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L blocker` passes and fails when the read-back is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L blocker` passes, including the mismatch, record, cannot-be-blocked and unelevated cases, and fails when the read-back is removed.",
+      "commit": "core: block one update with the state read back, recorded by KB number"
+    },
+    "enhancements": [
+      {
+        "title": "Unblock",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A block must be reversible. Unblock sets the update visible again, reads the state back, and removes the block record, so the update returns to the waiting list and the tool no longer asserts it. The record of what was blocked is the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Unblock button and its result, against `DESIGN.md` and `sdk/DESIGN.md`.",
+          "job": "a person lets a blocked update install again. Consumer: the update state, read back after the unblock.",
+          "treatment": "the update set visible, the record removed and the row back to waiting only when Windows reports it visible. Cheaper substitute that fails the checkpoint: deleting the record while the update stays hidden, so the row says waiting and nothing is installable."
+        },
+        "build": [
+          "Implement `Unblock(updateId)` in `src/core/Blocker.cpp` through the repair contract's record. Done when: block then unblock leaves the update visible in a fresh search.",
+          "Wire Unblock in `src/ui/UpdatesView.cpp`. Done when: the button is enabled only for a blocked row and the row returns to waiting."
+        ],
+        "items": [
+          "Implement `Unblock(updateId)` setting `IUpdate.IsHidden` to false, reading it back, and removing the record only after the read-back agrees. Done when: a fake that ignores the write keeps the record and names the mismatch. Cheaper substitute: removing the record first, which loses what was blocked when the write fails.",
+          "Record each block through the repair contract's restore record before the hide is written. Done when: a test finds the record on disk before the first change. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Wire the Unblock button in `src/ui/UpdatesView.cpp`, disabled with a tooltip when the selected update is not blocked. Done when: a first run shows it disabled and it enables after one block.",
+          "Cover it in `tests/unblock_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L unblock` passes and fails when the update is left hidden."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L unblock` passes: block then unblock leaves the update visible and the record gone, read back.",
+        "commit": "feature: unblock puts the update back, read back from Windows"
+      },
+      {
+        "title": "Keep It Blocked",
+        "intro": "A single hide is what failed before. The re-assert pass runs when the tool starts and optionally at sign-in, searches for each recorded KB number, and hides any matching update that is visible again, including one that returned under a new update id or revision after a feature update or a change in update metadata. The pass also records the Windows build, so a feature update is noticed.",
+        "surface": {
+          "fidelity": "the Blocked section and the Settings option, against `DESIGN.md` and `sdk/DESIGN.md`.",
+          "job": "a block stays after a feature update or a metadata change. Consumer: the update state, read back after each pass.",
+          "treatment": "each block showing when it was set and when it was last re-asserted, and what the pass did in Activity. Cheaper substitute that fails the checkpoint: hiding once at block time, which is what `wushowhide` did."
+        },
+        "build": [
+          "Implement the re-assert pass in `src/core/Reassert.cpp` matching by KB number. Done when: an update that returns visible under a new id is hidden again in a test.",
+          "Show the Blocked section in `src/ui/BlockedView.cpp` and the sign-in option in the framework's settings. Done when: each row shows its set and last re-asserted times."
+        ],
+        "items": [
+          "Implement `Reassert()` in `src/core/Reassert.cpp` that lists updates, matches each against the block records by KB number, and hides any matching update that is visible, updating the record's last re-asserted time. Done when: a fixture where an update returns with a new update id is hidden again and its record is updated. Cheaper substitute: matching by update id only, which a superseding update defeats.",
+          "Record the Windows build and each blocked update's revision with the block, and treat a changed build or revision as a reason to run a full pass with one Activity line saying which. Done when: a fixture with a new build number runs the pass and names the build change. Cheaper substitute: running the pass on a timer without saying why it ran.",
+          "Run `Reassert()` at tool start and, when the user enables it in the framework's settings, at sign-in through a scheduled task the tool creates and removes with that setting. Done when: turning the option on creates the task, turning it off removes it, and the task is read back each time. Cheaper substitute: a task that is created and never removed.",
+          "Build `src/ui/BlockedView.cpp` listing each block with the time it was set and the time it was last re-asserted. Done when: after one block and one pass the row shows both times and they differ.",
+          "Cover it in `tests/reassert_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L reassert` passes and fails when a returning update under a new id is not hidden again.",
+          "Write `docs/reassert.md` recording the mechanism: what is matched, which events trigger a pass, and why this outlasts a single hide. Done when: the file names each trigger and the test that covers it."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L reassert` passes: an update returning under a new id, a changed revision and a changed build all end blocked again, and the mechanism is recorded in `docs/reassert.md`.",
+        "commit": "feature: re-assert each block by KB number after the events that undo it"
+      },
+      {
+        "title": "Cannot Be Blocked, Said Plainly",
+        "intro": "A false sense of control is worse than none. When Windows installs an update regardless of its hidden state, the row says so, with the reason, and the Block button is disabled for it. A block that was in place and was overridden changes the row from blocked to cannot be blocked and adds an Activity line.",
+        "surface": {
+          "fidelity": "the cannot-be-blocked row and its explanation, against `DESIGN.md` and `sdk/DESIGN.md`.",
+          "job": "a person is never told an update is blocked when Windows will install it. Consumer: the update state, read back after each search.",
+          "treatment": "an icon and the words cannot be blocked, with one sentence giving the reason. Cheaper substitute that fails the checkpoint: showing the row as blocked with a warning icon, which still reads as blocked."
+        },
+        "build": [
+          "Show the state and the reason in `src/ui/UpdatesView.cpp`. Done when: a mandatory fixture update shows the words and a sentence.",
+          "Detect an override of an existing block in `src/core/Blockability.cpp`. Done when: a blocked update that installs anyway is reclassified."
+        ],
+        "items": [
+          "Show cannot be blocked with an icon, the words and the reason in `src/ui/UpdatesView.cpp` and disable Block for the row. Done when: a mandatory fixture update shows all three and its Block button is disabled. Cheaper substitute: colour alone, which fails the accessibility floor.",
+          "Reclassify a recorded block as cannot be blocked when a later search finds the update installed or mandatory despite the block, keeping the record and adding one Activity line with the reason. Done when: a fixture that installs the update after a block shows cannot be blocked and one Activity line.",
+          "Say in the confirmation before any block that a block is not a pause and that some updates Windows installs regardless. Done when: the confirmation text is read from the framework's message surface and includes both statements.",
+          "Cover it in `tests/unblockable_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L unblockable` passes and fails when an overridden block still shows as blocked."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L unblockable` passes: a mandatory update and an overridden block both show cannot be blocked with a reason, and neither shows blocked.",
+        "commit": "feature: an update that cannot be blocked is reported as such"
+      },
+      {
+        "title": "Block Driver Updates",
+        "intro": "Windows delivers driver updates through quality updates. The one policy switch for this is `ExcludeWUDriversInQualityUpdate`, which stops Windows Update from offering drivers at all, not a single driver. It is offered as a separate, explained, undoable setting and is never turned on silently. It is not a pause and does not touch feature update deferral or the `TargetReleaseVersion` policies, which are outside this tool.",
+        "surface": {
+          "fidelity": "the driver-update switch in the Settings section, against `sdk/DESIGN.md`.",
+          "job": "a person stops Windows Update offering driver updates, knowing what it covers. Consumer: the policy value, read back.",
+          "treatment": "a switch with a sentence saying that it affects all driver updates delivered through Windows Update, and its current state read from the machine. Cheaper substitute that fails the checkpoint: a switch that writes the value and never reads the real state."
+        },
+        "build": [
+          "Implement the policy read and write in `src/core/DriverPolicy.cpp`. Done when: setting it and reading it back agrees in a disposable registry root.",
+          "Add the switch to the framework's settings page in `src/ui/SettingsView.cpp`. Done when: the switch shows the machine's current state at start."
+        ],
+        "items": [
+          "Implement `SetExcludeDrivers(bool)` in `src/core/DriverPolicy.cpp` writing the DWORD `ExcludeWUDriversInQualityUpdate` under `HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate`, reading it back, and refusing by name when not elevated. Done when: a test under a disposable root reads back the value written and an unelevated run changes nothing. Cheaper substitute: writing through `reg.exe`, which cannot be redirected for a test.",
+          "Record the value that was there before the first write, including that the value was absent, through the repair contract. Done when: setting then undoing leaves the key exactly as before, including removing a value that did not exist. Cheaper substitute: always deleting the value on undo, which loses a prior policy the administrator set.",
+          "Add the switch to the settings page with a sentence that it affects all drivers delivered through Windows Update, and show its state read from the machine, not from the tool's own file. Done when: setting the policy by hand makes the switch show on at the next start.",
+          "Cover it in `tests/driver_policy_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L driverpolicy` passes and fails when the undo leaves the value behind."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L driverpolicy` passes: the switch writes, reads back and undoes the policy, including an absent prior value.",
+        "commit": "feature: one explained, undoable switch for driver updates"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine the list matches Windows Update's, a block is read back as hidden, and unblocking restores the update, both driven.",
+      "A block survives a feature update and an update-metadata change, matched by KB number, and `docs/reassert.md` records the mechanism and why it outlasts `wushowhide`.",
+      "An update Windows installs regardless is reported as cannot be blocked, and the window works in light and dark, by keyboard alone."
+    ]
+  }
+}

@@ -1,0 +1,246 @@
+{
+  "name": "ShellBisector",
+  "slug": "shellbisector",
+  "display": "Shell Bisector",
+  "job": "it finds the third-party shell extension that crashes or hangs File Explorer by switching off half of them, restarting Explorer and asking whether the fault is still there, round by round, and it puts every extension back when it is done.",
+  "tagline": "Find the add-on that keeps crashing File Explorer",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Hot pink",
+    "light": "#F9A8D4",
+    "dark": "#DB2777",
+    "social_ground": "#2E0A1C",
+    "social_muted": "#F7CFE3"
+  },
+  "icon": {
+    "idea": "A shape cut into two halves, one dark and one light: bisection.",
+    "points": [
+      "Free-standing with no tile behind it: two half rounded squares with a gap between them.",
+      "The left half is Hot pink and the right half is Hot pink light.",
+      "The small drawing, used below 40 pixels, widens the gap."
+    ],
+    "large": "<path d=\"M38 10 H26 A16 16 0 0 0 10 26 V70 A16 16 0 0 0 26 86 H38 Z\" fill=\"#DB2777\" stroke=\"#DB2777\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M58 10 H70 A16 16 0 0 1 86 26 V70 A16 16 0 0 1 70 86 H58 Z\" fill=\"#F9A8D4\" stroke=\"#F9A8D4\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<path d=\"M34 10 H26 A16 16 0 0 0 10 26 V70 A16 16 0 0 0 26 86 H34 Z\" fill=\"#DB2777\" stroke=\"#DB2777\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M62 10 H70 A16 16 0 0 1 86 26 V70 A16 16 0 0 1 70 86 H62 Z\" fill=\"#F9A8D4\" stroke=\"#F9A8D4\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Search",
+        "The round, the question and one row per extension still under suspicion"
+      ],
+      [
+        "Result",
+        "The culprit with its file and its program, and what to do next"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person whose Explorer crashes or hangs finds the responsible extension without doing the search by hand.",
+    "primary": "Start",
+    "secondary": "Restore all",
+    "rows": [
+      [
+        "Context menu handler",
+        "On"
+      ],
+      [
+        "Icon overlay handler",
+        "Off for this round"
+      ],
+      [
+        "Thumbnail handler",
+        "Cleared"
+      ],
+      [
+        "Property sheet handler",
+        "On"
+      ]
+    ],
+    "status": "Round 2, 4 suspects remain",
+    "notes": [
+      "The header shows the round number and how many suspects remain, and the screen asks one question: \"Is the problem still there?\", answered with Yes and No.",
+      "Each extension is a row with its name, the program it belongs to, and its state for this round shown with an icon and a word: On, Off for this round, or Cleared.",
+      "Start begins a search and becomes the Yes and No answer once a round is applied; Restore all puts every extension back to its starting state at any time and is always enabled while anything is off.",
+      "Only non-Microsoft extensions are rows: an extension whose file is signed by Microsoft is never listed and never switched off.",
+      "Closing the window while anything is off asks once whether to restore everything or keep the finding; the default is to restore, and a forced close is recovered at the next start.",
+      "The status bar says the state in words, for example \"Round 2, 4 suspects remain\" or \"Nothing is switched off\".",
+      "When the process is not elevated the tool refuses by name at Start, before any change, and says why."
+    ],
+    "cut": "This is a new tool, so there is no earlier window to cut from. It has no menus, no splash, no animations beyond the suite's own and no donate strip: everything a menu would hold is a section of the sidebar or a framework page, and that is recorded in the plan."
+  },
+  "readme": {
+    "lead": "Find the add-on that keeps crashing File Explorer.",
+    "what": [
+      "When File Explorer crashes or hangs, the cause is often a third-party shell extension: a context menu entry, a property sheet, an icon overlay, a thumbnail or preview handler. Every guide says the same thing: disable them one at a time and restart Explorer between each. Shell Bisector runs that search for you as a bisection.",
+      "It lists the non-Microsoft extensions, switches off half of them, restarts Explorer and asks whether the fault is still there, then narrows the set. Sixteen extensions with one faulty take at most five rounds. The result names the extension, its file and the installed program it belongs to. Every round is reversible, and the tool puts everything back when it closes."
+    ],
+    "new_intro": "Shell Bisector is a new tool in the suite, not a port.",
+    "new": [
+      [
+        "A real search.",
+        "Each round halves the suspects instead of leaving the user to guess an order."
+      ],
+      [
+        "Nothing left behind.",
+        "Every change is journalled before it is made, everything is restored on exit, and a forced close is recovered at the next start."
+      ],
+      [
+        "Names the program.",
+        "The finding gives the extension, its file and the installed program that owns it, with its uninstaller."
+      ],
+      [
+        "Deletes nothing.",
+        "An extension is switched off through the Blocked list by its class id, so its registration is never removed."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Shell Bisector ships as a complete, standalone C++ tool: it narrows the non-Microsoft shell extensions to the one that makes File Explorer crash or hang in as few rounds as the search allows, restores every extension to its starting state on exit or after a forced close, and names the culprit with its file and the installed program it belongs to.",
+    "current_state": "Nothing exists yet. This is a new tool of the suite and nothing is ported: there is no AutoIt original and no `reference/au3/` folder. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan section as it stood in the Resolute repository under `docs/origin/resolute-D05-T07-s2.md`, which also describes an Explorer performance tool that is not this tool's concern. The tool consumes the suite's shell-extension enumerator, which is built in the Startup Manager tool and proposed to Resolute-SDK, and writes no second one. The SDK's framework and repair contract, which the tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s2.md`: the plan section for this tool, from which only the bisector's items are taken.",
+      "The shell-extension enumerator built in the Startup Manager tool and proposed to Resolute-SDK: the one source of the extension list.",
+      "Windows itself: the shell extension handler keys under `HKEY_CLASSES_ROOT` and `HKLM\\SOFTWARE\\Classes` (`shellex`), the `Shell Extensions\\Blocked` key, and the installed-program records under `Uninstall`."
+    ],
+    "outcome": [
+      "A fixture set of sixteen extensions with one faulty is narrowed in at most five rounds, wherever the faulty one sits, and on a real machine each round blocks half, restarts Explorer and reads the answer.",
+      "Abandoning a search, closing the tool or killing it mid-round leaves every extension in its starting state, and the finding names the extension, its file and the program it belongs to.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Search screen, where each suspect is a row with its state for the round. Reporting and audit are the Activity section, which is the readable face of the journal and the trail a support reader checks. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated run is refused by name before any change. Reverse means putting every extension back to the state the journal recorded before the first change, and it anchors on the Restore Everything section.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "verification": [
+      "On a real machine with a known faulty extension the tool finds it, and afterwards every extension is in its starting state, read back from the Blocked key.",
+      "Killing the tool mid-round and starting it again restores everything, proven on the real registry and not only on a fixture.",
+      "The window runs in light and dark, by keyboard alone, and the finding names the extension, its file and its program."
+    ],
+    "engine": {
+      "title": "Bisection Engine and Journal",
+      "intro": "The tool's whole system effect: a pure search over a candidate set, the application of each round by blocking half of the extensions and restarting Explorer, a journal written before each change so that every round and a crash can be undone, and the restoring of every extension to its starting state. Extensions are switched off by class id in `Shell Extensions\\Blocked`, which disables one without deleting anything.",
+      "needs": "windows-host, sdk-framework",
+      "build": [
+        "Write the pure search in `src/core/Bisect.cpp` over a candidate set and an answer per round. Done when: the unit tests pass with no registry and no Explorer.",
+        "Write the round, the journal and the restore in `src/core/Round.cpp` and `src/core/Journal.cpp` against a registry root the tests can redirect. Done when: the unit tests pass against a disposable key."
+      ],
+      "items": [
+        "Implement `Bisect` in `src/core/Bisect.cpp` as a pure function: given the candidate set and the answer to a round (fault still there or not), return the next half to switch off, or the culprit when one remains. Done when: for sixteen candidates, every position of the single faulty one is found in at most five rounds, asserted for all sixteen.",
+        "Take the candidates in `src/core/Candidates.cpp` from the suite's shell-extension enumerator, and drop every extension whose file is signed by Microsoft, judged by the signer of the file and not by its folder. Done when: a fixture list with two Microsoft-signed and three other extensions yields the three, and no second enumerator exists in `src/`. Cheaper substitute: a second registry walk of the `shellex` keys, or filtering on the Windows folder path.",
+        "Implement `ApplyRound` in `src/core/Round.cpp`: block the chosen half by writing each class id as a value under `Shell Extensions\\Blocked` of the root passed in, and unblock the rest, leaving every registration in place. Done when: a test under a disposable root shows the right class ids blocked and no `shellex` key removed. Cheaper substitute: deleting the handler registrations, which cannot be put back exactly.",
+        "Write the journal in `src/core/Journal.cpp`: before each change, append what is about to change and its prior state, flushed to disk, in a file under the tool's data folder. Done when: a test that stops the process after the journal write and before the registry write finds the entry on disk. Cheaper substitute: keeping the record in memory, which is lost in the crash it exists for.",
+        "Restart Explorer in `src/core/Explorer.cpp`: close the shell, wait for it to end, start it again, and wait until the shell window exists before asking the question. Done when: on a real machine `explorer.exe` has a new process id and the taskbar is back before the call returns. Cheaper substitute: ending the process with `taskkill /f` and starting it blind, which asks the question before the shell is up.",
+        "Implement `RestoreAll` in `src/core/Round.cpp`: put every extension back to the state the journal recorded first, then mark the journal closed. Done when: a test that runs four rounds and abandons the search leaves the Blocked key equal to its starting state, asserted value by value.",
+        "Refuse `Start` and every round by name when the process is not elevated, before any journal write, with one activity record. Done when: an unelevated test run reports the refusal and the disposable root is unchanged. Cheaper substitute: letting the registry write fail with access denied halfway through a round.",
+        "Cover the engine in `tests/bisect_test.cpp` and `tests/round_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when the search takes a sixth round or a restore leaves one value blocked."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes: sixteen with one faulty are found in at most five rounds at every position, abandoning restores every extension, and an unelevated run is refused.",
+      "commit": "core: the bisection, its journal and the restore"
+    },
+    "enhancements": [
+      {
+        "title": "Restore Everything",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "The reverse of any round, and automatic on exit. The first state of every extension is recorded through the SDK repair contract before the first change, so Restore all puts back what was actually there and not a guess, and closing the tool does the same unless the user keeps the finding.",
+        "surface": {
+          "fidelity": "the Restore all button and the exit prompt, against `DESIGN.md` section 2.",
+          "job": "a person puts the machine back as it was at any point, and never leaves the tool with extensions switched off by accident. Consumer: the Blocked key, compared with the record.",
+          "treatment": "the recorded starting state restored value by value, with a result line in words. Cheaper substitute that fails the checkpoint: unblocking every class id the tool wrote, which also unblocks an extension the user had blocked before the search."
+        },
+        "build": [
+          "Record the starting state through the repair contract in `src/core/Journal.cpp`. Done when: a record exists before the first change.",
+          "Wire Restore all and the exit path in `src/ui/SearchView.cpp`. Done when: closing the window mid-search restores everything."
+        ],
+        "items": [
+          "Record the starting state of every candidate's Blocked entry through the repair contract before any change. Done when: a test finds the record on disk before the first value is written. Cheaper substitute: recording only what the tool changes, which loses an entry the user had already blocked.",
+          "Wire the Restore all button in `src/ui/SearchView.cpp` to `RestoreAll`, enabled whenever any extension is off. Done when: after two rounds one press leaves the Blocked key equal to the record, and the rows all read On. Cheaper substitute: a button that only clears the rows.",
+          "Restore on exit: on window close, on the framework's shutdown call and on an unhandled error, restore unless the user chose to keep the finding. Done when: a driven test closes the window mid-round and finds the starting state, and a test that raises an error in a round finds it too.",
+          "Cover it in `tests/restore_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restore` passes, and fails when one extension is left blocked."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restore` passes: abandoning, closing and a raised error each leave every extension in its starting state, including one the user had blocked before.",
+        "commit": "feature: restore everything, by button and on exit"
+      },
+      {
+        "title": "Recover After a Forced Close",
+        "intro": "A kill, a crash or a power cut mid-round leaves extensions switched off, and the journal knows which. At the next start the tool says what was left off and puts it back, before anything else, so a forced close never leaves the machine bisected.",
+        "surface": {
+          "fidelity": "the recovery prompt at start, against `DESIGN.md` section 2.",
+          "job": "a person who lost a session finds the machine back to normal without having to know what was switched off. Consumer: the journal and the Blocked key.",
+          "treatment": "a first screen that names each extension found off and puts them back with one action, then says so. Cheaper substitute that fails the checkpoint: restoring silently, which hides that the last session was cut short."
+        },
+        "build": [
+          "Read an open journal at start in `src/core/Recovery.cpp`. Done when: an unclosed journal is detected and its entries are listed.",
+          "Show the recovery step in `src/ui/SearchView.cpp`. Done when: the prompt names each extension left off."
+        ],
+        "items": [
+          "Implement `FindOpenJournal` in `src/core/Recovery.cpp`, returning the extensions the journal shows as changed and not restored, judged against the Blocked key as it is now. Done when: a fixture journal with three entries, one already restored, returns two.",
+          "Show the recovery prompt before the Search screen is usable, naming each extension and its program, with Restore as the default action. Done when: starting the tool over an open journal shows the prompt and the search cannot begin until it is answered. Cheaper substitute: restoring in the background without telling the user.",
+          "Restore through `RestoreAll` and close the journal, with one activity record. Done when: after the prompt the Blocked key equals the journal's starting state and the journal is marked closed.",
+          "Prove it by killing the process: start a round under a test harness, end the whole process tree mid-round, start again. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L recovery` passes, and fails when the journal is written after the registry change."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L recovery` passes: a process ended mid-round is recovered at the next start and every extension is back to its starting state.",
+        "commit": "feature: recover what a forced close left off"
+      },
+      {
+        "title": "Name the Program Behind It",
+        "intro": "A class id and a file are not an answer a person can act on. The finding names the installed program that owns the extension and its uninstaller, so the next step is clear: update it, repair it or remove it.",
+        "surface": {
+          "fidelity": "the Result section, against `DESIGN.md` section 2.",
+          "job": "a person learns which program to deal with, and how. Consumer: the installed-program records, read back.",
+          "treatment": "the extension, its file, the program with its publisher and version, and the action to uninstall it, which runs only when the user presses it. Cheaper substitute that fails the checkpoint: showing the file path alone, which leaves the user to work out the owner."
+        },
+        "build": [
+          "Match a file to an installed program in `src/core/Owner.cpp`. Done when: a fixture extension is matched to its program and its uninstall command.",
+          "Show the finding in `src/ui/ResultView.cpp`. Done when: the Result section shows the extension, file and program."
+        ],
+        "items": [
+          "Implement `OwnerOf` in `src/core/Owner.cpp`: read the installed-program records under both `Uninstall` views and match the extension's file to a program by its install location, then by the file's version information. Done when: a fixture with two programs matches the file to the right one, and an unmatched file returns an honest \"not found\". Cheaper substitute: guessing the owner from the folder name alone.",
+          "Show the Result section in `src/ui/ResultView.cpp`: the extension, its file, the program, its publisher and version, and an Uninstall action. Done when: the section shows the culprit of a finished fixture search with all of them.",
+          "Run the program's uninstaller only on the user's press, after a confirmation naming the program, and never switch the extension back on first. Done when: a driven test presses Uninstall, sees the confirmation, and the uninstall command is called once only after Yes.",
+          "Cover it in `tests/owner_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L owner` passes, and fails when the match picks the wrong program."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L owner` passes: the finding names the extension, its file and the installed program, and the uninstaller runs only after confirmation.",
+        "commit": "feature: name the program that owns the culprit"
+      },
+      {
+        "title": "Keep the Culprit Off",
+        "intro": "The one state the user may choose to leave behind: the culprit stays switched off, so Explorer stays stable until the program is fixed or removed. It is chosen explicitly, shown plainly and undoable.",
+        "surface": {
+          "fidelity": "the keep choice and its undo, in the Result section, against `DESIGN.md` section 2.",
+          "job": "a person keeps Explorer working now and can still undo it later. Consumer: the Blocked key and the journal.",
+          "treatment": "a clear choice between restoring everything and keeping only the culprit off, with the kept state listed in the Result section and a Turn it back on action. Cheaper substitute that fails the checkpoint: leaving the last round's half blocked, which keeps innocent extensions off."
+        },
+        "build": [
+          "Keep exactly one extension off in `src/core/Keep.cpp` and restore all others. Done when: after a keep the Blocked key differs from the start by the culprit only.",
+          "Show the choice and the undo in `src/ui/ResultView.cpp`. Done when: the kept extension is listed with a Turn it back on action."
+        ],
+        "items": [
+          "Implement `KeepOnly` in `src/core/Keep.cpp`: restore every extension except the culprit and record the kept state in the journal as kept, not as open. Done when: a test shows the Blocked key equal to the start plus the culprit, and the next start does not offer recovery. Cheaper substitute: skipping the restore, which leaves the whole last round blocked.",
+          "Offer the choice in `src/ui/ResultView.cpp` and at exit: Restore everything is the default, Keep the culprit off is the explicit alternative. Done when: closing after a finding asks once and each answer gives its state.",
+          "Implement Turn it back on: unblock the kept extension and close the record, available at any later start. Done when: a test keeps, restarts the tool and undoes, and the Blocked key equals the starting state.",
+          "Cover it in `tests/keep_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L keep` passes, and fails when an innocent extension stays off."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L keep` passes: only the culprit stays off, it is listed, and Turn it back on returns the starting state.",
+        "commit": "feature: keep the culprit off, and undo it"
+      }
+    ],
+    "no_reverse": ""
+  }
+}

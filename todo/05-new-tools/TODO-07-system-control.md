@@ -58,6 +58,8 @@ track: P3
 
 ## 1. Update Blocker and Update History
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/UpdateBlocker` repository (`D:\Resolute_Bin\UpdateBlocker`) by its own plan.
+
 Microsoft retired the tool that did this, its replacement is an enterprise product, and hidden updates reappear anyway. Meanwhile 2025 carried more than twenty major update problems. This is the clearest documented gap the research found.
 
 **Fidelity:** the update list and the block confirmation, against `DESIGN.md` and `docs/captures/house-style/`.
@@ -66,17 +68,19 @@ Microsoft retired the tool that did this, its replacement is an enterprise produ
 **Chrome:** consume the framework and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] List available and installed updates in `extensions/UpdateBlocker/` with title, KB number, size, and date. Done when: the list matches what Windows Update reports for the same machine.
-- [ ] Block a specific update, as a repair-contract item so it is reversible. Done when: a blocked update does not install and unblocking restores it, both driven.
-- [ ] **Re-assert the block after the events that historically break it.** Done when: the block survives a feature update and an update-metadata change, and this section records the mechanism used and why it outlasts `wushowhide`.
-- [ ] Report when a block cannot be honoured. Done when: an update Windows installs regardless is reported as such rather than appearing blocked, because a false sense of control is worse than none.
-- [ ] Show update history with what each update changed where Windows records it. Done when: history renders in `extensions/UpdateHistory/` and cross-references the `System Change Journal` where a snapshot spans the install.
-- [ ] Offer to uninstall a specific update. Done when: uninstall is a contract item, verified by reading the update state back, and an update Windows will not let you remove says so.
-- [ ] Commit: `"update blocker: stop one update, and have it stay stopped"`
+- [ ] ~~List available and installed updates in `extensions/UpdateBlocker/` with title, KB number, size, and date. Done when: the list matches what Windows Update reports for the same machine.~~ -> `rizonesoft/UpdateBlocker`
+- [ ] ~~Block a specific update, as a repair-contract item so it is reversible. Done when: a blocked update does not install and unblocking restores it, both driven.~~ -> `rizonesoft/UpdateBlocker`
+- [ ] ~~**Re-assert the block after the events that historically break it.** Done when: the block survives a feature update and an update-metadata change, and this section records the mechanism used and why it outlasts `wushowhide`.~~ -> `rizonesoft/UpdateBlocker`
+- [ ] ~~Report when a block cannot be honoured. Done when: an update Windows installs regardless is reported as such rather than appearing blocked, because a false sense of control is worse than none.~~ -> `rizonesoft/UpdateBlocker`
+- [ ] ~~Show update history with what each update changed where Windows records it. Done when: history renders in `extensions/UpdateHistory/` and cross-references the `System Change Journal` where a snapshot spans the install.~~ -> `rizonesoft/UpdateBlocker`
+- [ ] ~~Offer to uninstall a specific update. Done when: uninstall is a contract item, verified by reading the update state back, and an update Windows will not let you remove says so.~~ -> `rizonesoft/UpdateBlocker`
+- [ ] Commit: ~~`"update blocker: stop one update, and have it stay stopped"`~~ -> `rizonesoft/UpdateBlocker`
 
-**Test checkpoint:** The list matches Windows Update for the same machine. A blocked update does not install; unblocking restores it. The block survives a feature update and a metadata change, with the mechanism recorded. An unblockable update is reported rather than shown as blocked. Uninstall is verified by read-back.
+**Test checkpoint:** Moved with the section. The `rizonesoft/UpdateBlocker` repository's plan carries it.
 
 ## 2. Shell Extension Bisector and Explorer Performance
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ShellBisector` repository (`D:\Resolute_Bin\ShellBisector`) by its own plan.
 
 `ShellExView` lists shell extensions well and this does not compete with it. The gap is that every published fix reduces to "disable them one at a time and restart Explorer between each", which is a manual binary search a computer should run.
 
@@ -86,17 +90,19 @@ Microsoft retired the tool that did this, its replacement is an enterprise produ
 **Chrome:** consume the framework, the repair contract, and the shell-extension enumerator from `D05 T01 §5`. Write no second enumerator.
 **Needs:** Windows host (build/test)
 
-- [ ] Implement bisection in `extensions/ShellBisector/`: disable half the non-Microsoft extensions, restart Explorer, ask whether the fault persists, narrow. Done when: a fixture set of sixteen with one deliberately faulty is narrowed in at most five rounds.
-- [ ] Make every round reversible, through the repair contract. Done when: abandoning a bisection mid-run restores every extension to its starting state, asserted.
-- [ ] Never leave the machine in a bisected state. Done when: the tool restores everything on exit unless the user explicitly keeps a finding, and a forced termination mid-round still restores, proven by killing it.
-- [ ] Report the culprit with the software that owns it. Done when: the finding names the extension, its file, and the installed application it belongs to.
-- [ ] Measure Explorer responsiveness in `extensions/ExplorerPerformance/`: folder open time, right-click menu time, and thumbnail generation. Done when: each is measured and compared against a stated expectation.
-- [ ] Attribute slowness where the system allows. Done when: a deliberately slowed fixture handler is identified, or this section states plainly what could not be attributed and why.
-- [ ] Commit: `"shell bisector: run the search the guides tell users to do by hand"`
+- [ ] ~~Implement bisection in `extensions/ShellBisector/`: disable half the non-Microsoft extensions, restart Explorer, ask whether the fault persists, narrow. Done when: a fixture set of sixteen with one deliberately faulty is narrowed in at most five rounds.~~ -> `rizonesoft/ShellBisector`
+- [ ] ~~Make every round reversible, through the repair contract. Done when: abandoning a bisection mid-run restores every extension to its starting state, asserted.~~ -> `rizonesoft/ShellBisector`
+- [ ] ~~Never leave the machine in a bisected state. Done when: the tool restores everything on exit unless the user explicitly keeps a finding, and a forced termination mid-round still restores, proven by killing it.~~ -> `rizonesoft/ShellBisector`
+- [ ] ~~Report the culprit with the software that owns it. Done when: the finding names the extension, its file, and the installed application it belongs to.~~ -> `rizonesoft/ShellBisector`
+- [ ] ~~Measure Explorer responsiveness in `extensions/ExplorerPerformance/`: folder open time, right-click menu time, and thumbnail generation. Done when: each is measured and compared against a stated expectation.~~ -> `rizonesoft/ShellBisector`
+- [ ] ~~Attribute slowness where the system allows. Done when: a deliberately slowed fixture handler is identified, or this section states plainly what could not be attributed and why.~~ -> `rizonesoft/ShellBisector`
+- [ ] Commit: ~~`"shell bisector: run the search the guides tell users to do by hand"`~~ -> `rizonesoft/ShellBisector`
 
-**Test checkpoint:** A fixture set of sixteen extensions with one faulty is narrowed in at most five rounds. Abandoning mid-run restores every extension, asserted. Killing the process mid-round still restores. The finding names extension, file, and owning application. Explorer timings are measured against a stated expectation.
+**Test checkpoint:** Moved with the section. The `rizonesoft/ShellBisector` repository's plan carries it.
 
 ## 3. Defender Manager and Security Status
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DefenderManager` repository (`D:\Resolute_Bin\DefenderManager`) by its own plan.
 
 Windows Defender's exclusion list is where malware hides and where legitimate software gets wrongly blocked, and Windows surfaces it three levels deep in a settings app that changes shape every release.
 
@@ -106,17 +112,19 @@ Windows Defender's exclusion list is where malware hides and where legitimate so
 **Chrome:** consume the framework, its elevation guard, and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Report Defender status in `extensions/DefenderManager/`: real-time protection, cloud protection, tamper protection, and definition age. Done when: each renders and is verified against the system.
-- [ ] Say why protection is off where the system records it, distinguishing user choice, policy, and a third-party product taking over. Done when: all three are distinguishable and a fixture of each is attributed correctly.
-- [ ] List exclusions with what added them where that is recorded. Done when: paths, extensions, and processes all render.
-- [ ] **State plainly what an exclusion gives up**, before it is added. Done when: the confirmation says the excluded path will not be scanned, and adding is a contract item so it is reversible.
-- [ ] Flag exclusions that look wrong. Done when: an exclusion covering a whole drive, a user profile root, or a system directory is flagged with its reasoning.
-- [ ] Report the wider security posture in `extensions/SecurityStatus/`: firewall state, UAC level, SmartScreen, and Core Isolation. Done when: each renders and a machine with any of them off explains the consequence.
-- [ ] Commit: `"defender manager: see what your security software is doing"`
+- [ ] ~~Report Defender status in `extensions/DefenderManager/`: real-time protection, cloud protection, tamper protection, and definition age. Done when: each renders and is verified against the system.~~ -> `rizonesoft/DefenderManager`
+- [ ] ~~Say why protection is off where the system records it, distinguishing user choice, policy, and a third-party product taking over. Done when: all three are distinguishable and a fixture of each is attributed correctly.~~ -> `rizonesoft/DefenderManager`
+- [ ] ~~List exclusions with what added them where that is recorded. Done when: paths, extensions, and processes all render.~~ -> `rizonesoft/DefenderManager`
+- [ ] ~~**State plainly what an exclusion gives up**, before it is added. Done when: the confirmation says the excluded path will not be scanned, and adding is a contract item so it is reversible.~~ -> `rizonesoft/DefenderManager`
+- [ ] ~~Flag exclusions that look wrong. Done when: an exclusion covering a whole drive, a user profile root, or a system directory is flagged with its reasoning.~~ -> `rizonesoft/DefenderManager`
+- [ ] ~~Report the wider security posture in `extensions/SecurityStatus/`: firewall state, UAC level, SmartScreen, and Core Isolation. Done when: each renders and a machine with any of them off explains the consequence.~~ -> `rizonesoft/DefenderManager`
+- [ ] Commit: ~~`"defender manager: see what your security software is doing"`~~ -> `rizonesoft/DefenderManager`
 
-**Test checkpoint:** Defender status renders and is verified against the system. User choice, policy, and third-party takeover are distinguishable on fixtures. An exclusion states what it gives up before being added and is reversible. A whole-drive exclusion is flagged. Security posture renders with consequences stated.
+**Test checkpoint:** Moved with the section. The `rizonesoft/DefenderManager` repository's plan carries it.
 
 ## 4. BitLocker, Certificates, and Recovery
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BitLockerStatus` repository (`D:\Resolute_Bin\BitLockerStatus`) by its own plan.
 
 Three tools for the moments a machine is least recoverable: an encrypted drive with a missing key, a broken certificate chain, and a recovery environment that is not there when it is needed.
 
@@ -126,19 +134,21 @@ Three tools for the moments a machine is least recoverable: an encrypted drive w
 **Chrome:** consume the framework, its elevation guard, and its logging.
 **Needs:** Windows host (build/test)
 
-- [ ] Report BitLocker status per volume in `extensions/BitLockerStatus/`: protection state, method, and where the recovery key is escrowed. Done when: each renders and a volume with no escrow is flagged, because that is the dangerous case.
-- [ ] Gate, log, and limit any key reveal exactly as `D05 T06 §3` requires. Done when: an unelevated reveal is refused by name, one log line names the volume and not the key, and no export-all path exists, proven by search.
-- [ ] Inspect the certificate stores in `extensions/CertificateManager/`: expired roots, untrusted intermediates, and anything that would break HTTPS. Done when: a fixture expired root is flagged with what it affects.
-- [ ] Hand off to `ComIntRep`'s pre-flight where a certificate fault is the real cause. Done when: the hand-off works and carries the finding.
-- [ ] Report the recovery environment in `extensions/RecoveryManager/`: whether WinRE is present, enabled, and reachable. Done when: a machine with a broken or missing WinRE is reported as such, which most users discover only when they need it.
-- [ ] Create a recovery drive, with what it will erase named first. Done when: the confirmation names the target by letter, label, and size, and declining performs nothing.
-- [ ] Commit: `"bitlocker, certificates, and recovery: the tools you need before you need them"`
+- [ ] ~~Report BitLocker status per volume in `extensions/BitLockerStatus/`: protection state, method, and where the recovery key is escrowed. Done when: each renders and a volume with no escrow is flagged, because that is the dangerous case.~~ -> `rizonesoft/BitLockerStatus`
+- [ ] ~~Gate, log, and limit any key reveal exactly as `D05 T06 §3` requires. Done when: an unelevated reveal is refused by name, one log line names the volume and not the key, and no export-all path exists, proven by search.~~ -> `rizonesoft/BitLockerStatus`
+- [ ] ~~Inspect the certificate stores in `extensions/CertificateManager/`: expired roots, untrusted intermediates, and anything that would break HTTPS. Done when: a fixture expired root is flagged with what it affects.~~ -> `rizonesoft/BitLockerStatus`
+- [ ] ~~Hand off to `ComIntRep`'s pre-flight where a certificate fault is the real cause. Done when: the hand-off works and carries the finding.~~ -> `rizonesoft/BitLockerStatus`
+- [ ] ~~Report the recovery environment in `extensions/RecoveryManager/`: whether WinRE is present, enabled, and reachable. Done when: a machine with a broken or missing WinRE is reported as such, which most users discover only when they need it.~~ -> `rizonesoft/BitLockerStatus`
+- [ ] ~~Create a recovery drive, with what it will erase named first. Done when: the confirmation names the target by letter, label, and size, and declining performs nothing.~~ -> `rizonesoft/BitLockerStatus`
+- [ ] Commit: ~~`"bitlocker, certificates, and recovery: the tools you need before you need them"`~~ -> `rizonesoft/BitLockerStatus`
 
 **Freeze check:** What recovery drive creation writes to a target is frozen once shipped, because it erases that target. Evidence is a fixture target compared before and after against its recorded state. Fixture source: `tests/fixtures/drives/`.
 
-**Test checkpoint:** BitLocker status renders per volume with unescrowed volumes flagged. A key reveal is gated, logged without the key, and has no export-all path, proven by search. An expired root is flagged with what it affects. A broken WinRE is reported. Recovery drive creation names the target by letter, label, and size.
+**Test checkpoint:** Moved with the section. The `rizonesoft/BitLockerStatus` repository's plan carries it.
 
 ## 5. Privacy and Telemetry Settings
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PrivacySettings` repository (`D:\Resolute_Bin\PrivacySettings`) by its own plan.
 
 The research found forced diagnostics and telemetry among the things Microsoft is not addressing. This is also the most politically loaded tool in the suite and the one most likely to be wrong next year, so it is built to be honest rather than opinionated.
 
@@ -148,16 +158,18 @@ The research found forced diagnostics and telemetry among the things Microsoft i
 **Chrome:** consume the framework and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] List the settings in `extensions/PrivacySettings/` with their current state and where each is controlled. Done when: user setting, policy, and unavailable-on-this-edition are distinguishable.
-- [ ] **State the cost of each change** before it is made. Done when: every setting says what stops working, and anything that affects Windows Update or search says so prominently.
-- [ ] Make every change a repair-contract item. Done when: undo restores the previous value exactly, asserted.
-- [ ] Refuse to offer changes that break the machine. Done when: settings known to break Update, activation, or search are either not offered or carry an explicit warning, and this section records which and why.
-- [ ] Keep the tool current rather than opinionated. Done when: the setting list is data rather than code, so a Windows release that moves a setting is a data change.
-- [ ] Commit: `"privacy settings: state what each change costs"`
+- [ ] ~~List the settings in `extensions/PrivacySettings/` with their current state and where each is controlled. Done when: user setting, policy, and unavailable-on-this-edition are distinguishable.~~ -> `rizonesoft/PrivacySettings`
+- [ ] ~~**State the cost of each change** before it is made. Done when: every setting says what stops working, and anything that affects Windows Update or search says so prominently.~~ -> `rizonesoft/PrivacySettings`
+- [ ] ~~Make every change a repair-contract item. Done when: undo restores the previous value exactly, asserted.~~ -> `rizonesoft/PrivacySettings`
+- [ ] ~~Refuse to offer changes that break the machine. Done when: settings known to break Update, activation, or search are either not offered or carry an explicit warning, and this section records which and why.~~ -> `rizonesoft/PrivacySettings`
+- [ ] ~~Keep the tool current rather than opinionated. Done when: the setting list is data rather than code, so a Windows release that moves a setting is a data change.~~ -> `rizonesoft/PrivacySettings`
+- [ ] Commit: ~~`"privacy settings: state what each change costs"`~~ -> `rizonesoft/PrivacySettings`
 
-**Test checkpoint:** Settings render with user, policy, and edition-unavailable distinguishable. Every change states its cost before being made. Undo restores the previous value exactly, asserted. Settings that break Update, activation, or search are refused or warned, with the list recorded. The setting list is data, proven by adding one without a code change.
+**Test checkpoint:** Moved with the section. The `rizonesoft/PrivacySettings` repository's plan carries it.
 
 ## 6. Environment, Features, Power, and Locale
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/EnvironmentEditor` repository (`D:\Resolute_Bin\EnvironmentEditor`) by its own plan.
 
 Four configuration surfaces Windows ships with interfaces that are worse than no interface: a two-line environment variable box, an optional-features list that gives no progress, a power plan editor buried in legacy Control Panel, and a locale system whose failure mode is unreadable text.
 
@@ -167,14 +179,14 @@ Four configuration surfaces Windows ships with interfaces that are worse than no
 **Chrome:** consume the framework and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Build `extensions/EnvironmentEditor/` with one row per entry, reorderable, and duplicate and missing-path detection. Done when: a broken `PATH` entry is flagged, editing is undoable, and the prior value is recorded before any write.
-- [ ] Build `extensions/WindowsFeatures/` over optional components, with real progress. Done when: enabling and disabling a feature both report progress and verify by reading the feature state back.
-- [ ] Build `extensions/PowerPlans/` covering plans and the settings Windows hides from the modern interface. Done when: a hidden setting is exposed and changing it verifies by read-back.
-- [ ] Build `extensions/LocaleFixer/` for the mojibake case: system locale, ANSI code page, and the legacy Unicode setting. Done when: a machine displaying unreadable text in legacy applications is diagnosed and the responsible setting named.
-- [ ] Make every change in all four reversible through the contract. Done when: four undo assertions run.
-- [ ] Commit: `"environment, features, power, and locale editors"`
+- [ ] ~~Build `extensions/EnvironmentEditor/` with one row per entry, reorderable, and duplicate and missing-path detection. Done when: a broken `PATH` entry is flagged, editing is undoable, and the prior value is recorded before any write.~~ -> `rizonesoft/EnvironmentEditor`
+- [ ] ~~Build `extensions/WindowsFeatures/` over optional components, with real progress. Done when: enabling and disabling a feature both report progress and verify by reading the feature state back.~~ -> `rizonesoft/EnvironmentEditor`
+- [ ] ~~Build `extensions/PowerPlans/` covering plans and the settings Windows hides from the modern interface. Done when: a hidden setting is exposed and changing it verifies by read-back.~~ -> `rizonesoft/EnvironmentEditor`
+- [ ] ~~Build `extensions/LocaleFixer/` for the mojibake case: system locale, ANSI code page, and the legacy Unicode setting. Done when: a machine displaying unreadable text in legacy applications is diagnosed and the responsible setting named.~~ -> `rizonesoft/EnvironmentEditor`
+- [ ] ~~Make every change in all four reversible through the contract. Done when: four undo assertions run.~~ -> `rizonesoft/EnvironmentEditor`
+- [ ] Commit: ~~`"environment, features, power, and locale editors"`~~ -> `rizonesoft/EnvironmentEditor`
 
-**Test checkpoint:** A broken `PATH` entry is flagged and editing is undoable with the prior value recorded. Feature enable and disable both report progress and verify by read-back. A hidden power setting is exposed and verified. A mojibake machine is diagnosed and the setting named. Four undo assertions run.
+**Test checkpoint:** Moved with the section. The `rizonesoft/EnvironmentEditor` repository's plan carries it.
 
 ## 7. Network Configuration Tools
 

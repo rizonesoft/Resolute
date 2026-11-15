@@ -1,0 +1,249 @@
+{
+  "name": "DefenderManager",
+  "slug": "defendermanager",
+  "display": "Defender Manager",
+  "job": "it reports what Microsoft Defender is doing, says why protection is off when it is, lists the exclusions with a flag on the ones that look wrong, and adds or removes one exclusion only after saying what it gives up.",
+  "tagline": "See what your security software is doing, and what it has been told to ignore",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Guard blue",
+    "light": "#93C5FD",
+    "dark": "#1D4ED8",
+    "social_ground": "#0E1A3D",
+    "social_muted": "#C9DAF8"
+  },
+  "icon": {
+    "idea": "A shield with an eye: see what your protection is doing.",
+    "points": [
+      "Free-standing with no tile: a shield with a rounded point.",
+      "The shield is Guard blue, the eye is Guard blue light with a Guard blue pupil.",
+      "The small drawing below 40 pixels enlarges the eye."
+    ],
+    "large": "<path d=\"M48 10 L80 22 V46 C80 66 66 80 48 88 C30 80 16 66 16 46 V22 Z\" fill=\"#1D4ED8\" stroke=\"#1D4ED8\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M26 46 C34 36 41 33 48 33 C55 33 62 36 70 46 C62 56 55 59 48 59 C41 59 34 56 26 46 Z\" fill=\"#93C5FD\" stroke=\"#93C5FD\" stroke-width=\"2\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"48\" cy=\"46\" r=\"7\" fill=\"#1D4ED8\"/>",
+    "small": "<path d=\"M48 10 L80 22 V46 C80 66 66 80 48 88 C30 80 16 66 16 46 V22 Z\" fill=\"#1D4ED8\" stroke=\"#1D4ED8\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M24 46 C33 34 41 31 48 31 C55 31 63 34 72 46 C63 58 55 61 48 61 C41 61 33 58 24 46 Z\" fill=\"#93C5FD\" stroke=\"#93C5FD\" stroke-width=\"2\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"48\" cy=\"46\" r=\"9\" fill=\"#1D4ED8\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Status",
+        "A one-sentence verdict, then a row per protection: name, state and why"
+      ],
+      [
+        "Exclusions",
+        "Each exclusion with its kind and what it covers, flagged with the reason when it looks wrong"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees in one sentence whether Defender is protecting this computer, and for each protection whether it is on and, when it is off, whether the user chose that, a policy set it, or another security product took over.",
+    "primary": "Refresh",
+    "secondary": "Remove exclusion",
+    "rows": [
+      [
+        "Real-time protection",
+        "On, or off with the reason"
+      ],
+      [
+        "Cloud protection",
+        "On, or off with the reason"
+      ],
+      [
+        "Tamper protection",
+        "On, or off"
+      ],
+      [
+        "Definitions",
+        "Up to date, or how many days old"
+      ],
+      [
+        "Active antivirus",
+        "Defender, or the other product that has taken over"
+      ]
+    ],
+    "status": "Defender is protecting this computer, definitions 1 day old",
+    "notes": [
+      "The first line of the screen is one sentence: Defender is protecting this computer, Defender is partly off, or another product is protecting it and Defender is passive. It is never worded as reassurance when a protection is off.",
+      "Each row shows its state with an icon and a word: On, Off, Passive or Unknown. Colour is never the only signal. An off row carries its reason in words: turned off by the user, set by policy, or taken over by a named security product.",
+      "Selecting a row shows the evidence behind the verdict: the Defender value that was read, the policy key if one is present, and the product the Security Center lists.",
+      "Refresh is the accent button and re-reads everything from the system. The status bar says how old the definitions are and when they were last read, in words.",
+      "Remove exclusion is beside it, acts on the selected exclusion on the Exclusions screen and asks for confirmation naming the path, extension or process. It is disabled with a tooltip on the Status screen.",
+      "Adding or removing an exclusion is refused by name when the process is not elevated, before anything is changed, and the lists stay readable. When tamper protection or a policy refuses a change, the tool says so and shows the state it read back.",
+      "The tool has no button that turns a protection off and none that tries to get round tamper protection."
+    ],
+    "cut": "The tool is new and has no earlier window, so nothing is cut from an original. It has no menus, no splash, no animations and no donate strip, as no tool of the suite does. Preferences and About are the framework's pages hosted in the sidebar, and the plan records them as their own sections."
+  },
+  "readme": {
+    "lead": "Defender Manager shows what Microsoft Defender is doing and what it has been told to ignore.",
+    "what": [
+      "Windows spreads Defender's state over several pages of the Settings app, and its exclusion list is three levels deep. Defender Manager puts it on one screen: whether real-time protection, cloud protection and tamper protection are on, how old the definitions are, and, when a protection is off, why. It tells apart three causes: the user turned it off, a policy turned it off, or another security product has taken over and Defender has gone passive.",
+      "It lists every exclusion, whether a path, an extension or a process, and flags the ones that look wrong, such as a whole drive, a user profile root or a system folder, with the reason. Before an exclusion is added it says plainly that the excluded path will not be scanned, and it can undo a change. It never switches protection off and never tries to get round tamper protection."
+    ],
+    "new_intro": "Defender Manager is a new tool, not a port, so everything in it is new.",
+    "new": [
+      [
+        "It says why.",
+        "A protection that is off is shown with its cause: the user's choice, a policy, or another security product that took over."
+      ],
+      [
+        "It flags exclusions that look wrong.",
+        "An exclusion that covers a whole drive, a user profile root or a system directory is marked with the reason it is a risk."
+      ],
+      [
+        "It states what an exclusion gives up.",
+        "The confirmation before an exclusion is added says that the excluded path will not be scanned."
+      ],
+      [
+        "It can undo.",
+        "A removed exclusion can be put back and an added one removed, from the recorded prior state."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new tool: status, exclusions, confirmation, undo, release",
+    "goal": "Defender Manager ships as a complete, standalone C++ tool that reports what Microsoft Defender is doing: real-time, cloud and tamper protection and the age of the definitions, with the reason for every protection that is off told apart as the user's choice, a policy, or another security product having taken over. It lists the exclusions, flags the ones that look wrong with the reason, and adds or removes one exclusion through Defender's own interface after stating what it gives up, with the result read back and the change undoable. It never disables protection and never tries to get round tamper protection, and a test proves it.",
+    "current_state": "Nothing exists yet: this is a new tool and no code, no original and no reference material exist for it. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan text of the Resolute repository in `docs/origin/resolute-D05-T07-s3.md`, which describes it alongside a wider security status tool (only the Defender items apply here: the firewall, UAC, SmartScreen and Core Isolation item does not). The design rests on how Windows exposes Defender: the `MSFT_MpComputerStatus` and `MSFT_MpPreference` classes in `root\\Microsoft\\Windows\\Defender`, which the `Get-MpComputerStatus`, `Get-MpPreference`, `Add-MpPreference` and `Remove-MpPreference` cmdlets read and write; exclusions are hidden from non-administrators by default; tamper protection blocks changes made from outside Windows Security; policy lives under `Software\\Policies\\Microsoft\\Windows Defender` and wins over the user's setting; another antivirus appears in the `AntiVirusProduct` list in `root\\SecurityCenter2` and puts Defender into passive mode; `Update-MpSignature` refreshes definitions. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s3.md`: the plan section as it stood in the Resolute repository. Only the Defender Manager part applies; the wider Security Status part is a different tool.",
+      "The `MSFT_MpComputerStatus` and `MSFT_MpPreference` classes in `root\\Microsoft\\Windows\\Defender`, and the `AntiVirusProduct` class in `root\\SecurityCenter2`: what the engine reads.",
+      "The policy keys under `HKLM\\Software\\Policies\\Microsoft\\Windows Defender`, including its `Exclusions` subkeys: where a policy-set protection state or exclusion is recorded."
+    ],
+    "outcome": [
+      "`DefenderManager.exe` shows real-time, cloud and tamper protection and the definition age, verified against the system, and for each protection that is off says whether the user, a policy or another security product is the cause.",
+      "Every exclusion renders with its kind and what covers it, those that cover a whole drive, a user profile root or a system directory are flagged with the reason, and an added or removed exclusion is read back, refused by name when not elevated, and undoable.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Status screen, where a person reads one verdict and one row per protection, and the Exclusions screen, where each exclusion is a row. Reporting and audit are the Activity section, the trail of every exclusion change and its read-back. Settings are the framework's pages. Permissions anchor on the engine, where reading the exclusions and any change are refused by name when the process is not elevated, and where tamper protection or policy refusing a change is reported. Reverse anchors on the undo section: a removed exclusion is put back and an added one removed from the recorded prior state, and the tool never offers a reverse of protection being switched off because it never switches it off.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Defender Status and Exclusions",
+      "intro": "The tool's whole system effect and everything it knows, independent of any window: reading the protection status and why each part is on or off, reading the exclusions, judging an exclusion against a data list of dangerous shapes, and adding or removing one exclusion through Defender's own interface with the result read back. Reading the exclusions and any change are refused by name when the process is not elevated. The engine never turns a protection off: it has no code path that writes a protection setting.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the Defender classes, policy keys and dangerous shapes as data in `src/core/DefenderSources.h` and `src/core/RiskyShapes.h`. Done when: every class, key and shape the tool reads or judges is stated once, with the reason it is there.",
+        "Implement status, cause, exclusions, judgement and change in `src/core/DefenderStatus.cpp`, `src/core/WhyOff.cpp`, `src/core/Exclusions.cpp` and `src/core/ExclusionChange.cpp` against a source interface the tests can replace. Done when: the unit tests pass against fixtures with no Defender present."
+      ],
+      "items": [
+        "Implement `ReadStatus()` in `src/core/DefenderStatus.cpp` reading `RealTimeProtectionEnabled`, `IsTamperProtected`, `AMRunningMode`, `AntivirusSignatureLastUpdated` and `AntivirusSignatureAge` from `MSFT_MpComputerStatus`, and `MAPSReporting` from `MSFT_MpPreference`, through an interface a fixture can replace. Done when: a fixture returns real-time, cloud and tamper state and the definition age in days, and a machine where the class is missing returns Unknown for each, not Off. Cheaper substitute: running `Get-MpComputerStatus` and parsing its text, which cannot be replaced for a test and breaks with the console language.",
+        "Implement `ExplainOff()` in `src/core/WhyOff.cpp` attributing an off protection to one cause in a fixed order: another product when `AMRunningMode` is passive and `root\\SecurityCenter2` lists an active antivirus that is not Defender, then policy when `Software\\Policies\\Microsoft\\Windows Defender` holds the matching `Disable` value, then the user's choice when `MSFT_MpPreference` is off and neither of the others applies, else unknown. Done when: a fixture of each of the three causes is attributed correctly and carries the evidence it used (the product name, the policy value, or the preference). Cheaper substitute: reporting only that a protection is off, which leaves the person to guess who did it.",
+        "Implement `ReadExclusions()` in `src/core/Exclusions.cpp` reading `ExclusionPath`, `ExclusionExtension` and `ExclusionProcess` from `MSFT_MpPreference` and the `Exclusions` subkeys of the policy key, and marking each as set by policy, set locally, or added by this tool from its own activity record. Done when: a fixture with a path, an extension and a process each renders with its kind and its origin, and a policy-set path is attributed to the policy. Cheaper substitute: listing the paths only, which drops two of the three kinds.",
+        "Refuse `ReadExclusions()` by name when the process is not elevated, instead of returning the empty list Defender gives a non-administrator. Done when: an unelevated run reports the refusal and a fixture with exclusions never reads as having none. Cheaper substitute: showing the empty list, which reads as a clean machine when the list was only hidden.",
+        "Implement `JudgeExclusion()` in `src/core/Judge.cpp` matching a path, extension or process against the shapes in `src/core/RiskyShapes.h`: a whole drive, a user profile root, `C:\\Users`, `C:\\Windows` and `System32`, a Program Files root, a bare wildcard, executable and script extensions, and script hosts as processes, returning the shape matched and the reason in words. Done when: a fixture of each shape is flagged with its reason and `D:\\Build\\cache` is not. Cheaper substitute: a hardcoded `if` chain in the code, which hides the list from review and from the tests.",
+        "Implement `AddExclusion(kind, value)` and `RemoveExclusion(kind, value)` in `src/core/ExclusionChange.cpp` through the `Add` and `Remove` methods of `MSFT_MpPreference`, the same interface `Add-MpPreference` and `Remove-MpPreference` call, then reading the list back. Done when: a fixture add is present and a fixture remove is absent on read-back, and a mismatch is returned as kind, value, expected and found. Cheaper substitute: checking only the return code of the call, which succeeds while tamper protection discards the change.",
+        "Refuse `AddExclusion` and `RemoveExclusion` by name when the process is not elevated, before any call, with one activity record, and when the read-back shows the change was not applied report whether tamper protection or a policy is the cause. Done when: an unelevated run, a tamper-protected fixture and a policy-controlled fixture each return a different named refusal and the fixture list is unchanged. Cheaper substitute: letting the call fail with a code, which tells the person nothing they can act on.",
+        "Cover every path in `tests/defender_test.cpp` with replaceable sources. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L defender` passes, and fails when a cause rule, a shape or a refusal is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L defender` passes, including the three off causes, the flagged shapes, the unelevated refusal and the tamper and policy refusals, and fails when one of those rules is removed.",
+      "commit": "core: defender status, causes, exclusions and verified changes"
+    },
+    "enhancements": [
+      {
+        "title": "Flag Exclusions That Look Wrong",
+        "intro": "Windows lists exclusions without comment, and the exclusion list is where malware hides. This section is the Exclusions screen: each exclusion as a row with its kind, what it covers and where it came from, and a flag with the reason on the ones the engine judges dangerous. It consumes the engine's list and judgement and adds no rule of its own.",
+        "surface": {
+          "fidelity": "the Exclusions section and its flag, against `DESIGN.md` section 2.",
+          "job": "a person sees every exclusion and which of them leave the computer open. Consumer: the engine's exclusion list and judgement, read back.",
+          "treatment": "one row per exclusion with an icon and the word Flagged or Ordinary, and the reason in words on the row. Cheaper substitute that fails the checkpoint: a red tint on the row, which shows no reason and is lost on a monochrome screen."
+        },
+        "build": [
+          "Build the screen in `src/ui/ExclusionsView.cpp`. Done when: it lists paths, extensions and processes with kind, coverage and origin.",
+          "Show the flag and its reason. Done when: a whole-drive fixture, a user profile root fixture and a system directory fixture each show a flag with their own reason."
+        ],
+        "items": [
+          "Build `src/ui/ExclusionsView.cpp` from the SDK's list control, one row per exclusion with its kind, what it covers and what added it. Done when: a fixture with a path, an extension and a process shows three rows with the right kind. Cheaper substitute: a private list control, which the contract forbids.",
+          "Show the flag with an icon, the word Flagged and the reason from `JudgeExclusion()` on the row, and sort flagged rows first. Done when: a drive root, a profile root and `C:\\Windows` each show their reason in words and an ordinary path shows none.",
+          "Show the unelevated refusal on the screen in place of the list, naming what is needed. Done when: an unelevated run shows the refusal and no rows, and the Status screen still renders. Cheaper substitute: an empty list, which reads as no exclusions.",
+          "Make Remove exclusion act on the selected row after a confirmation naming it, through `RemoveExclusion()`, and re-read the list afterwards. Done when: the row disappears only when the read-back no longer holds it.",
+          "Cover it in `tests/exclusions_view_test.cpp` reading the rows through UI Automation. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L exclusions` passes, and fails when a flag loses its reason."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L exclusions` passes: the three exclusion kinds render and the whole-drive, user profile and system directory fixtures are each flagged with their reason.",
+        "commit": "ui: the Exclusions screen, flagging what looks wrong"
+      },
+      {
+        "title": "What an Exclusion Gives Up",
+        "intro": "An exclusion is not a neutral setting: it tells Defender never to look at something, and an attacker uses exactly that. Before an exclusion is added the confirmation says so in plain words, naming what will not be scanned, and adds a stronger warning when the engine flags the shape.",
+        "surface": {
+          "fidelity": "the add confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person adds an exclusion knowing what protection it removes. Consumer: the Defender exclusion list, read back after the add.",
+          "treatment": "a confirmation that states the excluded path will not be scanned and that anything in it, malware included, will not be detected there, with the confirm button labelled with the action. Cheaper substitute that fails the checkpoint: a generic Are you sure dialog, which presents the change as a neutral setting."
+        },
+        "build": [
+          "Write the confirmation text in `src/core/Consent.cpp`. Done when: it names the path, extension or process and says it will not be scanned.",
+          "Wire Add exclusion in `src/ui/ExclusionsView.cpp` through the framework's message surface. Done when: no exclusion is added without the confirmation having been shown."
+        ],
+        "items": [
+          "Implement `ConsentText(kind, value)` in `src/core/Consent.cpp` returning the confirmation: for a path, that the path and everything under it will not be scanned; for an extension, that files with it will not be scanned anywhere; for a process, that what it opens or writes will not be scanned. Done when: a test finds the words not scanned and the value itself in the text for each kind. Cheaper substitute: one generic sentence for all three kinds, which understates an extension.",
+          "Add to the text a second paragraph, taken from `JudgeExclusion()`, when the value is flagged, stating the reason in words. Done when: a whole-drive fixture shows both paragraphs and an ordinary path shows one.",
+          "Add an Add exclusion action in `src/ui/ExclusionsView.cpp` that shows the text through the framework's message surface before calling `AddExclusion()`, with the default button on Cancel. Done when: cancelling leaves the list unchanged and confirming adds it, read back. Cheaper substitute: a private dialog, which the contract forbids.",
+          "Record the confirmation shown and the choice in the Activity record. Done when: an add leaves one record naming the value and that the warning was shown.",
+          "Cover it in `tests/consent_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L consent` passes, and fails when the words not scanned are removed from the text."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L consent` passes: every kind of exclusion states that it will not be scanned before it is added, and a flagged shape adds its reason.",
+        "commit": "feature: the confirmation says what an exclusion gives up"
+      },
+      {
+        "title": "Undo an Exclusion Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before an exclusion is added or removed, the prior state of the exclusion lists is recorded, so Undo puts back a removed exclusion and takes away an added one, and does not remove an exclusion that was already there before the add. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo action and its result, against `DESIGN.md` section 2.",
+          "job": "a person reverses the last exclusion change. Consumer: the Defender exclusion list, compared with the record.",
+          "treatment": "the recorded prior state restored entry by entry and read back. Cheaper substitute that fails the checkpoint: an undo that always removes the last value typed, which deletes an exclusion that was there before."
+        },
+        "build": [
+          "Record the prior state through the repair contract in `src/core/ExclusionChange.cpp`. Done when: a record exists on disk before the first change.",
+          "Wire Undo in `src/ui/ExclusionsView.cpp`. Done when: add then undo and remove then undo each leave the list as it was."
+        ],
+        "items": [
+          "Record the three exclusion lists through the repair contract's restore record before any add or remove. Done when: a test finds the record on disk before the first change is made. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record entry by entry and reading the lists back. Done when: add then undo, and remove then undo, each leave the three lists equal to before, asserted, including an add of a value that was already present.",
+          "Refuse Undo by name when a policy now controls the list or tamper protection blocks the change, reporting the read-back. Done when: a policy fixture and a tamper-protected fixture each return a named refusal and the list is unchanged.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one change.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one entry is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: add then undo and remove then undo both leave the exclusion lists as they were.",
+        "commit": "feature: undo puts back what the exclusion list had"
+      },
+      {
+        "title": "Proof It Never Disables Protection",
+        "intro": "The tool's promise is that it cannot be used to switch Defender off or to get round tamper protection. A promise in a document is not enough, so a test searches the source for any call that writes a protection setting and fails the build when it finds one. It consumes the source tree and adds no behaviour to the tool.",
+        "build": [
+          "Write the forbidden list as data in `tests/forbidden_calls.txt`. Done when: it names every way to turn protection off the tool must never contain, one per line, each with the reason.",
+          "Write the scan in `tests/never_disables_test.cpp`. Done when: it reads every file under `src/` and fails naming file, line and call for each match."
+        ],
+        "items": [
+          "Write `tests/forbidden_calls.txt` listing `Set-MpPreference`, the `Set` method of `MSFT_MpPreference`, the names `DisableRealtimeMonitoring`, `DisableAntiSpyware`, `DisableBehaviorMonitoring`, `DisableIOAVProtection` and `TamperProtection` in any write, registry write calls (`RegSetValueEx`, `RegSetKeyValue`, `RegDeleteValue`, `RegDeleteKey`) in `src/core/`, stopping or disabling the `WinDefend` service, and `Add-MpPreference` with `-DisableRealtimeMonitoring`. Done when: each entry carries the reason and a test finds none without one.",
+          "Implement the scan in `tests/never_disables_test.cpp` over `src/` excluding only the tests and the list itself. Done when: it passes on the current source and reports file, line and entry on a violation. Cheaper substitute: a search in a review checklist, which no build runs.",
+          "Prove the scan can fail with a planted fixture `tests/fixtures/violation.cpp` that calls `Set-MpPreference -DisableRealtimeMonitoring $true`. Done when: the test run against the fixture reports a match and the run against `src/` reports none.",
+          "Check that the one place that changes Defender, `src/core/ExclusionChange.cpp`, calls only the exclusion parameters. Done when: a test asserts the set of parameter names passed to `Add` and `Remove` is `ExclusionPath`, `ExclusionExtension` and `ExclusionProcess` and nothing else.",
+          "Add the label to the build gate. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L never` passes in `pwsh scripts/check-all.ps1`, and fails when a forbidden call is added to `src/`."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L never` passes on the source, fails on the planted violation fixture, and is part of `pwsh scripts/check-all.ps1`.",
+        "commit": "test: prove the tool never disables protection"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A fixture of each off cause (user, policy, another product) is attributed correctly, the exclusion kinds render with their origin, and a whole-drive, a user profile and a system directory exclusion are each flagged with a reason.",
+      "An unelevated run, a tamper-protected fixture and a policy-controlled fixture are each refused by name; an exclusion states that it will not be scanned before it is added; add then undo and remove then undo leave the lists as they were; the never-disables test passes on the source and fails on its planted violation.",
+      "On a real machine the tool reads the status and the exclusions, says why when a protection is off, adds and removes a harmless test exclusion with the read-back, and undoes it, in light and dark, by keyboard alone."
+    ]
+  }
+}

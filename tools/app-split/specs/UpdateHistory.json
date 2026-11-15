@@ -1,0 +1,250 @@
+{
+  "name": "UpdateHistory",
+  "slug": "updatehistory",
+  "display": "Update History",
+  "job": "it lists every Windows update that was installed, with its date, result and what it changed, and uninstalls a chosen one where Windows allows it, saying plainly when Windows does not.",
+  "tagline": "See every Windows update that was installed, and remove one that broke something",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Indigo blue",
+    "light": "#A5B4FC",
+    "dark": "#4F46E5",
+    "social_ground": "#13123A",
+    "social_muted": "#CFD3FA"
+  },
+  "icon": {
+    "idea": "A calendar with an install arrow on it: what was installed, and when.",
+    "points": [
+      "The icon is free-standing with no tile behind it: a rounded calendar with two rings at the top.",
+      "The calendar is Indigo blue and the down arrow is Indigo blue light.",
+      "The small drawing, used below 40 pixels, drops the rings and thickens the arrow."
+    ],
+    "large": "<rect x=\"10\" y=\"16\" width=\"76\" height=\"70\" rx=\"12\" fill=\"#4F46E5\"/><path d=\"M30 8 V24 M66 8 V24\" fill=\"none\" stroke=\"#4F46E5\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M48 38 V66 M35 55 L48 68 L61 55\" fill=\"none\" stroke=\"#A5B4FC\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<rect x=\"8\" y=\"10\" width=\"80\" height=\"78\" rx=\"13\" fill=\"#4F46E5\"/><path d=\"M48 28 V64 M31 50 L48 67 L65 50\" fill=\"none\" stroke=\"#A5B4FC\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "History",
+        "One row per update: date, title, KB number, result, removable or not"
+      ],
+      [
+        "Details",
+        "The selected update: what it is, its error in words, where it is documented"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every update Windows installed or tried to install, finds the one that broke something and removes it where Windows allows.",
+    "primary": "Uninstall",
+    "secondary": "Refresh",
+    "rows": [
+      [
+        "Installed update",
+        "Installed, can be uninstalled"
+      ],
+      [
+        "Servicing stack update",
+        "Installed, permanent"
+      ],
+      [
+        "Failed install",
+        "Failed, with its error code"
+      ],
+      [
+        "Uninstalled update",
+        "Removed, restart pending or done"
+      ],
+      [
+        "Attempted but absent",
+        "Reported installed, not found on the machine"
+      ]
+    ],
+    "status": "12 installed, 2 failed, 1 removed",
+    "notes": [
+      "Each row shows its result with an icon and a word (installed, failed or removed), never by colour alone, beside its date, title and KB number.",
+      "A final column says whether the update can be uninstalled: yes, no because it is permanent, or not known, each with a word and an icon.",
+      "Uninstall acts on the selected row and is the accent button. For a permanent update it is disabled, and the Details section states the reason in plain words.",
+      "Before the user commits, a confirmation says that the update is put back by Windows Update itself and that a restart is usually needed. Refresh re-reads the history and changes nothing.",
+      "Options in the content header filter by date and by result. The Details section for a failed update shows its error code in words and a link to where Windows documents it.",
+      "The status bar counts the rows in words, for example \"12 installed, 2 failed, 1 removed\", and says when a restart is pending.",
+      "When the process is not elevated, Uninstall is refused by name and the reason is shown, while reading the history still works."
+    ],
+    "cut": "There is no original window to compare with, because this is a new tool and nothing is ported. The window has no menus, no splash, no animations and no donate strip: the suite's tool window has none of them, and the plan records that no such control is built."
+  },
+  "readme": {
+    "lead": "Update History shows every Windows update that was installed on this PC and removes one that broke something.",
+    "what": [
+      "Windows keeps the story of its updates in several places that do not agree. Update History reads the update history, which records every attempt with its date and result, and the installed packages, which record what is actually on the machine. It puts the two side by side, so a failed install is visible as failed and an update that was reported installed but is missing is noticed.",
+      "When an update causes trouble, Update History offers to uninstall it through Windows' own mechanism and reads the state back to confirm. Some updates cannot be removed, such as servicing stack updates and some cumulative updates, and the tool says so plainly instead of offering a button that fails. An uninstall usually needs a restart."
+    ],
+    "new_intro": "Update History is a new tool, written in C++ for the suite, and it works on the same terms as the others.",
+    "new": [
+      [
+        "Shows what happened, not just what was attempted.",
+        "The history and the installed packages are reconciled, so each row says installed, failed or removed."
+      ],
+      [
+        "Explains a failed update.",
+        "The error code is shown in plain words from a table the tool carries, with a pointer to where Windows documents it."
+      ],
+      [
+        "Says plainly when an update cannot be removed.",
+        "A permanent update has its Uninstall disabled and the reason written beside it."
+      ],
+      [
+        "Hands off to Update Blocker.",
+        "After an uninstall, when Update Blocker is installed, it offers to stop the update from coming back."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Update History ships as a complete, standalone C++ tool: it lists every installed or attempted Windows update with its date, result and KB number, reconciles the update history with the packages actually installed, explains a failed install's error code in words, uninstalls a chosen update through Windows' own mechanism with the state read back, and says plainly when Windows will not allow a removal.",
+    "current_state": "Nothing exists yet: no code, no original and no AutoIt source, because this is a new tool and nothing is ported. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and in `docs/origin/` one plan section as it stood in the Resolute repository, which covers Update Blocker and Update History together; only its history and uninstall lines concern this tool (list updates with title, KB number and date, show history with what each update changed, and offer an uninstall that is verified by reading the update state back and that says so when Windows will not allow it). It requires elevation to uninstall. The SDK's framework, repair contract and chart control, which this tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s1.md`: the plan section the tool comes from; take only its history and uninstall lines, since it also describes the sibling Update Blocker.",
+      "Windows' own sources of update state: the update history from `IUpdateSearcher.QueryHistory`, the installed packages from `Win32_QuickFixEngineering` and `DISM /Online /Get-Packages`, and the removal commands `wusa /uninstall /kb:<number>` and `DISM /Online /Remove-Package`.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the tool's identity and window sections, and the suite's design contract."
+    ],
+    "outcome": [
+      "`UpdateHistory.exe` lists every update with date, title, KB number and result, reconciled against the installed packages, and the list matches what Windows Update shows for the same machine.",
+      "A failed install shows its error code in words, a permanent update says why it cannot be removed, and an uninstall is verified by reading the update state back and is refused by name when the process is not elevated.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, language pack, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the History screen, where a person finds an update by its date, title, KB number and result. Reporting and audit are the Activity section, which records each refresh and each uninstall with its outcome. Settings are the framework's pages. Permissions anchor on the engine, where an uninstall without elevation is refused by name before any command runs. Reverse does not apply: an uninstalled update is put back by Windows Update itself, so the tool says so before the user commits, and reading the history changes nothing.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "History and Uninstall Engine",
+      "intro": "The tool's whole system effect and everything it reads: the update history, the installed packages, their reconciliation, the table that explains error codes, and the uninstall through Windows' own mechanism with the state read back. It has no window and runs under tests against recorded fixtures.",
+      "needs": "windows-host",
+      "build": [
+        "Implement reading and reconciling in `src/core/History.cpp`, `src/core/Packages.cpp` and `src/core/Reconcile.cpp`. Done when: the unit tests pass against recorded fixtures of both sources.",
+        "Implement the error table and the uninstall in `src/core/ErrorTable.cpp` and `src/core/Uninstall.cpp`. Done when: a fixture failed install is explained in words and an uninstall is refused when unelevated."
+      ],
+      "items": [
+        "Read the update history in `src/core/History.cpp` through `IUpdateSearcher.QueryHistory`, keeping for each entry its date, title, KB number, operation (installation or uninstallation) and result code (succeeded, succeeded with errors, failed, aborted, in progress). Done when: a test over a recorded fixture returns every entry with those fields and a result in words.",
+        "Read the installed packages in `src/core/Packages.cpp` from `Win32_QuickFixEngineering` and `DISM /Online /Get-Packages`, keeping the KB number, the package name and whether the package is permanent. Done when: a recorded fixture of each returns the packages and marks servicing stack updates as permanent.",
+        "Reconcile the two in `src/core/Reconcile.cpp` so each update is installed, failed or removed, and an update the history calls successful but the packages do not contain is reported as absent, not installed. Done when: a fixture with one successful install, one failed install, one later uninstalled and one missing package yields exactly those four states.",
+        "Explain a failed install in `src/core/ErrorTable.cpp` from a data table in `src/core/ErrorCodes.h` that maps an HRESULT to a sentence and to the page where Windows documents it, with a plain 'unknown error' sentence for a code not in the table. Done when: a test shows a known code returns its sentence and an unknown code returns the fallback with the code printed. Cheaper substitute: printing the raw hexadecimal code, which explains nothing.",
+        "Decide in `src/core/Uninstall.cpp` whether an update can be removed (not a servicing stack update, not marked permanent, still present) and return the reason when not. Done when: a test over the fixtures returns removable for an ordinary update and a named reason for a permanent one. Cheaper substitute: always offering the uninstall and letting Windows fail, which is the failure this tool exists to avoid.",
+        "Uninstall a chosen update in `src/core/Uninstall.cpp` through `wusa /uninstall /kb:<number>` or `DISM /Online /Remove-Package`, whichever applies to the update's kind, and then read the installed packages again to confirm it is gone or that a restart is pending. Done when: a test against a disposable package fixture shows the state read back as removed or restart pending, and a command that exits cleanly while the package remains is reported as not removed. Cheaper substitute: trusting the exit code of the command.",
+        "Refuse an uninstall by name when the process is not elevated, before any command runs, with one activity record. Done when: an unelevated test run reports the refusal and starts no process. Cheaper substitute: running the command and reporting its access-denied exit.",
+        "Refuse an uninstall of a permanent update with its reason, and report a restart as pending when the state says so, in `src/core/Uninstall.cpp`. Done when: the reasons and the pending state are each asserted in `tests/uninstall_test.cpp`.",
+        "Cover every path in `tests/history_test.cpp` and `tests/uninstall_test.cpp` with fixtures. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when one reconciliation rule is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, including the failed, absent, permanent, unelevated and read-back cases, and fails when one reconciliation rule is changed.",
+      "commit": "core: history read, reconciled with packages, uninstall verified by read-back"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Explain a Failed Update",
+        "intro": "A failed install is shown with its error code in words and a pointer to where Windows documents it, in the Details section, so a person learns why and not only that it failed.",
+        "surface": {
+          "fidelity": "the Details section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person sees why an update failed. Consumer: the Details text, compared with the error table.",
+          "treatment": "the code, a plain sentence and a link to the documentation, in that order. Cheaper substitute that fails the checkpoint: showing only the hexadecimal code."
+        },
+        "build": [
+          "Build the Details screen in `src/ui/DetailsView.cpp` bound to the selected row. Done when: selecting a row shows what the update is.",
+          "Show the error explanation for a failed row. Done when: the sentence and the documentation link appear for a failed update and are absent for an installed one."
+        ],
+        "items": [
+          "Create `src/ui/DetailsView.cpp` showing the selected update's title, KB number, date, result and kind. Done when: selecting another row changes every field.",
+          "Show for a failed row its error code, the sentence from the engine's table and the documentation link, through the framework's link control. Done when: a failed fixture row shows all three and an installed row shows none. Cheaper substitute: a private text box with the code only.",
+          "Say 'unknown error' with the code when the table has no entry. Done when: a row with an unlisted code shows that fallback.",
+          "Cover it in `tests/details_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L details` passes, and fails when the sentence is dropped from a failed row."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L details` passes: a failed row explains its code in words and an installed row has no error text.",
+        "commit": "feature: a failed update's error explained in words"
+      },
+      {
+        "title": "Cannot Be Uninstalled, Said Plainly",
+        "intro": "Windows will not remove servicing stack updates and some cumulative updates. The tool says so before the person tries, with the reason, and never shows a working-looking button that fails.",
+        "surface": {
+          "fidelity": "the Uninstall button and the confirmation, against `DESIGN.md` section 2.",
+          "job": "a person knows before acting whether an update can be removed and what happens when it is. Consumer: the button state and the confirmation text, read back.",
+          "treatment": "a disabled button with the reason beside it for a permanent update, and a confirmation for the rest that says the update is put back by Windows Update itself and that a restart is usually needed. Cheaper substitute that fails the checkpoint: leaving the button enabled and showing Windows' error afterwards."
+        },
+        "build": [
+          "Bind the Uninstall button to the engine's removable decision in `src/ui/HistoryView.cpp`. Done when: the button is disabled for a permanent row with the reason shown.",
+          "Add the confirmation in `src/ui/UninstallDialog.cpp`. Done when: it names the update, the restart and the fact that Windows Update may put it back."
+        ],
+        "items": [
+          "Disable Uninstall for a permanent row and show the engine's reason beside it. Done when: a servicing stack fixture row shows the button disabled and the reason in words. Cheaper substitute: a tooltip that only appears on hover, which a keyboard user never sees.",
+          "Show a confirmation before an uninstall naming the update, saying that a restart is usually needed and that Windows Update itself puts an uninstalled update back, through the framework's message surface. Done when: the confirmation appears for a removable row and cancelling runs no command. Cheaper substitute: a private dialog.",
+          "After the uninstall, show the read-back state in words: removed, restart pending or not removed. Done when: each of the three states from the engine fixtures is shown.",
+          "Refuse when not elevated, showing the refusal by name in the window and one Activity line. Done when: an unelevated driven run shows the refusal and runs nothing.",
+          "Cover it in `tests/uninstall_window_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L uninstall-ui` passes, and fails when a permanent row's button is left enabled."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L uninstall-ui` passes: a permanent row is disabled with its reason, a removable row confirms first, and an unelevated run is refused by name.",
+        "commit": "feature: an update that cannot be removed says so, with the reason"
+      },
+      {
+        "title": "Hand Off to Update Blocker",
+        "intro": "After an uninstall, Windows Update may install the same update again. When the sibling tool Update Blocker is installed, this tool offers to hand the update to it. The two tools never depend on each other at run time: the offer appears only when the other tool is found.",
+        "surface": {
+          "fidelity": "the offer after an uninstall, against `sdk/DESIGN.md` section 11.",
+          "job": "a person who just removed an update can stop it coming back in one step. Consumer: the launch of Update Blocker with the KB number, observed.",
+          "treatment": "a short offer naming the update, shown only when Update Blocker is installed, that opens that tool with the KB number. Cheaper substitute that fails the checkpoint: a button that is always shown and fails when the other tool is missing."
+        },
+        "build": [
+          "Detect whether Update Blocker is installed in `src/core/Handoff.cpp`. Done when: a test with and without the tool present returns each answer.",
+          "Show the offer after a successful uninstall in `src/ui/UninstallDialog.cpp`. Done when: it appears only after a removal read back as removed or restart pending."
+        ],
+        "items": [
+          "Detect Update Blocker in `src/core/Handoff.cpp` by its registered location, never by a hardcoded path. Done when: a test with a fixture registration finds it and one without reports it absent.",
+          "Offer the hand-off after an uninstall read back as removed or restart pending, naming the update. Done when: the offer is absent after a failed uninstall and when the other tool is absent. Cheaper substitute: always showing the offer.",
+          "Open Update Blocker with the KB number as its argument when accepted, and record one Activity line. Done when: a driven test sees the launch with that argument and the line in Activity.",
+          "Cover it in `tests/handoff_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes, and fails when the offer is shown with the tool absent."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes: the offer appears only after a removal and only when Update Blocker is installed.",
+        "commit": "feature: offer to hand an uninstalled update to Update Blocker"
+      },
+      {
+        "title": "Filter by Date and Result",
+        "intro": "A long history is hard to read, so the History screen can be narrowed by a date range and by result (installed, failed or removed) without changing what the tool reads.",
+        "surface": {
+          "fidelity": "the History screen's filter controls, against `sdk/DESIGN.md` section 16.",
+          "job": "a person narrows the list to a period or to failures. Consumer: the visible rows compared with the engine's records.",
+          "treatment": "a date range and a result choice in the content header, with the count shown in the status bar in words. Cheaper substitute that fails the checkpoint: hiding rows by colour or by scrolling to a position."
+        },
+        "build": [
+          "Add the filter to the engine's list in `src/core/Filter.cpp`. Done when: a test returns only the records in range with the chosen results.",
+          "Add the controls in `src/ui/HistoryView.cpp`. Done when: changing a control changes the rows and the status text."
+        ],
+        "items": [
+          "Implement the filter in `src/core/Filter.cpp` over the reconciled records by date range and by result. Done when: a fixture of mixed records returns exactly the expected set for each combination. Cheaper substitute: filtering in the view after drawing every row.",
+          "Add the date range and result controls to the content header in `src/ui/HistoryView.cpp` through the SDK's controls. Done when: choosing Failed shows only failed rows and the status bar says how many.",
+          "Keep the selection and the filter after a Refresh. Done when: a driven test refreshes with a filter set and finds the filter unchanged.",
+          "Cover it in `tests/filter_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L filter` passes, and fails when the date bound is made exclusive."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L filter` passes: every date and result combination returns the expected rows.",
+        "commit": "feature: filter the history by date and result"
+      }
+    ],
+    "no_reverse": "an uninstalled update is put back by Windows Update itself; the tool says so before the user commits, and reading the history changes nothing",
+    "verification": [
+      "The History list matches Windows Update's own list for the same machine, including a failed install and an update missing from the packages.",
+      "A removable update is uninstalled and read back, a permanent one is refused with its reason, and an unelevated run is refused by name, each driven on a real machine.",
+      "The window works in light and dark, by keyboard alone, and the release zip runs from an empty folder."
+    ]
+  }
+}

@@ -1,0 +1,247 @@
+{
+  "name": "DisplayInfo",
+  "slug": "displayinfo",
+  "display": "Display Info",
+  "job": "it lists every connected monitor with its resolution, refresh rate, connection type, colour profile and identity read from the monitor's own EDID data, in plain words, and changes nothing.",
+  "tagline": "Everything about your monitors, in plain words",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Sky",
+    "light": "#7DD3FC",
+    "dark": "#0284C7",
+    "social_ground": "#082436",
+    "social_muted": "#C6E4F3"
+  },
+  "icon": {
+    "idea": "Two monitors, one in front of the other: every connected display.",
+    "points": [
+      "Free-standing, with no tile behind it.",
+      "Two rounded screens overlap, with a short stand under the front one; the back screen is Sky light and the front one Sky.",
+      "The small drawing, used below 40 pixels, drops the stand."
+    ],
+    "large": "<rect x=\"6\" y=\"16\" width=\"50\" height=\"38\" rx=\"8\" fill=\"#7DD3FC\"/><rect x=\"36\" y=\"34\" width=\"54\" height=\"40\" rx=\"9\" fill=\"#0284C7\"/><path d=\"M52 86 H74\" fill=\"none\" stroke=\"#0284C7\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<rect x=\"4\" y=\"12\" width=\"54\" height=\"42\" rx=\"9\" fill=\"#7DD3FC\"/><rect x=\"34\" y=\"38\" width=\"58\" height=\"46\" rx=\"10\" fill=\"#0284C7\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Displays",
+        "Each monitor as a row: name, resolution, refresh rate, connection, scaling, main display"
+      ],
+      [
+        "Details",
+        "The selected monitor's identity, size, colour profile, HDR and supported modes"
+      ],
+      [
+        "Activity",
+        "What the tool read, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every connected monitor and how it is actually running, in words, without opening three Windows dialogs.",
+    "primary": "Refresh",
+    "secondary": "Copy summary",
+    "rows": [
+      [
+        "Main display",
+        "Resolution, refresh rate, HDMI, scaling 150 percent, main"
+      ],
+      [
+        "Second monitor",
+        "Resolution, refresh rate, DisplayPort, scaling, not main"
+      ],
+      [
+        "Laptop screen",
+        "Internal connection, running at its native resolution"
+      ],
+      [
+        "Monitor behind a dock",
+        "Some values not reported by this connection"
+      ]
+    ],
+    "status": "3 displays, 1 below its best",
+    "notes": [
+      "Each monitor is one row with its name, resolution, refresh rate, connection, scaling and a word saying whether it is the main display; the main display is marked with an icon and the word Main, not by colour alone.",
+      "A row whose monitor runs below its native resolution or highest refresh rate shows a warning icon and the words Not at its best, with the usual cause in the Details screen.",
+      "A value Windows does not report, for example through a dock or a remote session, reads Not reported, never a guess or a blank.",
+      "Refresh is the primary action: it re-reads every display and the rows update from that read. Copy summary puts a plain text summary of all monitors on the clipboard.",
+      "There is no undo and no confirmation, because the tool reads the display configuration and changes nothing.",
+      "Selecting a row fills the Details section; a display connected or removed while the window is open is picked up by Refresh.",
+      "The status bar counts the displays in words, for example 3 displays, 1 below its best."
+    ],
+    "cut": "There is no original window to cut from: Display Info is new and nothing is ported. It deliberately has no controls that change resolution, refresh rate, scaling or colour profile; Windows Display Settings does that and the tool offers a link to it. Menus, a splash screen, animations and a donate strip are not built; the framework supplies Settings and About."
+  },
+  "readme": {
+    "lead": "Display Info shows every monitor connected to your PC, and how it is really running, in plain words.",
+    "what": [
+      "For each connected monitor it shows the resolution, the refresh rate, how it is connected (HDMI, DisplayPort or the laptop's own screen), the scaling, whether it is the main display, its colour profile and whether HDR is on. It also decodes the monitor's own identity data (EDID): the maker, the model, the serial number, the year it was made and its physical size.",
+      "It says so when a monitor is running below its native resolution or its highest refresh rate, and when Windows does not report a value, for example through a dock or a remote session. It only reads. It never changes a display setting."
+    ],
+    "new_intro": "Display Info is a new tool, not a port, built for the suite from the start.",
+    "new": [
+      [
+        "Every monitor at a glance.",
+        "One row per connected display with resolution, refresh rate, connection, scaling and the main display marked."
+      ],
+      [
+        "Identity from the monitor itself.",
+        "Maker, model, serial number, year and physical size are read from the monitor's EDID data, not from a driver name."
+      ],
+      [
+        "Not running at its best.",
+        "A monitor below its native resolution or highest refresh rate is flagged, with the usual cause."
+      ],
+      [
+        "Copy a summary for support.",
+        "One button puts the whole picture on the clipboard as plain text."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Display Info ships as a complete, standalone C++ tool that lists every connected monitor with its resolution, refresh rate, connection type, scaling, colour profile, HDR state and EDID identity, says plainly when a monitor runs below its native resolution or refresh rate or when Windows does not report a value, and changes nothing on the machine.",
+    "current_state": "Nothing exists yet. There is no AutoIt original and no C++ code: the repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and one plan section as it stood in the Resolute repository (`docs/origin/resolute-D05-T06-s7.md`), which names the tool in a single line (`:14`) as `extensions/DisplayInfo/` reporting connected monitors, resolution, refresh rate, connection type, colour profile and EDID identity, verified against the system on a multi-monitor machine, with no write path (`:17`). That file also describes a credential viewer and a connection viewer, which are not part of this tool. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T06-s7.md`: the plan section for the display report, lines 14 and 17 only.",
+      "The Windows display APIs the engine reads: `EnumDisplayDevices`, `EnumDisplaySettingsEx`, `QueryDisplayConfig`, `DisplayConfigGetDeviceInfo` and `GetDpiForMonitor`.",
+      "The EDID block under each monitor's registry device key (`Device Parameters\\EDID`), and the colour profile association from the Windows colour system."
+    ],
+    "outcome": [
+      "`DisplayInfo.exe` lists every active display with its mode, connection type, scaling and main-display flag, matching what Windows Display Settings shows on a multi-monitor machine.",
+      "The Details screen decodes each monitor's EDID identity, physical size, colour profile, HDR state and supported modes, and says Not reported for any value Windows does not give.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, reads only, and ships with its settings, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Displays screen, where a person finds a monitor by name and connection. Reporting and audit are the Activity section: what each read returned, newest first. Settings are the framework's pages. Permissions do not apply: every read works for a standard user and nothing needs elevation. Reverse does not apply: the tool changes no display setting, so there is nothing to put back.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Display Reading Engine",
+      "intro": "The tool's whole system effect, which is only reading: enumerating active and connected displays, reading each one's mode, connection type, scaling, colour state and profile, decoding its EDID identity, and saying honestly when a value is not reported. Nothing is written to the system.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the display record in `src/core/Display.h`, with a reported-or-not marker on every field. Done when: no field can hold a guess, and an unreported value is a distinct state.",
+        "Implement enumeration and decoding in `src/core/DisplayReader.cpp` behind an interface the tests can replace with recorded data. Done when: `tests/display_test.cpp` passes against recorded fixtures."
+      ],
+      "items": [
+        "Implement `EnumerateDisplays()` in `src/core/DisplayReader.cpp` joining `EnumDisplayDevices` adapters and monitors with the paths from `QueryDisplayConfig`, returning only active and connected displays. Done when: a fixture with two active monitors and one detached adapter returns two records. Cheaper substitute: listing `GetSystemMetrics(SM_CMONITORS)` only, which cannot name a monitor.",
+        "Read each display's current mode with `EnumDisplaySettingsEx` (`ENUM_CURRENT_SETTINGS`): width, height, refresh rate and orientation. Done when: a fixture reports 1920 by 1080 at 60 Hz exactly as recorded.",
+        "Read the friendly name and the output technology with `DisplayConfigGetDeviceInfo` and map it to words (HDMI, DisplayPort, DVI, VGA, internal, other) in `src/core/Connection.cpp`. Done when: a table test maps every `DISPLAYCONFIG_OUTPUT_TECHNOLOGY` value to a word, and an unknown value reads Not reported.",
+        "Read scaling per monitor with `GetDpiForMonitor` and the main-display flag from the primary-device state. Done when: a fixture at 144 DPI reports 150 percent, and exactly one record is main.",
+        "Read advanced colour and HDR state through `DisplayConfigGetDeviceInfo` (`DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO`) and the colour profile from the Windows colour system (`GetICMProfile` or the WCS association). Done when: a fixture reports HDR on, off, or not supported, and a profile path or None.",
+        "Decode the EDID block under the monitor's registry device key in `src/core/Edid.cpp`: the three-letter maker code, model, serial, week and year, and physical size in centimetres. Done when: a test over a recorded 128 byte block returns the recorded maker, model, serial, year and size, and a block with a bad checksum reads Not reported. Cheaper substitute: using the driver's device description as the identity, which is not the monitor's own data.",
+        "Compare the current mode with the monitor's native mode and highest refresh rate from its supported modes, and set a below-its-best flag with the reason. Done when: a fixture at 1280 by 720 on a 1920 by 1080 panel is flagged, and a fixture at its native mode is not.",
+        "Say Not reported, with the likely reason (dock, remote session, driver), for any value Windows does not return, and never substitute a default. Done when: a remote session fixture returns Not reported for EDID and connection and a number for the resolution.",
+        "Cover every path in `tests/display_test.cpp` against recorded fixtures. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L display` passes, and fails when one decoded EDID field is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L display` passes for the multi-monitor, below-native and remote-session fixtures, and a search of `src/core/` finds no call that changes a display setting.",
+      "commit": "core: the display reading engine, reading only and honest about gaps"
+    },
+    "enhancements": [
+      {
+        "title": "Not Running at Its Best",
+        "intro": "A common problem the Windows settings pages do not point out: a monitor running below its native resolution or its highest refresh rate, often because of a cable, a dock, a driver or a setting. The tool says so on the row and says what usually causes it.",
+        "surface": {
+          "fidelity": "the Displays row and the Details notice, against `DESIGN.md` section 2.",
+          "job": "a person learns that a monitor is not at its best and what usually causes it. Consumer: the row, compared with the engine's flag.",
+          "treatment": "a warning icon and the words Not at its best on the row, and one plain sentence of cause in Details. Cheaper substitute that fails the checkpoint: a red resolution number with no words."
+        },
+        "build": [
+          "Map each below-its-best reason to one plain sentence in `src/core/Advice.cpp`. Done when: every flag the engine can raise has a sentence.",
+          "Show the flag and sentence in `src/ui/DisplaysView.cpp` and `src/ui/DetailsView.cpp`. Done when: a below-native fixture shows both."
+        ],
+        "items": [
+          "Write `src/core/Advice.cpp` turning the engine's below-its-best flag into text: a lower resolution than native (usually a driver, a cable or a changed setting), a lower refresh rate than the highest supported (usually a cable, a port or a setting). Done when: a test checks each flag returns its sentence. Cheaper substitute: one generic sentence for every case, which tells a person nothing.",
+          "Show a warning icon and the words Not at its best on the affected row in `src/ui/DisplaysView.cpp`. Done when: the row shows both and a UI Automation read of the row includes the words.",
+          "Show the current and the best mode side by side in Details with the sentence. Done when: a below-native fixture shows 1280 by 720 against 1920 by 1080.",
+          "Count the flagged displays in the status bar. Done when: the text reads 3 displays, 1 below its best for the fixture.",
+          "Cover it in `tests/advice_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L advice` passes, and fails when a flag has no sentence."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L advice` passes, and the below-native fixture shows the icon, the words and the cause on screen.",
+        "commit": "feature: say when a monitor is not running at its best"
+      },
+      {
+        "title": "Supported Modes List",
+        "intro": "Every mode a monitor offers, so a person can see what it could run at: resolution and refresh rate pairs read from the display's mode list, with the current and the native mode marked.",
+        "surface": {
+          "fidelity": "the Details screen's modes list, against `DESIGN.md` section 2.",
+          "job": "a person sees which modes the selected monitor supports. Consumer: the list, compared with `EnumDisplaySettingsEx`.",
+          "treatment": "a list grouped by resolution with the refresh rates beside it, the current mode and the native mode marked with words. Cheaper substitute that fails the checkpoint: a flat unsorted list of every duplicate the driver returns."
+        },
+        "build": [
+          "Collect and de-duplicate modes in `src/core/Modes.cpp`. Done when: a fixture with repeated driver entries returns each resolution and rate once.",
+          "Show them in `src/ui/DetailsView.cpp`. Done when: the list matches the engine's modes."
+        ],
+        "items": [
+          "Enumerate all modes with `EnumDisplaySettingsEx` in `src/core/Modes.cpp`, drop exact duplicates, and sort by resolution then refresh rate. Done when: a fixture with 40 raw entries returns the recorded distinct set in order.",
+          "Mark the current mode and the native mode in the list with the words Current and Native. Done when: a fixture shows each marker once and a mode can carry both.",
+          "Show the list in `src/ui/DetailsView.cpp` under the selected monitor. Done when: selecting a different row changes the list. Cheaper substitute: a list built once at start, which shows the wrong monitor after a selection change.",
+          "Cover it in `tests/modes_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L modes` passes, and fails when duplicates are kept."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L modes` passes, and the Details list for a fixture shows the Current and Native markers.",
+        "commit": "feature: the supported modes of each monitor"
+      },
+      {
+        "title": "Copy a Summary for Support",
+        "intro": "A person asked to send their display details to support can do it with one button: the whole picture as plain text on the clipboard, with Not reported where a value is missing.",
+        "surface": {
+          "fidelity": "the Copy summary button and its result, against `sdk/DESIGN.md` section 11.",
+          "job": "a person sends their display details to someone who can help. Consumer: the clipboard text, read back.",
+          "treatment": "one plain text block per monitor, in the same words as the screen, with the serial number included only when the person's setting allows it. Cheaper substitute that fails the checkpoint: copying a screenshot, which cannot be searched or pasted into a ticket."
+        },
+        "build": [
+          "Write the summary text in `src/core/Summary.cpp` from the engine's records. Done when: a fixture produces the recorded text.",
+          "Wire Copy summary in `src/ui/DisplaysView.cpp`. Done when: pressing it puts the text on the clipboard."
+        ],
+        "items": [
+          "Write `src/core/Summary.cpp` producing one block per monitor: name, resolution, refresh rate, connection, scaling, main display, colour profile, HDR, maker, model, year and size. Done when: a test compares the text with a committed expected file.",
+          "Leave the serial number out unless the person has switched it on, declared to the framework as one option. Done when: the default summary has no serial and the switched-on one does.",
+          "Wire the Copy summary button in `src/ui/DisplaysView.cpp` to put the text on the clipboard and show a short confirmation in the status bar. Done when: the clipboard holds the text after a press. Cheaper substitute: showing the text in a dialog for the person to select by hand.",
+          "Cover it in `tests/summary_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes, and fails when the serial appears with the option off."
+        ],
+        "needs": "sdk-framework",
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes, and a driven press puts the expected text on the clipboard.",
+        "commit": "feature: copy a plain text summary for support"
+      },
+      {
+        "title": "Open Windows Display Settings",
+        "intro": "The tool reads and changes nothing, so a person who wants to change a resolution, refresh rate, scaling or colour profile is taken to the place Windows makes the change.",
+        "surface": {
+          "fidelity": "the link in the Details screen, against `DESIGN.md` section 2.",
+          "job": "a person who has seen a problem goes straight to where it is fixed. Consumer: the Windows Settings page that opens.",
+          "treatment": "a plain link labelled Open Windows Display Settings that opens the system page and nothing else. Cheaper substitute that fails the checkpoint: a control inside the tool that changes a setting."
+        },
+        "build": [
+          "Open the system page from `src/core/Launch.cpp` with the `ms-settings:display` address. Done when: the call is the only thing the function does.",
+          "Place the link in `src/ui/DetailsView.cpp`. Done when: it shows for every selected monitor."
+        ],
+        "items": [
+          "Add `OpenDisplaySettings()` in `src/core/Launch.cpp` opening `ms-settings:display` through the shell and returning whether it was handed over. Done when: a test with a fake shell receives that exact address.",
+          "Show the link in `src/ui/DetailsView.cpp` and in the Not at its best notice. Done when: a press opens Windows Display Settings. Cheaper substitute: a button that calls `ChangeDisplaySettingsEx`, which writes to the system.",
+          "Prove the tool has no write path. Done when: a search of `src/` for `ChangeDisplaySettings`, `SetDisplayConfig` and registry write calls finds none, quoted.",
+          "Cover the launch in `tests/launch_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L launch` passes, and fails when the address changes."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L launch` passes, and the search for display-changing calls in `src/` finds none.",
+        "commit": "feature: a link to Windows Display Settings, where changes are made"
+      }
+    ],
+    "no_reverse": "the tool reads the display configuration and changes nothing",
+    "verification": [
+      "On a real multi-monitor machine, each monitor's resolution, refresh rate, connection and scaling match what Windows Display Settings shows.",
+      "A search of `src/` finds no call that changes a display setting, registry value or file outside the tool's own settings.",
+      "The tool lists, details and copies a summary in light and dark, by keyboard alone, and says Not reported through a dock or a remote session."
+    ]
+  }
+}

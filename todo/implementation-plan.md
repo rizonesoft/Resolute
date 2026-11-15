@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **97 of 185 sections complete (52%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **97 of 178 sections complete (54%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -305,24 +305,25 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 
 Seven programs from `samples/` become products and eleven new utilities join, all through one intake contract, on a framework that already exists. This phase is where the rewrite starts paying for itself, and it is where the suite stops being a port and starts being a better product than the one it replaces. Two of its tools matter beyond themselves: RegStudio is a registry editor that can undo what it did, and the Restore Point Manager gives every other tool in the suite a second undo layer.
 
-|  ✔  | Section      | Deliverable                                       | Items |
-| :-: | ------------ | ------------------------------------------------- | :---: |
-| [ ] | `D05 T02 §1` | RegStudio on the shared framework                 |   8   |
-| [ ] | `D05 T02 §2` | The registry engine                               |   7   |
-| [ ] | `D05 T02 §3` | Browse, display, and virtualize                   |   6   |
-| [ ] | `D05 T02 §4` | Editing, with a reverse                           |   8   |
-| [ ] | `D05 T02 §5` | Search across hives                               |   5   |
-| [ ] | `D05 T02 §6` | Backup, restore, and `.reg` exchange              |   7   |
-| [ ] | `D05 T06 §7` | Credential, Display, and Connection Viewers       |   8   |
-| [ ] | `D05 T07 §1` | Update Blocker and Update History                 |   7   |
-| [ ] | `D05 T07 §2` | Shell Extension Bisector and Explorer Performance |   7   |
-| [ ] | `D05 T07 §3` | Defender Manager and Security Status              |   7   |
-| [ ] | `D05 T07 §4` | BitLocker, Certificates, and Recovery             |   7   |
-| [ ] | `D05 T07 §5` | Privacy and Telemetry Settings                    |   6   |
-| [ ] | `D05 T07 §6` | Environment, Features, Power, and Locale          |   6   |
-| [ ] | `D05 T07 §7` | Network Configuration Tools                       |   7   |
-| [ ] | `D05 T07 §8` | Files, Boot, Audio, and Inventory                 |  11   |
-| [ ] | `D05 T07 §9` | Printing, Search, and Scheduled Tasks             |   6   |
+|  ✔  | Section      | Deliverable                           | Items |
+| :-: | ------------ | ------------------------------------- | :---: |
+| [ ] | `D05 T02 §1` | RegStudio on the shared framework     |   8   |
+| [ ] | `D05 T02 §2` | The registry engine                   |   7   |
+| [ ] | `D05 T02 §3` | Browse, display, and virtualize       |   6   |
+| [ ] | `D05 T02 §4` | Editing, with a reverse               |   8   |
+| [ ] | `D05 T02 §5` | Search across hives                   |   5   |
+| [ ] | `D05 T02 §6` | Backup, restore, and `.reg` exchange  |   7   |
+| [ ] | `D05 T07 §7` | Network Configuration Tools           |   7   |
+| [ ] | `D05 T07 §8` | Files, Boot, Audio, and Inventory     |  11   |
+| [ ] | `D05 T07 §9` | Printing, Search, and Scheduled Tasks |   6   |
+
+> **Moved:** `D05 T06 §7` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/CredentialViewer` repository (`D:\Resolute_Bin\CredentialViewer`) by its own plan.
+> **Moved:** `D05 T07 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/UpdateBlocker` repository (`D:\Resolute_Bin\UpdateBlocker`) by its own plan.
+> **Moved:** `D05 T07 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ShellBisector` repository (`D:\Resolute_Bin\ShellBisector`) by its own plan.
+> **Moved:** `D05 T07 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DefenderManager` repository (`D:\Resolute_Bin\DefenderManager`) by its own plan.
+> **Moved:** `D05 T07 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BitLockerStatus` repository (`D:\Resolute_Bin\BitLockerStatus`) by its own plan.
+> **Moved:** `D05 T07 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PrivacySettings` repository (`D:\Resolute_Bin\PrivacySettings`) by its own plan.
+> **Moved:** `D05 T07 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/EnvironmentEditor` repository (`D:\Resolute_Bin\EnvironmentEditor`) by its own plan.
 
 > **Moved:** `D05 T06 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ShadowBrowser` repository (`D:\Resolute_Bin\ShadowBrowser`) by its own plan.
 > **Moved:** `D05 T06 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/WindowsDiskSpace` repository (`D:\Resolute_Bin\WindowsDiskSpace`) by its own plan.

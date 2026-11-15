@@ -1,0 +1,246 @@
+{
+  "name": "ExplorerPerformance",
+  "slug": "explorerperformance",
+  "display": "Explorer Performance",
+  "job": "it measures how long File Explorer takes to open a folder, show the right-click menu and make thumbnails, and names the handler or location that cost the time, or says plainly what it could not attribute.",
+  "tagline": "Find out why File Explorer is slow",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Sunflower",
+    "light": "#FDE047",
+    "dark": "#CA8A04",
+    "social_ground": "#2A2106",
+    "social_muted": "#F4E7AE"
+  },
+  "icon": {
+    "idea": "A folder with a lightning bolt: File Explorer, and speed.",
+    "points": [
+      "It stands free with no tile behind it, and the folder has a tab.",
+      "The folder is Sunflower and the bolt is Sunflower light.",
+      "The small drawing, below 40 pixels, enlarges the bolt so it still reads."
+    ],
+    "large": "<path d=\"M8 20 H36 L44 28 H88 V80 H8 Z\" fill=\"#CA8A04\" stroke=\"#CA8A04\" stroke-width=\"5\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M54 34 L34 58 H47 L42 74 L62 50 H49 Z\" fill=\"#FDE047\" stroke=\"#FDE047\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<path d=\"M8 20 H36 L44 28 H88 V80 H8 Z\" fill=\"#CA8A04\" stroke=\"#CA8A04\" stroke-width=\"5\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M56 32 L30 60 H46 L40 78 L66 50 H50 Z\" fill=\"#FDE047\" stroke=\"#FDE047\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Measure",
+        "Each test as a row with the time measured and a verdict in words"
+      ],
+      [
+        "Causes",
+        "Each handler or location with the time it cost, slowest first"
+      ],
+      [
+        "Activity",
+        "What the tool measured and when, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees how fast File Explorer is for folders, the right-click menu and thumbnails, in words, and starts a new measurement with one button.",
+    "primary": "Measure",
+    "secondary": "Copy summary",
+    "rows": [
+      [
+        "Folder opening",
+        "Not measured, Measuring, Fast enough, Slow or Timed out"
+      ],
+      [
+        "Right-click menu",
+        "Not measured, Measuring, Fast enough, Slow or Timed out"
+      ],
+      [
+        "Thumbnails",
+        "Not measured, Measuring, Fast enough, Slow or Timed out"
+      ]
+    ],
+    "status": "Folder opening slow, right-click menu fast enough, thumbnails fast enough",
+    "notes": [
+      "Each row shows an icon and a word for its state: not measured, measuring, fast enough, slow or timed out. Colour is never the only signal.",
+      "Each finished row shows the median time and its spread (the fastest and slowest of the repeated runs), so one lucky or unlucky run is not quoted as the result.",
+      "Measure runs the three tests one after another in a helper process and the rows update as each finishes. A test that hits its time limit shows Timed out and names the handler that was running.",
+      "Copy summary puts a plain-text account on the clipboard: each test, its median and spread, the verdict, the slowest causes and anything that could not be attributed.",
+      "The tool changes nothing on the system, so there is no confirmation and no undo. Measure can be pressed again at any time and replaces the rows.",
+      "The status bar states the three verdicts in words, for example \"Folder opening slow, right-click menu fast enough, thumbnails fast enough\".",
+      "When a slowness cannot be traced to a handler or a location, the Causes section says so in one plain sentence and gives the reason."
+    ],
+    "cut": "There is no source window to cut from, because nothing exists yet. The window deliberately has no menu bar, no splash, no animation and no donate strip: the suite's tool window has none of them. Switching a shell extension off is not done here; that belongs to the sibling Shell Bisector tool, and this tool only offers to hand a finding over to it."
+  },
+  "readme": {
+    "lead": "Explorer Performance finds out why File Explorer is slow.",
+    "what": [
+      "It times three things: how long a folder takes to open, how long the right-click menu takes to appear, and how long thumbnails take to make. Each is repeated and reported as a median with its spread, and each gets a verdict in words.",
+      "Where Windows allows, it names the handler or the location that cost the time, such as a right-click entry added by an installed program or a mapped drive that no longer answers. Where it cannot tell, it says so and says why. It only measures: it changes nothing on the system."
+    ],
+    "new_intro": "Explorer Performance is a new tool in the suite, written in C++ from the start.",
+    "new": [
+      [
+        "Three real measurements.",
+        "Folder opening, the right-click menu and thumbnails are each timed through the same Windows interfaces Explorer uses."
+      ],
+      [
+        "Medians, not single runs.",
+        "Every measurement is repeated and reported as a median with its spread."
+      ],
+      [
+        "Causes named.",
+        "Slow right-click entries are listed by handler and by the program they belong to, and dead network locations are named."
+      ],
+      [
+        "Honest about limits.",
+        "What could not be attributed is stated plainly, with the reason, and never guessed."
+      ],
+      [
+        "Safe by design.",
+        "Measuring runs in a helper process with a time limit, so a handler that hangs is caught and named instead of hanging the tool."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Explorer Performance ships as a complete, standalone C++ tool that measures how fast File Explorer opens a folder, shows the right-click menu and makes thumbnails, repeats each measurement and reports a median with its spread, gives each a verdict in words against a stated expectation, attributes slowness to a handler or a location where Windows allows and states plainly what it could not attribute, and changes nothing on the system.",
+    "current_state": "Nothing exists yet: this is a new tool and there is no earlier version, no source to port and no baseline to capture. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/`, which holds the tool's plan section as it stood in the Resolute repository (one section shared with the Shell Bisector, of which only the two Explorer measurement lines concern this tool: measure folder open time, right-click menu time and thumbnail generation against a stated expectation, and attribute slowness where the system allows or state plainly what could not be attributed). The SDK's framework, repair contract and chart control, which this tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s2.md`: the plan section as it stood, of which only the Explorer measurement lines concern this tool.",
+      "The Windows shell interfaces the tool drives: `IShellFolder` enumeration, `IContextMenu::QueryContextMenu`, `IThumbnailProvider` and `IShellItemImageFactory`.",
+      "`DESIGN.md`: the tool's identity and window sections, and `sdk/DESIGN.md`, the suite's contract."
+    ],
+    "outcome": [
+      "`ExplorerPerformance.exe` measures folder opening, the right-click menu and thumbnails, each repeated and quoted as a median with its spread and a verdict in words against a stated expectation.",
+      "A deliberately slowed fixture handler is named as the cause, a dead network location is named, and anything that cannot be attributed is stated plainly with the reason; a hanging handler is caught by a time limit and named.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Measure screen, where each test is a row with its time and verdict, and the Causes section lists what cost the time. Reporting and audit are the Activity section, the trail of what was measured and when. Settings are the framework's pages. Permissions do not apply: the tool reads and times what an ordinary user can reach and never needs elevation. Reverse does not apply, because the tool measures and explains and changes nothing on the system; switching an extension off is the sibling Shell Bisector's job.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Explorer Measurement Engine",
+      "intro": "The tool's whole effect, independent of any window: time folder opening, the right-click menu and thumbnails through the shell's own interfaces, repeat each and reduce it to a median with its spread, run the work in a helper process with a time limit so a hanging handler is caught and named, time the menu handler by handler, and report what could not be attributed. Nothing here writes to the registry, the disk or any setting.",
+      "needs": "windows-host",
+      "build": [
+        "Write the measurement core in `src/core/Measure.cpp` and the helper process in `src/helper/MeasureHelper.cpp`. Done when: a test runs one measurement in the helper and reads back its record.",
+        "Write the verdict and attribution logic in `src/core/Verdict.cpp`. Done when: the unit tests for verdicts and for the could-not-attribute result pass."
+      ],
+      "items": [
+        "Implement `MeasureFolderOpen(path)` in `src/core/Measure.cpp`: bind the folder with `SHBindToObject` for `IShellFolder`, enumerate every child with `EnumObjects` and stop the clock after the last `Next`. Done when: a test folder of a known number of files reports that many children and a time greater than zero. Cheaper substitute: timing `FindFirstFile`, which skips the shell's namespace extensions and times a different thing.",
+        "Implement `MeasureContextMenu(item)` in `src/core/Measure.cpp`: get `IContextMenu` for the item and time `QueryContextMenu` for the whole menu. Done when: a test on a file returns a time and the number of entries added. Cheaper substitute: timing a synthesised mouse click, which includes drawing and the user's reaction.",
+        "Implement `MeasureThumbnails(folder)` in `src/core/Measure.cpp`: time `IShellItemImageFactory::GetImage` (and `IThumbnailProvider::GetThumbnail` where the item exposes it) for each item in the folder, with a request that does not read the thumbnail cache. Done when: a test folder of images reports a time per item and a total. Cheaper substitute: reading Explorer's thumbnail cache files, which measure nothing.",
+        "Implement `RunRepeated(test, count)` returning the median and the spread (fastest and slowest) of the repeated runs, the count held once as a constant in `src/core/Measure.h`. Done when: a test with scripted times of an odd and an even count returns the correct median and spread. Cheaper substitute: reporting the last run, which quotes one lucky or unlucky run.",
+        "Run each test in `src/helper/MeasureHelper.cpp` as a separate process with a time limit and a job object, so a hang ends the helper and not the tool; on the limit, kill the whole helper tree and name the handler that was being loaded. Done when: a fixture handler that never returns produces a Timed out result naming it, and no helper process remains. Cheaper substitute: running the measurement in a thread of the tool, which a hung handler takes down with it.",
+        "Implement `MeasureMenuByHandler()` in `src/core/Measure.cpp`: load each registered context-menu handler in turn, in the helper, and time its `IContextMenu::Initialize` and `QueryContextMenu`; take the handler list through `src/core/HandlerSource.h`, filled in production from the SDK's shell-extension enumerator (planned in Resolute-SDK and not built) and in tests from a fixture list. Done when: a fixture handler that sleeps is returned first with the largest time, and a test run registers nothing on the system. Cheaper substitute: timing the whole menu and dividing by the number of entries, which names no handler.",
+        "Implement `Verdict(test, median)` in `src/core/Verdict.cpp` returning fast enough, slow or timed out against stated expectations held in `src/core/Expectations.h`, each with a comment naming where its value came from. Done when: a test of times either side of each expectation returns the matching word. Cheaper substitute: colouring the time without a verdict in words.",
+        "Return an explicit `Unattributed{reason}` from `src/core/Verdict.cpp` when a slow result has no named handler or location: a handler that does not identify itself, a shell extension that hangs inside Explorer's own process, or a measurement with no slow part. Done when: a fixture with a slow first-party folder returns the reason and not a guessed cause. Cheaper substitute: naming the slowest item every time, which invents an attribution.",
+        "Cover every path in `tests/measure_test.cpp`, with the slow handler fixture built under `tests/fixtures/` and loaded by path without registration. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L measure` passes, and fails when the fixture handler's delay is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L measure` passes, including the slow fixture handler named as the cause, the hanging handler caught and named, no helper process left behind and the unattributed case, and fails when the fixture's delay is removed.",
+      "commit": "core: measure folder, menu and thumbnails, attribute what can be"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Slow Locations",
+        "intro": "A classic cause of a folder that takes a long time to open is a location that no longer answers: a disconnected mapped drive, a network share that is gone, a Quick Access entry pointing at a dead path. This section finds them and names them, each with the time it cost, without opening anything slowly on the tool's own thread.",
+        "surface": {
+          "fidelity": "the Causes section's location rows, against `DESIGN.md` section 2.",
+          "job": "a person sees which locations make folders open slowly, by name. Consumer: the rows, read back against the helper's results.",
+          "treatment": "one row per location with its name, its kind (mapped drive, Quick Access entry) and the time it cost, slowest first. Cheaper substitute that fails the checkpoint: a single line saying the network is slow, which names nothing."
+        },
+        "build": [
+          "Probe locations in `src/core/Locations.cpp`. Done when: a test lists a fixture's dead mapped drive and dead Quick Access entry by name.",
+          "Show them in the Causes section from `src/ui/CausesView.cpp`. Done when: the rows match the engine's results."
+        ],
+        "items": [
+          "Read the mapped drives and Quick Access entries into `src/core/Locations.cpp` (from `WNetOpenEnum` and the Quick Access folder through `IShellFolder`). Done when: a fixture list of three locations is read back with kind and path.",
+          "Time reaching each location in the helper process with its own time limit and report a location that does not answer as dead, with the time it took to give up. Done when: a fixture location that never answers is reported dead and the tool stays responsive. Cheaper substitute: calling `GetFileAttributes` on the tool's own thread, which hangs the tool on exactly the location being tested.",
+          "List the locations in the Causes section next to the handlers, slowest first, each with its kind and time. Done when: the dead fixture location appears above a fast one. Cheaper substitute: a separate list that is not sorted with the handlers.",
+          "Cover it in `tests/locations_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L locations` passes, and fails when a dead location is reported as fast."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L locations` passes: a dead mapped drive and a dead Quick Access entry are each named with their time, and the tool stays responsive while they are probed.",
+        "commit": "feature: name the dead locations that slow folders down"
+      },
+      {
+        "title": "Per-Handler Menu Timing",
+        "intro": "The right-click menu is slow because of one or two entries added by installed programs. This section shows the per-handler times of the engine in the Causes section, each with the program the handler belongs to, so a person knows which program to look at.",
+        "surface": {
+          "fidelity": "the Causes section's handler rows, against `DESIGN.md` section 2.",
+          "job": "a person sees which right-click entry cost the time and which program it belongs to. Consumer: the rows, read back against the engine's per-handler results.",
+          "treatment": "one row per handler with its time and the owning program's name, slowest first. Cheaper substitute that fails the checkpoint: a row showing only a class identifier, which tells a person nothing."
+        },
+        "build": [
+          "Resolve each handler to its owning program in `src/core/HandlerOwner.cpp`. Done when: a test maps a fixture handler's file to its product and company.",
+          "Show the rows in `src/ui/CausesView.cpp`. Done when: the fixture handler is the first row with its program named."
+        ],
+        "items": [
+          "Resolve each handler's server file to the product and company name from its version resource in `src/core/HandlerOwner.cpp`. Done when: a fixture file with a version resource returns both names. Cheaper substitute: showing the file name only.",
+          "Say so plainly when a handler has no readable owner, in the row, with the file path. Done when: a fixture with no version resource shows the path and the words \"owner not known\". Cheaper substitute: leaving the owner blank.",
+          "Show the handler rows in the Causes section, slowest first, with the time and the owner, and a Copy summary line for each. Done when: the summary text contains the same rows in the same order.",
+          "Cover it in `tests/handler_owner_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L owner` passes, and fails when the owner is taken from the wrong file."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L owner` passes: the slow fixture handler is the first row with its program named, and a handler with no owner says so.",
+        "commit": "feature: show which program owns the slow right-click entry"
+      },
+      {
+        "title": "Hand Off to Shell Bisector",
+        "intro": "This tool measures and explains; the sibling Shell Bisector is where an extension is switched off. When that tool is installed, a finding can be handed to it so the person can act on it. The tool does not depend on it: when it is not installed, the button is not shown and nothing else changes.",
+        "surface": {
+          "fidelity": "the hand-off button in the Causes section, against `DESIGN.md` section 2.",
+          "job": "a person who has found the slow handler opens it in Shell Bisector. Consumer: the launched tool's command line, read back.",
+          "treatment": "a button on a handler row that starts Shell Bisector with that handler's name, shown only when the tool is installed. Cheaper substitute that fails the checkpoint: a button that is always shown and fails when the tool is absent."
+        },
+        "build": [
+          "Find the installed Shell Bisector in `src/core/HandOff.cpp`. Done when: a test with a fixture install location finds it and with none reports it absent.",
+          "Add the button in `src/ui/CausesView.cpp`. Done when: it appears on a handler row only when the tool is found."
+        ],
+        "items": [
+          "Detect Shell Bisector from its registered install location in `src/core/HandOff.cpp`, with no dependency on it at build or run time. Done when: a test reports present for a fixture and absent when the location is missing. Cheaper substitute: assuming a path.",
+          "Start it with the handler's name on the command line, using a launch that waits for nothing. Done when: a test with a fake executable records the command line it received.",
+          "Hide the button when it is absent and show it on each handler row when present. Done when: a driven test sees it with the fixture and not without it. Cheaper substitute: showing it disabled, which invites a click that cannot work.",
+          "Cover it in `tests/handoff_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes, and fails when the command line omits the handler's name."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes: the button starts the fake tool with the handler's name when present and is not shown when it is absent.",
+        "commit": "feature: hand a slow handler to Shell Bisector when installed"
+      },
+      {
+        "title": "Before and After",
+        "needs": "sdk-framework",
+        "intro": "To see whether a change helped, the last measurements are kept and shown next to the new ones with the SDK's chart control. The chart control and the framework's settings store are planned in Resolute-SDK and not built, so this section waits for them.",
+        "surface": {
+          "fidelity": "the before and after view in the Measure section, against `sdk/DESIGN.md`.",
+          "job": "a person sees whether a change made File Explorer faster. Consumer: the chart, read back against the stored measurements.",
+          "treatment": "the previous and the current median for each test side by side with the SDK's chart control, with the spread, and the words faster, slower or about the same. Cheaper substitute that fails the checkpoint: a table of two numbers with no spread, which hides noise."
+        },
+        "build": [
+          "Store the last measurements through the framework in `src/core/History.cpp`. Done when: a test writes a result and reads it back after a restart.",
+          "Draw the comparison in `src/ui/MeasureView.cpp` with the SDK's chart control. Done when: the chart shows both runs for each test."
+        ],
+        "items": [
+          "Store each finished measurement (test, median, spread, time taken) through the framework's settings store in `src/core/History.cpp`, keeping the previous run. Done when: a test stores two runs and reads both back. Cheaper substitute: a private file the tool writes itself.",
+          "State faster, slower or about the same by comparing the two medians against their spreads in `src/core/History.cpp`. Done when: a test with overlapping spreads returns about the same and one with clear separation returns faster or slower. Cheaper substitute: comparing the medians alone.",
+          "Draw the previous and current median with their spread for each test using the SDK's chart control in `src/ui/MeasureView.cpp`. Done when: a driven test reads the plotted values and they equal the stored ones. Cheaper substitute: a private chart drawn by the tool, which the contract forbids.",
+          "Cover it in `tests/history_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L history` passes, and fails when the previous run is overwritten by the current one."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L history` passes: two stored runs are compared by median and spread, and the chart shows exactly the stored values.",
+        "commit": "feature: keep the last measurements so a change can be seen"
+      }
+    ],
+    "no_reverse": "the tool measures and explains; it changes nothing on the system",
+    "verification": [
+      "A deliberately slowed fixture handler is named as the cause of a slow right-click menu, a hanging handler is caught by the time limit and named, and an unattributable slowness is stated plainly with the reason.",
+      "Each measurement is repeated and quoted as a median with its spread, and the tool leaves no helper process and no change on the system after a run.",
+      "On a real machine the tool measures, shows verdicts and causes, and copies its summary, in light and dark, by keyboard alone."
+    ]
+  }
+}

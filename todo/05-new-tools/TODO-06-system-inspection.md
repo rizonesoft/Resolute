@@ -191,6 +191,8 @@ Two tools answering questions about the past. Windows records both and surfaces 
 
 ## 7. Credential, Display, and Connection Viewers
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/CredentialViewer` repository (`D:\Resolute_Bin\CredentialViewer`) by its own plan.
+
 Three read-only inspectors, grouped because each is a single surface over one thing Windows knows and reports badly.
 
 **Fidelity:** each tool's surface, against `DESIGN.md`.
@@ -199,16 +201,16 @@ Three read-only inspectors, grouped because each is a single surface over one th
 **Chrome:** consume the framework, its elevation guard, and its logging. All three are read-only.
 **Needs:** Windows host (build/test)
 
-- [ ] List stored credentials in `extensions/CredentialViewer/` by target, type, and user, **without revealing any secret by default**. Done when: the list renders with every secret masked.
-- [ ] **Gate, log, and limit the reveal**, exactly as `§3` requires. Done when: an unelevated reveal is refused by name, a driven reveal writes one log line naming the target but not the secret, and no reveal-all path exists, proven by search.
-- [ ] Report which credentials are causing repeated sign-in prompts, where the system records it. Done when: a stale credential is identified with its reasoning.
-- [ ] Report display configuration in `extensions/DisplayInfo/`: connected monitors, resolution, refresh rate, connection type, colour profile, and EDID identity. Done when: each renders for a multi-monitor machine and is verified against the system.
-- [ ] Report active connections in `extensions/ConnectionViewer/` with the owning process, its path, and its publisher. Done when: a known connection resolves to the right process and its signature state is shown.
-- [ ] Compose rather than re-enumerate. Done when: the connection viewer names a process's startup entry by asking the autoruns enumerator from `D05 T01 §5`, and implements no second one, proven by search.
-- [ ] None of the three writes to the system. Done when: no write path exists in any of them, proven by search.
-- [ ] Commit: `"credential, display, and connection viewers"`
+- [ ] ~~List stored credentials in `extensions/CredentialViewer/` by target, type, and user, **without revealing any secret by default**. Done when: the list renders with every secret masked.~~ -> `rizonesoft/CredentialViewer`
+- [ ] ~~**Gate, log, and limit the reveal**, exactly as `§3` requires. Done when: an unelevated reveal is refused by name, a driven reveal writes one log line naming the target but not the secret, and no reveal-all path exists, proven by search.~~ -> `rizonesoft/CredentialViewer`
+- [ ] ~~Report which credentials are causing repeated sign-in prompts, where the system records it. Done when: a stale credential is identified with its reasoning.~~ -> `rizonesoft/CredentialViewer`
+- [ ] ~~Report display configuration in `extensions/DisplayInfo/`: connected monitors, resolution, refresh rate, connection type, colour profile, and EDID identity. Done when: each renders for a multi-monitor machine and is verified against the system.~~ -> `rizonesoft/CredentialViewer`
+- [ ] ~~Report active connections in `extensions/ConnectionViewer/` with the owning process, its path, and its publisher. Done when: a known connection resolves to the right process and its signature state is shown.~~ -> `rizonesoft/CredentialViewer`
+- [ ] ~~Compose rather than re-enumerate. Done when: the connection viewer names a process's startup entry by asking the autoruns enumerator from `D05 T01 §5`, and implements no second one, proven by search.~~ -> `rizonesoft/CredentialViewer`
+- [ ] ~~None of the three writes to the system. Done when: no write path exists in any of them, proven by search.~~ -> `rizonesoft/CredentialViewer`
+- [ ] Commit: ~~`"credential, display, and connection viewers"`~~ -> `rizonesoft/CredentialViewer`
 
-**Test checkpoint:** The credential list renders with every secret masked. An unelevated reveal is refused by name; a driven reveal writes one log line naming the target and not the secret; no reveal-all path exists, proven by search. Display configuration is verified against the system on a multi-monitor machine. A known connection resolves to the right process with its signature state. None of the three has a write path, proven by search.
+**Test checkpoint:** Moved with the section. The `rizonesoft/CredentialViewer` repository's plan carries it.
 
 ## Verification
 
