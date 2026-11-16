@@ -132,6 +132,10 @@ if ($InstallShortcut) {
         Remove-Item -LiteralPath $obsolete
         Write-Host "Removed the Codex writer shortcut: $obsolete"
     }
+    # Explorer caches a shortcut's picture by the icon file's path. An icon re-rendered at the same path (the suite's
+    # icon changed on 2026-11-16) kept showing the old picture until the shell was told that icons changed.
+    $shell = Add-Type -Name ShellNotify -Namespace StartRun -PassThru -MemberDefinition '[DllImport("shell32.dll")] public static extern void SHChangeNotify(int eventId, uint flags, IntPtr item1, IntPtr item2);'
+    $shell::SHChangeNotify(0x08000000, 0, [IntPtr]::Zero, [IntPtr]::Zero)  # SHCNE_ASSOCCHANGED: icons are re-read
     exit 0
 }
 
