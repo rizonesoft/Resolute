@@ -49,6 +49,7 @@ track: Q1
 |   9   |   §9    | Smoke fixture release in finally              | §6            |  [x]   |
 |  10   |   §10   | Elevated smoke ends with the run that started it | §7          |  [ ]   |
 |  11   |   §11   | An interrupted registration is recovered      | §7            |  [x]   |
+|  12   |   §12   | Launcher suite under AddressSanitizer         | --            |  [ ]   |
 
 ---
 
@@ -518,6 +519,26 @@ What recovery does not put back, by decision: the directory's earlier owner and 
 > **CRUD:** applicable | the journal written, read and removed, the pinned hashes and runtime switched, kept, restored and dropped, and the task registered, restored and unregistered, each read back in the sandbox after every injected interruption
 > **Duration:** 2026-11-13T00:38:45Z to 2026-11-13T02:31:16Z
 > **Implementer:** Claude Fable 5.2 (claude-fable-5-2) to the first record's plan review; Claude Opus 5.5 (claude-opus-5-5) from the build on 2026-11-13, per the session's model notice (the first record keeps `claude-fable-5-2` because the dispatcher pins one writer model per record)
+
+## 12. Launcher Suite Under AddressSanitizer
+
+**Filed 2026-11-16** from the operator's memory-safety review of every C++ repository on the machine. The launcher builds with no memory-safety option beyond the linker's defaults (measured that day: `git grep` over the build files finds no sanitizer, hardening or stack-protector option, and `TODO.md` line 701 carries an unscheduled "Memory leak detection (AddressSanitizer)"). The options themselves are owned by Resolute-SDK, where the plan sections `D00 T01 §10` (the hardening policy every consumer inherits through `sdk/cmake/ResoluteSdk.cmake`, and the image-flag clause of the conformance profile) and `D00 T01 §11` (the `RESOLUTE_SANITIZE` option and its probe) were filed in commits `055ed25` and `1727752`. This section is the launcher's half: take that SDK, and run the launcher's own Catch2 suite under the sanitizer, because a dangling pointer in `src/` is caught by no option a shipped binary carries. It cannot start before an SDK commit carries both sections; until then its first item has nothing to pin.
+
+No surface of its own: a test preset, one gate and the SDK pin.
+
+**Needs:** Windows host (build/test)
+
+- [ ] Bump `sdk.json` to the Resolute-SDK commit that ships its `D00 T01 §10` and `D00 T01 §11`, named by its hash from that repository's `CHANGELOG.md`. Done when: `pwsh scripts/sdk.ps1` puts that commit at `sdk/`, `build/release/compile_commands.json` shows `_LIBCPP_HARDENING_MODE` on a `src/` source, and `ctest --preset release` passes. Cheaper substitute that fails the checkpoint: retyping the options in this repository's `CMakeLists.txt`, which is the copy the SDK exists to prevent.
+- [ ] Add `asan` configure, build and test presets to `CMakePresets.json` on the shape of the SDK's: `RelWithDebInfo`, `RESOLUTE_SANITIZE=address`, binary directory `build/asan`, and the test preset's `PATH` led by `${sourceDir}/sdk/reskit/llvm-mingw/x86_64-w64-mingw32/bin`. Done when: `cmake --preset asan` and `cmake --build --preset asan` exit 0 from an empty `build/asan`.
+- [ ] Prove the preset is instrumented with the SDK's `uaf_probe`, built in this tree through the SDK's tests or registered here from `sdk/tests/hardening/uaf_probe.cpp`. Done when: `ctest --preset asan -R uaf_probe` passes, and fails when the preset's `RESOLUTE_SANITIZE` is emptied, then it is restored, both quoted.
+- [ ] Run the launcher suite with `ctest --preset asan` and fix each report at the line it names in `src/`; a report inside `sdk/` is filed in Resolute-SDK's `todo/findings.md` with `file:line` and fixed there. Done when: the preset passes with every report fixed or filed, and the count of each is stated.
+- [ ] Add an `asan` gate to `scripts/check-all.ps1` that builds and tests the preset. Done when: `pwsh scripts/check-all.ps1` prints the gate's line and its gate count rises by one, quoted.
+- [ ] Strike "Memory leak detection (AddressSanitizer)" in `TODO.md` with this section's address. Done when: the line names `D07 T01 §12`.
+- [ ] Commit: `"quality: the launcher suite runs under AddressSanitizer on the hardened SDK"`
+
+-> SOURCE: operator-2026-11-16-memory-safety-review (the launcher has no sanitizer run)
+
+**Test checkpoint:** `ctest --preset asan` passes with `uaf_probe` in its list, `uaf_probe` fails when `RESOLUTE_SANITIZE` is empty, and `python scripts/conformance-check.py` passes the image-flag clause on `Resolute.exe` built from the bumped pin (each quoted from a real run).
 
 ## Verification
 
