@@ -4,7 +4,7 @@
   "display": "Profile Manager",
   "job": "it lists every Windows user profile on the PC with its account, security identifier, path, size and last use, flags orphans and broken profiles, and removes a profile so that its folder, its registry entry and its identifier go together or not at all.",
   "tagline": "See every user profile on this PC and remove one properly",
-  "frozen": false,
+  "frozen": true,
   "elevated": true,
   "au3": [],
   "hue": {

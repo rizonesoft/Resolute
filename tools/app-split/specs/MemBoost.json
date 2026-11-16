@@ -4,7 +4,7 @@
   "display": "MemBoost",
   "job": "it frees physical memory by trimming the working sets of running processes, on demand or on a schedule, and reports what each trim gave back.",
   "tagline": "Free up memory, and see what each trim gave back",
-  "frozen": false,
+  "frozen": true,
   "elevated": false,
   "au3": [
     "MemBoost"

@@ -1,0 +1,247 @@
+{
+  "name": "ColorProfiles",
+  "slug": "colorprofiles",
+  "display": "Color Profiles",
+  "job": "it shows the colour profiles associated with each display and which one is the default, lets a person associate a profile, set the default or reset a display to Windows' default, reads back every change and can undo it.",
+  "tagline": "See which colour profile each display uses, and put the right one back",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Display blue",
+    "light": "#93C5FD",
+    "dark": "#3B82F6",
+    "social_ground": "#0B1B3F",
+    "social_muted": "#C9DAF8"
+  },
+  "icon": {
+    "idea": "Three swatches, red, green and blue: the colours a display is made of.",
+    "points": [
+      "Free-standing with no tile behind it: three upright rounded bars side by side.",
+      "The bars are red #EF4444, green #22C55E and blue #3B82F6. It is the one icon in the suite that uses three colours, because colour is its subject (the operator's choice).",
+      "The small drawing below 40 pixels widens the bars and narrows the gaps."
+    ],
+    "large": "<rect x=\"6\" y=\"14\" width=\"26\" height=\"68\" rx=\"8\" fill=\"#EF4444\"/><rect x=\"35\" y=\"14\" width=\"26\" height=\"68\" rx=\"8\" fill=\"#22C55E\"/><rect x=\"64\" y=\"14\" width=\"26\" height=\"68\" rx=\"8\" fill=\"#3B82F6\"/>",
+    "small": "<rect x=\"4\" y=\"12\" width=\"27\" height=\"72\" rx=\"8\" fill=\"#EF4444\"/><rect x=\"34.5\" y=\"12\" width=\"27\" height=\"72\" rx=\"8\" fill=\"#22C55E\"/><rect x=\"65\" y=\"12\" width=\"27\" height=\"72\" rx=\"8\" fill=\"#3B82F6\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Displays",
+        "One row per display: its name, its default profile, how many profiles are associated and whether Windows manages its colour itself"
+      ],
+      [
+        "Profiles",
+        "The selected display's profiles with description, kind and file, and the installed profiles that could be added"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which colour profile each display uses and puts the right one back with one button.",
+    "primary": "Set as default",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Built-in display",
+        "sRGB default, 1 profile"
+      ],
+      [
+        "Office monitor",
+        "Custom default, 3 profiles"
+      ],
+      [
+        "Second monitor",
+        "Default file missing"
+      ],
+      [
+        "HDR television",
+        "Windows manages colour"
+      ]
+    ],
+    "status": "4 displays, 1 managed by Windows, 1 needs attention",
+    "notes": [
+      "Each display is a row with its name, its default profile, the number of associated profiles and one state in an icon and a word: Windows default, Custom, Needs attention or Windows manages colour.",
+      "A display that Windows manages itself (Advanced Color or HDR) is shown with that state and its change actions are disabled, with a tooltip that says why.",
+      "Set as default is the accent button and acts on the profile selected in the Profiles section; it is disabled until a profile is selected, and its label names the profile it will apply.",
+      "Undo reverses the last change and is disabled, with a tooltip, when there is nothing to undo.",
+      "A per-user and system-wide choice sits beside the actions; system-wide is refused by name, before any write, when the tool is not elevated, and nothing else in the tool asks for elevation.",
+      "Every change is read back from Windows before the row updates, and the status bar says in words how many displays are listed, how many Windows manages and how many need attention.",
+      "Resetting a display to the Windows default asks for confirmation that names the display and the profile it will return to."
+    ],
+    "cut": "There is no earlier window to compare with, so nothing is cut. The window has no menu bar, no splash, no animation of its own and no donate strip: the suite's tool window does not have them, and the framework supplies Settings and About."
+  },
+  "readme": {
+    "lead": "Color Profiles shows which colour profile each of your displays uses and puts the right one back.",
+    "what": [
+      "Windows keeps a list of colour profiles for each display and one of them is the default. After a driver or Windows update that list can change, and a wrong or damaged profile makes colours look washed out, too warm or too saturated. Windows shows this only in a settings page that hides most of the detail.",
+      "Color Profiles lists every display with its default profile, the profiles associated with it and whether Windows is managing its colour itself, as on an HDR display. You can associate a profile, set the default, or reset a display to Windows' default. Every change is read back from Windows, and the last one can be undone."
+    ],
+    "new_intro": "Color Profiles is a new tool, written in C++ for the suite, and has no earlier version.",
+    "new": [
+      [
+        "One screen for every display.",
+        "The default profile, the number of associated profiles and the colour-management state of each display are in one list."
+      ],
+      [
+        "Every change is checked.",
+        "After each change the tool reads the setting back from Windows and says so if it did not take."
+      ],
+      [
+        "Undo for any change.",
+        "The prior association is recorded before a change, so Undo puts back what was there and not a guess."
+      ],
+      [
+        "Damaged profiles are flagged.",
+        "A profile file that is missing or fails its header check is marked with an icon and a word."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Color Profiles ships as a complete, standalone C++ tool: it lists each display with its associated and default colour profiles for the user and system-wide, reads each profile's header, associates and disassociates profiles, sets the default and resets a display to the Windows default, reads back every change, refuses a system-wide change by name when it is not elevated, and can undo any change it made.",
+    "current_state": "Nothing exists yet. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits and one source, the tool's plan section as it stood in the Resolute repository (`docs/origin/resolute-D05-T07-s8.md`). That section describes nine small tools; the part that concerns this one is a single line, `docs/origin/resolute-D05-T07-s8.md:21`: profiles per display, with association and reset, done when association and reset both verify by read-back. There is no AutoIt original, no C++ and no baseline, and nothing is ported. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s8.md`: the plan section, of which line 21 and the test checkpoint at line 27 (colour changes verify by read-back) concern this tool.",
+      "`DESIGN.md`: the tool's identity and its window's sections, and `sdk/DESIGN.md`, the suite's design contract.",
+      "The Windows Color System API and the ICC profile format, read on a real machine: `mscms.dll`, `%SystemRoot%\\System32\\spool\\drivers\\color` and the Calibration Loader task."
+    ],
+    "outcome": [
+      "`ColorProfiles.exe` lists each display with its default and associated profiles, for the user and system-wide, and shows a damaged or missing profile file by name.",
+      "Association, disassociation, set default and reset each change Windows, are read back and are refused by name when a system-wide change is attempted without elevation; the last change can be undone.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Displays screen, where a person finds a display by name and sees its profile. Reporting and audit are the Activity section, which is the record of what each change did. Settings are the framework's pages. Permissions do not anchor on a section of their own because per-user changes need no elevation; the one case that does, a system-wide change, is refused by name in the engine. Reverse anchors on the Undo Any Change section, which restores the association that was recorded before the change.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Display Profile Engine",
+      "intro": "The tool's whole system effect, independent of any window: listing displays with their associated and default profiles, reading a profile file's header, associating, disassociating and setting the default through the Windows Color System, resetting a display to the Windows default, and reading every change back. Per-user changes need no elevation. System-wide ones are refused by name without it.",
+      "needs": "windows-host",
+      "build": [
+        "Wrap the Windows Color System calls behind one interface in `src/core/ColorSystem.h`, with a Windows implementation and a fake for tests. Done when: the engine's unit tests run against the fake with no display attached.",
+        "Implement listing, header reading, change and reset in `src/core/Profiles.cpp` on that interface. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L profiles` passes."
+      ],
+      "items": [
+        "Implement `ListDisplays()` in `src/core/Displays.cpp` returning each active display with its name, device identifier and adapter, from `EnumDisplayDevicesW` and the display configuration API. Done when: on a machine with two displays it returns two entries whose names match Settings, Display. Cheaper substitute: a list typed into the view, which shows nothing real.",
+        "Implement `ListProfiles(display, scope)` in `src/core/Profiles.cpp` returning the associated profiles for the per-user and the system-wide list (`WcsGetUsePerUserProfiles` decides which list applies) and the default (`WcsGetDefaultColorProfile`), plus the installed profiles under `%SystemRoot%\\System32\\spool\\drivers\\color` (`EnumColorProfilesW`) that are not yet associated. Done when: a fixture display with three associated profiles reports three, names the default and lists the rest as addable.",
+        "Implement `ReadHeader(path)` in `src/core/IccHeader.cpp` reading the 128-byte ICC header (the `acsp` signature at offset 36, the profile class at offset 12, the colour space at offset 16) and the description tag (`desc` or `mluc`). Done when: a valid fixture profile returns description, class and colour space, and a truncated one and one without `acsp` each return a named failure. Cheaper substitute: trusting the file name, which cannot tell a damaged file from a good one.",
+        "Report whether Windows manages a display's colour itself, in `src/core/Displays.cpp`, from the Advanced Color state in the display configuration (`DisplayConfigGetDeviceInfo`), and report whether the Calibration Loader task that applies calibration at sign-in is enabled. Done when: a fixture with Advanced Color on reports Windows manages colour, a change on that display is refused by name, and the task's state is listed. Cheaper substitute: assuming no display is managed, which would let a change be made that Windows ignores.",
+        "Implement `Associate`, `Disassociate` and `SetDefault` in `src/core/Profiles.cpp` through `WcsAssociateColorProfileWithDevice`, `WcsDisassociateColorProfileFromDevice` and `WcsSetDefaultColorProfile`, recording the prior association first and then reading the profile lists and the default back. Done when: a test that makes the fake silently ignore a change gets a mismatch returned as display, expected and found. Cheaper substitute: trusting the call's return value, which says nothing about what Windows now holds.",
+        "Implement `ResetToWindowsDefault(display)` in `src/core/Profiles.cpp` removing the profiles added by a person and setting the Windows default (the sRGB profile `sRGB Color Space Profile.icm`), with the prior association recorded and the result read back. Done when: a fixture display with three profiles ends with the Windows default as its only one, asserted after a re-read.",
+        "Refuse a system-wide `Associate`, `Disassociate`, `SetDefault` or reset by name when the process is not elevated, before any write, with one activity record, and never ask a per-user change to elevate. Done when: an unelevated run reports the refusal for the system-wide call, the fixture is unchanged, and a per-user call succeeds. Cheaper substitute: letting the call fail with access denied halfway through a reset.",
+        "Cover every path in `tests/profiles_test.cpp` against the fake. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L profiles` passes, and fails when the read-back is removed from `SetDefault`."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L profiles` passes, including the ignored-change, damaged-header, Advanced Color and unelevated system-wide cases, and fails when the read-back is removed.",
+      "commit": "core: display profiles listed, changed and read back"
+    },
+    "enhancements": [
+      {
+        "title": "Undo Any Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before every association, disassociation, default change or reset, the display's prior profiles and default are recorded, so Undo restores what was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back what the last action changed. Consumer: the display's profile list and default, compared with the record.",
+          "treatment": "the recorded association restored profile by profile and the default restored, then read back. Cheaper substitute that fails the checkpoint: an undo that resets to the Windows default, which is not what was there before."
+        },
+        "build": [
+          "Record the prior association through the repair contract in `src/core/Profiles.cpp`. Done when: a record exists on disk before the first change.",
+          "Wire Undo in `src/ui/DisplaysView.cpp`. Done when: a change then Undo leaves the display as it was."
+        ],
+        "items": [
+          "Record each display's associated profiles, default and scope through the repair contract's restore record before any change. Done when: a test finds the record on disk before the fake is first written to. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record profile by profile and the default, then reading both back. Done when: associate then undo, set default then undo and reset then undo each leave the fake equal to before, asserted.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one change.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one profile is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: each kind of change followed by Undo leaves the display as it was.",
+        "commit": "feature: undo puts back the profiles that were there before"
+      },
+      {
+        "title": "Reset a Display",
+        "intro": "Wrong colours after a driver or Windows update are usually a wrong or damaged profile. One action returns a display to Windows' default profile, names what it is about to remove, and can be undone through the section before it.",
+        "surface": {
+          "fidelity": "the reset confirmation and the Displays row after it, against `sdk/DESIGN.md` section 11.",
+          "job": "a person gets a display back to a known good colour setup in one step. Consumer: the display's profile list and default, read back.",
+          "treatment": "a confirmation naming the display, the profiles that will be disassociated and the profile it returns to. Cheaper substitute that fails the checkpoint: resetting silently, which hides what was removed."
+        },
+        "build": [
+          "Add the reset action and its confirmation in `src/ui/DisplaysView.cpp`. Done when: the confirmation lists each profile that will be removed.",
+          "Bind it to `ResetToWindowsDefault` in `src/core/Profiles.cpp`. Done when: the row shows the Windows default after a re-read."
+        ],
+        "items": [
+          "Show a confirmation before a reset, naming the display, each profile that will be disassociated and the profile it returns to, through the framework's message surface. Done when: a fixture display with three profiles lists three. Cheaper substitute: a private dialog.",
+          "Run the reset through the engine and refresh the row from a re-read, not from an assumption. Done when: the row shows Windows default and one associated profile.",
+          "Make the reset one undoable change: a single record, a single Undo. Done when: reset then Undo returns all three profiles and the former default.",
+          "Cover it in `tests/reset_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L reset` passes, and fails when the confirmation omits a profile."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L reset` passes: a reset names every profile removed, lands on the Windows default and undoes in one step.",
+        "commit": "feature: a display can be reset to the Windows default profile"
+      },
+      {
+        "title": "Damaged Profile Check",
+        "intro": "A profile file that is missing or fails its header check gives wrong colours without any message. The Profiles section flags such a file with an icon and a word, and the Displays row says that the display needs attention.",
+        "surface": {
+          "fidelity": "the Profiles list and the Displays row state, against `DESIGN.md` section 2.",
+          "job": "a person sees which profile is the likely cause of wrong colours. Consumer: the header check of each associated file, read back.",
+          "treatment": "an icon and a word beside each profile: Good, Missing or Damaged, with the reason in the tooltip. Cheaper substitute that fails the checkpoint: a red colour on the row with no word."
+        },
+        "build": [
+          "Run the header check on each associated profile in `src/core/IccHeader.cpp`. Done when: a missing file and a truncated file are each reported with a reason.",
+          "Show the result in `src/ui/ProfilesView.cpp`. Done when: a damaged default makes its display row read Needs attention."
+        ],
+        "items": [
+          "Check every associated profile of the selected display with `ReadHeader` and the file's existence, and keep the result with the profile. Done when: a fixture with one good, one missing and one truncated file reports Good, Missing and Damaged.",
+          "Show Good, Missing or Damaged as an icon and a word in the Profiles list, with the reason in the tooltip. Done when: each state is visible without colour. Cheaper substitute: colour alone.",
+          "Mark a display Needs attention in the Displays list when its default profile is missing or damaged, and count it in the status bar. Done when: the fixture's display reads Needs attention and the status bar says 1.",
+          "Cover it in `tests/damaged_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L damaged` passes, and fails when a truncated file is reported as Good."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L damaged` passes: missing and truncated files are flagged with a word and a damaged default marks its display.",
+        "commit": "feature: missing and damaged profile files are flagged"
+      },
+      {
+        "title": "Install a Profile From a File",
+        "intro": "A profile that came with a calibration device or a download has to be installed before it can be associated. This installs a chosen file into the Windows profile folder, checks it first, and offers it for association.",
+        "surface": {
+          "fidelity": "the install action and its result in the Profiles section, against `sdk/DESIGN.md` section 11.",
+          "job": "a person adds a profile file Windows does not yet know. Consumer: the installed profile list, read back.",
+          "treatment": "a file picker, a check of the header before anything is copied, and the profile appearing in the addable list after a re-read. Cheaper substitute that fails the checkpoint: copying the file into the folder without checking it."
+        },
+        "build": [
+          "Implement `InstallProfile(path)` in `src/core/Profiles.cpp` over `InstallColorProfileW`. Done when: a valid file appears in `EnumColorProfilesW` afterwards.",
+          "Add the action in `src/ui/ProfilesView.cpp`. Done when: the installed file shows in the addable list."
+        ],
+        "items": [
+          "Check the chosen file with `ReadHeader` and refuse a file that fails, by name and reason, before anything is copied. Done when: a truncated fixture is refused and the profile folder is unchanged. Cheaper substitute: letting `InstallColorProfileW` fail on its own.",
+          "Install through `InstallColorProfileW` and read the installed list back. Done when: the fixture profile appears with its description, class and colour space.",
+          "Record the install so Undo can remove the file it added. Done when: install then Undo leaves the profile folder as it was.",
+          "Refuse an install that needs write access to the system profile folder, by name, when the tool is not elevated. Done when: an unelevated run reports the refusal and writes nothing.",
+          "Cover it in `tests/install_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L install` passes, and fails when an unchecked file is installed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L install` passes: a valid file installs and shows, a damaged file is refused before any copy.",
+        "commit": "feature: install a colour profile from a file, checked first"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine with at least one display, the list matches Windows' own Color Management for each display's associated and default profiles.",
+      "Association, disassociation, set default, reset and Undo each read back what Windows holds, and a system-wide change is refused by name when the tool is not elevated.",
+      "The tool lists, changes, flags and undoes in light and dark, by keyboard alone."
+    ]
+  }
+}

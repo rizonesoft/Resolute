@@ -1,0 +1,253 @@
+{
+  "name": "BootManager",
+  "slug": "bootmanager",
+  "display": "Boot Manager",
+  "job": "it shows the Windows boot menu with its entries, order, default and timeout, changes them with every change recorded and a full export of the boot store taken first, and says how to recover from Windows Recovery if a machine will not start.",
+  "tagline": "Change the Windows boot menu, with a way back if it goes wrong",
+  "frozen": true,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Royal indigo",
+    "light": "#A5B4FC",
+    "dark": "#4338CA",
+    "social_ground": "#14143A",
+    "social_muted": "#CFD3FA"
+  },
+  "icon": {
+    "idea": "Three menu rows, the top one lit with a start arrow: the boot menu and its default.",
+    "points": [
+      "Free-standing with no tile behind it: three rounded bars stacked.",
+      "The top bar is Royal indigo light with a Royal indigo triangle, the other two are Royal indigo.",
+      "The small drawing below 40 pixels drops the triangle."
+    ],
+    "large": "<rect x=\"6\" y=\"10\" width=\"84\" height=\"22\" rx=\"9\" fill=\"#A5B4FC\"/><path d=\"M16 15 L26 21 L16 27 Z\" fill=\"#4338CA\" stroke=\"#4338CA\" stroke-width=\"2\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><rect x=\"6\" y=\"38\" width=\"84\" height=\"22\" rx=\"9\" fill=\"#4338CA\"/><rect x=\"6\" y=\"66\" width=\"84\" height=\"22\" rx=\"9\" fill=\"#4338CA\"/>",
+    "small": "<rect x=\"6\" y=\"8\" width=\"84\" height=\"24\" rx=\"10\" fill=\"#A5B4FC\"/><rect x=\"6\" y=\"36\" width=\"84\" height=\"24\" rx=\"10\" fill=\"#4338CA\"/><rect x=\"6\" y=\"64\" width=\"84\" height=\"24\" rx=\"10\" fill=\"#4338CA\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Boot menu",
+        "The timeout in the header, and each boot entry as a row with its name, what it starts, whether it is the default and its place in the order"
+      ],
+      [
+        "Backups",
+        "Each export of the boot store with its date, and how to restore one from Windows Recovery"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees the boot menu as Windows will show it and changes its order, default, timeout and entry names with a way back.",
+    "primary": "Apply",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Windows 11 Pro",
+        "Default, first in order"
+      ],
+      [
+        "Windows 10 Pro",
+        "Listed, second in order"
+      ],
+      [
+        "Windows Recovery Environment",
+        "Listed, not in the menu"
+      ],
+      [
+        "UEFI firmware entry",
+        "Shown, not editable"
+      ],
+      [
+        "Old Windows, disk missing",
+        "Cannot start, disk not found"
+      ]
+    ],
+    "status": "3 entries, default Windows 11 Pro, timeout 10 seconds",
+    "notes": [
+      "Each entry is a row with an icon and a word for its state: Default, Listed, Cannot start (its disk or file is not found) or Firmware (shown, not editable).",
+      "The timeout is in the header with the primary button. Changing the order, the default, the timeout or a name only stages the change: the rows show the staged state and nothing is written until Apply is pressed.",
+      "Apply takes the full export of the boot store first when this is the first change of the session, then writes each change, reads it back and records the prior value. The button is labelled with what it will do, for example Apply 2 changes.",
+      "Undo reverses the last applied change from the recorded prior values and is disabled, with a tooltip, when there is nothing to undo.",
+      "Before the first change, a confirmation shows the Windows Recovery steps and the BitLocker warning, and says where the export was saved.",
+      "A change that would leave no bootable default is refused by name and the Apply button stays off. The entry Windows is running from has no delete action, and the tool refuses to delete it.",
+      "When the tool is not elevated the rows are shown read-only and the primary button explains that Windows asks for elevation; no write is tried. The status bar reads for example \"3 entries, default Windows 11 Pro, timeout 10 seconds\"."
+    ],
+    "cut": "This tool has no original window, so nothing is cut from one. It does not carry menus, a splash, animations or a donate strip: it has the suite's sidebar window only, and it does not edit firmware entries, safe mode or boot flags (those belong to Boot Options). The plan records this scope in its engine and window sections."
+  },
+  "readme": {
+    "lead": "Boot Manager shows and changes the Windows boot menu, and keeps a way back for every change.",
+    "what": [
+      "Boot Manager reads the boot configuration data store and shows each boot entry with its name, what it starts, whether it is the default and its place in the order, with the menu timeout. It changes the order, the default, the timeout and an entry's name. Entries that the firmware owns on a UEFI machine are shown but not edited.",
+      "A wrong boot store leaves a machine that does not start, so the tool takes a full export of the store before its first change, records every change and the value it replaced, reads each value back, and states the steps to recover from Windows Recovery. It needs elevation. Safe mode and boot flags for the running entry are the job of Boot Options."
+    ],
+    "new_intro": "Boot Manager is a new tool, not a port, and it is built around getting back from a bad change.",
+    "new": [
+      [
+        "A full export first.",
+        "The boot store is exported to a file before the first change of a session, and each export is listed with its date."
+      ],
+      [
+        "Undo any change.",
+        "Every write records the value it replaced, so a change can be reversed to what was there."
+      ],
+      [
+        "If it will not start.",
+        "The recovery steps from Windows Recovery are shown before the first change and saved as a text file that can be printed."
+      ],
+      [
+        "A BitLocker warning.",
+        "The tool says the recovery key may be asked for after a boot change, before the change is made."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Boot Manager ships as a complete, standalone C++ tool that reads the Windows boot menu, changes the order, the default, the timeout and an entry's name with every value read back and every prior value recorded, takes a full export of the boot store before the first change, refuses changes that would leave no bootable default, shows firmware entries without editing them, and states how to recover from Windows Recovery when a machine will not start.",
+    "current_state": "Nothing exists yet. This is a new tool: there is no AutoIt original, no `reference/au3/` folder and nothing to port or compare against. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan text of the Resolute repository under `docs/origin/`, whose section 8 says the tool must be specified before it is built, covering entries, order, timeout and the recovery path when a machine will not boot (`docs/origin/resolute-D05-T07-s8.md:17`), and whose freeze check says what it writes is frozen once shipped, with fixture source `tests/fixtures/boot/` (`docs/origin/resolute-D05-T07-s8.md:25`). The boot store is read and written through the BCD WMI provider classes `BcdStore` and `BcdObject`, or through `bcdedit`; the SDK's framework, repair contract and chart control, which the tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s8.md`: the plan section, with the freeze check and the fixture source `tests/fixtures/boot/` (`:25`).",
+      "`tests/fixtures/boot/`: fixture boot stores and exports the tests read, written under this plan, never a live store.",
+      "Windows documentation for the boot configuration data store (the boot manager object with its `displayorder`, `default` and `timeout` elements, boot loader entries with `description`, `device` and `path`), `bcdedit /export` and `/import`, and `bootrec` and `bcdboot` in Windows Recovery."
+    ],
+    "outcome": [
+      "`BootManager.exe` reads the boot manager and every entry, and changes the order, the default, the timeout and an entry's name, each read back and each prior value recorded, after a full export of the boot store.",
+      "A change with no bootable default left, a write without elevation and a delete of the entry Windows runs from are each refused by name, and firmware entries are shown and never edited.",
+      "Undo, the recovery steps from Windows Recovery and the BitLocker warning work in the Sidebar window of `DESIGN.md`, in light and dark at every scale, by keyboard alone."
+    ],
+    "adjacency_rationale": "The list is the Boot menu screen, where a person sees the entries in the order Windows will show them. Reporting and audit are the Activity section, the trail of every change and the value it replaced. Settings are the framework's pages. Permissions anchor on the engine, where a write without elevation is refused by name before any change. Reverse anchors on the undo section, which restores the recorded prior values of the boot manager and its entries, and the full export in Backups is the way back when the tool itself cannot start.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Boot Store Engine",
+      "intro": "The tool's whole system effect: reading the boot manager and its entries, taking the full export, and changing the order, the default, the timeout and an entry's name through the BCD WMI provider or `bcdedit`, with each value read back and its prior value recorded. This is the frozen part: what it writes to the boot configuration does not change once shipped, because a mistake there costs the user their machine.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the boot manager elements and the boot loader entry elements the tool reads and writes as data in `src/core/BootElements.h`. Done when: `displayorder`, `default`, `timeout`, `description`, `device` and `path` are each stated once with the type Windows gives them.",
+        "Implement read, export, change, read-back and refusal in `src/core/BootStore.cpp` against a store the tests can redirect to a fixture. Done when: the unit tests pass against a fixture store and never touch the machine's own."
+      ],
+      "items": [
+        "Implement `ReadBootStore()` in `src/core/BootStore.cpp` returning the boot manager (`displayorder`, `default`, `timeout`) and each entry (identifier, `description`, `device`, `path`, type), marking firmware entries on a UEFI machine as read-only. Done when: a fixture store under `tests/fixtures/boot/` with two loaders and one firmware entry returns three entries with the firmware one marked. Cheaper substitute: parsing the text of `bcdedit /enum`, which changes with the display language.",
+        "Implement `ExportStore(path)` writing the full export (the equivalent of `bcdedit /export`) before the first change of a session, and refuse to continue when the export is missing or empty. Done when: a test finds a non-empty export file on disk before the first value is written. Cheaper substitute: exporting only the entries being changed, which cannot restore the whole store.",
+        "Implement `SetOrder(ids)`, `SetDefault(id)` and `SetTimeout(seconds)` in `src/core/BootStore.cpp`, each recording the prior value, writing the new one and reading it back. Done when: a test that alters one value after the write gets the element, expected and found named. Cheaper substitute: checking only the return code of the write.",
+        "Implement `RenameEntry(id, description)` with the same record and read-back. Done when: a fixture entry renamed shows the new `description` on re-read and the prior one in the record.",
+        "Refuse by name, before any write, a change that would leave no bootable default (the default is not in `displayorder`, or its `device` or `path` is not found). Done when: a test that removes the default from the order reports the refusal and the fixture is unchanged. Cheaper substitute: writing and checking afterwards, which has already broken the store.",
+        "Refuse by name to delete the entry Windows is running from and to edit a firmware entry. Done when: a test that targets the running entry and a firmware entry gets two named refusals and no write.",
+        "Refuse every write by name when the process is not elevated, before the export, with one activity record. Done when: an unelevated test run reports the refusal and the fixture is unchanged. Cheaper substitute: letting the write fail with access denied halfway through.",
+        "Cover every path in `tests/bootstore_test.cpp` against fixtures, and compare an entry changed then undone with its original, entry for entry, as the freeze check says (`docs/origin/resolute-D05-T07-s8.md:25`). Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L bootstore` passes, and fails when one declared element in `src/core/BootElements.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L bootstore` passes, including the export-first, corrupted-write, no-bootable-default, running-entry and unelevated cases, and fails when one declared element is changed.",
+      "commit": "core: the boot store read, exported first, changed with read-back and refused when unsafe"
+    },
+    "enhancements": [
+      {
+        "title": "Undo Any Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A boot change recorded with its prior value can be put back to what was actually there. Before each write the prior value of the boot manager element or entry element is recorded, and Undo restores it and reads it back. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back what the last change altered. Consumer: the boot store, compared with the record.",
+          "treatment": "the recorded prior value restored element by element and read back. Cheaper substitute that fails the checkpoint: an undo that re-imports the whole export, which also throws away later changes the person wanted to keep."
+        },
+        "build": [
+          "Record each prior value through the repair contract in `src/core/BootStore.cpp`. Done when: a record exists on disk before the first value is written.",
+          "Wire Undo in `src/ui/BootMenuView.cpp`. Done when: changing the order, the default, the timeout and a name, then undoing each, leaves the store as it was."
+        ],
+        "items": [
+          "Record the prior value of every element before it is written, through the repair contract's restore record. Done when: a test finds the record on disk before the first value is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring each recorded element and reading it back, newest change first. Done when: order, default, timeout and rename each followed by undo leave the fixture store equal to before, entry for entry, asserted.",
+          "Refuse an undo by name when the recorded entry no longer exists in the store. Done when: a fixture with the entry removed reports the refusal and writes nothing.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one applied change.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: each kind of change then undo leaves the fixture store as it was.",
+        "commit": "feature: undo puts back the value that was there before"
+      },
+      {
+        "title": "Export Before Changing",
+        "intro": "A full export of the boot store is the one way back that does not depend on this tool starting, so it is taken automatically before the first change of a session and kept where the person can find it. Each export is listed in the Backups section with its date.",
+        "surface": {
+          "fidelity": "the Backups section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person sees every export of the boot store with its date and where it is. Consumer: the export files on disk, read back.",
+          "treatment": "one row per export file with its date and size in words, and the restore steps beside it. Cheaper substitute that fails the checkpoint: a single overwritten backup file, which loses the earlier states."
+        },
+        "build": [
+          "Take and list exports in `src/core/Backups.cpp`. Done when: a change run leaves a dated export file and one list entry.",
+          "Show them in `src/ui/BackupsView.cpp`. Done when: the list equals the files on disk."
+        ],
+        "items": [
+          "Add `src/core/Backups.cpp`: write each export to a new dated file in the tool's data folder, never over an earlier one. Done when: two sessions leave two export files. Cheaper substitute: overwriting one file, which loses the earlier state.",
+          "Verify each export after writing it by reading it as a store and comparing its entry count with the live store. Done when: a truncated export in a test is refused and the change does not start.",
+          "Build `src/ui/BackupsView.cpp` listing exports newest first with date and size, and the restore steps from Windows Recovery beside the list. Done when: the rows equal the files on disk and the steps name `bcdedit /import`.",
+          "Add a restore of an export from the running system through `bcdedit /import`, behind a confirmation that names the file and the BitLocker warning. Done when: a fixture export restored returns the store to equal the export. Cheaper substitute: copying the store file over the live one, which Windows does not support.",
+          "Cover it in `tests/backups_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L backups` passes, and fails when an export is overwritten."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L backups` passes: each session leaves one verified dated export, listed in Backups, and a restore returns the fixture store to the export.",
+        "commit": "feature: a full export of the boot store before the first change, listed in Backups"
+      },
+      {
+        "title": "If It Will Not Start",
+        "intro": "When a boot store is wrong the machine does not reach Windows, and the tool cannot help from inside it. So the recovery steps from Windows Recovery are written down before the first change: reaching the Command Prompt in Windows Recovery, importing the export with `bcdedit /import`, and rebuilding with `bootrec /rebuildbcd` or `bcdboot`. They are shown on screen and saved as a text file the person can print and keep.",
+        "surface": {
+          "fidelity": "the recovery steps screen and the first-change confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person knows exactly what to do if the machine will not start, before it can happen. Consumer: the saved text file, read back.",
+          "treatment": "numbered steps in plain words with the name and path of the person's own export filled in, shown before the first change and saved as `Boot recovery steps.txt`. Cheaper substitute that fails the checkpoint: a link to a web page, which the person cannot open on a machine that will not start."
+        },
+        "build": [
+          "Write the steps from a template with the real export path in `src/core/RecoverySteps.cpp`. Done when: a generated text names the export file taken for this session.",
+          "Show them before the first change in `src/ui/BootMenuView.cpp`. Done when: the first Apply is blocked until the steps have been shown and the text file is saved."
+        ],
+        "items": [
+          "Add `src/core/RecoverySteps.cpp` producing the steps: start Windows Recovery from installation media or the recovery screen, open Command Prompt, run `bcdedit /import` with the export's path, and if that is not enough run `bootrec /rebuildbcd` or `bcdboot` with the Windows folder. Done when: a test checks the generated text holds each command with the export's real path.",
+          "Save the steps as a text file next to the export before the first change. Done when: the file exists on disk before the first value is written, in the same folder as the export.",
+          "Show the steps in the first-change confirmation through the framework's message surface. Done when: the first Apply shows them and a second Apply in the same session does not. Cheaper substitute: a private dialog.",
+          "State in the steps that the export file must be reachable from Windows Recovery, and offer to copy it to a second location chosen by the person. Done when: a fixture second location receives the export and its path appears in the text.",
+          "Cover it in `tests/recovery_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L recovery` passes, and fails when a command is dropped from the text."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L recovery` passes: the steps name every command and the real export path, and the text file exists before the first write.",
+        "commit": "feature: the recovery steps from Windows Recovery, shown and saved before the first change"
+      },
+      {
+        "title": "BitLocker Warning",
+        "intro": "Changing the boot configuration can make BitLocker ask for its recovery key at the next start. A person who does not have the key can be locked out of their own drive, so the tool says this before the change is committed and states whether BitLocker protection is on for the system drive.",
+        "surface": {
+          "fidelity": "the pre-change confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person knows before committing that the recovery key may be asked for, and that they should have it. Consumer: the confirmation text, read back against the BitLocker state.",
+          "treatment": "a confirmation that names the system drive, says whether protection is on, and says the recovery key may be asked for at the next start. Cheaper substitute that fails the checkpoint: a generic footnote shown whether or not BitLocker is on, which people stop reading."
+        },
+        "build": [
+          "Read the BitLocker protection state of the system drive in `src/core/BitLockerState.cpp`. Done when: a fixture state of on, off and unknown each returns the matching value.",
+          "Show the warning before Apply in `src/ui/BootMenuView.cpp`. Done when: with protection on the confirmation names the drive and the recovery key."
+        ],
+        "items": [
+          "Add `src/core/BitLockerState.cpp` reading the system drive's protection state through the BitLocker WMI provider, returning on, off or unknown. Done when: a test with a fake provider returns each of the three states. Cheaper substitute: running `manage-bde` and reading its text, which changes with the display language.",
+          "Show the confirmation before the first change of a session through the framework's message surface, with wording that depends on the state. Done when: on shows the key warning, off shows a shorter note and unknown shows the warning too.",
+          "Never print or store a recovery key. Done when: a search of `src/` and of a test run's log finds no recovery key value, and the confirmation only tells the person to have theirs.",
+          "Cover it in `tests/bitlocker_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L bitlocker` passes, and fails when the warning is skipped with protection on."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L bitlocker` passes: the warning is shown with protection on and unknown, and no key is ever handled.",
+        "commit": "feature: the BitLocker warning before a boot change is committed"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a disposable machine or virtual machine, the tool exports the store, changes the order, default, timeout and a name, reads each back, and undoes each, with the store equal to its first export.",
+      "The recovery steps are followed once from Windows Recovery on that machine, importing the export with `bcdedit /import`, and the machine starts.",
+      "A fixture boot entry changed and undone reproduces the original entry for entry, as the freeze check requires (`docs/origin/resolute-D05-T07-s8.md:25`), and the window works in light and dark, by keyboard alone."
+    ]
+  }
+}

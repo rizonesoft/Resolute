@@ -4,7 +4,7 @@
   "display": "Recovery Manager",
   "job": "it reports whether the Windows Recovery Environment is present, enabled and reachable, repairs it when it is not, and starts Windows' own recovery drive maker after a confirmation that names the drive it will erase.",
   "tagline": "Make sure Windows can repair itself, before you need it to",
-  "frozen": false,
+  "frozen": true,
   "elevated": true,
   "au3": [],
   "hue": {

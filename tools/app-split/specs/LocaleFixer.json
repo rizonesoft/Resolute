@@ -1,0 +1,255 @@
+{
+  "name": "LocaleFixer",
+  "slug": "localefixer",
+  "display": "Locale Fixer",
+  "job": "it reads the system locale, the code pages and the UTF-8 beta setting that decide how older programs show text, names the one that makes text garbled, and changes it with an undo and a plain warning that a restart is needed.",
+  "tagline": "Fix garbled text in older programs",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Ultramarine",
+    "light": "#A5B4FC",
+    "dark": "#4338CA",
+    "social_ground": "#14143A",
+    "social_muted": "#CFD3FA"
+  },
+  "icon": {
+    "idea": "A speech bubble full of blank boxes: text that shows as boxes.",
+    "points": [
+      "Free-standing with no tile behind it: a speech bubble with a tail at the lower left.",
+      "The bubble is Ultramarine and the three boxes in it are Ultramarine light.",
+      "The small drawing, used below 40 pixels, has two larger boxes."
+    ],
+    "large": "<path d=\"M10 12 H86 V62 H46 L28 82 V62 H10 Z\" fill=\"#4338CA\" stroke=\"#4338CA\" stroke-width=\"5\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><rect x=\"22\" y=\"28\" width=\"13\" height=\"18\" rx=\"3\" fill=\"#A5B4FC\"/><rect x=\"42\" y=\"28\" width=\"13\" height=\"18\" rx=\"3\" fill=\"#A5B4FC\"/><rect x=\"62\" y=\"28\" width=\"13\" height=\"18\" rx=\"3\" fill=\"#A5B4FC\"/>",
+    "small": "<path d=\"M8 10 H88 V64 H46 L26 86 V64 H8 Z\" fill=\"#4338CA\" stroke=\"#4338CA\" stroke-width=\"5\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><rect x=\"24\" y=\"26\" width=\"18\" height=\"22\" rx=\"4\" fill=\"#A5B4FC\"/><rect x=\"54\" y=\"26\" width=\"18\" height=\"22\" rx=\"4\" fill=\"#A5B4FC\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Diagnosis",
+        "A one-sentence verdict, then each setting with its value now and whether it is the likely cause"
+      ],
+      [
+        "Try it",
+        "Paste garbled text and see which code page makes it readable"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person finds out which locale setting garbles text in an older program, changes it knowing a restart is needed, and can put it back.",
+    "primary": "Apply",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "System locale for non-Unicode programs",
+        "Matches or Does not match the program's language"
+      ],
+      [
+        "ANSI code page",
+        "Shown as a number and a name, likely cause or not"
+      ],
+      [
+        "OEM code page",
+        "Shown as a number and a name, likely cause or not"
+      ],
+      [
+        "Unicode UTF-8 (beta)",
+        "On, likely cause, or Off"
+      ],
+      [
+        "Your account's format locale",
+        "Shown, never the cause of garbled text"
+      ]
+    ],
+    "status": "UTF-8 beta is on: the likely cause. A restart is needed after a change",
+    "notes": [
+      "The top of the Diagnosis screen is one sentence in plain words, for example that the UTF-8 beta setting is on and older programs may show wrong letters, or that the system locale is English while the program expects Russian.",
+      "Each setting is one row with its name, its value now in words (the number and the name of the code page) and a state shown with an icon and a word: Likely cause, Not the cause or Unknown. Colour is never the only signal.",
+      "The tool never claims a cause it cannot support: with no information about the program's language it says which settings could cause the symptom and asks which language the program uses.",
+      "Apply is the accent button and is labelled with what it will do, for example Turn off UTF-8 beta or Set system locale to Russian. Before it changes anything a confirmation says the change needs a restart and which programs it affects.",
+      "Undo sits beside Apply, is disabled with a tooltip when there is nothing to undo, and restores the values recorded before the last change.",
+      "After a change the status bar says that a restart is pending, because the values stored for the next start differ from the ones the running system uses.",
+      "Without elevation the screen still shows the diagnosis, and Apply and Undo refuse by name: they say that changing the system locale needs an administrator and offer to restart the tool elevated."
+    ],
+    "cut": "This is a new tool, so there is no earlier window to cut from. Three things are left out on purpose: a per-program locale switch (Windows has no such setting and the tool does not pretend to add one), an automatic restart (the tool says a restart is needed and the person chooses when), and a list of named programs said to be affected (only what a program declares itself, in its manifest, is read). Each is recorded in the plan."
+  },
+  "readme": {
+    "lead": "Fix garbled text in older programs: find the Windows setting that turns letters into question marks or boxes, and change it with an undo.",
+    "what": [
+      "Older programs that are not Unicode-aware show text through a code page chosen by Windows. When that code page is wrong, Cyrillic or Japanese text appears as accented Latin letters, boxes or question marks. Three settings decide it: the system locale for non-Unicode programs, the ANSI and OEM code pages that follow from it, and the Beta setting \"Use Unicode UTF-8 for worldwide language support\".",
+      "Locale Fixer reads those settings, says in one sentence which one is the likely cause, and changes it. It records the earlier values first so Undo can put them back, and it tells you before you commit that a restart is needed. A Try it page lets you paste garbled text and see which code page makes it readable."
+    ],
+    "new_intro": "Locale Fixer is a new tool: it has no earlier version, and these are the things it is built around.",
+    "new": [
+      [
+        "It names the cause.",
+        "Instead of a list of settings, it gives one sentence and marks each setting as the likely cause or not."
+      ],
+      [
+        "It undoes.",
+        "Every change records the previous values, and Undo restores exactly those."
+      ],
+      [
+        "It says a restart is needed before you commit.",
+        "The warning comes in the confirmation, and the status bar shows a pending restart afterwards."
+      ],
+      [
+        "It decodes a sample.",
+        "Paste garbled text and see it under each likely code page, to learn which locale the program expects."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new tool: build, engine, window, features, release",
+    "goal": "Locale Fixer ships as a complete, standalone C++ tool: it reads the system locale, the ANSI and OEM code pages and the UTF-8 beta setting, diagnoses which one is responsible for garbled text in older programs and names it in plain words, decodes a pasted sample under candidate code pages, changes the system locale or the UTF-8 setting with the prior values recorded, says that a restart is needed before the user commits, and puts the old values back on Undo.",
+    "current_state": "Nothing exists yet: there is no AutoIt original, no C++ code and no earlier version of this tool, and `reference/au3/` is absent. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan text it came from in `docs/origin/resolute-D05-T07-s6.md`. That text covered four tools in one section; only its fourth bullet concerns this one: a tool for \"the mojibake case: system locale, ANSI code page, and the legacy Unicode setting\" that diagnoses a machine showing unreadable text in legacy applications and names the responsible setting (`docs/origin/resolute-D05-T07-s6.md:16`), with every change reversible (`:17`) and made through the repair contract because a user chose these settings deliberately (`:9`). The Windows facts the plan rests on come from general knowledge of Windows, not from a source here, and the engine's tests state them as fixtures. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s6.md`: the plan section the tool came from, of which the locale item (`:16`) and the reversibility item (`:17`) concern this tool.",
+      "`DESIGN.md`: the tool's identity and its window's sections, and `sdk/DESIGN.md`, the suite's contract.",
+      "`tests/fixtures/`: the locale, code-page and UTF-8 settings of five configurations (English, Cyrillic and Japanese with the UTF-8 beta off, English and Japanese with it on), written with the engine."
+    ],
+    "outcome": [
+      "`LocaleFixer.exe` reads the locale, code-page and UTF-8 settings, and a one-sentence diagnosis names the responsible one, tested against fixtures for each cause.",
+      "A change to the system locale or the UTF-8 setting records the prior values first, is read back after writing, is refused by name when not elevated, says a restart is needed before it is committed, and is undone from the record.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Diagnosis screen, where a person sees each setting, its value in words and whether it is the likely cause. Reporting and audit are the Activity section, the readable trail of what was read and changed. Settings are the framework's pages. Permissions anchor on the engine, where a change without elevation is refused by name before any write. Reverse anchors on the undo section: the tool records the prior values of every value it is about to write and Undo restores those, which takes effect after a restart like the change did.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Locale Read, Diagnosis and Change",
+      "intro": "The tool's whole system effect: reading the locale and code-page settings, deciding from them which one is the likely cause of garbled text, decoding a sample under candidate code pages, and writing the system locale or the UTF-8 setting with the earlier values recorded and read back. Nothing here knows about a window.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the settings the tool reads and writes as data in `src/core/LocaleSettings.h`, and read them in `src/core/LocaleSettings.cpp`. Done when: a test against a redirected registry root returns the values of a fixture and the running values of the API calls.",
+        "Implement the diagnosis in `src/core/Diagnosis.cpp`, the decoder in `src/core/Decoder.cpp` and the change in `src/core/Change.cpp`. Done when: the unit tests pass against a disposable key."
+      ],
+      "items": [
+        "Declare in `src/core/LocaleSettings.h` the values the tool reads (`ACP`, `OEMCP`, `MACCP` under `Control\\Nls\\CodePage`, `Default` under `Control\\Nls\\Language`) and the calls it makes (`GetACP`, `GetOEMCP`, `GetSystemDefaultLocaleName`, `GetUserDefaultLocaleName`). Done when: the header lists each once with a note of what it means, and a test builds the five fixture configurations from it.",
+        "Implement `ReadSettings()` in `src/core/LocaleSettings.cpp` returning the stored values and the running ones side by side, with the code page numbers named (for example 1251 as Cyrillic) and the UTF-8 setting as true when `ACP` is `65001`. Done when: a fixture with the stored value different from `GetACP` reports a pending change. Cheaper substitute: reading only the API calls, which hides a change waiting for a restart.",
+        "Implement `Diagnose(settings, programLanguage)` in `src/core/Diagnosis.cpp` returning one verdict and, per setting, likely cause, not the cause or unknown: the UTF-8 setting on is the likely cause when older programs misread text, a system locale that does not match the program's language is the likely cause when the program's language is known, and the account's format locale is never the cause. Done when: a table of fixtures, one per cause and one with no cause found, each returns the expected verdict. Cheaper substitute: always blaming the system locale, which is wrong when UTF-8 is on.",
+        "Implement `Decode(sample, candidates)` in `src/core/Decoder.cpp`: for each candidate code page, take the sample's characters as the bytes a wrong code page produced, re-read them as that code page with `MultiByteToWideChar`, and score the result by how much of it is letters of one script. Done when: a fixture of Cyrillic text shown as accented Latin letters ranks code page 1251 first and Japanese text ranks 932 first. Cheaper substitute: scoring by the absence of question marks, which ranks wrong pages high.",
+        "Detect text that cannot be recovered: a sample made mostly of `?` or of the replacement character was already converted by the program and the original bytes are gone. Done when: such a fixture returns \"cannot be recovered\" and the reason in words, not a wrong decode.",
+        "Implement `Change(request)` in `src/core/Change.cpp` for the two changes the tool makes: the system locale (writing `Default`, and `ACP`, `OEMCP` and `MACCP` taken from `GetLocaleInfoEx` for that locale) and the UTF-8 setting (writing `65001` to the three code-page values, or restoring them from the locale when turned off), under a root passed in, with the prior values returned in a record first. Done when: a test under a disposable root changes each and the record holds the earlier values. Cheaper substitute: writing through `reg.exe`, which cannot be redirected for a test.",
+        "Read every value back after writing and return a mismatch as value, expected and found. Done when: a test that corrupts one value after the write gets it named. Cheaper substitute: checking only the return code of the write.",
+        "Refuse `Change` by name when the process is not elevated, before any write, with one activity record. Done when: an unelevated test run reports that changing the system locale needs an administrator and the fixture is unchanged. Cheaper substitute: letting the write fail with access denied halfway through.",
+        "Cover every path in `tests/locale_test.cpp` with a disposable root. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L locale` passes, and fails when the diagnosis rule for the UTF-8 setting is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L locale` passes, including the one-fixture-per-cause diagnoses, the unrecoverable sample, the corrupted write and the unelevated refusal, and fails when a diagnosis rule is changed.",
+      "commit": "core: read the locale, diagnose the cause, change it with a record"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Decode Garbled Text",
+        "intro": "The Try it section. A person pastes a piece of garbled text from the program and sees it under each likely code page, with the one that reads marked, and so learns which locale the program expects. It uses the decoder of the engine and changes nothing on the machine.",
+        "surface": {
+          "fidelity": "the Try it section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person finds out which code page makes a garbled sample readable. Consumer: the result list, compared with the decoder's output.",
+          "treatment": "a text box for the sample and a list of candidate code pages, each with the text as it would read and a word for how likely it is. Cheaper substitute that fails the checkpoint: showing only the top guess, which hides the others when the guess is wrong."
+        },
+        "build": [
+          "Build the sample box and the result list in `src/ui/TryItView.cpp` from the SDK's controls. Done when: pasting a sample fills the list.",
+          "Map the best code page to the locale a program expects in `src/core/Decoder.cpp`. Done when: a Cyrillic sample names Russian and a Japanese sample names Japanese."
+        ],
+        "items": [
+          "Add the sample box and the result list in `src/ui/TryItView.cpp`, with each candidate code page named in words, the text under it, and a state (Reads well, Possible or Unlikely) shown with an icon and a word. Done when: pasting a fixture sample fills the list in order of likelihood. Cheaper substitute: a private list control, which the contract forbids.",
+          "Name the locale the program expects from the best code page, and offer to use it as the program's language on the Diagnosis screen. Done when: choosing it changes the verdict sentence from \"which language does the program use?\" to one that names the setting.",
+          "Show the \"cannot be recovered\" result in words when the sample is mostly question marks. Done when: such a sample shows one sentence saying the program already lost the text, with what to try instead.",
+          "Keep the pasted sample on the machine only and never in the log. Done when: a test finds no sample text in the log after a decode.",
+          "Cover it in `tests/decode_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L decode` passes, and fails when the ranking of two code pages is swapped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L decode` passes for the Cyrillic, Japanese and unrecoverable samples, and the Try it list matches the decoder's output.",
+        "commit": "feature: Try it, paste garbled text and see which code page reads"
+      },
+      {
+        "title": "Restart Needed, Said Plainly",
+        "intro": "A change to the system locale or the UTF-8 setting takes effect only after a restart, and the tool says so before the user commits and again afterwards while the restart is pending. It never restarts the machine by itself.",
+        "surface": {
+          "fidelity": "the confirmation and the status bar, against `sdk/DESIGN.md` section 11.",
+          "job": "a person knows a restart is needed before pressing Apply, and knows afterwards that it is still pending. Consumer: the confirmation text and the status bar, read back.",
+          "treatment": "a confirmation that states the change, that it needs a restart, and what the person should save first, with Apply and Cancel; afterwards a status bar line while stored and running values differ. Cheaper substitute that fails the checkpoint: a notice shown after the change, which is too late to decide."
+        },
+        "build": [
+          "Show the confirmation before `Change` runs, in `src/ui/DiagnosisView.cpp`. Done when: declining it leaves the registry unchanged.",
+          "Report the pending restart from `src/core/LocaleSettings.cpp`. Done when: the status bar follows the difference between stored and running values."
+        ],
+        "items": [
+          "Show a confirmation through the framework's message surface before any change, stating in words what will change, that a restart is needed, and that nothing is changed until Apply is confirmed. Done when: Cancel leaves every value as it was, asserted. Cheaper substitute: a private dialog.",
+          "Compute `RestartPending()` in `src/core/LocaleSettings.cpp` as true when a stored value differs from the running one, so a change made earlier or by another tool is also reported. Done when: a fixture with a stored `ACP` different from `GetACP` reports it, and one with both equal does not.",
+          "Show the pending restart in the status bar and on the Diagnosis screen in words, with an icon. Done when: after Apply the line appears, and after the fixture's values are made equal it disappears.",
+          "Offer a Restart now button only after the change, which asks once more and calls the system restart, and which is absent when nothing is pending. Done when: a test of the button's visibility passes in both states, and no restart is ever started without the second confirmation. Cheaper substitute: restarting right after Apply, which can lose a person's unsaved work.",
+          "Cover it in `tests/restart_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restart` passes, and fails when the confirmation is skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restart` passes: the confirmation names the restart, declining changes nothing, and the pending state follows the stored and running values.",
+        "commit": "feature: say a restart is needed before the change, and while it is pending"
+      },
+      {
+        "title": "What This Setting Affects",
+        "intro": "Before the user commits, the tool says in words which programs a change will alter: every program that uses the system code page and does not declare UTF-8 itself, for all users, with nothing changed for Unicode programs or for the display language. Windows has no per-program locale, so the tool says that too and does not offer one.",
+        "surface": {
+          "fidelity": "the explanation on the Diagnosis screen and in the confirmation, against `DESIGN.md` section 2.",
+          "job": "a person understands what a change will alter before committing. Consumer: the explanation text, compared with what a chosen program's manifest declares.",
+          "treatment": "a short plain-words paragraph per setting, and a check of one chosen program that says whether it declares UTF-8 and so ignores the system setting. Cheaper substitute that fails the checkpoint: a warning that says only \"this may affect some programs\", which tells the person nothing."
+        },
+        "build": [
+          "Write the explanation for each setting in `src/core/Effects.cpp`. Done when: each of the three changes has a paragraph that names what it affects and what it does not.",
+          "Read a program's manifest in `src/core/Manifest.cpp`. Done when: a fixture executable that declares UTF-8 is reported as ignoring the system setting."
+        ],
+        "items": [
+          "Write the explanation of each change in `src/core/Effects.cpp`: the system locale, the UTF-8 beta turned on, and the UTF-8 beta turned off, each saying that it applies to all users, to programs that use the ANSI functions, and that Unicode programs and the display language do not change. Done when: a test finds all three paragraphs and a search of them finds no claim about a named program. Cheaper substitute: one general warning for all three, which hides that UTF-8 on breaks some older programs and off does not.",
+          "State that Windows has no per-program locale and that the tool does not add one. Done when: the sentence is in the explanation and the Diagnosis screen offers no per-program switch.",
+          "Read the active code page a program declares in its manifest in `src/core/Manifest.cpp`, from a file the person chooses. Done when: a fixture that declares UTF-8 is reported as ignoring the system setting and one that declares nothing is reported as following it.",
+          "Show the explanation in the confirmation of every change, before Apply. Done when: the confirmation of each change contains its paragraph.",
+          "Cover it in `tests/effects_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L effects` passes, and fails when a paragraph is missing."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L effects` passes: each change has its paragraph, the manifest fixtures are reported correctly, and no per-program switch exists.",
+        "commit": "feature: say what a setting affects before the change"
+      },
+      {
+        "title": "Undo the Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before every change the prior values of the registry values the tool is about to write are recorded, so Undo restores what was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists. Undo needs a restart like the change did, and says so.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back the values the last change replaced. Consumer: the registry values, compared with the record.",
+          "treatment": "the recorded values restored one by one, with the restart warning shown before. Cheaper substitute that fails the checkpoint: an undo that turns the UTF-8 setting off or resets the locale to a default, which is not what was there before."
+        },
+        "build": [
+          "Record the prior values through the repair contract in `src/core/Change.cpp`. Done when: a record exists on disk before the first write.",
+          "Wire Undo in `src/ui/DiagnosisView.cpp`. Done when: a change then Undo leaves the values as they were."
+        ],
+        "items": [
+          "Record the prior `ACP`, `OEMCP`, `MACCP` and `Default` values through the repair contract's restore record before any write. Done when: a test finds the record on disk before the first value is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record value by value, reading each back. Done when: a system locale change then Undo, and a UTF-8 change then Undo, each leave the four values equal to before, asserted.",
+          "Show the restart warning before Undo, as for a change, and report the pending restart after it. Done when: Undo shows the confirmation and the status bar line follows the values.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one change.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: a system locale change then Undo and a UTF-8 change then Undo both leave the four values as they were.",
+        "commit": "feature: undo puts back the values that were there before"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "`docs/origin/resolute-D05-T07-s6.md:16-17` is met: a machine showing unreadable text in older programs is diagnosed, the responsible setting is named, and the change is reversible.",
+      "The engine's fixtures for the five configurations pass, and a real machine's readings match what Windows reports.",
+      "On a real machine the tool reads, diagnoses, decodes a sample, says a restart is needed, changes, verifies and undoes, in light and dark, by keyboard alone."
+    ]
+  }
+}

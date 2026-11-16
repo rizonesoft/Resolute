@@ -159,11 +159,11 @@ Two small tools for two classic annoyances whose fixes are obscure enough that p
 **Needs:** Windows host (build/test)
 
 - [ ] ~~Rebuild the icon and thumbnail caches in `extensions/IconCacheRepair/`, restarting Explorer as part of the operation. Done when: a machine with a deliberately corrupted cache renders correct icons afterwards, captured before and after.~~ -> `rizonesoft/IconCacheRepair`
-- [ ] ~~Warn that Explorer will restart, and what that closes. Done when: the warning appears before the user commits.~~ -> `rizonesoft/IconCacheRepair`
-- [ ] ~~Repair default apps and protocol handlers in `extensions/DefaultAppsRepair/`, covering `http`, `https`, `mailto`, and the common file types. Done when: a deliberately broken handler is repaired and verified by reading it back.~~ -> `rizonesoft/IconCacheRepair`
-- [ ] ~~Capture prior handlers before changing them. Done when: undo restores each handler to exactly what it was, asserted.~~ -> `rizonesoft/IconCacheRepair`
-- [ ] ~~Repair only what is broken, not everything. Done when: a handler the user deliberately set to a third-party application is left alone unless explicitly selected.~~ -> `rizonesoft/IconCacheRepair`
-- [ ] Commit: ~~`"icon cache and default apps: two obscure fixes made obvious"`~~ -> `rizonesoft/IconCacheRepair`
+- [ ] ~~Warn that Explorer will restart, and what that closes. Done when: the warning appears before the user commits.~~ -> `rizonesoft/IconCacheRepair`, `rizonesoft/DefaultAppsRepair`
+- [ ] ~~Repair default apps and protocol handlers in `extensions/DefaultAppsRepair/`, covering `http`, `https`, `mailto`, and the common file types. Done when: a deliberately broken handler is repaired and verified by reading it back.~~ -> `rizonesoft/DefaultAppsRepair`
+- [ ] ~~Capture prior handlers before changing them. Done when: undo restores each handler to exactly what it was, asserted.~~ -> `rizonesoft/IconCacheRepair`, `rizonesoft/DefaultAppsRepair`
+- [ ] ~~Repair only what is broken, not everything. Done when: a handler the user deliberately set to a third-party application is left alone unless explicitly selected.~~ -> `rizonesoft/IconCacheRepair`, `rizonesoft/DefaultAppsRepair`
+- [ ] Commit: ~~`"icon cache and default apps: two obscure fixes made obvious"`~~ -> `rizonesoft/IconCacheRepair`, `rizonesoft/DefaultAppsRepair`
 
 **Test checkpoint:** Moved with the section. The `rizonesoft/IconCacheRepair` repository's plan carries it.
 
@@ -180,18 +180,18 @@ Two tools answering questions about the past. Windows records both and surfaces 
 **Needs:** Windows host (build/test)
 
 - [ ] ~~Record process CPU, disk, and memory over time in `extensions/ResourceHistory/`, at an interval the user controls. Done when: a recorded period renders per process and the recorder's own cost is measured and quoted.~~ -> `rizonesoft/ResourceHistory`
-- [ ] ~~Make the recorder optional and off by default. Done when: it is enabled explicitly, its storage is bounded, and disabling it stops all recording.~~ -> `rizonesoft/ResourceHistory`
-- [ ] ~~Answer the question the tool exists for. Done when: selecting a time range names what was consuming the machine during it.~~ -> `rizonesoft/ResourceHistory`
-- [ ] ~~List every USB device ever connected in `extensions/USBHistory/`, with description, serial where present, and first and last connection. Done when: a machine's list is cross-checked against its registry entries.~~ -> `rizonesoft/ResourceHistory`
-- [ ] ~~Explain what the record can and cannot establish. Done when: the surface states that a device with no serial cannot be distinguished from another of the same model.~~ -> `rizonesoft/ResourceHistory`
-- [ ] ~~Neither tool writes to the system. Done when: neither has a write path, proven by search.~~ -> `rizonesoft/ResourceHistory`
-- [ ] Commit: ~~`"resource and usb history: what windows records and hides"`~~ -> `rizonesoft/ResourceHistory`
+- [ ] ~~Make the recorder optional and off by default. Done when: it is enabled explicitly, its storage is bounded, and disabling it stops all recording.~~ -> `rizonesoft/ResourceHistory`, `rizonesoft/USBHistory`
+- [ ] ~~Answer the question the tool exists for. Done when: selecting a time range names what was consuming the machine during it.~~ -> `rizonesoft/ResourceHistory`, `rizonesoft/USBHistory`
+- [ ] ~~List every USB device ever connected in `extensions/USBHistory/`, with description, serial where present, and first and last connection. Done when: a machine's list is cross-checked against its registry entries.~~ -> `rizonesoft/USBHistory`
+- [ ] ~~Explain what the record can and cannot establish. Done when: the surface states that a device with no serial cannot be distinguished from another of the same model.~~ -> `rizonesoft/ResourceHistory`, `rizonesoft/USBHistory`
+- [ ] ~~Neither tool writes to the system. Done when: neither has a write path, proven by search.~~ -> `rizonesoft/ResourceHistory`, `rizonesoft/USBHistory`
+- [ ] Commit: ~~`"resource and usb history: what windows records and hides"`~~ -> `rizonesoft/ResourceHistory`, `rizonesoft/USBHistory`
 
 **Test checkpoint:** Moved with the section. The `rizonesoft/ResourceHistory` repository's plan carries it.
 
 ## 7. Credential, Display, and Connection Viewers
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/CredentialViewer` repository (`D:\Resolute_Bin\CredentialViewer`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/CredentialViewer`, `rizonesoft/DisplayInfo` and `rizonesoft/ConnectionViewer` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 Three read-only inspectors, grouped because each is a single surface over one thing Windows knows and reports badly.
 
@@ -202,13 +202,13 @@ Three read-only inspectors, grouped because each is a single surface over one th
 **Needs:** Windows host (build/test)
 
 - [ ] ~~List stored credentials in `extensions/CredentialViewer/` by target, type, and user, **without revealing any secret by default**. Done when: the list renders with every secret masked.~~ -> `rizonesoft/CredentialViewer`
-- [ ] ~~**Gate, log, and limit the reveal**, exactly as `§3` requires. Done when: an unelevated reveal is refused by name, a driven reveal writes one log line naming the target but not the secret, and no reveal-all path exists, proven by search.~~ -> `rizonesoft/CredentialViewer`
-- [ ] ~~Report which credentials are causing repeated sign-in prompts, where the system records it. Done when: a stale credential is identified with its reasoning.~~ -> `rizonesoft/CredentialViewer`
-- [ ] ~~Report display configuration in `extensions/DisplayInfo/`: connected monitors, resolution, refresh rate, connection type, colour profile, and EDID identity. Done when: each renders for a multi-monitor machine and is verified against the system.~~ -> `rizonesoft/CredentialViewer`
-- [ ] ~~Report active connections in `extensions/ConnectionViewer/` with the owning process, its path, and its publisher. Done when: a known connection resolves to the right process and its signature state is shown.~~ -> `rizonesoft/CredentialViewer`
-- [ ] ~~Compose rather than re-enumerate. Done when: the connection viewer names a process's startup entry by asking the autoruns enumerator from `D05 T01 §5`, and implements no second one, proven by search.~~ -> `rizonesoft/CredentialViewer`
-- [ ] ~~None of the three writes to the system. Done when: no write path exists in any of them, proven by search.~~ -> `rizonesoft/CredentialViewer`
-- [ ] Commit: ~~`"credential, display, and connection viewers"`~~ -> `rizonesoft/CredentialViewer`
+- [ ] ~~**Gate, log, and limit the reveal**, exactly as `§3` requires. Done when: an unelevated reveal is refused by name, a driven reveal writes one log line naming the target but not the secret, and no reveal-all path exists, proven by search.~~ -> `rizonesoft/CredentialViewer`, `rizonesoft/DisplayInfo`, `rizonesoft/ConnectionViewer`
+- [ ] ~~Report which credentials are causing repeated sign-in prompts, where the system records it. Done when: a stale credential is identified with its reasoning.~~ -> `rizonesoft/CredentialViewer`, `rizonesoft/DisplayInfo`, `rizonesoft/ConnectionViewer`
+- [ ] ~~Report display configuration in `extensions/DisplayInfo/`: connected monitors, resolution, refresh rate, connection type, colour profile, and EDID identity. Done when: each renders for a multi-monitor machine and is verified against the system.~~ -> `rizonesoft/DisplayInfo`
+- [ ] ~~Report active connections in `extensions/ConnectionViewer/` with the owning process, its path, and its publisher. Done when: a known connection resolves to the right process and its signature state is shown.~~ -> `rizonesoft/ConnectionViewer`
+- [ ] ~~Compose rather than re-enumerate. Done when: the connection viewer names a process's startup entry by asking the autoruns enumerator from `D05 T01 §5`, and implements no second one, proven by search.~~ -> `rizonesoft/CredentialViewer`, `rizonesoft/DisplayInfo`, `rizonesoft/ConnectionViewer`
+- [ ] ~~None of the three writes to the system. Done when: no write path exists in any of them, proven by search.~~ -> `rizonesoft/CredentialViewer`, `rizonesoft/DisplayInfo`, `rizonesoft/ConnectionViewer`
+- [ ] Commit: ~~`"credential, display, and connection viewers"`~~ -> `rizonesoft/CredentialViewer`, `rizonesoft/DisplayInfo`, `rizonesoft/ConnectionViewer`
 
 **Test checkpoint:** Moved with the section. The `rizonesoft/CredentialViewer` repository's plan carries it.
 

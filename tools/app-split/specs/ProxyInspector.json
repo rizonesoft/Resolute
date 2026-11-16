@@ -1,0 +1,251 @@
+{
+  "name": "ProxyInspector",
+  "slug": "proxyinspector",
+  "display": "Proxy Inspector",
+  "job": "it reports every proxy setting in force on this PC (the per-user system proxy, the machine-wide WinHTTP proxy, automatic configuration scripts, proxy environment variables) and VPN state, names where each comes from and checks whether anything answers at each proxy address, and changes nothing.",
+  "tagline": "See every proxy and VPN setting on this PC, and where each one comes from",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Graphite blue",
+    "light": "#CBD5E1",
+    "dark": "#475569",
+    "social_ground": "#161D29",
+    "social_muted": "#D5DCE6"
+  },
+  "icon": {
+    "idea": "A line passing through a box and out as an arrow: traffic going through a proxy.",
+    "points": [
+      "Free-standing with no tile behind it: a rounded upright box with a line entering at the left and an arrow leaving at the right.",
+      "The box is Graphite blue, the line and the arrow are Graphite blue light.",
+      "The small drawing below 40 pixels thickens the arrow."
+    ],
+    "large": "<path d=\"M4 48 H26 M70 48 H92 M80 38 L92 48 L80 58\" fill=\"none\" stroke=\"#CBD5E1\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"28\" y=\"20\" width=\"40\" height=\"56\" rx=\"10\" fill=\"#475569\"/><path d=\"M40 48 H56\" fill=\"none\" stroke=\"#CBD5E1\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M4 48 H26 M68 48 H92 M78 34 L92 48 L78 62\" fill=\"none\" stroke=\"#CBD5E1\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"28\" y=\"18\" width=\"40\" height=\"60\" rx=\"11\" fill=\"#475569\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Proxies",
+        "A one-sentence verdict, then each proxy setting as a row: what it is, its value, where it comes from and whether anything answers at that address"
+      ],
+      [
+        "Test an address",
+        "Type a web address and see which proxy would be used for it and why"
+      ],
+      [
+        "Activity",
+        "What the tool read and checked, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every proxy and VPN setting in force on this PC, where each comes from and which ones nothing answers at, so a leftover setting that breaks some programs is found.",
+    "primary": "Refresh",
+    "secondary": "Copy summary",
+    "rows": [
+      [
+        "Per-user proxy",
+        "Set by the user, answering or nothing answers"
+      ],
+      [
+        "Machine-wide WinHTTP proxy",
+        "Direct, or set by the machine, answering or nothing answers"
+      ],
+      [
+        "Automatic configuration script",
+        "Not used, or set by the user or by policy"
+      ],
+      [
+        "Proxy environment variables",
+        "Not set, or set for the user, the machine or this process"
+      ],
+      [
+        "VPN",
+        "None configured, configured, or connected"
+      ]
+    ],
+    "status": "3 proxy settings, 1 with nothing answering",
+    "notes": [
+      "The first line of the Proxies screen is one sentence of verdict, for example that no proxy is set, or that a proxy is set and nothing answers at its address.",
+      "Each row shows its state with an icon and a word: Direct, Answering, Nothing answers, Not checked or Not set. Colour is never the only signal.",
+      "A row reads as a sentence: what the setting is, its value, and where it comes from (the user's setting, a policy, an environment variable, a configuration script). A proxy at 127.0.0.1 with nothing listening is marked as a likely leftover, with what usually leaves it behind.",
+      "Selecting a row shows the detail: the raw value, the registry key or variable it was read from, the bypass list, and the result of the reachability check with the time it took.",
+      "Refresh is the accent button and reads every source again; Copy summary is beside it and puts the verdict and the rows on the clipboard as text. The tool changes no setting, so it has no Undo and no confirmation.",
+      "The status bar says how many proxy settings are in force and how many have nothing answering, in words.",
+      "The tool needs no elevation and never asks for it; a source that cannot be read is shown as Could not read, with the reason, and the rest of the list stays."
+    ],
+    "cut": "The tool is new and has no earlier window, so nothing is cut from an original. It has no menus, no splash, no animations and no donate strip, as no tool of the suite does. Preferences and About are the framework's pages hosted in the sidebar, and the plan records them as their own sections."
+  },
+  "readme": {
+    "lead": "Proxy Inspector shows every proxy and VPN setting on this PC and where each one comes from.",
+    "what": [
+      "When the internet works in a browser but not in some programs, a leftover proxy setting is a common cause. Malware or a program that was uninstalled can leave a proxy behind, often pointing at 127.0.0.1 where nothing listens. Windows keeps proxy settings in several places that do not agree: the per-user system proxy, the machine-wide WinHTTP proxy, an automatic configuration script (PAC), automatic detection, and the HTTP_PROXY, HTTPS_PROXY and NO_PROXY environment variables that command-line tools obey. Proxy Inspector reads all of them, names the source of each, checks whether anything answers at each proxy address, and reports the state of any VPN.",
+      "You can also type a web address and see which proxy Windows would use for it, and why, including the answer a configuration script gives. Proxy Inspector only reads. A proxy is reset in ComIntRep, when it is installed, or in Windows' own settings."
+    ],
+    "new_intro": "Proxy Inspector is a new tool, not a port, so everything in it is new.",
+    "new": [
+      [
+        "It shows every place a proxy can be set.",
+        "The per-user setting, the machine-wide WinHTTP setting, a configuration script, automatic detection, the environment variables and VPN state are listed together, each with its source."
+      ],
+      [
+        "It flags a dead proxy.",
+        "A proxy that nothing answers at is marked with an icon and a word, with what usually left it there."
+      ],
+      [
+        "It answers for one address.",
+        "Type a web address and see which proxy would be used for it, and the reason, including the result of a configuration script."
+      ],
+      [
+        "It changes nothing.",
+        "The tool only reads, so there is nothing to undo, and it hands over to ComIntRep when you want a proxy reset."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new tool: proxy sources, window, address test, release",
+    "goal": "Proxy Inspector ships as a complete, standalone C++ tool that reports every proxy setting in force on the machine and names the source of each: the per-user system proxy, the machine-wide WinHTTP proxy, automatic configuration scripts and automatic detection, the proxy environment variables, and VPN state. It checks whether anything answers at each named proxy, evaluates which proxy applies to a given web address and why, flags a leftover proxy with what usually left it, and changes nothing.",
+    "current_state": "Nothing exists yet: this is a new tool and no code, no original and no reference material exist for it. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan text of the Resolute repository in `docs/origin/resolute-D05-T07-s7.md`, which covers four network tools in one section (only the Proxy Inspector line, `resolute-D05-T07-s7.md:15`, and the remote-case line at `:16` apply; the firewall, adapter and DNS tools are different tools). That line asks for system proxy, per-application proxy, PAC scripts and VPN state, with the source of each named. The design rests on how Windows stores proxy settings: the per-user `Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings` key (`ProxyEnable`, `ProxyServer`, `ProxyOverride`, `AutoConfigURL`), read with `WinHttpGetIEProxyConfigForCurrentUser`; the machine-wide WinHTTP proxy read with `WinHttpGetDefaultProxyConfiguration` (what `netsh winhttp show proxy` prints); `WinHttpGetProxyForUrl` to evaluate a configuration script for an address; the policy that makes proxy settings per-machine; the `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables; and `RasEnumConnections` with the VPN profile list for VPN state. A proxy at 127.0.0.1 with nothing listening is the tell-tale leftover. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s7.md`: the plan section as it stood in the Resolute repository. Only the Proxy Inspector part applies; the firewall rules tool, the adapter manager and the DNS selector are different tools.",
+      "The per-user and policy `Internet Settings` keys under `HKCU` and `HKLM`, the WinHTTP proxy configuration, and the proxy environment variables of the user, the machine and the process: what the engine reads.",
+      "The Remote Access phone books and `RasEnumConnections`: where VPN profiles and the active VPN connections are read from."
+    ],
+    "outcome": [
+      "`ProxyInspector.exe` lists every proxy source with its value and its origin (user setting, policy, environment, script), checks whether anything answers at each named proxy within a time limit, and reports VPN state.",
+      "Typing a web address shows which proxy would be used for it and the reason, including the result of the automatic configuration script, and the tool writes no setting anywhere.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Proxies screen, where a person finds the setting that breaks some programs and reads where it comes from. Reporting and audit are the Activity section, the trail of what was read and checked. Settings are the framework's pages. Permissions do not apply, because every source is readable by a standard user and the tool never asks for elevation. Reverse does not apply, because the tool changes nothing: a proxy is reset in ComIntRep or in Windows' own settings.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Proxy Source Reading Engine",
+      "intro": "The tool's whole knowledge, independent of any window: one table of proxy sources declared as data, each read independently with its origin, a reachability check of each named proxy with a time limit, the evaluation of which proxy applies to a given address, and VPN state. It reads only and writes no setting. A source that cannot be read is reported as such and never stops the others.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the proxy sources as data in `src/core/ProxySources.h`. Done when: every source the tool reads is stated once, with the key, variable or call it is read from and the origin it reports.",
+        "Implement the readers, the reachability check, the address evaluation and the VPN read in `src/core/` against a registry root, an environment and a network the tests can redirect. Done when: the unit tests pass against a disposable key, a fixture environment and a local test listener."
+      ],
+      "items": [
+        "Declare in `src/core/ProxySources.h` one table of sources (per-user setting, per-user script, automatic detection, machine-wide WinHTTP, `HTTP_PROXY`, `HTTPS_PROXY`, `NO_PROXY` and their lower-case forms, VPN), each row naming what it is, where it is read and which origin it reports (user setting, policy, environment, script). Done when: a test finds no source without a name, a place and an origin, and adding a row adds it to the report with no other edit.",
+        "Implement `ReadUserProxy()` in `src/core/UserProxy.cpp` reading `ProxyEnable`, `ProxyServer`, `ProxyOverride` and `AutoConfigURL` from the per-user `Internet Settings` key and automatic detection from `WinHttpGetIEProxyConfigForCurrentUser`, and reporting a value found under the `Policies` Internet Settings or Internet Explorer control panel keys, or made per-machine by the `ProxySettingsPerUser` policy, with origin policy and not user setting. Done when: fixtures for a user setting, a policy and a per-machine policy report origins user setting, policy and policy. Cheaper substitute: reading only `ProxyServer`, which reports a proxy that is switched off as in force and misses a script and the policy origin.",
+        "Implement `ReadWinHttpProxy()` in `src/core/WinHttpProxy.cpp` calling `WinHttpGetDefaultProxyConfiguration` and returning the access type, the proxy and the bypass list. Done when: the same configuration `netsh winhttp show proxy` prints is returned for a direct, a named-proxy and a bypass-list fixture. Cheaper substitute: parsing the text of `netsh winhttp show proxy`, which changes with the display language.",
+        "Implement `ReadEnvironmentProxy()` in `src/core/EnvProxy.cpp` reading `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY` and `NO_PROXY` (both cases) from the process environment, the user's `Environment` key and the machine's `Environment` key, reporting which of the three holds each. Done when: a fixture with the variable set only in the machine key reports it with origin machine environment, which a read of the process environment alone would miss.",
+        "Implement `ProbeProxy()` in `src/core/Probe.cpp` opening a connection to each named proxy host and port on a worker thread, with the time limit a named constant in `src/core/Probe.h`, returning Answering, Refused, Timed out or Could not resolve with the time taken. Done when: a local test listener returns Answering and a closed local port returns Refused, each within the limit, and a non-routable address returns Timed out at the limit. Cheaper substitute: probing on the interface thread, which freezes the window for as long as a dead address takes to fail.",
+        "Implement `ResolveForAddress()` in `src/core/Resolve.cpp` returning the proxy that applies to a web address and the reason: the bypass list and `NO_PROXY` matched first, then the configuration script evaluated with `WinHttpGetProxyForUrl` (using automatic detection or the script address as configured), then the static proxy. Done when: fixtures return, for one address, a bypass match, a script answer and a static proxy, each with its reason in words. Cheaper substitute: returning the static `ProxyServer` for every address, which ignores the script and the bypass list that decide the answer.",
+        "Implement `ReadVpn()` in `src/core/Vpn.cpp` listing the configured VPN profiles from the Remote Access phone books through `RasEnumEntries` and the active connections through `RasEnumConnections`. Done when: a fixture with one profile and one active connection reports one configured and one connected, and a machine with neither reports none. Cheaper substitute: inferring a VPN from an adapter name, which misses profiles that are not connected.",
+        "Implement `Verdict()` in `src/core/Verdict.cpp` composing the one-sentence verdict from the rows, and marking a proxy at a loopback address with nothing answering as a likely leftover with the reasoning. Done when: fixtures for no proxy, a live proxy and a dead loopback proxy give three different sentences, the last naming that the program which set it is often uninstalled or malware.",
+        "Cover every path in `tests/proxy_test.cpp` with a disposable registry root, a fixture environment and a local listener that is closed at teardown. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L proxy` passes, and fails when one origin in `ProxySources.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L proxy` passes, including the policy origin, the dead loopback proxy, the script evaluation and the VPN fixtures, and fails when one declared origin is changed.",
+      "commit": "core: proxy sources read with their origin, checked and evaluated"
+    },
+    "enhancements": [
+      {
+        "title": "Dead Proxy Warning",
+        "intro": "A proxy that nothing answers at is the usual reason some programs fail while a browser with its own settings works. The warning marks such a proxy with an icon and a word, and says what usually left it there, so a person knows what to look for next.",
+        "surface": {
+          "fidelity": "the Proxies screen and its detail, against `DESIGN.md` section 2.",
+          "job": "a person sees at once which proxy settings point at nothing and why that may be. Consumer: the rows, read back against the reachability results.",
+          "treatment": "an icon and the words Nothing answers on the row, with a likely cause in the detail. Cheaper substitute that fails the checkpoint: a red row with no word, which says nothing to a person who cannot see colour and nothing about the cause."
+        },
+        "build": [
+          "Show the reachability state and the likely cause in `src/ui/ProxiesView.cpp`. Done when: a dead fixture proxy shows the icon, the word and the cause.",
+          "Keep the probe off the interface thread. Done when: the window stays responsive while a probe waits out its limit."
+        ],
+        "items": [
+          "Show the reachability result on each row in `src/ui/ProxiesView.cpp` as an icon and a word (Answering, Nothing answers, Not checked). Done when: a fixture with one live and one dead proxy shows both words and the window can be operated while the dead one is still being checked. Cheaper substitute: colour alone.",
+          "Write the likely causes as data in `src/core/Causes.h`: a loopback address with nothing listening, a proxy host that no longer resolves, and a script address that no longer answers, each with what usually leaves it (an uninstalled program, a closed filtering or VPN tool, malware). Done when: each cause is returned only for the state that matches it and a live proxy returns none.",
+          "Show the cause in the row's detail and in the verdict sentence, without telling the person to delete anything. Done when: a dead loopback fixture names the cause and points to ComIntRep or Windows' own settings for the reset.",
+          "Cover it in `tests/deadproxy_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L deadproxy` passes, and fails when a live proxy is marked dead."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L deadproxy` passes: a dead fixture proxy shows its icon, its word and its likely cause, and a live one shows none.",
+        "commit": "feature: a dead proxy is flagged with what usually left it"
+      },
+      {
+        "title": "Which Proxy for This Address",
+        "intro": "A proxy setting only matters for the addresses it applies to, and a configuration script can answer differently for each. The Test an address section takes a web address and shows which proxy would be used for it and why, including the script's answer.",
+        "surface": {
+          "fidelity": "the Test an address section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person types the address a failing program uses and learns which proxy it would go through and why. Consumer: the engine's evaluation, read back.",
+          "treatment": "one input, one sentence of answer naming the proxy or Direct, and the reason with its source. Cheaper substitute that fails the checkpoint: showing the static proxy for every address, which is wrong wherever a script or a bypass list decides."
+        },
+        "build": [
+          "Build the section in `src/ui/TestAddressView.cpp` on the SDK's input and list controls. Done when: typing an address and pressing Enter shows the answer.",
+          "Bind it to `ResolveForAddress()`. Done when: the answer for each fixture address equals the engine's."
+        ],
+        "items": [
+          "Build `src/ui/TestAddressView.cpp` with an address field and an answer area. Done when: a person can type, press Enter and read the answer without the mouse. Cheaper substitute: a private text control, which the contract forbids.",
+          "Show the answer as the proxy (or Direct) first and the reason second, with the source of the rule that decided it (bypass list, script, static proxy). Done when: three fixture addresses show three different reasons.",
+          "Run the script evaluation off the interface thread and show Checking while it runs. Done when: a script fixture that is slow to answer leaves the window responsive and then shows its answer.",
+          "Say plainly when the address is not valid or the script cannot be fetched, and show the answer the engine could still give. Done when: a malformed address and an unreachable script each show their own message.",
+          "Cover it in `tests/testaddress_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L testaddress` passes, and fails when the bypass list is ignored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L testaddress` passes: bypass, script and static fixtures each give their own proxy and reason.",
+        "commit": "feature: which proxy applies to an address, and why"
+      },
+      {
+        "title": "Hand Off to ComIntRep",
+        "intro": "Proxy Inspector only reads, and a proxy is reset in ComIntRep. When ComIntRep is installed, the tool offers to open it; when it is not, the tool says so and points to Windows' own proxy settings. The tool never depends on ComIntRep to work.",
+        "surface": {
+          "fidelity": "the action on a proxy row and its detail, against `DESIGN.md` section 2.",
+          "job": "a person who has found a leftover proxy gets to the place where it is reset. Consumer: the launched tool or the opened Windows settings page.",
+          "treatment": "one action named for what it does, shown only when ComIntRep is found, with the Windows settings page offered otherwise. Cheaper substitute that fails the checkpoint: a button that always shows and fails silently when ComIntRep is absent."
+        },
+        "build": [
+          "Find an installed ComIntRep in `src/core/HandOff.cpp`. Done when: a fixture with it registered returns its path and one without returns none.",
+          "Add the action in `src/ui/ProxiesView.cpp`. Done when: it starts ComIntRep when found and opens Windows' proxy settings page when not."
+        ],
+        "items": [
+          "Implement `FindComIntRep()` in `src/core/HandOff.cpp` looking in the registered application paths and the uninstall list, and returning its path or none. Done when: a registered fixture returns the path and an empty fixture returns none. Cheaper substitute: assuming a fixed install folder, which fails when the suite is installed elsewhere.",
+          "Add a Reset in ComIntRep action to `src/ui/ProxiesView.cpp` shown on a proxy row only when `FindComIntRep()` returns a path, starting it with no argument. Done when: it starts the fixture executable once and is absent when none is found. Cheaper substitute: a command line that assumes ComIntRep accepts arguments it has not declared.",
+          "When ComIntRep is not found, show an action that opens Windows' own proxy settings page and one line saying where the reset is done. Done when: the fixture without ComIntRep shows that action and the line.",
+          "Record the hand-off in the Activity record, naming the tool or page opened. Done when: one press adds one record and the tool itself changed no setting, asserted by a registry comparison before and after.",
+          "Cover it in `tests/handoff_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes, and fails when the action shows with ComIntRep absent."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes: the action appears only when ComIntRep is found, and the tool's registry is unchanged after it.",
+        "commit": "feature: hand a leftover proxy to ComIntRep for reset"
+      },
+      {
+        "title": "Copy a Summary for Support",
+        "intro": "A person asking for help, or a support reader, needs the proxy picture in text. The summary writes the verdict and each row as plain text, with the source of each, and leaves out anything the screen does not show.",
+        "surface": {
+          "fidelity": "the Copy summary action in the Proxies header, against `DESIGN.md` section 2.",
+          "job": "a person sends the proxy picture of this PC to someone who can help. Consumer: the clipboard text, read back against the rows.",
+          "treatment": "the verdict sentence, then one line per source with its value, origin and reachability in words. Cheaper substitute that fails the checkpoint: copying raw registry values, which drops the origin and the reachability that make it useful."
+        },
+        "build": [
+          "Write the summary text in `src/core/Summary.cpp`. Done when: it holds the verdict and one line per row with every column of the screen.",
+          "Wire Copy summary in `src/ui/ProxiesView.cpp`. Done when: it puts the text on the clipboard."
+        ],
+        "items": [
+          "Implement `BuildSummary()` in `src/core/Summary.cpp` returning the verdict and one line per row with the value, origin and reachability in words. Done when: a fixture list produces text whose lines equal the rows on screen.",
+          "Leave out anything the screen does not show, and mask any user name or password inside a proxy address (`user:password@host`) as `***` in the summary and on screen. Done when: a fixture proxy with credentials shows the host and port and never the credentials.",
+          "Wire Copy summary in `src/ui/ProxiesView.cpp` through the framework's clipboard service. Done when: pressing it puts the text on the clipboard and the status bar says so. Cheaper substitute: a private clipboard call, which the contract forbids.",
+          "Cover it in `tests/summary_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes, and fails when credentials appear in the text."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes: the copied text equals the rows on screen and carries no credentials.",
+        "commit": "feature: copy a proxy summary for support"
+      }
+    ],
+    "no_reverse": "the tool reads the proxy settings and changes nothing; a proxy is reset in ComIntRep or in Windows' own settings",
+    "verification": [
+      "Fixtures for a user proxy, a policy proxy, a machine-wide WinHTTP proxy, a script, an environment variable and a VPN each report their value with the right origin, and a dead loopback proxy is flagged with its likely cause.",
+      "Typing an address shows the proxy that applies and the reason, matching `WinHttpGetProxyForUrl` for a script fixture, and a registry comparison before and after a full run shows the tool wrote nothing.",
+      "On a real machine behind a proxy the tool lists every layer with its source, in light and dark, by keyboard alone."
+    ]
+  }
+}

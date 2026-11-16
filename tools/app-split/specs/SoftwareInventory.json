@@ -1,0 +1,251 @@
+{
+  "name": "SoftwareInventory",
+  "slug": "softwareinventory",
+  "display": "Software Inventory",
+  "job": "it lists the software installed on this PC with its version, publisher, size and install date, and exports the list to a documented file, reading only and never changing anything.",
+  "tagline": "Everything installed on this PC, with its version, publisher, size and date",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Moss",
+    "light": "#BEF264",
+    "dark": "#4D7C0F",
+    "social_ground": "#16230A",
+    "social_muted": "#D6ECAE"
+  },
+  "icon": {
+    "idea": "A clipboard with four app tiles: an inventory of programs.",
+    "points": [
+      "It is free-standing, with no tile behind it, and the board is a rounded shape with a clip at the top.",
+      "The board is Moss. The clip and the four small tiles on it are Moss light.",
+      "The small drawing, used below 40 pixels, has two larger tiles."
+    ],
+    "large": "<rect x=\"14\" y=\"14\" width=\"68\" height=\"74\" rx=\"11\" fill=\"#4D7C0F\"/><rect x=\"34\" y=\"6\" width=\"28\" height=\"16\" rx=\"6\" fill=\"#BEF264\"/><rect x=\"26\" y=\"34\" width=\"18\" height=\"18\" rx=\"5\" fill=\"#BEF264\"/><rect x=\"52\" y=\"34\" width=\"18\" height=\"18\" rx=\"5\" fill=\"#BEF264\"/><rect x=\"26\" y=\"60\" width=\"18\" height=\"18\" rx=\"5\" fill=\"#BEF264\"/><rect x=\"52\" y=\"60\" width=\"18\" height=\"18\" rx=\"5\" fill=\"#BEF264\"/>",
+    "small": "<rect x=\"12\" y=\"12\" width=\"72\" height=\"78\" rx=\"12\" fill=\"#4D7C0F\"/><rect x=\"32\" y=\"4\" width=\"32\" height=\"18\" rx=\"7\" fill=\"#BEF264\"/><rect x=\"24\" y=\"38\" width=\"20\" height=\"34\" rx=\"6\" fill=\"#BEF264\"/><rect x=\"52\" y=\"38\" width=\"20\" height=\"34\" rx=\"6\" fill=\"#BEF264\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Installed",
+        "The count in the header, and one row per program with its origin"
+      ],
+      [
+        "Details",
+        "The selected program's install folder, uninstall command (shown only) and record location"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every program installed on this PC and saves the list to a file.",
+    "primary": "Export",
+    "secondary": "Refresh",
+    "rows": [
+      [
+        "Registry, 64-bit view",
+        "Origin: Registry"
+      ],
+      [
+        "Registry, 32-bit view",
+        "Origin: Registry (32-bit)"
+      ],
+      [
+        "Current user",
+        "Origin: Current user"
+      ],
+      [
+        "Windows Installer",
+        "Origin: Installer"
+      ],
+      [
+        "Packaged apps",
+        "Origin: Package"
+      ]
+    ],
+    "status": "212 programs, 3 without a size",
+    "notes": [
+      "The header shows the count of programs in words, for example \"212 programs\", and it changes when the list is refreshed.",
+      "Each program is one row with its name, version, publisher, size, install date and origin. A value the record does not hold is shown as an empty cell, never as 0 or a placeholder.",
+      "Each row's origin (Registry, Registry 32-bit, Current user, Installer or Package) is shown as an icon and a word, so the source of a record is never colour alone.",
+      "Export is the accent button. It asks where to save the file and writes the list there, and it is the only thing the tool writes.",
+      "Refresh reads every source again and replaces the list. The selected program stays selected when it is still installed.",
+      "Selecting a row fills the Details section: install folder, the uninstall command as text that can be copied, and the location of the record. The command is shown and never run, and there is no uninstall button anywhere.",
+      "The status bar reads in words, for example \"212 programs, 3 without a size\". The tool needs no elevation and never asks for it."
+    ],
+    "cut": "There is no earlier window to cut from: this is a new tool and nothing is ported. The window has no menus, no splash, no animation and no donate strip, because the suite's tool window does not carry them. It also has no uninstall or repair button, on purpose: the tool reads the list and writes one export file, and the plan records that as its reason for having no reverse."
+  },
+  "readme": {
+    "lead": "See everything installed on this PC, and save the list.",
+    "what": [
+      "Software Inventory reads the places Windows keeps its list of installed programs, joins them into one list without duplicates, and shows each program with its version, publisher, size and install date. Every row also says where its record came from.",
+      "The list can be exported as CSV or in a structured file with a version field. The structured file is documented so that the suite's System Report tool can read it, and neither tool needs the other to be installed. Software Inventory only reads: it does not install, repair or uninstall anything."
+    ],
+    "new_intro": "Software Inventory is a new tool, written for the suite, and these are the things it does that the usual lists do not.",
+    "new": [
+      [
+        "One list from every source.",
+        "The 64-bit and 32-bit registry views, per-user installs, Windows Installer products and packaged apps are merged, and a program that appears in two of them is listed once."
+      ],
+      [
+        "Origin on every row.",
+        "Each program shows which source its record came from, so a missing or doubtful entry can be traced."
+      ],
+      [
+        "Safe by design.",
+        "It never queries `Win32_Product`, which makes Windows run a repair of every installed package just to be listed."
+      ],
+      [
+        "A documented export.",
+        "CSV and a structured file with a version field, which an older reader can open and which System Report can read."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new tool: engine, window, export, features, release",
+    "goal": "Software Inventory ships as a complete, standalone C++ tool: it lists the software installed on this PC from every place Windows records it, merges the records into one list without duplicates, keeps each row's origin, shows version, publisher, size and install date, never queries `Win32_Product`, and exports the list in a documented, versioned CSV and structured file that the suite's System Report tool can read without either tool depending on the other at runtime.",
+    "current_state": "Nothing exists yet, in C++ or in any other language: this is a new tool and nothing is ported, so there is no AutoIt original and no `reference/au3/`. The repository holds its plan text under `docs/origin/` (one line, `docs/origin/resolute-D05-T07-s8.md:22`, which asks for installed software with version, publisher, size and install date, exportable into the System Report), the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. What Windows offers is known and is the basis of the plan: the Uninstall keys under `HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall`, the 32-bit view under `WOW6432Node`, and `HKCU` for per-user installs, with `DisplayName`, `DisplayVersion`, `Publisher`, `InstallDate`, `EstimatedSize`, `SystemComponent` and `ParentKeyName`; Windows Installer product enumeration with `MsiEnumProductsEx` and `MsiGetProductInfo`; and packaged apps through the package manager. Many entries carry no size or no date, and the same program often appears in more than one view. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s8.md`: the plan text for this tool, which is one checklist line (`:22`) among several other small tools.",
+      "The Windows registry and the Windows Installer and package manager interfaces of the machine the tool runs on: the only source of the list, read and never written.",
+      "`DESIGN.md` and `brand/`: the tool's identity and the sections of its window."
+    ],
+    "outcome": [
+      "`SoftwareInventory.exe` lists the installed software from every source in one list without duplicates, with each row's origin kept, and the list matches what Windows itself reports, checked against the Installed apps page and Windows Installer's own count.",
+      "The tool never queries `Win32_Product`, proven by a search of the source, and it writes nothing except the one export file the user chooses, in CSV and in a documented, versioned structured form.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Installed screen, where a person finds a program by name, publisher, date or size. Reporting and audit are the Activity section, which records each refresh and each export. Settings are the framework's pages. Permissions do not apply: every source is readable by a standard user, and the tool never asks for elevation. Reverse does not apply, because the tool reads the list and writes one export file where the user says; it installs and removes nothing, and the uninstall command in Details is text that is shown and never run.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Software Source Engine",
+      "intro": "The tool's whole core, independent of any window: one table of sources declared as data (each registry view, Windows Installer, packaged apps), a merge of their records into one list without duplicates and with each row's origin kept, and a documented, versioned export in CSV and in a structured form. It reads only, and it never queries `Win32_Product`, because that class makes Windows repair every installed package as a side effect of being listed.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the sources as data in `src/core/Sources.h` and read them in `src/core/Inventory.cpp`. Done when: the unit tests list a fixture registry root and a fixture package list into rows with origin.",
+        "Write the merge and the export in `src/core/Merge.cpp` and `src/core/Export.cpp`. Done when: the fixture produces one list without duplicates and a CSV and a structured file that read back equal."
+      ],
+      "items": [
+        "Declare in `src/core/Sources.h` one table of sources as data: the `HKLM` Uninstall key, the same key under `WOW6432Node`, the `HKCU` Uninstall key, Windows Installer and packaged apps, each with its origin name and a registry root the tests can redirect. Done when: adding a source is one table row and a test lists all five names. Cheaper substitute: one hard-coded function per source, which makes a sixth source a code change.",
+        "Implement the registry reader in `src/core/Inventory.cpp` reading `DisplayName`, `DisplayVersion`, `Publisher`, `InstallDate`, `EstimatedSize`, `InstallLocation`, `UninstallString`, `SystemComponent` and `ParentKeyName` from each key, with no write or delete call anywhere. Done when: a fixture root with one complete entry, one with no size, one with no date and one with no `DisplayName` gives three rows with the missing values empty and the nameless one left out, and the nameless one is counted. Cheaper substitute: turning a missing size or date into `0`, which shows a false value.",
+        "Parse `InstallDate` (`yyyymmdd`) into a date and `EstimatedSize` (kilobytes) into bytes in `src/core/Inventory.cpp`, keeping a malformed value as empty and recording it in the row's notes. Done when: a test with `20240131`, `2024-01-31`, a blank and a size of `0` returns a date, an empty, an empty and an empty size. Cheaper substitute: showing the raw string, which sorts wrongly.",
+        "Enumerate Windows Installer products in `src/core/Installer.cpp` with `MsiEnumProductsEx` and read name, version, publisher, install date and install location with `MsiGetProductInfo`, and enumerate packaged apps in `src/core/Packages.cpp` through the package manager. Done when: each returns rows with its origin, and the source file contains no call that installs, repairs, reinstalls or configures a product. Cheaper substitute: querying `Win32_Product`, which triggers a repair of every installed package.",
+        "Prove `Win32_Product` is never used: add a test in `tests/source_scan_test.cpp` that reads every file under `src/` and fails when the text `Win32_Product` appears in any of them outside a comment that explains the ban. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L scan` passes, and fails when a file under `src/` mentions the class in code.",
+        "Implement the merge in `src/core/Merge.cpp`: a registry key whose name is an Installer product code and the Installer record for that code are one program, and the same name, version and publisher in the 64-bit and the 32-bit view are one program, each keeping every origin it was found in. Done when: a fixture with the same program in two views and in Installer lists it once with both origins, and two different programs with the same name stay two. Cheaper substitute: de-duplicating on name alone, which merges different programs.",
+        "Hide system components and updates by flag, not by deletion: mark a row `SystemComponent=1` or with a `ParentKeyName` as a component or an update in `src/core/Merge.cpp` and keep it in the list. Done when: the engine returns the row with its kind, and a count of each kind is available to the header.",
+        "Write the export in `src/core/Export.cpp`: CSV with a header row and a structured file (JSON) with a `format` name, a `version` number and a `generated` time, written to the path the caller gives through a temporary file and a rename, with the CSV and the structured file holding the same rows. Done when: a test writes both, reads both back and compares them field by field, and a failed write leaves no half file. Cheaper substitute: writing straight to the target, which leaves a broken file when the write fails.",
+        "Cover every path in `tests/inventory_test.cpp`, `tests/merge_test.cpp` and `tests/export_test.cpp` with a redirected registry root and a fixture package list. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L inventory` passes, and fails when the merge key is changed to the name alone."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L inventory` passes, including the missing size and date, the duplicate views, the export round trip and the source scan for `Win32_Product`, and fails when the merge key is weakened.",
+      "commit": "core: the installed software list from every source, merged and exportable"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Export for System Report",
+        "intro": "The plan says the export feeds the suite's System Report tool. This section makes that a documented file: a format with a name, a version field and a stated set of columns, so System Report reads it without Software Inventory being installed, and Software Inventory never calls System Report. A reader written for an older version of the format must skip fields it does not know, and a test proves it.",
+        "surface": {
+          "fidelity": "the Export action and its save dialog, against `sdk/DESIGN.md` section 11.",
+          "job": "a person saves the list to a file that another tool can read. Consumer: the file, read back by a reader written from the document alone.",
+          "treatment": "the framework's save dialog with CSV and structured choices, and a result line in Activity naming the file and the count. Cheaper substitute that fails the checkpoint: a file whose layout is known only from the code, which nobody else can read."
+        },
+        "build": [
+          "Write the format document in `docs/export-format.md` and the writer and reader in `src/core/Export.cpp`. Done when: a reader written only from the document reads the file.",
+          "Wire Export in `src/ui/InstalledView.cpp`. Done when: the file is written where the user chose and Activity names it."
+        ],
+        "items": [
+          "Write `docs/export-format.md` stating the format name, the `version` field, every field with its type and unit (bytes for size, an ISO date for install date, empty for unknown) and the rule that a reader skips unknown fields. Done when: every field the writer in `src/core/Export.cpp` emits is in the document, checked by a test that parses the document's field list and compares it with the writer's.",
+          "Implement a reader in `src/core/ExportReader.cpp` that reads the structured file of the current version and of an older one, and skips fields it does not know. Done when: a fixture file with an extra unknown field per row and an extra top-level field reads without error and gives the known fields. Cheaper substitute: a strict parser, which breaks the day a field is added.",
+          "Add the version rule in `src/core/ExportReader.cpp`: a file with a newer major version is refused by name, and a newer minor version is read. Done when: tests for a newer minor and a newer major give a read and a named refusal.",
+          "Wire the Export button in `src/ui/InstalledView.cpp` to the framework's save dialog and the engine's writer, then add the result to Activity. Done when: choosing CSV and then the structured form each writes a file with the row count shown in the header, and a cancelled dialog writes nothing. Cheaper substitute: a private file dialog, which the contract forbids.",
+          "Cover it in `tests/export_format_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes, and fails when the writer emits a field the document does not list."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L export` passes: the document and the writer agree, an older reader skips unknown fields, and a newer major version is refused by name.",
+        "commit": "feature: a documented, versioned export that System Report can read"
+      },
+      {
+        "title": "Search, Sort and Filter",
+        "intro": "A machine can hold several hundred programs, so the list needs a way to narrow and order it. A search box matches name and publisher, the columns sort, and filters narrow by publisher, install date and size. Programs with no size or no date are kept and sorted last, not dropped.",
+        "surface": {
+          "fidelity": "the search box, column headers and filter controls of the Installed section, against `sdk/DESIGN.md` section 16.",
+          "job": "a person finds a program or a group of programs quickly. Consumer: the rendered rows, compared with the engine's list.",
+          "treatment": "the SDK's search field, list headers and filter chips, with the count in the header changing to match. Cheaper substitute that fails the checkpoint: filtering the displayed text, which breaks sorting and the export."
+        },
+        "build": [
+          "Write the query in `src/core/Query.cpp` over the merged list. Done when: tests filter and sort a fixture of rows.",
+          "Bind the search box, headers and filters in `src/ui/InstalledView.cpp`. Done when: the shown rows and the header count follow the query."
+        ],
+        "items": [
+          "Implement `Query` in `src/core/Query.cpp` with a text match on name and publisher, a publisher filter, an install-date range and a size range. Done when: a fixture of ten rows returns the expected rows for each filter alone and for two together. Cheaper substitute: matching on the displayed strings, which fails for dates and sizes.",
+          "Sort by any column in `src/core/Query.cpp`, ascending or descending, with rows that have no size or no date sorted last in both directions. Done when: a fixture with two empty sizes keeps them at the end either way.",
+          "Bind the search field, the column headers and the filters in `src/ui/InstalledView.cpp`, and make the header count say how many of the total are shown, for example \"40 of 212 programs\". Done when: typing in the search field changes the rows and the count together, and clearing it restores both. Cheaper substitute: a private text box and a hand-drawn header row, which the contract forbids.",
+          "Make the export write the rows the query shows only when the user asks for that, and the whole list otherwise. Done when: a test exports with a filter set and gets the whole list by default and the shown rows with the option.",
+          "Cover it in `tests/query_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L query` passes, and fails when empty sizes sort first."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L query` passes: filters, sorts and the shown count agree with the engine's list, and empty sizes and dates sort last.",
+        "commit": "feature: search, sort and filter the installed list"
+      },
+      {
+        "title": "Compare Two Exports",
+        "intro": "Two saved lists, from two dates or two machines, are compared to show what was added, what was removed and what changed version. The comparison reads the tool's own documented export files, so it needs nothing but the two files and changes neither.",
+        "surface": {
+          "fidelity": "the comparison view in the Installed section, against `sdk/DESIGN.md` section 16.",
+          "job": "a person sees what changed between two saved lists. Consumer: the rendered result, compared with the engine's comparison of the same two files.",
+          "treatment": "three groups, Added, Removed and Updated, each row with an icon and a word, the old and the new version shown side by side for an update. Cheaper substitute that fails the checkpoint: a plain text diff of two files, which shows reordering as change."
+        },
+        "build": [
+          "Write the comparison in `src/core/Compare.cpp` over two read exports. Done when: tests give the added, removed and updated groups for fixture pairs.",
+          "Show it in `src/ui/CompareView.cpp`. Done when: the groups and counts match the engine."
+        ],
+        "items": [
+          "Implement `Compare` in `src/core/Compare.cpp` matching programs by their merge key from `src/core/Merge.cpp`, giving Added, Removed and Updated (same key, different version). Done when: a fixture pair gives one of each and a reordered, unchanged pair gives nothing. Cheaper substitute: comparing line by line, which reports order as change.",
+          "Read the two files through `src/core/ExportReader.cpp`, including an older format version. Done when: a fixture pair with one file of an older version compares without error.",
+          "Build `src/ui/CompareView.cpp` with the SDK's list, a choice of the two files through the framework's open dialog, and the three groups with their counts in words. Done when: choosing two fixture files shows the three groups and their counts. Cheaper substitute: a private dialog, which the contract forbids.",
+          "Cover it in `tests/compare_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L compare` passes, and fails when an updated program is reported as removed and added."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L compare` passes: added, removed and updated are each found for fixture pairs, and a reordered unchanged pair reports no change.",
+        "commit": "feature: compare two saved lists"
+      },
+      {
+        "title": "System Components Hidden",
+        "intro": "Windows lists many entries a person did not install: system components, runtimes and updates. By default the list shows what a person would call software, and a switch shows the rest. The engine keeps every row and marks its kind, so nothing is lost and the count says what is hidden.",
+        "surface": {
+          "fidelity": "the Installed section's header toggle and count, against `sdk/DESIGN.md` section 16.",
+          "job": "a person sees their software first and the system's entries only when they ask. Consumer: the rendered rows and count, compared with the engine's kinds.",
+          "treatment": "a toggle that reads \"Show system components and updates\" with the hidden count beside it in words. Cheaper substitute that fails the checkpoint: deleting those rows from the list, which makes the export and the count wrong."
+        },
+        "build": [
+          "Expose the kind and a hidden count from `src/core/Merge.cpp`. Done when: tests give the count of each kind for a fixture.",
+          "Add the toggle in `src/ui/InstalledView.cpp`. Done when: the rows and header follow the toggle."
+        ],
+        "items": [
+          "Define the kinds in `src/core/Merge.cpp`: program, system component (`SystemComponent=1`) and update (a `ParentKeyName` or a `KB` name). Done when: a fixture with one of each, plus a program whose key lists a parent, gives the right kind to each and the count of each. Cheaper substitute: guessing from the name, which fails for localised names.",
+          "Add the toggle in `src/ui/InstalledView.cpp`, off at start, and show the hidden count in the header, for example \"212 programs, 41 system entries hidden\". Done when: switching it on shows the other rows and updates the count, and switching it off hides them again. Cheaper substitute: a private checkbox and label, which the contract forbids.",
+          "Keep the choice in the framework's settings and let the export say which rows it holds. Done when: after a restart the toggle is as it was left, and an export made with it off marks the hidden kinds as not included.",
+          "Cover it in `tests/kind_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L kind` passes, and fails when a system component is counted as a program."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L kind` passes: kinds and the hidden count match the fixture, and the toggle state is read back after a restart.",
+        "commit": "feature: system components and updates shown only on request"
+      }
+    ],
+    "no_reverse": "the tool reads the list of installed software and writes one export file where the user says; it installs and removes nothing",
+    "verification": [
+      "On a real machine the list matches what Windows reports in Installed apps and in the Windows Installer product count, with a program present in two views listed once.",
+      "A search of `src/` finds no `Win32_Product`, a run with a process monitor shows no write to the registry and no repair started, and the only file written is the export.",
+      "The export reads back in CSV and in the structured form, an older reader skips unknown fields, and the window works in light and dark, by keyboard alone."
+    ]
+  }
+}

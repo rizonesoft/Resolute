@@ -1,0 +1,256 @@
+{
+  "name": "AdapterManager",
+  "slug": "adaptermanager",
+  "display": "Adapter Manager",
+  "job": "it lists the machine's network adapters with their state, interface metrics and order of preference, and changes a metric or enables and disables an adapter, with an undo and a warning before a change that would cut the connection it is being used over.",
+  "tagline": "See your network adapters and choose which one Windows prefers",
+  "frozen": true,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Pine",
+    "light": "#6EE7B7",
+    "dark": "#047857",
+    "social_ground": "#07261C",
+    "social_muted": "#BFEBDA"
+  },
+  "icon": {
+    "idea": "A network socket: the adapter itself.",
+    "points": [
+      "Free-standing with no tile behind it: a rounded square with a socket opening in it.",
+      "The body is Pine and the opening is Pine light.",
+      "The small drawing, used below 40 pixels, enlarges the opening."
+    ],
+    "large": "<rect x=\"10\" y=\"14\" width=\"76\" height=\"68\" rx=\"12\" fill=\"#047857\"/><path d=\"M26 32 H70 V58 H60 V68 H36 V58 H26 Z\" fill=\"#6EE7B7\" stroke=\"#6EE7B7\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<rect x=\"8\" y=\"12\" width=\"80\" height=\"72\" rx=\"13\" fill=\"#047857\"/><path d=\"M22 28 H74 V58 H62 V70 H34 V58 H22 Z\" fill=\"#6EE7B7\" stroke=\"#6EE7B7\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Adapters",
+        "One row per adapter: name, kind, connected or not, address, metric and place in the order Windows prefers"
+      ],
+      [
+        "Details",
+        "The selected adapter's bindings, speed, hardware address and driver"
+      ],
+      [
+        "Activity",
+        "What the tool changed and what it refused, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every adapter in the order Windows prefers and changes a metric or an adapter's state with one action they can undo.",
+    "primary": "Apply",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Ethernet",
+        "Connected, first choice"
+      ],
+      [
+        "Wi-Fi",
+        "Connected, second choice"
+      ],
+      [
+        "VPN adapter",
+        "Connected, virtual, last choice"
+      ],
+      [
+        "Bluetooth network",
+        "Not connected"
+      ],
+      [
+        "Old Ethernet",
+        "Disabled"
+      ]
+    ],
+    "status": "5 adapters, 3 connected, Ethernet preferred",
+    "notes": [
+      "Each row shows the adapter's name, its kind (Ethernet, Wi-Fi, virtual, other), its state with an icon and a word (Connected, Not connected, Disabled), its address, its metric and its rank in the order Windows prefers.",
+      "Disconnected, disabled and virtual adapters are listed too, marked as such, so a person sees the whole set and not only the ones in use.",
+      "A person edits a metric (a number, or Automatic) or the enabled state on the selected row, and Apply makes the change; the row then shows the value read back from Windows, not the value typed.",
+      "Undo reverses the last applied change and is disabled, with a tooltip, when there is nothing to undo.",
+      "Apply names a change that would cut the connection the tool is used over, and asks before it goes ahead.",
+      "The status bar says how many adapters there are, how many are connected and which one Windows prefers.",
+      "When the tool is not elevated it says so at the top of the list, the list stays readable, and Apply is refused by name before anything is written."
+    ],
+    "cut": "This is a new tool, so there is no earlier window and nothing is cut. It has no menus, splash, animations or donate strip, because the suite's tool window has none; the settings, About and update surfaces are the framework's pages and are recorded in the plan."
+  },
+  "readme": {
+    "lead": "Adapter Manager shows every network adapter on your PC, in the order Windows prefers them, and lets you change that order.",
+    "what": [
+      "When a PC has two ways onto the network, for example Wi-Fi and Ethernet, or a VPN on top of both, Windows picks one by comparing interface metrics: the lowest number wins. Adapter Manager lists every adapter with its state, address and metric, and says in plain words which one wins and why.",
+      "You can change an adapter's metric, return it to Automatic, or enable and disable an adapter. Every change is read back from Windows, can be undone, and is warned about first if it would cut the connection you are using the tool over, such as a remote session."
+    ],
+    "new_intro": "Adapter Manager is a new tool and is built in C++ from the start.",
+    "new": [
+      [
+        "One list of every adapter.",
+        "Connected, disconnected, disabled and virtual adapters appear together with their metric and rank."
+      ],
+      [
+        "The winner explained.",
+        "The order Windows prefers is shown in plain words, with the metric behind it."
+      ],
+      [
+        "Undo for every change.",
+        "A metric or an enabled state goes back to what it was, from a record made before the change."
+      ],
+      [
+        "A guard for remote sessions.",
+        "A change that would break the connection the tool is used over is warned about before it is applied."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new tool: adapter list, metrics, enable and undo",
+    "goal": "Adapter Manager ships as a complete, standalone C++ tool: it lists every network adapter including disconnected and virtual ones, works out and explains the order Windows prefers from their metrics, changes an interface metric or its automatic setting and enables or disables an adapter with each change read back, undoes any change from a recorded prior state, and warns before a change that would cut the connection the tool is being used over.",
+    "current_state": "Nothing exists yet: there is no AutoIt original, no code and no baseline, because this is a new tool. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and one plan section in `docs/origin/resolute-D05-T07-s7.md`, which covers four network tools; only its adapter line (state, binding order and interface metrics, a metric change verified by read-back and undoable, `docs/origin/resolute-D05-T07-s7.md:13`) and its remote-case line (`:16`) concern this tool. That section also states the rule that a change which would break the connection the tool is being used over is warned about before it is applied, and that the section records how this is detected. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s7.md`: the plan section as it stood in the Resolute repository, of which the adapter line and the remote-session rule apply here.",
+      "Windows' own interfaces: `GetAdaptersAddresses`, `GetIfTable2`, `GetIpInterfaceEntry`, `SetIpInterfaceEntry`, the route table, and the `MSFT_NetAdapter` and `MSFT_NetAdapterBindingSettingData` classes in `root\\StandardCimv2`.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the tool's identity and window sections, and the suite's design contract."
+    ],
+    "outcome": [
+      "`AdapterManager.exe` lists every adapter, connected or not, physical or virtual, with its metric and its place in the order Windows prefers, and explains in words which one wins.",
+      "A metric, its automatic setting or an adapter's enabled state is changed, read back from Windows, and refused by name when the tool is not elevated; any change can be undone from a record made before it.",
+      "A change that would cut the remote session or the adapter carrying the tool's own connection is warned about before it is applied, and the Sidebar window works in light and dark at every scale, by keyboard alone."
+    ],
+    "adjacency_rationale": "The list is the Adapters screen, where a person finds an adapter and sees its rank. Reporting and audit are the Activity section: what was changed, refused or undone, with the value read back. Settings are the framework's pages. Permissions anchor on the engine, because changing a metric or enabling an adapter needs elevation and an unelevated action is refused by name before any write. Reverse anchors on the Undo enhancement, which restores the prior metric, automatic flag or enabled state from a record made before the change.",
+    "inventory_items": [],
+    "baseline_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Adapter and Metric Engine",
+      "intro": "The tool's whole system effect, independent of any window: reading every adapter, working out the order Windows prefers (the route with the lowest metric wins, and a route's effective metric is its own plus its interface's), changing an interface metric or its automatic setting, and enabling or disabling an adapter, with every change read back and refused by name when the process is not elevated.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the adapter, metric and change-record types in `src/core/Adapter.h` and read them through an interface the tests can replace in `src/core/NetworkApi.h`. Done when: the engine compiles against a fake `NetworkApi` that serves a fixture.",
+        "Implement reading, ranking, metric change, enable and disable in `src/core/Adapters.cpp` and `src/core/Metrics.cpp`. Done when: the unit tests pass against the fake and a read-only run against the real machine lists its adapters."
+      ],
+      "items": [
+        "Implement `EnumerateAdapters()` in `src/core/Adapters.cpp` using `GetAdaptersAddresses` with `GAA_FLAG_INCLUDE_ALL_INTERFACES` and `GetIfTable2`, returning name, kind, operational state, addresses, hardware address and whether the adapter is hidden, disconnected or virtual (VPN and virtual machine adapters). Done when: a fixture with a connected Ethernet, a disconnected Wi-Fi, a disabled adapter and two virtual adapters returns all five, each with the right kind and state.",
+        "Read each adapter's metric in `src/core/Metrics.cpp` with `GetIpInterfaceEntry` for IPv4 and IPv6, returning the interface metric and whether `UseAutomaticMetric` is set. Done when: a test shows an adapter on automatic metric reports Automatic and its current computed value, and a manual one reports Manual.",
+        "Implement `RankAdapters()` in `src/core/Preference.cpp`: order the connected adapters by the effective metric of their default route (interface metric plus route metric, from the route table), lowest first, and report a tie as a tie. Done when: a fixture where Wi-Fi has a lower sum than Ethernet ranks Wi-Fi first, and a fixture with equal sums reports both as tied and not an invented order.",
+        "Implement `SetMetric(adapter, family, value or Automatic)` in `src/core/Metrics.cpp` with `GetIpInterfaceEntry` then `SetIpInterfaceEntry` (clearing `SitePrefixLength` for IPv4 as the call requires), then read the entry back and return a mismatch as adapter, family, expected and found. Done when: a test that makes the fake ignore the write gets the mismatch named. Cheaper substitute: running `netsh interface ip set interface` and trusting its exit code, which does not prove the value took.",
+        "Record the prior state before every change in `src/core/ChangeRecord.cpp`: the adapter's identity (its LUID and name), the prior metric, the prior automatic flag and the prior enabled state, written to disk before the change is made. Done when: a test finds the record on disk before the fake sees the write. Cheaper substitute: keeping the prior value in memory, which is lost if the tool closes.",
+        "Implement `SetEnabled(adapter, bool)` in `src/core/Adapters.cpp` through the `Enable` and `Disable` methods of `MSFT_NetAdapter` in `root\\StandardCimv2`, then read the adapter's state back. Done when: a test shows a disable that the fake ignores is reported by adapter and state. Cheaper substitute: `netsh interface set interface` with the exit code trusted.",
+        "Implement `ReadDetails(adapter)` in `src/core/Details.cpp` returning the adapter's bindings (for example IPv6, file and printer sharing, client for Microsoft networks), link speed, hardware address and driver name and version. Done when: a fixture adapter returns each of the four groups, and an adapter with no driver information says so and does not return an empty string.",
+        "Implement `IsElevated()` and refuse `SetMetric` and `SetEnabled` by name when the process is not elevated, before any write and before any record, with one activity record. Done when: an unelevated test run reports the refusal and the fake is unchanged. Cheaper substitute: letting the write fail with access denied and reporting that.",
+        "Cover every path in `tests/adapters_test.cpp` and `tests/metrics_test.cpp` against the fake. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L adapters` passes, and fails when the ranking compares the interface metric alone and ignores the route metric."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L adapters` passes, including the ignored-write, unelevated and tie cases, and a read-only run on a real machine lists its adapters with their metrics.",
+      "commit": "core: adapters, metrics and enable, read back after every change and refused when unelevated"
+    },
+    "enhancements": [
+      {
+        "title": "Undo Any Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before every metric change or enable and disable, the prior state is recorded, so Undo restores what was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back what the last change altered. Consumer: the adapter's metric, automatic flag and enabled state, read back from Windows and compared with the record.",
+          "treatment": "the recorded prior value restored on the same adapter and shown with its read-back. Cheaper substitute that fails the checkpoint: an undo that sets Automatic, which is not what was there when the metric had been set by hand."
+        },
+        "build": [
+          "Hand the record of `src/core/ChangeRecord.cpp` to the repair contract. Done when: a record exists in the contract's store before the first write.",
+          "Wire Undo in `src/ui/AdaptersView.cpp`. Done when: change then undo leaves the adapter as it was."
+        ],
+        "items": [
+          "Store each change record through the repair contract's restore record in `src/core/ChangeRecord.cpp`, keyed by the adapter's LUID and not its display name, which can change. Done when: a test finds the record on disk before the first write, and an adapter renamed between change and undo is still found. Cheaper substitute: keying by name.",
+          "Implement `Undo()` restoring the prior metric, automatic flag and enabled state, then reading each back. Done when: set metric then undo, automatic then undo, and disable then undo each leave the fake equal to before, asserted.",
+          "Report an Undo whose adapter has gone (a removed USB adapter or a deleted VPN adapter) by name and leave the record in place. Done when: a test with a missing adapter reports it and no other adapter changes.",
+          "Disable Undo with a tooltip when there is nothing to undo, in `src/ui/AdaptersView.cpp`. Done when: a first run shows it disabled and it enables after one change.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one prior value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: a metric change, an automatic change and a disable each undo to the recorded prior state.",
+        "commit": "feature: undo puts back the metric or state that was there before"
+      },
+      {
+        "title": "Which Connection Wins",
+        "intro": "The Adapters screen shows each adapter's rank, but a person also needs to know why. This section states the order Windows prefers in plain words, naming the adapter that wins, the metric that decides it and what would change the result, for example that a lower number wins and that Automatic lets Windows choose from link speed.",
+        "surface": {
+          "fidelity": "the explanation line and the rank column, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person understands which connection Windows uses and why. Consumer: the sentence, checked against the engine's ranking.",
+          "treatment": "one plain sentence per adapter that is connected, such as which wins and by how much. Cheaper substitute that fails the checkpoint: a bare rank number with no reason."
+        },
+        "build": [
+          "Write the explanation text from the ranking in `src/core/Explain.cpp`. Done when: every ranked fixture produces a sentence that names the winner and the deciding metric.",
+          "Show the sentence and the rank column in `src/ui/AdaptersView.cpp`. Done when: the screen shows both for the real machine."
+        ],
+        "items": [
+          "Implement `Explain(ranking)` in `src/core/Explain.cpp` returning, for the winning adapter, one sentence naming the adapter, its effective metric and the runner-up's. Done when: a Wi-Fi against Ethernet fixture yields a sentence naming each with its number.",
+          "Explain a tie and an automatic metric in words in `src/core/Explain.cpp`, the first as a tie and the second as Windows choosing from link speed. Done when: both fixtures produce their own sentence and neither says the adapter was chosen by the user.",
+          "Name a virtual adapter that wins, for example a VPN, and say that it is virtual. Done when: a fixture where a VPN adapter ranks first says so in the sentence.",
+          "Show the rank column and the sentence in `src/ui/AdaptersView.cpp`, updated from a re-read after every change. Done when: changing a metric on the fake changes the winner shown without a manual refresh. Cheaper substitute: a static label set at start.",
+          "Cover it in `tests/explain_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes, and fails when the winner named differs from the ranking's first."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L explain` passes for the winner, tie, automatic and virtual fixtures.",
+        "commit": "feature: the order Windows prefers, in plain words, with the reason"
+      },
+      {
+        "title": "Remote Session Guard",
+        "intro": "A change to the adapter that carries the tool's own session can lock a person out of a machine they are repairing remotely. The plan's rule is that such a change is warned about before it is applied, and this section records how it is detected: whether the session is remote, which adapter carries it, and whether the pending change would disable that adapter or move its metric below another adapter's so that the route to the remote peer moves elsewhere.",
+        "surface": {
+          "fidelity": "the warning dialog, against `sdk/DESIGN.md` section 11.",
+          "job": "a person is told before a change that would cut the session they are using, and can stop. Consumer: the dialog's text against the detected session and adapter.",
+          "treatment": "a confirmation naming the adapter and the reason, with the safe choice as the default button. Cheaper substitute that fails the checkpoint: a generic are you sure that appears on every change and names nothing."
+        },
+        "build": [
+          "Detect the remote session and the adapter that carries it in `src/core/RemoteGuard.cpp`. Done when: a fixture session reports its peer and its adapter.",
+          "Warn before Apply in `src/ui/AdaptersView.cpp`. Done when: a change to the carrying adapter shows the warning and a change to another adapter shows none."
+        ],
+        "items": [
+          "Implement `DetectSession()` in `src/core/RemoteGuard.cpp`: a remote desktop session through `GetSystemMetrics(SM_REMOTESESSION)` and `WTSQuerySessionInformation` with `WTSClientAddress`, and the peer address of other established connections the tool can see in `GetExtendedTcpTable`. Done when: a fixture with a remote desktop client address returns the peer, and a console session returns none.",
+          "Implement `CarryingAdapter(peer)` using `GetBestRoute2` to the peer address and returning the adapter's LUID. Done when: a fixture with the peer reachable over the VPN adapter returns the VPN adapter, not the default Ethernet.",
+          "Implement `WouldBreak(change)` returning true when the change disables the carrying adapter, or when a metric change makes another adapter win the route to the peer, by re-running `RankAdapters()` on the changed metrics. Done when: disabling the carrying adapter, and raising its metric above Wi-Fi's, both return true, and changing an unrelated adapter returns false.",
+          "Show the warning in `src/ui/AdaptersView.cpp` through the framework's message surface, naming the adapter and the reason, with Cancel as the default. Done when: Apply on the carrying adapter shows it and Cancel leaves the fake unchanged. Cheaper substitute: a private dialog.",
+          "Say in the dialog and in `docs/guide.md` what the detection cannot see, such as a remote tool that tunnels through another adapter without a visible connection. Done when: the limit is written in both places.",
+          "Cover it in `tests/remote_guard_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L remote` passes, and fails when the carrying adapter's disable is not flagged."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L remote` passes: disabling or outranking the carrying adapter is flagged, an unrelated change is not.",
+        "commit": "feature: a change that would cut the remote session is warned about first"
+      },
+      {
+        "title": "Bindings",
+        "intro": "Each adapter has bindings, such as IPv6, file and printer sharing and client for Microsoft networks, which Windows' own Details page lists only inside an old properties dialog. The Details section shows them, and this section turns one off and on for one adapter, with an undo.",
+        "surface": {
+          "fidelity": "the Details section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person sees an adapter's bindings, speed, hardware address and driver, and turns a binding off or on. Consumer: the binding's state, read back from Windows.",
+          "treatment": "a list of bindings with each state in an icon and a word, a toggle per binding, and the other details as labelled values. Cheaper substitute that fails the checkpoint: the details as one block of text, with no toggle."
+        },
+        "build": [
+          "Implement binding changes in `src/core/Bindings.cpp`. Done when: a binding set against the fake reads back as set.",
+          "Build the Details screen in `src/ui/DetailsView.cpp`. Done when: selecting an adapter on the Adapters screen shows its details."
+        ],
+        "items": [
+          "Implement `SetBinding(adapter, componentId, bool)` in `src/core/Bindings.cpp` through the enable and disable methods of `MSFT_NetAdapterBindingSettingData` (for example `ms_tcpip6`, `ms_server`, `ms_msclient`), then read the binding back. Done when: a test whose fake ignores the write gets the mismatch named. Cheaper substitute: editing the registry value for the binding, which Windows does not reread.",
+          "Record the binding's prior state before the change, through the same record as `src/core/ChangeRecord.cpp`, so Undo restores it. Done when: set then undo leaves the binding as it was, asserted.",
+          "Build `src/ui/DetailsView.cpp` showing the selected adapter's bindings, speed, hardware address and driver from `ReadDetails()`. Done when: selecting a different adapter changes every field, and a binding is shown with an icon and a word. Cheaper substitute: fields typed into the view, which show nothing real.",
+          "Refuse a binding change when not elevated, by name, and warn through the remote guard when the binding is the one carrying the session. Done when: both cases are asserted in `tests/bindings_test.cpp`.",
+          "Cover it in `tests/bindings_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L bindings` passes, and fails when a binding's prior state is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L bindings` passes: a binding turns off, reads back off and undoes to on.",
+        "commit": "feature: adapter details and bindings, undoable"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A run on a real machine with two active adapters lists both with their metrics, names the winner, and the winner matches what `Get-NetRoute` and `Get-NetIPInterface` report.",
+      "A metric change, an enable or disable and a binding change each read back from Windows, undo to the recorded prior state, and are refused by name when the tool is not elevated.",
+      "Over a remote desktop session, disabling the adapter that carries it is warned about before it is applied, and the window works in light and dark by keyboard alone."
+    ]
+  }
+}

@@ -4,7 +4,7 @@
   "display": "Erase Verification",
   "job": "it scans a drive or the free space of a volume for data a recovery tool could still find, reads only, and reports what it found with the confidence the scan supports.",
   "tagline": "Check that erased really means gone",
-  "frozen": false,
+  "frozen": true,
   "elevated": true,
   "au3": [],
   "hue": {

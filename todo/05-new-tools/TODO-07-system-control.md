@@ -58,7 +58,7 @@ track: P3
 
 ## 1. Update Blocker and Update History
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/UpdateBlocker` repository (`D:\Resolute_Bin\UpdateBlocker`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/UpdateBlocker` and `rizonesoft/UpdateHistory` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 Microsoft retired the tool that did this, its replacement is an enterprise product, and hidden updates reappear anyway. Meanwhile 2025 carried more than twenty major update problems. This is the clearest documented gap the research found.
 
@@ -69,18 +69,18 @@ Microsoft retired the tool that did this, its replacement is an enterprise produ
 **Needs:** Windows host (build/test)
 
 - [ ] ~~List available and installed updates in `extensions/UpdateBlocker/` with title, KB number, size, and date. Done when: the list matches what Windows Update reports for the same machine.~~ -> `rizonesoft/UpdateBlocker`
-- [ ] ~~Block a specific update, as a repair-contract item so it is reversible. Done when: a blocked update does not install and unblocking restores it, both driven.~~ -> `rizonesoft/UpdateBlocker`
-- [ ] ~~**Re-assert the block after the events that historically break it.** Done when: the block survives a feature update and an update-metadata change, and this section records the mechanism used and why it outlasts `wushowhide`.~~ -> `rizonesoft/UpdateBlocker`
-- [ ] ~~Report when a block cannot be honoured. Done when: an update Windows installs regardless is reported as such rather than appearing blocked, because a false sense of control is worse than none.~~ -> `rizonesoft/UpdateBlocker`
-- [ ] ~~Show update history with what each update changed where Windows records it. Done when: history renders in `extensions/UpdateHistory/` and cross-references the `System Change Journal` where a snapshot spans the install.~~ -> `rizonesoft/UpdateBlocker`
-- [ ] ~~Offer to uninstall a specific update. Done when: uninstall is a contract item, verified by reading the update state back, and an update Windows will not let you remove says so.~~ -> `rizonesoft/UpdateBlocker`
-- [ ] Commit: ~~`"update blocker: stop one update, and have it stay stopped"`~~ -> `rizonesoft/UpdateBlocker`
+- [ ] ~~Block a specific update, as a repair-contract item so it is reversible. Done when: a blocked update does not install and unblocking restores it, both driven.~~ -> `rizonesoft/UpdateBlocker`, `rizonesoft/UpdateHistory`
+- [ ] ~~**Re-assert the block after the events that historically break it.** Done when: the block survives a feature update and an update-metadata change, and this section records the mechanism used and why it outlasts `wushowhide`.~~ -> `rizonesoft/UpdateBlocker`, `rizonesoft/UpdateHistory`
+- [ ] ~~Report when a block cannot be honoured. Done when: an update Windows installs regardless is reported as such rather than appearing blocked, because a false sense of control is worse than none.~~ -> `rizonesoft/UpdateBlocker`, `rizonesoft/UpdateHistory`
+- [ ] ~~Show update history with what each update changed where Windows records it. Done when: history renders in `extensions/UpdateHistory/` and cross-references the `System Change Journal` where a snapshot spans the install.~~ -> `rizonesoft/UpdateHistory`
+- [ ] ~~Offer to uninstall a specific update. Done when: uninstall is a contract item, verified by reading the update state back, and an update Windows will not let you remove says so.~~ -> `rizonesoft/UpdateBlocker`, `rizonesoft/UpdateHistory`
+- [ ] Commit: ~~`"update blocker: stop one update, and have it stay stopped"`~~ -> `rizonesoft/UpdateBlocker`, `rizonesoft/UpdateHistory`
 
 **Test checkpoint:** Moved with the section. The `rizonesoft/UpdateBlocker` repository's plan carries it.
 
 ## 2. Shell Extension Bisector and Explorer Performance
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ShellBisector` repository (`D:\Resolute_Bin\ShellBisector`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ShellBisector` and `rizonesoft/ExplorerPerformance` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 `ShellExView` lists shell extensions well and this does not compete with it. The gap is that every published fix reduces to "disable them one at a time and restart Explorer between each", which is a manual binary search a computer should run.
 
@@ -91,18 +91,18 @@ Microsoft retired the tool that did this, its replacement is an enterprise produ
 **Needs:** Windows host (build/test)
 
 - [ ] ~~Implement bisection in `extensions/ShellBisector/`: disable half the non-Microsoft extensions, restart Explorer, ask whether the fault persists, narrow. Done when: a fixture set of sixteen with one deliberately faulty is narrowed in at most five rounds.~~ -> `rizonesoft/ShellBisector`
-- [ ] ~~Make every round reversible, through the repair contract. Done when: abandoning a bisection mid-run restores every extension to its starting state, asserted.~~ -> `rizonesoft/ShellBisector`
-- [ ] ~~Never leave the machine in a bisected state. Done when: the tool restores everything on exit unless the user explicitly keeps a finding, and a forced termination mid-round still restores, proven by killing it.~~ -> `rizonesoft/ShellBisector`
-- [ ] ~~Report the culprit with the software that owns it. Done when: the finding names the extension, its file, and the installed application it belongs to.~~ -> `rizonesoft/ShellBisector`
-- [ ] ~~Measure Explorer responsiveness in `extensions/ExplorerPerformance/`: folder open time, right-click menu time, and thumbnail generation. Done when: each is measured and compared against a stated expectation.~~ -> `rizonesoft/ShellBisector`
-- [ ] ~~Attribute slowness where the system allows. Done when: a deliberately slowed fixture handler is identified, or this section states plainly what could not be attributed and why.~~ -> `rizonesoft/ShellBisector`
-- [ ] Commit: ~~`"shell bisector: run the search the guides tell users to do by hand"`~~ -> `rizonesoft/ShellBisector`
+- [ ] ~~Make every round reversible, through the repair contract. Done when: abandoning a bisection mid-run restores every extension to its starting state, asserted.~~ -> `rizonesoft/ShellBisector`, `rizonesoft/ExplorerPerformance`
+- [ ] ~~Never leave the machine in a bisected state. Done when: the tool restores everything on exit unless the user explicitly keeps a finding, and a forced termination mid-round still restores, proven by killing it.~~ -> `rizonesoft/ShellBisector`, `rizonesoft/ExplorerPerformance`
+- [ ] ~~Report the culprit with the software that owns it. Done when: the finding names the extension, its file, and the installed application it belongs to.~~ -> `rizonesoft/ShellBisector`, `rizonesoft/ExplorerPerformance`
+- [ ] ~~Measure Explorer responsiveness in `extensions/ExplorerPerformance/`: folder open time, right-click menu time, and thumbnail generation. Done when: each is measured and compared against a stated expectation.~~ -> `rizonesoft/ExplorerPerformance`
+- [ ] ~~Attribute slowness where the system allows. Done when: a deliberately slowed fixture handler is identified, or this section states plainly what could not be attributed and why.~~ -> `rizonesoft/ShellBisector`, `rizonesoft/ExplorerPerformance`
+- [ ] Commit: ~~`"shell bisector: run the search the guides tell users to do by hand"`~~ -> `rizonesoft/ShellBisector`, `rizonesoft/ExplorerPerformance`
 
 **Test checkpoint:** Moved with the section. The `rizonesoft/ShellBisector` repository's plan carries it.
 
 ## 3. Defender Manager and Security Status
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DefenderManager` repository (`D:\Resolute_Bin\DefenderManager`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DefenderManager` and `rizonesoft/SecurityStatus` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 Windows Defender's exclusion list is where malware hides and where legitimate software gets wrongly blocked, and Windows surfaces it three levels deep in a settings app that changes shape every release.
 
@@ -113,18 +113,18 @@ Windows Defender's exclusion list is where malware hides and where legitimate so
 **Needs:** Windows host (build/test)
 
 - [ ] ~~Report Defender status in `extensions/DefenderManager/`: real-time protection, cloud protection, tamper protection, and definition age. Done when: each renders and is verified against the system.~~ -> `rizonesoft/DefenderManager`
-- [ ] ~~Say why protection is off where the system records it, distinguishing user choice, policy, and a third-party product taking over. Done when: all three are distinguishable and a fixture of each is attributed correctly.~~ -> `rizonesoft/DefenderManager`
-- [ ] ~~List exclusions with what added them where that is recorded. Done when: paths, extensions, and processes all render.~~ -> `rizonesoft/DefenderManager`
-- [ ] ~~**State plainly what an exclusion gives up**, before it is added. Done when: the confirmation says the excluded path will not be scanned, and adding is a contract item so it is reversible.~~ -> `rizonesoft/DefenderManager`
-- [ ] ~~Flag exclusions that look wrong. Done when: an exclusion covering a whole drive, a user profile root, or a system directory is flagged with its reasoning.~~ -> `rizonesoft/DefenderManager`
-- [ ] ~~Report the wider security posture in `extensions/SecurityStatus/`: firewall state, UAC level, SmartScreen, and Core Isolation. Done when: each renders and a machine with any of them off explains the consequence.~~ -> `rizonesoft/DefenderManager`
-- [ ] Commit: ~~`"defender manager: see what your security software is doing"`~~ -> `rizonesoft/DefenderManager`
+- [ ] ~~Say why protection is off where the system records it, distinguishing user choice, policy, and a third-party product taking over. Done when: all three are distinguishable and a fixture of each is attributed correctly.~~ -> `rizonesoft/DefenderManager`, `rizonesoft/SecurityStatus`
+- [ ] ~~List exclusions with what added them where that is recorded. Done when: paths, extensions, and processes all render.~~ -> `rizonesoft/DefenderManager`, `rizonesoft/SecurityStatus`
+- [ ] ~~**State plainly what an exclusion gives up**, before it is added. Done when: the confirmation says the excluded path will not be scanned, and adding is a contract item so it is reversible.~~ -> `rizonesoft/DefenderManager`, `rizonesoft/SecurityStatus`
+- [ ] ~~Flag exclusions that look wrong. Done when: an exclusion covering a whole drive, a user profile root, or a system directory is flagged with its reasoning.~~ -> `rizonesoft/DefenderManager`, `rizonesoft/SecurityStatus`
+- [ ] ~~Report the wider security posture in `extensions/SecurityStatus/`: firewall state, UAC level, SmartScreen, and Core Isolation. Done when: each renders and a machine with any of them off explains the consequence.~~ -> `rizonesoft/SecurityStatus`
+- [ ] Commit: ~~`"defender manager: see what your security software is doing"`~~ -> `rizonesoft/DefenderManager`, `rizonesoft/SecurityStatus`
 
 **Test checkpoint:** Moved with the section. The `rizonesoft/DefenderManager` repository's plan carries it.
 
 ## 4. BitLocker, Certificates, and Recovery
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BitLockerStatus` repository (`D:\Resolute_Bin\BitLockerStatus`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BitLockerStatus`, `rizonesoft/CertificateManager` and `rizonesoft/RecoveryManager` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 Three tools for the moments a machine is least recoverable: an encrypted drive with a missing key, a broken certificate chain, and a recovery environment that is not there when it is needed.
 
@@ -135,12 +135,12 @@ Three tools for the moments a machine is least recoverable: an encrypted drive w
 **Needs:** Windows host (build/test)
 
 - [ ] ~~Report BitLocker status per volume in `extensions/BitLockerStatus/`: protection state, method, and where the recovery key is escrowed. Done when: each renders and a volume with no escrow is flagged, because that is the dangerous case.~~ -> `rizonesoft/BitLockerStatus`
-- [ ] ~~Gate, log, and limit any key reveal exactly as `D05 T06 §3` requires. Done when: an unelevated reveal is refused by name, one log line names the volume and not the key, and no export-all path exists, proven by search.~~ -> `rizonesoft/BitLockerStatus`
-- [ ] ~~Inspect the certificate stores in `extensions/CertificateManager/`: expired roots, untrusted intermediates, and anything that would break HTTPS. Done when: a fixture expired root is flagged with what it affects.~~ -> `rizonesoft/BitLockerStatus`
-- [ ] ~~Hand off to `ComIntRep`'s pre-flight where a certificate fault is the real cause. Done when: the hand-off works and carries the finding.~~ -> `rizonesoft/BitLockerStatus`
-- [ ] ~~Report the recovery environment in `extensions/RecoveryManager/`: whether WinRE is present, enabled, and reachable. Done when: a machine with a broken or missing WinRE is reported as such, which most users discover only when they need it.~~ -> `rizonesoft/BitLockerStatus`
-- [ ] ~~Create a recovery drive, with what it will erase named first. Done when: the confirmation names the target by letter, label, and size, and declining performs nothing.~~ -> `rizonesoft/BitLockerStatus`
-- [ ] Commit: ~~`"bitlocker, certificates, and recovery: the tools you need before you need them"`~~ -> `rizonesoft/BitLockerStatus`
+- [ ] ~~Gate, log, and limit any key reveal exactly as `D05 T06 §3` requires. Done when: an unelevated reveal is refused by name, one log line names the volume and not the key, and no export-all path exists, proven by search.~~ -> `rizonesoft/BitLockerStatus`, `rizonesoft/CertificateManager`, `rizonesoft/RecoveryManager`
+- [ ] ~~Inspect the certificate stores in `extensions/CertificateManager/`: expired roots, untrusted intermediates, and anything that would break HTTPS. Done when: a fixture expired root is flagged with what it affects.~~ -> `rizonesoft/CertificateManager`
+- [ ] ~~Hand off to `ComIntRep`'s pre-flight where a certificate fault is the real cause. Done when: the hand-off works and carries the finding.~~ -> `rizonesoft/BitLockerStatus`, `rizonesoft/CertificateManager`, `rizonesoft/RecoveryManager`
+- [ ] ~~Report the recovery environment in `extensions/RecoveryManager/`: whether WinRE is present, enabled, and reachable. Done when: a machine with a broken or missing WinRE is reported as such, which most users discover only when they need it.~~ -> `rizonesoft/RecoveryManager`
+- [ ] ~~Create a recovery drive, with what it will erase named first. Done when: the confirmation names the target by letter, label, and size, and declining performs nothing.~~ -> `rizonesoft/BitLockerStatus`, `rizonesoft/CertificateManager`, `rizonesoft/RecoveryManager`
+- [ ] Commit: ~~`"bitlocker, certificates, and recovery: the tools you need before you need them"`~~ -> `rizonesoft/BitLockerStatus`, `rizonesoft/CertificateManager`, `rizonesoft/RecoveryManager`
 
 **Freeze check:** What recovery drive creation writes to a target is frozen once shipped, because it erases that target. Evidence is a fixture target compared before and after against its recorded state. Fixture source: `tests/fixtures/drives/`.
 
@@ -169,7 +169,7 @@ The research found forced diagnostics and telemetry among the things Microsoft i
 
 ## 6. Environment, Features, Power, and Locale
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/EnvironmentEditor` repository (`D:\Resolute_Bin\EnvironmentEditor`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/EnvironmentEditor`, `rizonesoft/WindowsFeatures`, `rizonesoft/PowerPlans` and `rizonesoft/LocaleFixer` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 Four configuration surfaces Windows ships with interfaces that are worse than no interface: a two-line environment variable box, an optional-features list that gives no progress, a power plan editor buried in legacy Control Panel, and a locale system whose failure mode is unreadable text.
 
@@ -180,17 +180,17 @@ Four configuration surfaces Windows ships with interfaces that are worse than no
 **Needs:** Windows host (build/test)
 
 - [ ] ~~Build `extensions/EnvironmentEditor/` with one row per entry, reorderable, and duplicate and missing-path detection. Done when: a broken `PATH` entry is flagged, editing is undoable, and the prior value is recorded before any write.~~ -> `rizonesoft/EnvironmentEditor`
-- [ ] ~~Build `extensions/WindowsFeatures/` over optional components, with real progress. Done when: enabling and disabling a feature both report progress and verify by reading the feature state back.~~ -> `rizonesoft/EnvironmentEditor`
-- [ ] ~~Build `extensions/PowerPlans/` covering plans and the settings Windows hides from the modern interface. Done when: a hidden setting is exposed and changing it verifies by read-back.~~ -> `rizonesoft/EnvironmentEditor`
-- [ ] ~~Build `extensions/LocaleFixer/` for the mojibake case: system locale, ANSI code page, and the legacy Unicode setting. Done when: a machine displaying unreadable text in legacy applications is diagnosed and the responsible setting named.~~ -> `rizonesoft/EnvironmentEditor`
-- [ ] ~~Make every change in all four reversible through the contract. Done when: four undo assertions run.~~ -> `rizonesoft/EnvironmentEditor`
-- [ ] Commit: ~~`"environment, features, power, and locale editors"`~~ -> `rizonesoft/EnvironmentEditor`
+- [ ] ~~Build `extensions/WindowsFeatures/` over optional components, with real progress. Done when: enabling and disabling a feature both report progress and verify by reading the feature state back.~~ -> `rizonesoft/WindowsFeatures`
+- [ ] ~~Build `extensions/PowerPlans/` covering plans and the settings Windows hides from the modern interface. Done when: a hidden setting is exposed and changing it verifies by read-back.~~ -> `rizonesoft/PowerPlans`
+- [ ] ~~Build `extensions/LocaleFixer/` for the mojibake case: system locale, ANSI code page, and the legacy Unicode setting. Done when: a machine displaying unreadable text in legacy applications is diagnosed and the responsible setting named.~~ -> `rizonesoft/LocaleFixer`
+- [ ] ~~Make every change in all four reversible through the contract. Done when: four undo assertions run.~~ -> `rizonesoft/EnvironmentEditor`, `rizonesoft/WindowsFeatures`, `rizonesoft/PowerPlans`, `rizonesoft/LocaleFixer`
+- [ ] Commit: ~~`"environment, features, power, and locale editors"`~~ -> `rizonesoft/EnvironmentEditor`, `rizonesoft/WindowsFeatures`, `rizonesoft/PowerPlans`, `rizonesoft/LocaleFixer`
 
 **Test checkpoint:** Moved with the section. The `rizonesoft/EnvironmentEditor` repository's plan carries it.
 
 ## 7. Network Configuration Tools
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/FirewallRules` repository (`D:\Resolute_Bin\FirewallRules`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/FirewallRules`, `rizonesoft/AdapterManager`, `rizonesoft/DNSSelector` and `rizonesoft/ProxyInspector` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 `ComIntRep` repairs the stack and `Wi-Fi Diagnostics` covers the radio. These four cover the configuration between them, which Windows exposes only through `netsh` and a Control Panel page that has not changed since Windows 7.
 
@@ -201,12 +201,12 @@ Four configuration surfaces Windows ships with interfaces that are worse than no
 **Needs:** Windows host (build/test)
 
 - [ ] ~~Build `extensions/FirewallRules/` listing rules with program, direction, profile, and what created them. Done when: the list matches what the system reports and a rule's owning program is named where recorded.~~ -> `rizonesoft/FirewallRules`
-- [ ] ~~Flag rules that look wrong. Done when: an inbound allow-any rule is flagged with its reasoning.~~ -> `rizonesoft/FirewallRules`
-- [ ] ~~Build `extensions/AdapterManager/` covering adapter state, binding order, and interface metrics. Done when: changing a metric verifies by read-back and is undoable.~~ -> `rizonesoft/FirewallRules`
-- [ ] ~~Build `extensions/DNSSelector/`, measuring resolver latency from this machine and offering to switch. Done when: measurements are taken from the actual machine rather than quoted, and switching is undoable.~~ -> `rizonesoft/FirewallRules`
-- [ ] ~~Build `extensions/ProxyInspector/`, reporting system proxy, per-application proxy, PAC scripts, and VPN state. Done when: a machine behind a proxy reports all of it and the source of each is named.~~ -> `rizonesoft/FirewallRules`
-- [ ] ~~Protect the remote case. Done when: a change that would break the connection the tool is being used over is warned about before it is applied, and this section records how that is detected.~~ -> `rizonesoft/FirewallRules`
-- [ ] Commit: ~~`"network configuration: firewall, adapters, dns, and proxy"`~~ -> `rizonesoft/FirewallRules`
+- [ ] ~~Flag rules that look wrong. Done when: an inbound allow-any rule is flagged with its reasoning.~~ -> `rizonesoft/FirewallRules`, `rizonesoft/AdapterManager`, `rizonesoft/DNSSelector`, `rizonesoft/ProxyInspector`
+- [ ] ~~Build `extensions/AdapterManager/` covering adapter state, binding order, and interface metrics. Done when: changing a metric verifies by read-back and is undoable.~~ -> `rizonesoft/AdapterManager`
+- [ ] ~~Build `extensions/DNSSelector/`, measuring resolver latency from this machine and offering to switch. Done when: measurements are taken from the actual machine rather than quoted, and switching is undoable.~~ -> `rizonesoft/DNSSelector`
+- [ ] ~~Build `extensions/ProxyInspector/`, reporting system proxy, per-application proxy, PAC scripts, and VPN state. Done when: a machine behind a proxy reports all of it and the source of each is named.~~ -> `rizonesoft/ProxyInspector`
+- [ ] ~~Protect the remote case. Done when: a change that would break the connection the tool is being used over is warned about before it is applied, and this section records how that is detected.~~ -> `rizonesoft/FirewallRules`, `rizonesoft/AdapterManager`, `rizonesoft/DNSSelector`, `rizonesoft/ProxyInspector`
+- [ ] Commit: ~~`"network configuration: firewall, adapters, dns, and proxy"`~~ -> `rizonesoft/FirewallRules`, `rizonesoft/AdapterManager`, `rizonesoft/DNSSelector`, `rizonesoft/ProxyInspector`
 
 **Freeze check:** What a rule or adapter change writes is frozen once shipped, because a wrong one removes a machine from the network it is being repaired over. Evidence is a fixture configuration round-tripped through change and undo, compared field by field. Fixture source: `tests/fixtures/network/`.
 
@@ -214,7 +214,7 @@ Four configuration surfaces Windows ships with interfaces that are worse than no
 
 ## 8. Files, Boot, Audio, and Inventory
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/LinkManager` repository (`D:\Resolute_Bin\LinkManager`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/LinkManager`, `rizonesoft/PermissionsCopier`, `rizonesoft/HashVerifier`, `rizonesoft/LongPathEnabler`, `rizonesoft/BootManager`, `rizonesoft/PageFileManager`, `rizonesoft/AudioDevices`, `rizonesoft/ColorProfiles` and `rizonesoft/SoftwareInventory` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 Nine tools. **Most are one surface over one thing and are built from the items below; three are not, and are specified first.**
 
@@ -227,16 +227,16 @@ Nine tools. **Most are one surface over one thing and are built from the items b
 **Needs:** Windows host (build/test)
 
 - [ ] ~~`extensions/LinkManager/`: create and inspect junctions, symlinks, and hard links, which Windows offers only through `mklink`. Done when: each type is created and identified, and a broken link is reported as broken.~~ -> `rizonesoft/LinkManager`
-- [ ] ~~**Specify** `PermissionsCopier` in its own TODO file before building it, covering the preview, inheritance, the recursive case, and what happens when a path cannot be read. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/LinkManager`
-- [ ] ~~`extensions/HashVerifier/`: compute and compare file hashes against an expected value. Done when: a matching and a mismatching file are each reported clearly.~~ -> `rizonesoft/LinkManager`
-- [ ] ~~`extensions/LongPathEnabler/`: report and set the long-path setting, including the manifest requirement most guides omit. Done when: the setting is changed, verified by read-back, and the surface states that applications must opt in too.~~ -> `rizonesoft/LinkManager`
-- [ ] ~~**Specify** `BootManager` in its own TODO file before building it, covering entries, order, timeout, the recovery path when a machine will not boot, and the freeze check below. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/LinkManager`
-- [ ] ~~`extensions/PageFileManager/`: page file location and size per volume. Done when: a change verifies by read-back and states that it needs a restart.~~ -> `rizonesoft/LinkManager`
-- [ ] ~~`extensions/AudioDevices/`: default device per role, per-application routing, and devices Windows has hidden. Done when: a hidden device is surfaced and setting a default verifies by read-back.~~ -> `rizonesoft/LinkManager`
-- [ ] ~~**Specify** `AudioDevices` in its own TODO file before building it, covering device enumeration, per-role defaults, per-application routing, hidden devices, and the audio repair it owns from Complete Windows Repair across the service, endpoint, routing, and driver causes. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/LinkManager`
-- [ ] ~~`extensions/ColorProfiles/`: profiles per display, with association and reset. Done when: association and reset both verify by read-back.~~ -> `rizonesoft/LinkManager`
-- [ ] ~~`extensions/SoftwareInventory/`: installed software with version, publisher, size, and install date, exportable into the System Report. Done when: the list matches what the system reports and the export feeds `D05 T03 §6`.~~ -> `rizonesoft/LinkManager`
-- [ ] Commit: ~~`"link, permissions, hash, boot, page file, audio, colour, and inventory tools"`~~ -> `rizonesoft/LinkManager`
+- [ ] ~~**Specify** `PermissionsCopier` in its own TODO file before building it, covering the preview, inheritance, the recursive case, and what happens when a path cannot be read. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/PermissionsCopier`
+- [ ] ~~`extensions/HashVerifier/`: compute and compare file hashes against an expected value. Done when: a matching and a mismatching file are each reported clearly.~~ -> `rizonesoft/HashVerifier`
+- [ ] ~~`extensions/LongPathEnabler/`: report and set the long-path setting, including the manifest requirement most guides omit. Done when: the setting is changed, verified by read-back, and the surface states that applications must opt in too.~~ -> `rizonesoft/LongPathEnabler`
+- [ ] ~~**Specify** `BootManager` in its own TODO file before building it, covering entries, order, timeout, the recovery path when a machine will not boot, and the freeze check below. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/BootManager`
+- [ ] ~~`extensions/PageFileManager/`: page file location and size per volume. Done when: a change verifies by read-back and states that it needs a restart.~~ -> `rizonesoft/PageFileManager`
+- [ ] ~~`extensions/AudioDevices/`: default device per role, per-application routing, and devices Windows has hidden. Done when: a hidden device is surfaced and setting a default verifies by read-back.~~ -> `rizonesoft/AudioDevices`
+- [ ] ~~**Specify** `AudioDevices` in its own TODO file before building it, covering device enumeration, per-role defaults, per-application routing, hidden devices, and the audio repair it owns from Complete Windows Repair across the service, endpoint, routing, and driver causes. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/AudioDevices`
+- [ ] ~~`extensions/ColorProfiles/`: profiles per display, with association and reset. Done when: association and reset both verify by read-back.~~ -> `rizonesoft/ColorProfiles`
+- [ ] ~~`extensions/SoftwareInventory/`: installed software with version, publisher, size, and install date, exportable into the System Report. Done when: the list matches what the system reports and the export feeds `D05 T03 §6`.~~ -> `rizonesoft/SoftwareInventory`
+- [ ] Commit: ~~`"link, permissions, hash, boot, page file, audio, colour, and inventory tools"`~~ -> `rizonesoft/LinkManager`, `rizonesoft/PermissionsCopier`, `rizonesoft/HashVerifier`, `rizonesoft/LongPathEnabler`, `rizonesoft/BootManager`, `rizonesoft/PageFileManager`, `rizonesoft/AudioDevices`, `rizonesoft/ColorProfiles`, `rizonesoft/SoftwareInventory`
 
 **Freeze check:** What `BootManager` writes to the boot configuration is frozen once shipped, because a mistake there costs the user their machine. Evidence is a fixture boot entry changed and undone, reproducing the original exactly, entry for entry. Fixture source: `tests/fixtures/boot/`.
 
@@ -244,7 +244,7 @@ Nine tools. **Most are one surface over one thing and are built from the items b
 
 ## 9. Printing, Search, and Scheduled Tasks
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PrinterManager` repository (`D:\Resolute_Bin\PrinterManager`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PrinterManager`, `rizonesoft/SearchManager` and `rizonesoft/TaskManager` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 **All three are specified before they are built.** Each replaces a Windows interface that is split across several places or is actively avoided, and none is a one-section job. This section authors their TODO files; those files are what gets built.
 
@@ -257,11 +257,11 @@ Three surfaces where Windows ships an interface so poor that the usual advice is
 **Needs:** Windows host (build/test)
 
 - [ ] ~~**Specify** `PrinterManager` in its own TODO file. Required scope: printers, queues, drivers, and ports in one place; the stuck-queue case including the spooler restart it needs; diagnosis across spooler state, driver, port, offline status, and a queue blocked by one failed job; and removing a printer with its driver while refusing a driver still in use. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/PrinterManager`
-- [ ] ~~**Specify** `SearchManager` in its own TODO file. Required scope: index status, size, indexed locations, and exclusions; the not-found diagnosis distinguishing a file outside indexed locations, one excluded by type, and one the indexer cannot read; and a rebuild that states search will be incomplete until it finishes and gives an estimate. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/PrinterManager`
-- [ ] ~~**Specify** `TaskManager` in its own TODO file. Required scope: view, create, edit, enable, and disable over scheduled tasks; the triggers and conditions Task Scheduler buries; every change as a repair-contract item with undo restoring the definition exactly; and flagging a task running from a temporary directory or pointing at a missing executable. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/PrinterManager`
-- [ ] ~~Take the task enumeration from `D05 T01 §5` rather than writing a second one, and record that in each spec. Done when: all three specs name what they consume rather than what they will reimplement.~~ -> `rizonesoft/PrinterManager`
-- [ ] ~~Carry the freeze check below into the `TaskManager` spec. Done when: that file owns it, because a freeze check belongs with the section that does the writing.~~ -> `rizonesoft/PrinterManager`
-- [ ] Commit: ~~`"printer, search, and scheduled task managers"`~~ -> `rizonesoft/PrinterManager`
+- [ ] ~~**Specify** `SearchManager` in its own TODO file. Required scope: index status, size, indexed locations, and exclusions; the not-found diagnosis distinguishing a file outside indexed locations, one excluded by type, and one the indexer cannot read; and a rebuild that states search will be incomplete until it finishes and gives an estimate. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/SearchManager`
+- [ ] ~~**Specify** `TaskManager` in its own TODO file. Required scope: view, create, edit, enable, and disable over scheduled tasks; the triggers and conditions Task Scheduler buries; every change as a repair-contract item with undo restoring the definition exactly; and flagging a task running from a temporary directory or pointing at a missing executable. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/TaskManager`
+- [ ] ~~Take the task enumeration from `D05 T01 §5` rather than writing a second one, and record that in each spec. Done when: all three specs name what they consume rather than what they will reimplement.~~ -> `rizonesoft/PrinterManager`, `rizonesoft/SearchManager`, `rizonesoft/TaskManager`
+- [ ] ~~Carry the freeze check below into the `TaskManager` spec. Done when: that file owns it, because a freeze check belongs with the section that does the writing.~~ -> `rizonesoft/TaskManager`
+- [ ] Commit: ~~`"printer, search, and scheduled task managers"`~~ -> `rizonesoft/PrinterManager`, `rizonesoft/SearchManager`, `rizonesoft/TaskManager`
 
 **Freeze check:** What `TaskManager` writes to a task definition is frozen once shipped, because a malformed definition can stop a task a machine depends on. Evidence is a fixture task round-tripped through edit and undo, compared field by field. **This check transfers to the `TaskManager` spec**, which is where the writing happens. Fixture source: `tests/fixtures/tasks/`.
 

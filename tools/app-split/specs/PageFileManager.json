@@ -1,0 +1,251 @@
+{
+  "name": "PageFileManager",
+  "slug": "pagefilemanager",
+  "display": "Page File Manager",
+  "job": "it shows where the Windows page file lives and how big it is on each drive, changes it between system managed and a set size, verifies the change by read-back and can undo it.",
+  "tagline": "See where the Windows page file lives and how big it is, and change it safely",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Grape",
+    "light": "#D8B4FE",
+    "dark": "#7E22CE",
+    "social_ground": "#220B38",
+    "social_muted": "#E6D3F9"
+  },
+  "icon": {
+    "idea": "A memory chip, an arrow, a drive: memory spilling over to disk.",
+    "points": [
+      "Free-standing, with no tile behind it: a chip with pins at the upper left, a down arrow, and a rounded drive at the lower right.",
+      "The chip is Grape light; the arrow and the drive are Grape.",
+      "The small drawing, used below 40 pixels, drops the pins and thickens the arrow."
+    ],
+    "large": "<rect x=\"8\" y=\"6\" width=\"44\" height=\"34\" rx=\"6\" fill=\"#D8B4FE\"/><path d=\"M18 40 V50 M30 40 V50 M42 40 V50\" fill=\"none\" stroke=\"#D8B4FE\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M66 22 V46 M56 38 L66 48 L76 38\" fill=\"none\" stroke=\"#7E22CE\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"30\" y=\"56\" width=\"60\" height=\"32\" rx=\"9\" fill=\"#7E22CE\"/><circle cx=\"76\" cy=\"72\" r=\"4.5\" fill=\"#D8B4FE\"/>",
+    "small": "<rect x=\"6\" y=\"6\" width=\"46\" height=\"34\" rx=\"7\" fill=\"#D8B4FE\"/><path d=\"M66 16 V46 M54 36 L66 48 L78 36\" fill=\"none\" stroke=\"#7E22CE\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"26\" y=\"54\" width=\"64\" height=\"36\" rx=\"10\" fill=\"#7E22CE\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Page file",
+        "Whether Windows manages the page file, and one row per drive with its free space, its page file setting and its use now and at peak"
+      ],
+      [
+        "Advice",
+        "What the current setting means for crash dumps and free space, and what a proposed change would do"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees where the page file lives and how big it is, then changes it for one drive at a time and knows it takes effect after a restart.",
+    "primary": "Apply",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Management",
+        "Managed by Windows or Set by you, shown in the header"
+      ],
+      [
+        "Drive letter",
+        "Each fixed drive, with its free space"
+      ],
+      [
+        "Page file setting",
+        "System managed, Custom size, Fixed size or None"
+      ],
+      [
+        "In use now",
+        "The size in use at this moment, per drive"
+      ],
+      [
+        "Peak use",
+        "The highest size in use since the last restart, per drive"
+      ]
+    ],
+    "status": "Managed by Windows, 1 drive holds a page file, restart not needed",
+    "notes": [
+      "The header says in words whether Windows manages the page file or the user does, with an icon, and the rows below it follow from that.",
+      "Each drive is one row: letter, free space, the setting (system managed, a set initial and maximum size, or none), the size in use now and the peak. State is an icon and a word, never colour alone.",
+      "Apply is the accent button and acts on the selected drive's proposed setting. It is disabled until the proposal differs from what is set and passes validation, and its label says what it will do.",
+      "Undo sits beside Apply and restores the setting recorded before the last change. It is disabled with a tooltip when there is nothing to undo.",
+      "After Apply the row shows the setting read back from Windows and a plain line that the change takes effect only after a restart. Current use does not change until then.",
+      "A change that removes every page file asks for confirmation first and names what it breaks. The status bar reads the page file state in words, for example \"Managed by Windows, restart not needed\".",
+      "When the process is not elevated the window still reads and shows everything, and Apply names the refusal (a change needs administrator rights) before any write."
+    ],
+    "cut": "There is no original window, so nothing is cut from one. The window has no menus, no splash, no animations and no donate strip: the suite's tool window provides the sidebar, the status bar, Settings and About, and the plan records that nothing outside them is drawn by the tool."
+  },
+  "readme": {
+    "lead": "See where the Windows page file lives and how big it is, and change it safely.",
+    "what": [
+      "Page File Manager shows the page file on every drive: whether Windows manages it or you set it, how much space the drive has free, and how much of the page file is in use now and at its peak. It reads what Windows holds, not a guess.",
+      "It changes the setting one drive at a time, between system managed and a size you choose. It checks the change first (free space, a page file on the system drive for crash dumps, sizes Windows accepts), reads the setting back after writing it, records what was there before so the change can be undone, and says plainly that Windows applies it only after a restart. A change needs administrator rights."
+    ],
+    "new_intro": "Page File Manager is new, written in C++ for the suite, and answers the questions most guides leave out.",
+    "new": [
+      [
+        "Read-back on every change.",
+        "The setting is read from Windows after it is written and a mismatch is refused by name."
+      ],
+      [
+        "Undo.",
+        "The setting that was there before a change is recorded, and Undo puts exactly that back."
+      ],
+      [
+        "Restart said plainly.",
+        "The tool states that a change takes effect only after a restart and shows the pending setting beside what is running."
+      ],
+      [
+        "A warning before no page file.",
+        "Before a change that leaves no page file, it says what that breaks: crash dumps are not written and some programs fail."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The tool: build, engine, window, features, release",
+    "goal": "Page File Manager ships as a complete, standalone C++ tool: it shows the Windows page file per drive with its setting and its use now and at peak, changes it between system managed and a set size after validating the change, verifies every write by reading the setting back, records the prior setting so a change can be undone, says that a restart is needed, and refuses by name when it is not elevated.",
+    "current_state": "Nothing exists yet. This is a new tool and nothing is ported: there is no AutoIt original and no `reference/au3/` folder. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and one plan paragraph in `docs/origin/resolute-D05-T07-s8.md` (line 18): page file location and size per volume, a change that verifies by read-back and states that it needs a restart. The rest of the Windows behaviour in this plan is from Windows itself: the `PagingFiles` and `ExistingPageFiles` values under `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management`, the `AutomaticManagedPagefile` property of `Win32_ComputerSystem`, and the `Win32_PageFileSetting` and `Win32_PageFileUsage` classes. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s8.md`: the plan section as it stood in the Resolute repository, of which line 18 concerns this tool.",
+      "`HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management`: the `PagingFiles` and `ExistingPageFiles` values, read on a real machine to learn the formats.",
+      "`root\\cimv2`: the `Win32_ComputerSystem`, `Win32_PageFileSetting` and `Win32_PageFileUsage` classes, read on a real machine for the size and use fields."
+    ],
+    "outcome": [
+      "`PageFileManager.exe` shows whether Windows manages the page file and, per drive, its free space, its setting and its use now and at peak, read from Windows.",
+      "A change is validated before it is written, read back after, recorded so it can be undone, refused by name when not elevated, and always stated to need a restart.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Page file screen, where each drive is a row. Reporting and audit are the Activity section, which is the trail of every read and change the tool made. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated change is refused by name before any write. Reverse anchors on the Undo the Change section: the setting recorded before a change is restored, and until a restart a restored setting simply replaces the pending one.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Page File Engine",
+      "intro": "The tool's whole system effect, independent of any window: reading the page file setting per drive and its use now and at peak, validating a proposed change, writing it with the setting read back and the prior setting recorded, and saying that a restart is needed. Every change is refused by name when the process is not elevated.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the setting model and the registry and WMI names once in `src/core/PageFile.h`. Done when: the header holds the `PagingFiles` format, the `Win32_` property names and the units (megabytes), each with a comment saying which Windows source it comes from.",
+        "Implement read, validate, write and verify in `src/core/PageFile.cpp` against a registry root and a WMI source that the tests can redirect. Done when: the unit tests pass against a disposable key and a fake WMI source."
+      ],
+      "items": [
+        "Implement `ReadSettings()` in `src/core/PageFile.cpp` returning whether Windows manages the page file (`AutomaticManagedPagefile` of `Win32_ComputerSystem`) and, per drive, the configured initial and maximum size from `PagingFiles` and `Win32_PageFileSetting`. Done when: a fixture with one custom drive, one system managed drive and one drive with none reports each correctly.",
+        "Implement `ReadUsage()` returning per drive the allocated size, the current use and the peak use from `Win32_PageFileUsage`, in megabytes, and the free space of each fixed drive. Done when: a fake source with known values returns them unchanged and a drive with no page file returns no usage row.",
+        "Report the packaged-app swap file separately: detect `swapfile.sys` on the system drive and show it as its own line, not as a page file the tool changes. Done when: a fixture with and without `swapfile.sys` reports each, and no change the tool makes names it.",
+        "Implement `Validate(change)` returning every problem by name: a set size larger than the drive's free space, an initial size above the maximum, a size of zero for a custom setting, a change that leaves no page file on the system drive (so a crash dump cannot be written), and a drive that is not fixed. Done when: a test per rule passes and a valid change returns an empty list. Cheaper substitute: letting Windows refuse the size at the next boot, which the user only finds out after restarting.",
+        "Implement `Apply(change)` in `src/core/PageFile.cpp`: turn off `AutomaticManagedPagefile` first when a set size is chosen, write the drive's entry to `PagingFiles` (or system managed, or none), and return the setting read back from the registry and `Win32_PageFileSetting`. Done when: a test under a disposable root shows the written entry equal to the requested one and a corrupted value after the write is returned as drive, field, expected and found. Cheaper substitute: checking only the return code of the write, or writing through `wmic.exe`, which cannot be redirected for a test.",
+        "Record the prior setting of every drive and the management flag to a record file before the first write, and mark the result as pending a restart. Done when: a test finds the record on disk before any value is written and the result carries `RestartRequired` true. Cheaper substitute: keeping the record in memory, which is lost if the tool closes before the restart.",
+        "Refuse `Apply` by name when the process is not elevated, before any read of the old setting or any write, with one activity record. Done when: an unelevated test run reports the refusal and the fixture is unchanged. Cheaper substitute: letting the registry write fail with access denied halfway through a multi-drive change.",
+        "Cover every path in `tests/pagefile_test.cpp` with a disposable root and a fake WMI source. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L pagefile` passes and fails when one validation rule is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L pagefile` passes, including the corrupted-write, no-system-drive-page-file and unelevated cases, and fails when one validation rule is removed.",
+      "commit": "core: read, validate and apply the page file setting, verified and refused when unelevated"
+    },
+    "enhancements": [
+      {
+        "title": "Undo the Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A page file change is hard to reason about because it only takes effect after a restart. Before a change, the prior setting of every drive and the management flag are recorded, so Undo restores what was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back the page file setting that was there before the last change. Consumer: the registry and `Win32_ComputerSystem`, compared with the record.",
+          "treatment": "the recorded prior setting restored drive by drive, with the management flag, and read back. Cheaper substitute that fails the checkpoint: an undo that switches to system managed, which is not what was there before."
+        },
+        "build": [
+          "Record the prior state through the repair contract in `src/core/PageFile.cpp`. Done when: a record exists before the first write.",
+          "Wire Undo in `src/ui/PageFileView.cpp`. Done when: a change then Undo leaves every drive's setting and the management flag as they were."
+        ],
+        "items": [
+          "Store the prior setting through the repair contract's restore record before any write. Done when: a test finds the record on disk before the first value is written. Cheaper substitute: keeping it in memory.",
+          "Implement Undo in `src/core/PageFile.cpp` restoring the record drive by drive and the management flag, then reading the result back. Done when: a change then Undo leaves the fixture equal to before, asserted for a custom size, system managed and none.",
+          "Disable Undo with a tooltip when there is nothing to undo, in `src/ui/PageFileView.cpp`. Done when: a first run shows it disabled and it enables after one change.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes and fails when one drive is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: a change then Undo leaves every drive's setting and the management flag as they were.",
+        "commit": "feature: undo puts back the page file setting that was there before"
+      },
+      {
+        "title": "Restart Needed, Said Plainly",
+        "intro": "Windows reads the page file setting at boot, so a change shows in the registry at once and in use only after a restart. Without saying so, a person sees the old size still in use and believes the change failed. This section shows the pending setting beside the running one and says in words that a restart is needed.",
+        "surface": {
+          "fidelity": "the Page file section's rows and the status bar, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person knows a change is saved but not yet in force. Consumer: the row, compared with the running setting from `ExistingPageFiles` and the configured one from `PagingFiles`.",
+          "treatment": "a row state \"Pending restart\" with an icon and a word, and a status bar line naming it. Cheaper substitute that fails the checkpoint: a one-off dialog after Apply, which is gone when the person looks again."
+        },
+        "build": [
+          "Compare the configured setting with the running one in `src/core/PageFile.cpp`. Done when: the engine returns a pending flag per drive.",
+          "Show the pending state in `src/ui/PageFileView.cpp`. Done when: a drive with a pending change shows it after the tool is closed and reopened."
+        ],
+        "items": [
+          "Derive a per drive pending flag in `src/core/PageFile.cpp` by comparing `PagingFiles` with `ExistingPageFiles`. Done when: a fixture where they differ reports pending for that drive only, and where they match reports none.",
+          "Show the row state \"Pending restart\" with an icon and a word, and the status bar line, in `src/ui/PageFileView.cpp`. Done when: a pending fixture shows both and a settled fixture shows neither. Cheaper substitute: a state shown by colour alone.",
+          "State in the Advice section that the use shown is the running setting and that the new one applies at the next restart. Done when: the text appears only while a change is pending.",
+          "Cover it in `tests/pending_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L pending` passes and fails when the pending flag is always false."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L pending` passes and the pending state survives closing and reopening the tool.",
+        "commit": "feature: a pending change is shown, with a restart said plainly"
+      },
+      {
+        "title": "Warn Before Removing It",
+        "intro": "Having no page file is allowed but has costs: Windows cannot write a crash dump without a page file on the system drive, and some programs fail when they ask for memory Windows can only back with a page file. This section says so before the person commits, rather than after the first failure.",
+        "surface": {
+          "fidelity": "the confirmation and the Advice section, against `sdk/DESIGN.md` section 11.",
+          "job": "a person who is about to remove the page file, or move it off the system drive, learns what that breaks before committing. Consumer: the proposed change, compared with the rules in the engine.",
+          "treatment": "a confirmation naming each consequence that applies to this change and what the Cancel button keeps. Cheaper substitute that fails the checkpoint: a generic \"are you sure\", which tells the person nothing."
+        },
+        "build": [
+          "Derive the consequences of a proposed change in `src/core/Advice.cpp`. Done when: each rule returns its plain sentence for a fixture change.",
+          "Show them before Apply in `src/ui/AdviceView.cpp`. Done when: a change that leaves no page file shows the confirmation and Cancel leaves the setting unchanged."
+        ],
+        "items": [
+          "Write `src/core/Advice.cpp` returning, for a proposed change, the sentences that apply: no page file at all (no crash dump, programs can fail), none on the system drive (no crash dump), a size smaller than the installed memory for a full dump, and little free space on the target drive. Done when: a test per rule passes and a harmless change returns none.",
+          "Show the Advice section for the current setting and for a proposed one, with the same sentences. Done when: selecting a drive and editing the proposal changes the text live.",
+          "Show a confirmation before Apply when a consequence applies, naming each one, through the framework's message surface. Done when: Cancel leaves the fixture untouched and Confirm continues to Apply. Cheaper substitute: a private dialog.",
+          "Cover it in `tests/advice_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L advice` passes and fails when a rule's sentence is dropped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L advice` passes and a change that leaves no page file cannot be applied without the confirmation naming what it breaks.",
+        "commit": "feature: advice and a warning before the page file is removed"
+      },
+      {
+        "title": "Use Over Time",
+        "needs": "sdk-framework",
+        "intro": "One reading of current and peak use says little about whether a size is right. This section records the current and peak use at each start and at intervals while the tool is open, and shows them with the SDK's chart control, so a person can see whether the page file is ever near its maximum. The chart control is planned in Resolute-SDK and not built.",
+        "surface": {
+          "fidelity": "the use chart in the Page file section, against `sdk/DESIGN.md`.",
+          "job": "a person sees how much of the page file has been used over time, per drive. Consumer: the chart, compared with the recorded samples.",
+          "treatment": "the SDK's chart control with current use as a line and the maximum size as a reference, and a table of the same samples for those who cannot read a chart. Cheaper substitute that fails the checkpoint: a chart drawn by the tool, which the contract forbids."
+        },
+        "build": [
+          "Record samples in `src/core/UsageLog.cpp`. Done when: a sample has the time, the drive, the current use and the peak, and survives a restart.",
+          "Show them in `src/ui/UsageChartView.cpp` with the SDK's chart control. Done when: the chart equals the recorded samples."
+        ],
+        "items": [
+          "Write `src/core/UsageLog.cpp` appending a sample (time, drive, current use, peak, all in megabytes) on start and at a fixed interval while open, through the framework's data folder. Done when: a test shows two samples after two calls and that they are read back after a restart. Cheaper substitute: holding samples in memory only.",
+          "Bound the log: drop the oldest samples past a stated count, declared in `src/core/UsageLog.h`. Done when: a test adds past the bound and the oldest are gone.",
+          "Show the samples in `src/ui/UsageChartView.cpp` with the SDK's chart control and a table of the same values. Done when: the chart and the table list the same samples and every point has an accessible name.",
+          "Cover it in `tests/usage_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L usage` passes and fails when a sample is dropped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L usage` passes and the chart equals the recorded samples after a restart.",
+        "commit": "feature: current and peak use recorded and charted over time"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine the tool reads the setting and the use on every drive, and the values match what Windows shows in System Properties and in `Win32_PageFileUsage`.",
+      "A change on a test machine is validated, written, read back, shown as pending, applied after a restart, and undone, in light and dark, by keyboard alone.",
+      "An unelevated run reads everything, refuses a change by name before any write, and leaves every setting as it was."
+    ]
+  }
+}

@@ -4,7 +4,7 @@
   "display": "Attribute Repair",
   "job": "it finds files and folders wrongly marked hidden and system, the usual sign of USB malware that hides a person's files and leaves shortcuts in their place, and clears those two attributes in the places the person chooses, leaving Windows' own protected files alone.",
   "tagline": "Bring back files that a USB virus hid",
-  "frozen": false,
+  "frozen": true,
   "elevated": false,
   "au3": [],
   "hue": {

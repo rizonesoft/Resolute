@@ -1,0 +1,255 @@
+{
+  "name": "HashVerifier",
+  "slug": "hashverifier",
+  "display": "Hash Verifier",
+  "job": "it computes the hash of a file and compares it with the expected value a download page publishes, and says clearly whether the file matches or does not.",
+  "tagline": "Check that a download is exactly the file its publisher made",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Deep sky",
+    "light": "#7DD3FC",
+    "dark": "#0369A1",
+    "social_ground": "#07202F",
+    "social_muted": "#C4E4F5"
+  },
+  "icon": {
+    "idea": "A hash sign with a tick badge: hash, verified.",
+    "points": [
+      "Free-standing, with no tile: a hash sign with rounded ends and a disc at its lower right.",
+      "The hash sign is Deep sky, the disc is Deep sky light with a Deep sky tick.",
+      "The small drawing, used below 40 pixels, thickens the hash sign and enlarges the disc."
+    ],
+    "large": "<path d=\"M30 10 L24 66 M56 10 L50 66 M10 28 H68 M8 50 H66\" fill=\"none\" stroke=\"#0369A1\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"68\" cy=\"68\" r=\"21\" fill=\"#7DD3FC\"/><path d=\"M58 68 L66 76 L79 60\" fill=\"none\" stroke=\"#0369A1\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M30 10 L24 66 M56 10 L50 66 M10 28 H68 M8 50 H66\" fill=\"none\" stroke=\"#0369A1\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"68\" cy=\"68\" r=\"24\" fill=\"#7DD3FC\"/><path d=\"M56 68 L65 77 L80 59\" fill=\"none\" stroke=\"#0369A1\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Verify",
+        "The file, the expected value, the verdict, and each algorithm's computed value"
+      ],
+      [
+        "Many files",
+        "A checksum list checked against the files beside it, one row per file"
+      ],
+      [
+        "Activity",
+        "What the tool checked, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees at once whether a downloaded file is exactly the file its publisher made.",
+    "primary": "Verify",
+    "secondary": "Choose a file",
+    "rows": [
+      [
+        "File",
+        "Chosen or Not chosen"
+      ],
+      [
+        "Expected value",
+        "Pasted or Empty"
+      ],
+      [
+        "Verdict",
+        "Matches, Does not match or Nothing to compare with"
+      ],
+      [
+        "SHA-256",
+        "Computed value, marked when it is the one compared"
+      ],
+      [
+        "MD5",
+        "Computed value, marked when it is the one compared"
+      ]
+    ],
+    "status": "Matches: SHA-256 of setup.exe",
+    "notes": [
+      "The verdict is a large line of words with an icon: Matches, Does not match, or Nothing to compare with. It never relies on colour alone.",
+      "The primary action is Verify. It hashes the chosen file in blocks off the interface thread, shows progress, and offers Cancel while it runs.",
+      "Pasting an expected value picks the algorithm from its length (32, 40, 64, 96 or 128 hexadecimal digits). Case, spaces and a trailing file name are ignored.",
+      "Below the verdict each algorithm is a row with its computed value, so a person can also copy a value to publish. The row that was compared is marked.",
+      "When the pasted value is MD5 or SHA-1, a short note says these are broken against a deliberate attacker and only good against accidental damage.",
+      "The tool only reads. It has no undo because it changes nothing, and it needs no elevation.",
+      "The status bar says the verdict in words and names the file and the algorithm compared."
+    ],
+    "cut": "There is no earlier window to cut from, because the tool is new. The window has no menus, splash, animations or donate strip: the suite's sidebar, settings pages and About page replace them, and the plan records that choice."
+  },
+  "readme": {
+    "lead": "Check that a download is exactly the file its publisher made.",
+    "what": [
+      "Hash Verifier computes the hash of a file and compares it with the value a download page publishes. It computes SHA-256, SHA-1, SHA-384, SHA-512 and MD5 in one pass over the file and says in words whether the file matches or does not. It only reads the file.",
+      "A hash proves the file is the same as the one the value was made from. It does not prove the page that published the value is trustworthy, and MD5 and SHA-1 only guard against accidental damage, not a deliberate swap."
+    ],
+    "new_intro": "Hash Verifier is a new tool, written in C++ for the suite, and nothing is ported from an earlier version.",
+    "new": [
+      [
+        "Reads big files without freezing.",
+        "The file is read in blocks off the interface thread, with progress and a Cancel button."
+      ],
+      [
+        "Knows the algorithm from the value.",
+        "Paste the published value and the tool picks the algorithm from its length, ignoring case, spaces and a trailing file name."
+      ],
+      [
+        "Checks a whole checksum list.",
+        "Point it at a list file and it checks every file the list names, with one verdict each."
+      ],
+      [
+        "Says what a match means.",
+        "A note appears when the published value is MD5 or SHA-1, saying what that does and does not prove."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Hash Verifier ships as a complete, standalone C++ tool: it hashes a file in blocks with progress and cancel, compares the result with a pasted expected value, reports in words and with an icon whether the file matches, checks a checksum list file against the files beside it, and only ever reads.",
+    "current_state": "Nothing exists yet: this is a new tool and nothing is ported, so there is no AutoIt original and no `reference/au3/` folder. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and one plan section under `docs/origin/` that names the tool in one line (`docs/origin/resolute-D05-T07-s8.md:15`: compute and compare file hashes against an expected value, with a matching and a mismatching file each reported clearly). The rest of that file describes other tools and is not this one's. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s8.md`: the plan section as it stood at the move; only line 15 and the hash clause of the test checkpoint (line 27) concern this tool.",
+      "`DESIGN.md`: the tool's identity and its window's sections, and `sdk/DESIGN.md`, the suite's contract.",
+      "The published standards' test vectors for SHA-1, SHA-256, SHA-384, SHA-512 and MD5, which become the fixtures under `tests/fixtures/`."
+    ],
+    "outcome": [
+      "`HashVerifier.exe` hashes a file with SHA-256, SHA-1, SHA-384, SHA-512 and MD5 in one pass and reports a matching and a mismatching file each clearly, proven against the published test vectors.",
+      "A pasted expected value is understood whatever its case, spacing or trailing file name, its algorithm is told from its length, and a checksum list file is checked file by file.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Verify screen, where the file, the expected value and one row per algorithm are the first thing a person sees, with Many files as the second list. Reporting and audit are the Activity section, the readable trail of what was checked. Settings are the framework's pages. Permissions do not apply: the tool reads a file the user can already read and needs no elevation. Reverse anchors on the Explorer right-click entry, which the tool installs and removes itself; hashing changes nothing, so it has nothing to undo.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Hash and Compare Engine",
+      "intro": "The tool's core, independent of any window: hashing a file in blocks with progress and cancel, several algorithms in one pass, parsing a pasted expected value, a constant comparison that ignores case and spaces, and parsing a checksum list file. It reads only, and the published standards' test vectors are the fixtures.",
+      "needs": "windows-host",
+      "build": [
+        "Implement hashing over the Windows cryptography API in `src/core/Hasher.cpp` (`BCryptOpenAlgorithmProvider`, `BCryptCreateHash`, `BCryptHashData`, `BCryptFinishHash`). Done when: the test vectors for all five algorithms pass.",
+        "Implement the expected-value parser, the comparison and the list parser in `src/core/Expected.cpp` and `src/core/ChecksumList.cpp`. Done when: the unit tests pass for every accepted and refused form."
+      ],
+      "items": [
+        "Implement `HashFile(path, algorithms, progress, cancel)` in `src/core/Hasher.cpp` reading the file in fixed-size blocks and feeding every requested algorithm from each block, so the file is read once. Done when: a test with SHA-256, SHA-1, SHA-384, SHA-512 and MD5 requested together reads the fixture once, counted by a read hook, and returns five values.",
+        "Check each algorithm against the published test vectors in `tests/fixtures/vectors.json`: the empty input and the three bytes `abc` for each of the five (for example SHA-256 of `abc` begins `ba7816bf`). Done when: `tests/hasher_test.cpp` compares the full values and fails when one digit of one vector is changed.",
+        "Call `progress` after every block with bytes done and total, and honour `cancel` between blocks. Done when: a test with a fixture of several blocks sees rising progress ending at the total, and a cancel after the first block returns cancelled and releases the file handle, asserted by deleting the file afterwards.",
+        "Run the hashing off the interface thread through the framework's task runner, never on the caller's thread. Done when: a test that blocks inside `progress` shows the calling thread still answering a message. Cheaper substitute: a loop that pumps messages, which hides the block instead of removing it.",
+        "Implement `ParseExpected(text)` in `src/core/Expected.cpp` returning the hexadecimal digits, the algorithm told from the length (32 digits MD5, 40 SHA-1, 64 SHA-256, 96 SHA-384, 128 SHA-512) and any trailing file name, ignoring case, spaces and line ends. Done when: `tests/expected_test.cpp` accepts upper case, lower case, spaced groups and `<hash>  setup.exe`, and refuses a length that fits no algorithm, a non-hexadecimal character and an empty string, each with its own reason.",
+        "Implement `Matches(computed, expected)` comparing every byte without stopping at the first difference and ignoring case and spaces. Done when: a test with a value differing only in its last digit returns not matching and one differing only in case returns matching.",
+        "Implement `ParseChecksumList(text)` in `src/core/ChecksumList.cpp` reading the form `hash`, two spaces, `file name` (and the binary-mode form with `*` before the name), one entry per line, skipping blank lines and comment lines. Done when: `tests/checksum_list_test.cpp` parses a list of mixed algorithms and names each malformed line by its number.",
+        "Report a file that cannot be opened (missing, locked, access denied) as its own outcome with the system's reason, never as a mismatch. Done when: a test with a missing file and a locked file gets two distinct outcomes, neither of which is Does not match.",
+        "Cover the engine in the tests above. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when one test vector or one length rule is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes for the five algorithms' test vectors, the parser, the comparison and the list parser, and fails when one vector is changed.",
+      "commit": "core: hashing in blocks, expected-value parsing and list parsing"
+    },
+    "enhancements": [
+      {
+        "title": "Check a Checksum List",
+        "intro": "A download often comes with a list file of hashes and file names. This section is the Many files screen: it checks every file the list names, beside the list, and gives one verdict each, so a person does not paste a value per file.",
+        "surface": {
+          "fidelity": "the Many files section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16, in light and dark at 100 and 150 percent.",
+          "job": "a person checks every file a checksum list names in one action. Consumer: the rows, compared with the engine's verdict per file.",
+          "treatment": "one row per file with an icon and a word: matches, does not match, missing or unreadable. Cheaper substitute that fails the checkpoint: one overall pass or fail line, which hides which file is wrong."
+        },
+        "build": [
+          "Build the screen in `src/ui/ManyFilesView.cpp` from the SDK's list control. Done when: choosing a list file fills one row per entry.",
+          "Run the checks one file after another with progress in `src/core/ListCheck.cpp`. Done when: every row ends with a verdict and Cancel stops the run."
+        ],
+        "items": [
+          "Add `src/core/ListCheck.cpp`: for each entry of a parsed list, hash the named file beside the list with the entry's algorithm and return one verdict. Done when: a fixture folder with two matching files, one changed file and one missing file returns exactly those four verdicts.",
+          "Show the rows in `src/ui/ManyFilesView.cpp`: file name, algorithm, verdict as an icon and a word. Done when: the fixture shows four rows, each with its icon and word. Cheaper substitute: colouring the row only, which fails for people who cannot tell the colours apart.",
+          "Show a summary in the status bar in words (for example \"3 match, 1 does not\"). Done when: the text changes with the rows and counts equal the rows.",
+          "Keep a list line that names a path outside the list's folder from being read silently. Done when: a `..\\` entry is shown as refused with its reason and no file outside the folder is opened.",
+          "Cover it in `tests/list_check_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L list` passes, and fails when a changed file is reported as matching."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L list` passes for the four-verdict fixture, and the screen shows one row per file.",
+        "commit": "feature: check every file a checksum list names"
+      },
+      {
+        "title": "Drop a File on the Window",
+        "intro": "A person can drop a file, or a checksum list file, onto the window instead of browsing for it. A dropped file fills the Verify screen's file; a dropped list file opens the Many files screen.",
+        "surface": {
+          "fidelity": "the drop target on the Verify and Many files sections, against `sdk/DESIGN.md`.",
+          "job": "a person starts a check by dragging the file from Explorer. Consumer: the chosen file shown on screen, read back.",
+          "treatment": "the SDK's drop-target highlight and a sentence naming what will happen on release. Cheaper substitute that fails the checkpoint: accepting the drop silently with no sign of what was taken."
+        },
+        "build": [
+          "Accept file drops in `src/ui/MainWindow.cpp` through the SDK's drop support. Done when: dropping one file sets the Verify file.",
+          "Route a list file to Many files in `src/ui/MainWindow.cpp`. Done when: dropping a checksum list selects that section and fills its rows."
+        ],
+        "items": [
+          "Register the window as a drop target in `src/ui/MainWindow.cpp` through the SDK, taking only a single file. Done when: dropping one file shows its path in the Verify screen.",
+          "Tell a checksum list from a file to verify by its extension (`.sha256`, `.sha1`, `.md5`, `.sha512`, `.txt`) and ask when a `.txt` is ambiguous. Done when: a `.sha256` file opens Many files and a `.iso` file fills Verify.",
+          "Refuse a drop of several files or a folder with one sentence. Done when: dropping two files shows the sentence and changes nothing.",
+          "Show the highlight and the sentence while a drag is over the window. Done when: a driven drag shows both and removes them on leave. Cheaper substitute: no feedback, so the drop looks like it did nothing.",
+          "Cover the routing in `tests/drop_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L drop` passes, and fails when a list file is sent to Verify."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L drop` passes: one file goes to Verify, a list file to Many files, several files are refused.",
+        "commit": "feature: drop a file or a checksum list on the window"
+      },
+      {
+        "title": "Explorer Right-Click Entry",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A Verify entry in Explorer's right-click menu opens the tool with the file already chosen. The tool installs the entry for the current user only and removes it again, so it needs no elevation, and removal is the reverse of installation. The record of what was written is the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Install and Remove control in Settings, against `sdk/DESIGN.md`.",
+          "job": "a person adds or removes the right-click entry and sees which it is. Consumer: the registry key, read back.",
+          "treatment": "one control showing the entry as Installed or Not installed in words, with the action that changes it. Cheaper substitute that fails the checkpoint: a button that only writes and never shows or removes the entry."
+        },
+        "build": [
+          "Write and remove the per-user entry in `src/core/ShellEntry.cpp` under a root the tests can redirect. Done when: the unit tests pass against a disposable key.",
+          "Show its state and the action in `src/ui/ShellEntryPage.cpp`. Done when: the control shows Installed after an install and Not installed after a removal."
+        ],
+        "items": [
+          "Implement `InstallEntry(exePath)` in `src/core/ShellEntry.cpp` writing a `Verify with Hash Verifier` verb under `HKCU\\Software\\Classes\\*\\shell` with a quoted command passing the file as an argument. Done when: a test under a disposable root finds the verb, its command and its icon. Cheaper substitute: writing under `HKLM`, which needs elevation the tool does not otherwise have.",
+          "Read back every value after writing and report a mismatch by name. Done when: a test that corrupts one value after the write names it. Cheaper substitute: checking only the return code of the write.",
+          "Record the prior state before the first write through the repair contract's restore record. Done when: a test finds the record on disk before a value is written.",
+          "Implement `RemoveEntry()` restoring the recorded prior state, which deletes the verb when there was none. Done when: install then remove leaves the key tree equal to before, asserted, and a second remove changes nothing.",
+          "Accept a file path on the command line in `src/main.cpp` and open Verify with it chosen. Done when: starting the executable with a path shows that file in the Verify screen.",
+          "Cover it in `tests/shell_entry_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L shell` passes, and fails when one value is left behind after removal."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L shell` passes: install, read back, remove and a second remove each leave the key tree as expected.",
+        "commit": "feature: an Explorer right-click entry, installed and removed by the tool"
+      },
+      {
+        "title": "Weak Algorithm Note",
+        "intro": "MD5 and SHA-1 are broken against a deliberate attacker and are good only against accidental damage, and a hash of any kind proves the file matches what the page published, not that the page is trustworthy. When the published value is MD5 or SHA-1, the verdict carries a short note that says both.",
+        "surface": {
+          "fidelity": "the note under the verdict on the Verify screen, against `DESIGN.md` section 2.",
+          "job": "a person learns what a match does and does not prove, when it matters. Consumer: the note's text, read back for each algorithm.",
+          "treatment": "one calm sentence under the verdict, with an icon and words, shown only for MD5 and SHA-1. Cheaper substitute that fails the checkpoint: a warning on every verdict, which people learn to ignore."
+        },
+        "build": [
+          "Decide which algorithms carry a note in `src/core/Expected.cpp`. Done when: MD5 and SHA-1 report a weak flag and the other three do not.",
+          "Show the note in `src/ui/VerifyView.cpp`. Done when: a verdict for an MD5 value shows it and one for SHA-256 does not."
+        ],
+        "items": [
+          "Add a `weak` property to each algorithm in `src/core/Expected.cpp`, true for MD5 and SHA-1. Done when: `tests/expected_test.cpp` asserts it for all five.",
+          "Write the note text as framework strings: what the weakness means (a deliberate swap can keep the same value) and what a match still shows (the file matches what the page published, which is not proof the page is trustworthy). Done when: both facts are in the string for each case and a search of `src/` finds no literal copy. Cheaper substitute: a single generic warning, which says neither.",
+          "Show the note under the verdict only when the compared algorithm is weak, and suggest the stronger value when the page offers one. Done when: a driven run shows the note for a 32-digit value and not for a 64-digit one.",
+          "Cover it in `tests/weak_note_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L weak` passes, and fails when SHA-256 is flagged weak."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L weak` passes: MD5 and SHA-1 show the note, SHA-256, SHA-384 and SHA-512 do not.",
+        "commit": "feature: say what an MD5 or SHA-1 match does and does not prove"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "The engine reproduces the published test vectors for SHA-1, SHA-256, SHA-384, SHA-512 and MD5, and a matching and a mismatching file are each reported clearly.",
+      "A pasted value in upper case, with spaces or with a trailing file name, is understood, and a checksum list file gets one verdict per file.",
+      "On a real machine the tool verifies a large file with progress and cancel, in light and dark, by keyboard alone."
+    ]
+  }
+}

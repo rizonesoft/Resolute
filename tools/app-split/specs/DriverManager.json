@@ -4,7 +4,7 @@
   "display": "Driver Manager",
   "job": "it lists the installed third-party drivers, backs the ones you choose up to a folder with a manifest, verifies the backup and puts a driver back, and it never updates, checks for or downloads a driver.",
   "tagline": "Back up your drivers and roll one back. It never updates them",
-  "frozen": false,
+  "frozen": true,
   "elevated": true,
   "au3": [],
   "hue": {

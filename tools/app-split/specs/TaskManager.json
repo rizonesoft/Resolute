@@ -1,0 +1,259 @@
+{
+  "name": "TaskManager",
+  "slug": "taskmanager",
+  "display": "Scheduled Tasks",
+  "job": "it lists every Windows scheduled task with what it runs, when it runs in plain words and what looks wrong with it, lets a person enable, disable, edit and create tasks, and records each task's exact prior definition so every change can be undone.",
+  "tagline": "Every scheduled task on this PC, readable, editable, and undoable",
+  "frozen": true,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Cobalt blue",
+    "light": "#93C5FD",
+    "dark": "#1D4ED8",
+    "social_ground": "#0E1A3D",
+    "social_muted": "#C9DAF8"
+  },
+  "icon": {
+    "idea": "A calendar with a clock badge: tasks on a schedule.",
+    "points": [
+      "Free-standing with no tile behind it: a rounded calendar with two rings at the top and a clock overlapping its lower right.",
+      "The calendar is Cobalt blue; its line and the clock's ring and hands are Cobalt blue light.",
+      "The small drawing, used below 40 pixels, drops the rings and enlarges the clock."
+    ],
+    "large": "<rect x=\"6\" y=\"14\" width=\"70\" height=\"66\" rx=\"11\" fill=\"#1D4ED8\"/><path d=\"M24 6 V22 M58 6 V22\" fill=\"none\" stroke=\"#1D4ED8\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M18 40 H64\" fill=\"none\" stroke=\"#93C5FD\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"68\" cy=\"68\" r=\"22\" fill=\"#1D4ED8\"/><circle cx=\"68\" cy=\"68\" r=\"17\" fill=\"none\" stroke=\"#93C5FD\" stroke-width=\"7\"/><path d=\"M68 59 V68 L75 72\" fill=\"none\" stroke=\"#93C5FD\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<rect x=\"6\" y=\"10\" width=\"72\" height=\"70\" rx=\"12\" fill=\"#1D4ED8\"/><circle cx=\"66\" cy=\"66\" r=\"26\" fill=\"#1D4ED8\"/><circle cx=\"66\" cy=\"66\" r=\"20\" fill=\"none\" stroke=\"#93C5FD\" stroke-width=\"9\"/><path d=\"M66 55 V66 L75 71\" fill=\"none\" stroke=\"#93C5FD\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Tasks",
+        "Each task as a row with its name, what it runs, when it runs in plain words, its last result, whether it is on, and a flag with the reason when it looks wrong"
+      ],
+      [
+        "Definition",
+        "The selected task in full: its triggers, conditions, settings and the account it runs as, in plain words"
+      ],
+      [
+        "Changes",
+        "What this tool changed, each change undoable"
+      ],
+      [
+        "Activity",
+        "What the tool did and refused, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every scheduled task in one list, understands when and why it runs, spots the ones that look wrong, and switches one off or back on with one button.",
+    "primary": "Switch off",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "A task that is on",
+        "On"
+      ],
+      [
+        "A task that is switched off",
+        "Off"
+      ],
+      [
+        "A task of Windows itself under \\Microsoft\\Windows",
+        "On or Off, with the note Windows task"
+      ],
+      [
+        "A task that runs from a temporary folder",
+        "Looks wrong: runs from a temporary folder"
+      ],
+      [
+        "A task whose file is gone",
+        "Looks wrong: file missing"
+      ]
+    ],
+    "status": "212 tasks, 14 off, 3 look wrong",
+    "notes": [
+      "Every row shows the task's name, what it runs, when it runs in plain words, its last result, and its state with an icon and a word (On, Off, Looks wrong). Colour is never the only signal.",
+      "A flagged row carries the reason in words, such as Runs from a temporary folder, File missing or Hidden with an odd name. The same row can be switched off or edited.",
+      "The primary action is labelled with what it will do for the selected row: Switch off when the task is on, Switch on when it is off. After the change the row is re-read from the Task Scheduler, not assumed.",
+      "Undo registers the definition recorded before the last change and compares it with the original. It is disabled with a tooltip when there is nothing to undo.",
+      "A task under \\Microsoft\\Windows is shown, marked as a Windows task, and a change to it asks for a confirmation that says what depends on it. Nothing is hidden.",
+      "The status bar counts tasks, tasks that are off and tasks that look wrong, in words.",
+      "A change when the tool is not elevated is refused by name before anything is written, with the task and its path in the message and one record in Activity. Tasks that run as SYSTEM are refused the same way."
+    ],
+    "cut": "This is a new tool, so there is no earlier window to cut from. It also has no menu bar, no splash, no animations and no donate strip: the suite's sidebar window, its Settings and its About page from the framework carry what those would have held. The Task Scheduler's folder tree is not copied: the list shows the folder as a column."
+  },
+  "readme": {
+    "lead": "Scheduled Tasks shows every scheduled task on your Windows PC in words you can read, and lets you switch tasks off and on, edit them, create them and undo any change.",
+    "what": [
+      "It reads every task from the Task Scheduler into one list. Each row says what the task runs, when it runs, how its last run ended and whether it is on. A second view shows the selected task in full: the triggers, conditions and settings the Task Scheduler buries, and the account it runs as.",
+      "It flags a task that runs from a temporary folder or points at a file that no longer exists, and says why. Before any change it records the task's exact definition, so Undo puts back the same task. It is not a process viewer: the name Scheduled Tasks is there so nobody mistakes it for the Windows Task Manager."
+    ],
+    "new_intro": "Scheduled Tasks is new in the Resolute suite, written in C++ from the start.",
+    "new": [
+      [
+        "Triggers and conditions in plain words.",
+        "A task that runs at log on, at startup, on an event, when idle or on a schedule says so in a sentence, with its power and network conditions."
+      ],
+      [
+        "Exact undo.",
+        "The task's definition is saved before every change and registered again on Undo, then compared with the original."
+      ],
+      [
+        "Tasks that look wrong are flagged.",
+        "A task running from a temporary folder, pointing at a missing file or hidden with an odd name shows the reason on its row."
+      ],
+      [
+        "Create a task from a short form.",
+        "The form produces a valid definition, shown before it is registered."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Scheduled Tasks ships as a complete, standalone C++ tool: it lists every task through the suite's shared task enumerator, shows each task's triggers, conditions, settings and account in plain words, enables, disables, edits and creates tasks through a definition validated before it is registered, flags tasks that run from a temporary folder or point at a missing file, and records the exact prior definition before every change so Undo restores it exactly.",
+    "current_state": "Nothing exists yet. This is a new tool of the suite and nothing is ported: the repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T07-s9.md` (23 lines), the plan text as it stood in the Resolute repository, which also describes a printer manager and a search manager that are separate tools and not part of this plan. For this tool that text requires view, create, edit, enable and disable over scheduled tasks, the triggers and conditions Task Scheduler buries, every change as a repair-contract item with undo restoring the definition exactly, and flagging a task that runs from a temporary directory or points at a missing executable. It also says to take task enumeration from the suite's shared enumerators, built in the Startup Manager tool (`TaskSource.cpp` there) and proposed to Resolute-SDK, and never to write a second one, and it hands this tool the freeze check below. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built, so every section that needs them carries the Need `sdk-framework`. The sources of truth are Windows itself: the Task Scheduler 2.0 COM interfaces `ITaskService`, `ITaskFolder`, `IRegisteredTask` and `ITaskDefinition`, and a task's XML.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s9.md`: the plan section for this tool, from which only what concerns scheduled tasks is taken, including the freeze check at its end.",
+      "`DESIGN.md`: the identity and the window's sections, with `sdk/DESIGN.md`, the suite's contract.",
+      "The Task Scheduler COM interfaces and the task XML schema, read on a real machine, with the shared task enumerator from Startup Manager as proposed to Resolute-SDK."
+    ],
+    "outcome": [
+      "`TaskManager.exe` lists every task through the shared enumerator, shows each one's triggers, conditions, settings and account in plain words, and flags tasks that run from a temporary folder, point at a missing file or hide behind an odd name.",
+      "A task can be switched on and off, edited and created, each change goes through a validated definition read back from the Task Scheduler, a change without elevation is refused by name, and Undo restores the recorded definition exactly, proven by the freeze check.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Tasks screen, where a person sees every task and the ones that look wrong. Reporting and audit are the Activity section, which records each change and each refusal. Settings are the framework's pages. Permissions anchor on the engine, where a change without elevation, or to a task that needs the SYSTEM account, is refused by name before any write. Reverse anchors on the undo section: it means registering the exact definition recorded before the last change, not rebuilding it from the fields the tool understands.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "verification": [
+      "On a real machine the list shows every task the Task Scheduler shows, a fixture task is switched off and on, edited, and undone, and each result is read back from the Task Scheduler.",
+      "A fixture task round-tripped through edit and undo equals the original field by field, and a task whose file is deleted shows File missing.",
+      "The tool lists, shows, switches, edits, creates and undoes, in light and dark, by keyboard alone."
+    ],
+    "engine": {
+      "title": "Task Engine and Exact Definitions",
+      "intro": "The tool's whole system effect: listing tasks through the shared enumerator, reading one task's whole definition as its XML, saying triggers and conditions in plain words, enabling and disabling, and editing and creating through a definition that is validated before it is registered, with the task's exact prior definition recorded before every change. Nothing here knows about a window. What this engine writes to a task definition is frozen once shipped, because a malformed definition can stop a task a machine depends on.",
+      "needs": "windows-host, sdk-framework",
+      "build": [
+        "Declare the task model and the checks as data in `src/core/Task.h` and `src/core/Checks.h`. Done when: a test builds a task list from a fake enumerator and the looks-wrong checks are a table, not code.",
+        "Implement read, describe, switch, register and record in `src/core/` against an interface the tests can replace. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L tasks` passes without touching the real Task Scheduler."
+      ],
+      "items": [
+        "Take the task list from the suite's shared task enumerator (Startup Manager's `TaskSource.cpp`, proposed to Resolute-SDK) through `src/core/TaskList.cpp`, and write no second enumerator. Done when: a search of `src/` finds no `GetTasks` or `GetFolders` call and a test fills the list from a fake enumerator. Cheaper substitute: a private walk of the folders with `ITaskFolder`, which is the second enumerator the plan forbids.",
+        "Read one task's whole definition in `src/core/Definition.cpp`: the `Xml` property of the `IRegisteredTask` kept verbatim, and from it the triggers, conditions, settings, principal and run level, and the last run result. Done when: a fixture task gives its XML byte for byte and each field is read from it. Cheaper substitute: rebuilding the XML from parsed fields, which loses what the tool does not understand.",
+        "Say each trigger and condition in plain words in `src/core/Plain.cpp`: at log on, at startup, on an event, on idle, on a schedule, run only on mains power, wake to run, stop if it runs longer than, run whether the user is logged on or not. Done when: a fixture with each kind gives one correct sentence each, and an unknown trigger gives its type name and not an empty cell.",
+        "Implement enable and disable in `src/core/Switch.cpp` by the task's own Enabled setting, read back from the Task Scheduler. Done when: a test switches a fake task off and on and reads each state back, and the rest of its XML is unchanged. Cheaper substitute: deleting the task to switch it off, which cannot be undone exactly.",
+        "Implement `Register(Definition)` in `src/core/Register.cpp` for edit and create: the XML is validated against the Task Scheduler schema before `RegisterTask` is called, and refused by field name when invalid. Done when: a test with a trigger missing its start boundary is refused naming the field and the task is unchanged. Cheaper substitute: calling `RegisterTask` and showing its error, which has already replaced the task.",
+        "Record the task's exact prior XML before every change in `src/core/Journal.cpp` and refuse a change by name when the process is not elevated or the task runs as SYSTEM, before any write, with one activity record. Done when: a test finds the record on disk before the write and an unelevated run names the task and its path with the fixture unchanged. Cheaper substitute: keeping the record in memory, or letting the write fail with access denied partway through.",
+        "Declare the looks-wrong checks as data in `src/core/Checks.h`: the action's file does not exist, the file is under a temporary directory (`%TEMP%`, `%TMP%`, `AppData\\Local\\Temp`, `Windows\\Temp`), and a hidden task with an odd name, each with its reason text. Done when: a fixture with each case is flagged with its reason and a healthy task is not. Cheaper substitute: checks written as code per case, which hides a rule from the person reading the list.",
+        "Warn before changing a task under `\\Microsoft\\Windows` in `src/core/Warn.cpp`: the engine returns a warning that the caller must acknowledge, and the task is still listed. Done when: a change to a fixture task under that path without the acknowledgement is refused and with it proceeds.",
+        "Own the freeze check in `tests/task_roundtrip_test.cpp`: round trip every fixture task under `tests/fixtures/tasks/` through edit and Undo and compare field by field. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L tasks` passes, and fails naming the field when one written value is changed. Cheaper substitute: comparing the two XML strings as text, which passes on reordered fields and fails on harmless whitespace."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L tasks` passes: the fixture tasks list, read, switch, edit and undo to an exact match, the invalid and unelevated cases are refused by name, and it fails when one written field is changed.",
+      "commit": "core: task list, exact definitions, a validated and recorded change"
+    },
+    "enhancements": [
+      {
+        "title": "Undo Any Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before every change the task's exact XML is recorded, so Undo registers that same definition again and compares it with the original. The record and the undo are the SDK repair contract's, which this section consumes once it exists. A task that was created is undone by deleting it, and a task that was off before a change stays off after Undo.",
+        "surface": {
+          "fidelity": "the Changes section and the Undo button, against `DESIGN.md` section 2.",
+          "job": "a person puts back exactly what the last change did to a task. Consumer: the Task Scheduler, read back and compared with the record.",
+          "treatment": "the recorded XML registered again and compared field by field, with the result said in words. Cheaper substitute that fails the checkpoint: an undo that sets the task's fields back one by one, which loses whatever the tool did not read."
+        },
+        "build": [
+          "Register the recorded definition again in `src/core/Undo.cpp` and compare it with the original. Done when: edit then Undo leaves the task's XML equal to the original.",
+          "Wire the Changes section and Undo in `src/ui/ChangesView.cpp`. Done when: each change is a row and Undo restores the selected one."
+        ],
+        "items": [
+          "Implement Undo in `src/core/Undo.cpp` through `RegisterTask` with the recorded XML, then read the task back and compare. Done when: for edit, enable, disable and create, a change then Undo leaves the task equal to the original, asserted field by field.",
+          "Show every change in `src/ui/ChangesView.cpp` with the task, what changed and the time, newest first, each with an Undo. Done when: after two changes the list shows two rows and Undo on the older one restores that task. Cheaper substitute: a private history list, which the contract forbids.",
+          "Report a mismatch after Undo by field name in the same view. Done when: a test that corrupts one field after the restore shows that field and the row is marked Not exactly restored.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one change.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when the record is skipped for one kind of change."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: edit, switch and create each undo to a definition equal to the original, field by field.",
+        "commit": "feature: undo registers the exact prior definition and checks it"
+      },
+      {
+        "title": "Tasks That Look Wrong",
+        "intro": "A task that runs from a temporary folder, points at a file that no longer exists, or hides with an odd name is the usual sign of leftover or unwanted software. The row says so with the reason, from the checks declared as data in the engine.",
+        "surface": {
+          "fidelity": "the flag cell of the Tasks rows, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person sees at a glance which tasks run from a temporary folder, point at a missing file or hide behind an odd name, and why. Consumer: the rows, read back against the file system.",
+          "treatment": "an icon and the reason in words on each flagged row, and the count in the status bar. Cheaper substitute that fails the checkpoint: a red row, which shows state by colour alone and gives no reason."
+        },
+        "build": [
+          "Run the checks over the task list in `src/core/Flags.cpp`. Done when: a test lists one task of each case with its reason.",
+          "Show the flag in `src/ui/TasksView.cpp`. Done when: each flagged row shows its icon and reason."
+        ],
+        "items": [
+          "Show the reason in its own column in `src/ui/TasksView.cpp` and leave it empty for a healthy task. Done when: a fixture with a missing file shows File missing and a healthy one shows an empty cell.",
+          "Resolve the action of a task that is quoted, has arguments, uses environment variables or a COM handler, such as `\"%ProgramFiles%\\App\\app.exe\" /quiet`. Done when: a test with four such actions resolves each to the right file or says Cannot tell, and does not flag a COM handler as missing.",
+          "Keep a flagged task switchable and editable. Done when: a fixture flagged task can be switched off and Undo restores it.",
+          "Add a filter for flagged rows beside the search box. Done when: choosing it shows only tasks that look wrong.",
+          "Cover it in `tests/flags_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L flags` passes, and fails when a missing file is reported as present."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L flags` passes: temporary folder, missing file and odd name are told apart, each with its reason on the row.",
+        "commit": "feature: tasks that look wrong are flagged with the reason"
+      },
+      {
+        "title": "Plain-Words Schedule",
+        "intro": "The Definition section says in sentences what the Task Scheduler spreads over five tabs: when the task runs, under what conditions, with what limits and as which account.",
+        "surface": {
+          "fidelity": "the Definition section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person reads when and how a task runs without opening five tabs. Consumer: the text, compared with the task's XML.",
+          "treatment": "one sentence per trigger, one per condition and one for the account and run level, with the last result code said in words. Cheaper substitute that fails the checkpoint: showing the raw XML in a text box, which is the buried view again."
+        },
+        "build": [
+          "Compose the sentences in `src/core/Plain.cpp` from the definition. Done when: a test gives the expected sentence for each fixture task.",
+          "Show them in `src/ui/DefinitionView.cpp`. Done when: selecting a task fills the section."
+        ],
+        "items": [
+          "Show the triggers in `src/ui/DefinitionView.cpp`, each as a sentence, with a task that has no trigger saying so. Done when: a fixture with a log on, an event and an idle trigger shows three sentences.",
+          "Show the conditions and settings as sentences: mains power only, wake to run, stop after a limit, run whether the user is logged on or not. Done when: a fixture with each shows its sentence and one without says nothing extra.",
+          "Show the account and run level and say when a change needs elevation or the SYSTEM account. Done when: a fixture running as SYSTEM says so and its Switch off is explained.",
+          "Say the last run result in words for the codes Windows documents, and the code itself beside it. Done when: success, task not yet run and an access error each show their words and number.",
+          "Cover it in `tests/plain_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L plain` passes, and fails when a trigger's sentence is dropped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L plain` passes: each trigger kind, condition and account shows as a correct sentence.",
+        "commit": "feature: a task's schedule and conditions in plain words"
+      },
+      {
+        "title": "Create a Task",
+        "intro": "A short form produces a valid definition, shown as plain words and as XML before it is registered, so a person creates a task without the wizard.",
+        "surface": {
+          "fidelity": "the create form and its preview, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person makes a new scheduled task from a name, a program, arguments and one trigger. Consumer: the Task Scheduler, read back after registration.",
+          "treatment": "the form's fields, the definition previewed as sentences, and a Create button that registers only what was previewed. Cheaper substitute that fails the checkpoint: a free text box for XML, which lets a malformed definition through."
+        },
+        "build": [
+          "Build the definition from the form in `src/core/Create.cpp` and validate it. Done when: a valid form gives a registrable definition and an invalid one is refused by field.",
+          "Add the form and preview in `src/ui/CreateView.cpp`. Done when: Create registers the previewed task."
+        ],
+        "items": [
+          "Implement `BuildDefinition(const Form&)` in `src/core/Create.cpp` for a program, arguments, a working folder and one trigger of the kinds the engine says in words. Done when: a test form for each trigger kind passes validation and produces the sentence the preview shows.",
+          "Add the form to `src/ui/CreateView.cpp` with the program file picked through the framework and checked for existence. Done when: a missing program is refused beside its field and the Create button stays disabled. Cheaper substitute: a private file dialog.",
+          "Preview the definition as sentences before registering and register only the previewed one. Done when: a test changes a field after the preview and Create asks for the preview again.",
+          "Record the creation so Undo deletes the task, and read the task back after registering. Done when: create then Undo leaves the Task Scheduler as it was.",
+          "Cover it in `tests/create_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L create` passes, and fails when an invalid definition is registered."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L create` passes: each trigger kind creates a valid task, an invalid form is refused by field, and Undo removes the created task.",
+        "commit": "feature: create a task from a short, previewed form"
+      }
+    ],
+    "no_reverse": ""
+  }
+}

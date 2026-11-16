@@ -1,0 +1,251 @@
+{
+  "name": "LinkManager",
+  "slug": "linkmanager",
+  "display": "Link Manager",
+  "job": "it creates and inspects junctions, symbolic links and hard links, tells which kind a path is and where it points, and reports a link whose target is gone as broken.",
+  "tagline": "Make and inspect junctions, symbolic links and hard links without the command line",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Raspberry",
+    "light": "#FDA4AF",
+    "dark": "#E11D48",
+    "social_ground": "#2E0913",
+    "social_muted": "#F7CDD4"
+  },
+  "icon": {
+    "idea": "Two chain links: a link.",
+    "points": [
+      "Free-standing with no tile: two rounded links overlapping.",
+      "The left link is Raspberry and the right one Raspberry light.",
+      "The small drawing, used below 40 pixels, thickens both links."
+    ],
+    "large": "<rect x=\"8\" y=\"32\" width=\"48\" height=\"32\" rx=\"16\" fill=\"none\" stroke=\"#E11D48\" stroke-width=\"11\"/><rect x=\"40\" y=\"32\" width=\"48\" height=\"32\" rx=\"16\" fill=\"none\" stroke=\"#FDA4AF\" stroke-width=\"11\"/>",
+    "small": "<rect x=\"8\" y=\"30\" width=\"48\" height=\"36\" rx=\"18\" fill=\"none\" stroke=\"#E11D48\" stroke-width=\"14\"/><rect x=\"40\" y=\"30\" width=\"48\" height=\"36\" rx=\"18\" fill=\"none\" stroke=\"#FDA4AF\" stroke-width=\"14\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Links",
+        "The folder being looked at, and each link found in it with its path, kind, target and whether the target exists"
+      ],
+      [
+        "Create",
+        "The kind of link, where it goes, what it points to, and a plain explanation of the kind chosen"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every link in a folder, what kind each is and where it points, and makes a new one without typing mklink.",
+    "primary": "Create link",
+    "secondary": "Choose a folder",
+    "rows": [
+      [
+        "Documents and Settings",
+        "Junction, target exists"
+      ],
+      [
+        "Shared Tools",
+        "Symbolic link to a folder, target exists"
+      ],
+      [
+        "Old Reports",
+        "Symbolic link to a folder, target missing"
+      ],
+      [
+        "notes.txt",
+        "Hard link, 2 names"
+      ],
+      [
+        "Backup",
+        "Junction, target missing"
+      ]
+    ],
+    "status": "5 links in this folder, 2 broken",
+    "notes": [
+      "The header shows the folder being looked at and a Choose a folder button; each link found is one row with its path, its kind, where it points and whether the target exists.",
+      "Every row shows its kind and its target state with an icon and a word (Junction, Symbolic link, Hard link; Target exists, Target missing), never by colour alone. A broken link reads Target missing.",
+      "The Links screen has an option to include subfolders. A scan never follows a link into its target, so a link that points at its own parent cannot make the scan loop.",
+      "Create link is the accent button. It opens the Create section, where the kind chosen shows a plain explanation of what it does and what it cannot do (a hard link cannot cross drives or point to a folder).",
+      "Creating a symbolic link without elevation or Developer Mode is refused by name before anything is written, with the two ways to allow it. Junctions and hard links need neither.",
+      "Every create is read back: the tool identifies the new path again and shows the kind and target it found, not the ones that were asked for.",
+      "The status bar counts links and broken links in the folder in words, and a folder or file that cannot be read is listed as unreadable, not skipped silently."
+    ],
+    "cut": "This is a new tool and has no earlier window, so nothing is cut from one. It has none of the suite's older window furniture: no menu bar, no splash, no animations and no donate strip. Settings and About are the framework's pages hosted in the sidebar."
+  },
+  "readme": {
+    "lead": "Make and inspect junctions, symbolic links and hard links, and see at once which ones are broken.",
+    "what": [
+      "Windows has three kinds of link besides the shortcut: a junction, a symbolic link and a hard link. Explorer cannot make any of them and does not say which a file or folder is. Link Manager shows the links in a folder with their kind and target, and creates each kind from one screen.",
+      "A link whose target has been moved or deleted is reported as broken, with the path it still points to. A link is removed as a link: the folder or file it points to is left as it was."
+    ],
+    "new_intro": "Link Manager is a new tool, written in C++ for the suite. Nothing is ported from an earlier version.",
+    "new": [
+      [
+        "Three kinds, one screen.",
+        "It creates junctions, symbolic links to files and to folders, and hard links, and explains in plain words what each can and cannot do."
+      ],
+      [
+        "Reads what the link really is.",
+        "It reads the link itself to tell a junction from a symbolic link from a hard link, and shows where it points and whether that place still exists."
+      ],
+      [
+        "Safe removal.",
+        "Removing a link deletes the link and never the contents of the target."
+      ],
+      [
+        "Refusals by name.",
+        "A hard link across drives, a junction to a network path or a symbolic link without the right to create one is refused with the reason, before anything is written."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "Build, engine, window, link features, release",
+    "goal": "Link Manager ships as a complete, standalone C++ tool: it identifies what kind of link a path is and where it points, scans a folder for links without following them, creates junctions, symbolic links and hard links with the result read back, lists every name of a hard-linked file, reports a broken link as broken, and removes a link without touching the target.",
+    "current_state": "Nothing exists yet: no C++, no AutoIt original and no `reference/au3/` folder. The repository holds the SDK pin, the plan scaffolding and one source of requirements, `docs/origin/resolute-D05-T07-s8.md`, whose section 8 lists the tool in one line (`docs/origin/resolute-D05-T07-s8.md:13`): create and inspect junctions, symlinks and hard links, which Windows offers only through `mklink`, done when each type is created and identified and a broken link is reported as broken. The same file describes eight other tools, which are not this one. Everything else in this plan comes from how Windows works: `CreateSymbolicLinkW` with the directory flag and the unprivileged-create flag, `CreateHardLinkW` and its same-volume limit, a junction made by setting a mount-point reparse point with `FSCTL_SET_REPARSE_POINT`, a link read with `FSCTL_GET_REPARSE_POINT`, and every name of a hard-linked file listed with `FindFirstFileNameW`. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s8.md`: the plan section the tool came from, of which only the Link Manager line (line 13) and its share of the checkpoint (line 27) concern this tool.",
+      "`DESIGN.md`: the tool's identity and the sections of its window, and `sdk/DESIGN.md`, the suite's contract.",
+      "A real Windows machine and a disposable folder on an NTFS volume, a second drive or volume for the cross-drive refusals, and a network share for the network refusal: where the behaviour of each link kind is measured."
+    ],
+    "outcome": [
+      "`LinkManager.exe` creates a junction, a symbolic link to a file, a symbolic link to a folder and a hard link, and identifies each correctly with its target, proven by creating and then reading back every kind.",
+      "A broken link is reported as broken in the scan and in the screen, a scan never follows a link, and a removal deletes the link and leaves the target's contents intact.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, language pack, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Links screen, where a person finds a link by its path, kind and target. Reporting and audit are the Activity section, the readable trail of every link made or removed. Settings are the framework's pages. The tool does not ask for elevation, so permissions anchor only on the one refusal in the engine, where a symbolic link is refused by name when neither elevation nor Developer Mode allows it. Reverse here means removing a link safely: the reverse of creating one, which never touches the target.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Link Engine",
+      "intro": "The tool's whole system effect, independent of any window: identifying a path's link kind and target, scanning a folder for links, creating the three kinds with the result read back, listing every name of a hard-linked file, and removing a link without touching its target. A symbolic link is refused by name when the process has neither elevation nor Developer Mode.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the link kinds and their rules as data in `src/core/LinkKinds.h`. Done when: each kind states what it can point to, whether it can cross drives and whether it needs a right.",
+        "Implement identify, scan, create, names and remove in `src/core/Links.cpp` against a disposable NTFS folder. Done when: the tests pass against real links in `%TEMP%`."
+      ],
+      "items": [
+        "Declare in `src/core/LinkKinds.h` the three kinds and their limits: a junction points to a local folder by absolute path, a symbolic link points to a file or a folder by absolute or relative path, a hard link points to a file on the same volume. Done when: each limit is stated once and the create function reads it from the header. Cheaper substitute: limits typed into each create function, which drift apart.",
+        "Implement `IdentifyLink(path)` in `src/core/Links.cpp`: open the path with `FILE_FLAG_OPEN_REPARSE_POINT`, read it with `FSCTL_GET_REPARSE_POINT`, and return the kind and the target. A `IO_REPARSE_TAG_MOUNT_POINT` whose target is a `\\??\\Volume{` path is a volume mount point, not a junction, and a tag the tool does not know (a cloud file, for example) is reported as another reparse point. A file with a link count above one (`GetFileInformationByHandle`) is a hard link. Done when: a test with one of each reports the right kind and target, and a folder that Windows made itself, such as `Documents and Settings`, is identified as a junction. Cheaper substitute: reading only `FILE_ATTRIBUTE_REPARSE_POINT`, which cannot tell a junction from a symbolic link.",
+        "Return, for a link, whether its target exists, resolved against the link's own folder when the target is relative. Done when: a test that deletes the target reports the link as broken with the path it still points to, for a junction and for a symbolic link of each kind. Cheaper substitute: testing the link path, which exists even when its target does not.",
+        "Implement `ScanFolder(path, includeSubfolders)` with `FindFirstFileExW`, listing every entry that is a link and never descending into one. Done when: a fixture with a symbolic link to its own parent finishes, lists that link once, and a folder that cannot be read is listed as unreadable, not skipped. Cheaper substitute: a recursive walk that follows reparse points, which loops.",
+        "Implement `CreateLink(kind, linkPath, targetPath)` for each kind: a junction by creating the folder and setting a mount-point reparse point with `FSCTL_SET_REPARSE_POINT`, a symbolic link with `CreateSymbolicLinkW` and the directory flag chosen from the target, and a hard link with `CreateHardLinkW`. Done when: a test creates one of each in a disposable folder. Cheaper substitute: running `cmd /c mklink`, which hides the error and needs a console.",
+        "Read every created link back with `IdentifyLink` and return a mismatch as path, expected kind and target, and found kind and target. Done when: a test that swaps the target after creation gets both named. Cheaper substitute: checking only the return code of the create call.",
+        "Refuse by name before any write: a hard link across volumes or to a folder, a junction to a file or to a network path, a path that already exists, and a symbolic link when `CreateSymbolicLinkW` with `SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE` reports `ERROR_PRIVILEGE_NOT_HELD` (neither elevated nor Developer Mode). Done when: each refusal is a test that names the reason and leaves the folder unchanged. Cheaper substitute: letting the call fail with a bare error number.",
+        "Implement `NamesOfFile(path)` with `FindFirstFileNameW` and `FindNextFileNameW`, returning every path that is a name of the same file on the volume. Done when: a fixture with three hard links to one file lists all three, and a file with one name lists one.",
+        "Implement `RemoveLink(path)`: delete a file link or hard link name with `DeleteFileW`, and a junction or folder symbolic link with `RemoveDirectoryW`, and refuse anything that is not a link. Done when: a test removes a junction whose target holds files and the files are still there, and a refusal on a real folder leaves it intact. Cheaper substitute: a recursive delete of the path, which can delete the target's contents through a junction. Cover every path in `tests/links_test.cpp`; `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L links` passes, and fails when a limit in `LinkKinds.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L links` passes: each kind is created and identified, a broken link is reported as broken, a scan never follows a link, and a removal leaves the target's contents.",
+      "commit": "core: identify, scan, create, list and remove the three kinds of link"
+    },
+    "enhancements": [
+      {
+        "title": "Remove a Link Safely",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "The reverse of creating a link. Removing a link must delete the link and never the target's contents, which a wrong call on a junction can do. The confirmation names the kind and the target, and states that the target is left alone. The record of what was removed is the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Remove button and its confirmation, against `DESIGN.md` section 2.",
+          "job": "a person removes a link and is sure the target is untouched. Consumer: the target's contents, listed before and after.",
+          "treatment": "a confirmation naming the link, its kind and its target, then a row that disappears while the target remains. Cheaper substitute that fails the checkpoint: a plain Delete that goes through the Recycle Bin or deletes recursively, which can take the target's contents with it."
+        },
+        "build": [
+          "Add the Remove action to the Links screen in `src/ui/LinksView.cpp`. Done when: a selected link row can be removed after a confirmation.",
+          "Record the removed link through the repair contract in `src/core/Links.cpp`. Done when: a record of kind and target exists before the link is removed."
+        ],
+        "items": [
+          "Add Remove to the Links screen's header for the selected row, with a confirmation naming the link, its kind and its target and stating that the target is left as it is, through the framework's message surface. Done when: pressing Remove on a junction asks first and names all three. Cheaper substitute: a private dialog.",
+          "Call `RemoveLink` and re-read the folder. Done when: the row disappears and a listing of the target's contents before and after is identical, asserted for a junction and a folder symbolic link.",
+          "Record the kind, path and target of the removed link through the repair contract before removing it, and re-create it from the record on Undo. Done when: remove then Undo gives back a link that `IdentifyLink` reports with the same kind and target. Cheaper substitute: keeping the record in memory, which is lost if the tool closes.",
+          "Refuse to remove a path that is not a link, naming it. Done when: selecting a real folder offers no Remove and an API call on it is refused. Cover it in `tests/remove_test.cpp`; `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L remove` passes, and fails when removal deletes the target's contents."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L remove` passes: a removed junction leaves its target's files in place, and Undo brings the link back with the same kind and target.",
+        "commit": "feature: remove a link safely, never the target"
+      },
+      {
+        "title": "Find Broken Links",
+        "intro": "Shows only the links whose target is gone, across a folder and its subfolders, so a person can repair or remove them. A link is broken when what it points to no longer exists, which Explorer shows only by failing to open it.",
+        "surface": {
+          "fidelity": "the broken-link filter on the Links screen, against `DESIGN.md` section 2.",
+          "job": "a person finds every dead link in a folder tree. Consumer: the rows, compared with the targets on disk.",
+          "treatment": "a filter that shows only rows whose target is missing, each with the path it still points to and an icon and the words Target missing. Cheaper substitute that fails the checkpoint: marking a broken row by colour alone."
+        },
+        "build": [
+          "Add the filter to `src/ui/LinksView.cpp`. Done when: switching it on lists only broken links.",
+          "Count broken links in `src/core/Links.cpp`. Done when: the status bar count equals the number of rows."
+        ],
+        "items": [
+          "Add a Broken links only option beside the subfolder option in `src/ui/LinksView.cpp`, filtering the scan's rows by the engine's target state. Done when: with it on, only rows whose target is missing are shown, and the status bar counts them. Cheaper substitute: filtering by whether the link path opens, which is wrong for a link to a folder.",
+          "Show for each broken row the path it still points to, resolved the way the engine resolved it for a relative target. Done when: a relative symbolic link whose target was renamed shows the full path it expects.",
+          "Offer Remove on a broken row through the existing remove action and no second path. Done when: removing a broken row calls `RemoveLink` and the count drops by one.",
+          "Cover it in `tests/broken_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L broken` passes with a junction, a file symbolic link and a folder symbolic link each broken, and fails when the target check tests the link path."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L broken` passes and the filter lists exactly the broken links of a fixture tree.",
+        "commit": "feature: find broken links in a folder tree"
+      },
+      {
+        "title": "Which Kind Do I Need",
+        "intro": "A plain-words guide in the Create section that recommends a kind from what the person wants to do: across drives, to a network path, for a file or for a folder. People choose the wrong kind because the names say nothing about the limits.",
+        "surface": {
+          "fidelity": "the guide in the Create section, against `DESIGN.md` section 2.",
+          "job": "a person picks the right kind without knowing the terms. Consumer: the kind the guide selects, compared with the engine's limits.",
+          "treatment": "four plain questions and one answer in a sentence, which selects the kind on the Create screen. Cheaper substitute that fails the checkpoint: a help page that explains the terms and leaves the choice to the person."
+        },
+        "build": [
+          "Write the guide's rules in `src/core/KindGuide.cpp` from `LinkKinds.h`. Done when: each question and answer pair is derived from the declared limits.",
+          "Show it in `src/ui/CreateView.cpp`. Done when: an answer selects the kind."
+        ],
+        "items": [
+          "Write `src/core/KindGuide.cpp` returning the kind for a file or a folder, the same drive or another, and a local or a network target, from the limits in `src/core/LinkKinds.h`. Done when: a table test covers every combination and returns the one kind that works, or says none does. Cheaper substitute: a hand-written text, which can disagree with the engine.",
+          "Show the guide in `src/ui/CreateView.cpp` as questions with plain answers, and select the kind from the answer. Done when: answering a folder on another drive selects Symbolic link or Junction and says why in one sentence.",
+          "Show, under the chosen kind, one sentence on what it cannot do, taken from the same declared limits. Done when: choosing Hard link shows that it cannot cross drives or point to a folder.",
+          "Cover it in `tests/kindguide_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L guide` passes, and fails when a limit in `LinkKinds.h` is changed and the guide is not."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L guide` passes and every combination of the four questions gives a kind the engine will create or a stated reason none can.",
+        "commit": "feature: a plain-words guide to which kind of link to make"
+      },
+      {
+        "title": "All Names of a File",
+        "intro": "Lists every hard link to one file on a volume. A hard link has no arrow and no target: every name is equal, so Explorer cannot say which others exist or that deleting one leaves the rest.",
+        "surface": {
+          "fidelity": "the names list opened from a Hard link row, against `DESIGN.md` section 2.",
+          "job": "a person sees every name one file has. Consumer: the list, compared with the engine's names.",
+          "treatment": "a list of full paths, the one selected marked, opened from a row of kind Hard link. Cheaper substitute that fails the checkpoint: showing only the count of names, which does not say where they are."
+        },
+        "build": [
+          "Add the names list in `src/ui/LinksView.cpp`. Done when: a Hard link row opens its list.",
+          "Use `NamesOfFile` from `src/core/Links.cpp`. Done when: the list equals the engine's result."
+        ],
+        "items": [
+          "Add All names to the Links screen for a row of kind Hard link, opening a list of every full path from `NamesOfFile`. Done when: a file with three names shows three paths and marks the one selected. Cheaper substitute: a second listing routine in the view, which can disagree with the engine.",
+          "Make a path in the list selectable and copyable. Done when: Ctrl+C on a selected path puts it on the clipboard.",
+          "Say in one sentence that removing a name leaves the other names and the data. Done when: the list shows it, and removing one name in a driven test leaves the file readable by the others.",
+          "Cover it in `tests/names_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L names` passes, and fails when a name is dropped from the list."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L names` passes and a fixture file with three names lists all three.",
+        "commit": "feature: list every name of a hard-linked file"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine each of the three kinds is created, identified with its target, shown in the list, broken by deleting its target, reported as broken and removed with the target's contents intact.",
+      "The refusals are each seen once by name: a hard link across drives, a junction to a network path and a symbolic link without elevation or Developer Mode.",
+      "The window works in light and dark, at 100 and 150 percent, by keyboard alone."
+    ]
+  }
+}

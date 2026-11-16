@@ -4,7 +4,7 @@
   "display": "Undelete",
   "job": "it finds deleted files on a drive, says plainly how likely each one is to come back, and recovers the ones you choose to a different physical drive, never writing to the drive it reads.",
   "tagline": "Get deleted files back, without touching the drive they were on",
-  "frozen": false,
+  "frozen": true,
   "elevated": true,
   "au3": [],
   "hue": {

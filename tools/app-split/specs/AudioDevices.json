@@ -1,0 +1,258 @@
+{
+  "name": "AudioDevices",
+  "slug": "audiodevices",
+  "display": "Audio Devices",
+  "job": "it lists every sound device Windows knows including the hidden ones, sets the default device per role, routes a program to a device, and works through the causes of no sound in order to name the one at fault.",
+  "tagline": "Choose where sound goes, bring back hidden devices, and fix no sound",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Rose",
+    "light": "#F9A8D4",
+    "dark": "#BE185D",
+    "social_ground": "#2E0A1C",
+    "social_muted": "#F7CFE3"
+  },
+  "icon": {
+    "idea": "A speaker with two sound waves.",
+    "points": [
+      "It is free-standing with no tile: a speaker cone pointing right with two arcs.",
+      "The speaker is Rose and the waves are Rose light.",
+      "The small drawing, used below 40 pixels, keeps one thicker wave."
+    ],
+    "large": "<path d=\"M10 36 H26 L48 16 V80 L26 60 H10 Z\" fill=\"#BE185D\" stroke=\"#BE185D\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M60 36 A17 17 0 0 1 60 60 M70 22 A35 35 0 0 1 70 74\" fill=\"none\" stroke=\"#F9A8D4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M10 34 H26 L50 12 V84 L26 62 H10 Z\" fill=\"#BE185D\" stroke=\"#BE185D\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M64 30 A22 22 0 0 1 64 66\" fill=\"none\" stroke=\"#F9A8D4\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Devices",
+        "Each sound device as a row: its name, whether it plays or records, its state (default, default for calls, ready, disabled or unplugged) and its level now"
+      ],
+      [
+        "Programs",
+        "Each program making sound, its volume, and which device it plays through"
+      ],
+      [
+        "Fix sound",
+        "The repair: each check as a row with its result"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every sound device on the machine, including the ones Windows hides, chooses which one is the default, and fixes no sound without guessing.",
+    "primary": "Make default",
+    "secondary": "Fix sound",
+    "rows": [
+      [
+        "Speakers",
+        "Plays, default"
+      ],
+      [
+        "Headset",
+        "Plays, default for calls"
+      ],
+      [
+        "Microphone",
+        "Records, default"
+      ],
+      [
+        "HDMI output",
+        "Plays, disabled"
+      ],
+      [
+        "USB headset",
+        "Plays, unplugged"
+      ]
+    ],
+    "status": "5 devices, Speakers is the default",
+    "notes": [
+      "Each device is a row with an icon and a word for its state: Default, Default for calls, Ready, Disabled or Unplugged. Playback and recording devices are marked by words and colour is never the only signal. Each row also shows its level now, or says Muted.",
+      "Make default, the primary action, makes the selected device the default for its kind and re-reads Windows to confirm it. It is disabled for a device that is already the default and for one that is disabled or unplugged. Making a device the default for calls is in the header's more menu.",
+      "Fix sound, the secondary action, opens the Fix sound section and starts its checks. Each check is a row with its result, and nothing is restarted without saying so first.",
+      "Undo a default change is in the header's more menu. It names the device it will put back and is disabled when there is nothing to undo.",
+      "A device that is disabled shows an Enable action. An unplugged device cannot be enabled, and the row says it is not connected instead of offering an action that cannot work.",
+      "The tool runs for the signed-in user. An action that needs more, such as restarting the audio service, is disabled and a line names the reason. If this version of Windows does not accept the default change, the screen says so plainly and changes nothing.",
+      "The status bar says the device count and the default playback device in words, for example \"5 devices, Speakers is the default\"."
+    ],
+    "cut": "There is no original window, so nothing is cut from one. The window has no menu bar, splash, animation or donate strip: the plan's sections cover what the suite's other tools get from those, and Windows' own Sound dialog and its tabs are not copied."
+  },
+  "readme": {
+    "lead": "Audio Devices lets you choose where sound goes, brings back the devices Windows hides, and fixes no sound.",
+    "what": [
+      "Audio Devices lists every playback and recording device Windows knows, in every state: the default for each role, ready, disabled and unplugged. It lets you choose the default device, the default for calls and the default recording device, and shows every program that is making sound with its volume and the device it plays through.",
+      "When there is no sound, Fix sound works through the causes in order: the audio services, the device, the routing, and the driver. Each check shows what it found, and the tool names the one at fault. It never restarts a service without saying so first."
+    ],
+    "new_intro": "Audio Devices is a new tool, written in C++ from the start, not a port.",
+    "new": [
+      [
+        "Hidden devices come back.",
+        "Disabled and unplugged devices are listed, and a disabled one can be enabled from the row."
+      ],
+      [
+        "Programs can use their own device.",
+        "Route one program to another device where Windows allows it, and see plainly where it does not."
+      ],
+      [
+        "No sound has an answer.",
+        "The repair checks the services, the device, the routing and the driver in that order and names the cause."
+      ],
+      [
+        "A default change can be undone.",
+        "The defaults are recorded before any change, so Undo puts back the device that was there."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "New tool: build, engine, window, features, release",
+    "goal": "Audio Devices ships as a complete, standalone C++ tool: it lists every playback and recording device in every state, shows the default per role and each program's volume and device, sets a default and a program's device through one isolated module that fails honestly on a Windows version it does not know, enables a hidden device, works through the four causes of no sound (services, endpoint, routing, driver) as separate steps and names the one at fault, and puts back a changed default.",
+    "current_state": "Nothing exists yet. This is a new tool with no AutoIt original and no code: the repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The only source is `docs/origin/resolute-D05-T07-s8.md`, a plan section that covered nine small tools; for this one it says the tool handles the default device per role, per-application routing and hidden devices (`:19`), that it absorbs the audio repair from Complete Windows Repair (`:5`), and that it must be specified before it is built, covering enumeration, per-role defaults, per-application routing, hidden devices and the repair across the service, endpoint, routing and driver causes (`:20`). The rest comes from Windows' Core Audio API: `IMMDeviceEnumerator::EnumAudioEndpoints` with the states active, disabled, not present and unplugged, `GetDefaultAudioEndpoint` for the roles eConsole, eMultimedia and eCommunications, and `IAudioSessionManager2` for each program's session with its volume and mute. Setting the default device and routing one program to a device use interfaces Microsoft does not document, `IPolicyConfig` and the audio policy configuration factory, whose shape changes between Windows builds. The services are `Audiosrv` and `AudioEndpointBuilder`, and a device's driver state comes from the configuration manager. The SDK's framework, repair contract and chart control, which this tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s8.md`: the plan section this tool came from; only its audio lines (`:5`, `:19`, `:20`, `:27`) apply.",
+      "`DESIGN.md` and `brand/`: the tool's identity and the sections of its window.",
+      "The Windows Core Audio API, the service control manager and the configuration manager, read on a real machine with more than one sound device, which is the source of truth for devices, states, defaults, sessions and driver state."
+    ],
+    "outcome": [
+      "`AudioDevices.exe` lists playback and recording devices in every state, shows the defaults per role and each program's volume and device, and sets a default, each verified by reading Windows back.",
+      "Hidden devices are surfaced and a disabled one can be enabled; a program can be routed to a device where Windows allows it and the tool says plainly where it does not; the undocumented calls live in one module that refuses by name on a Windows version it does not know.",
+      "Fix sound checks the services, the device, the routing and the driver as separate steps and names the one at fault; a changed default can be undone; the Sidebar window of `DESIGN.md` works in light and dark at every scale and by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Devices screen, with each program's device in the Programs screen and the repair's rows in Fix sound. Reporting and audit are the Activity section: what the tool changed, when, and from which prior default. Settings are the framework's pages. Permissions do not anchor on the engine as a requirement because the tool runs for the signed-in user and a default, a program's device and the listing need no elevation; the one action that does, restarting the audio service, is refused by name before it is tried. Reverse anchors on the undo section: the defaults per role are recorded before a change, so Undo puts back the device that was there.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Audio Engine",
+      "intro": "The tool's whole system effect, independent of any window: enumerating playback and recording endpoints in every state, reading the defaults per role and each program's session, enabling a hidden device, the one isolated module for the undocumented default and routing calls with its version check, and the four checks of the repair, each a separate step that reports what it found. It runs for the signed-in user, and restarting the audio service is refused by name without elevation.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the engine's types in `src/core/AudioModel.h`. Done when: endpoint, state, role, session, check result and prior-defaults record are stated once and a test builds each.",
+        "Implement enumeration, defaults, sessions and the four checks in `src/core/AudioEngine.cpp` behind a backend the tests can replace, and the undocumented calls in `src/core/PolicyBridge.cpp`. Done when: the unit tests pass against a fake backend."
+      ],
+      "items": [
+        "Implement `EnumerateEndpoints()` in `src/core/AudioEngine.cpp` with `IMMDeviceEnumerator::EnumAudioEndpoints` for `eRender` and `eCapture` and `DEVICE_STATEMASK_ALL`, reading each endpoint's id, `PKEY_Device_FriendlyName` and state (active, disabled, not present, unplugged). Done when: on a real machine the list matches the playback and recording tabs of Windows' Sound dialog with its disabled and disconnected devices shown, and each endpoint carries one state.",
+        "Implement `ReadDefaults()` calling `GetDefaultAudioEndpoint` for each flow and each of `eConsole`, `eMultimedia` and `eCommunications`, and the level and mute of each active endpoint through `IAudioEndpointVolume`. Done when: a fixture with a different device for calls reports it for `eCommunications` only, and a device with no default reports none and not an error.",
+        "Implement `EnumerateSessions()` with `IAudioSessionManager2::GetSessionEnumerator`, reading each session's process id and name, its `ISimpleAudioVolume` volume and mute, and the endpoint it plays through. Done when: with two programs playing, both are listed with their own volume, and a session of a program that has exited is not listed.",
+        "Put every undocumented call in one module, `src/core/PolicyBridge.cpp`, behind a small interface with `SetDefaultEndpoint`, `SetProgramEndpoint` and `SetEndpointVisibility`, and a version check against the Windows build it was written for that is made before any call. Done when: on a build the module does not recognise every call returns a named refusal that includes the build number, and nothing else in `src/` includes `IPolicyConfig`. Cheaper substitute: calling the interface from the view, which spreads a build-specific risk over the tool.",
+        "Implement `SetDefault(device, role)` and `EnableEndpoint(device)` through the bridge, recording the prior defaults first and re-reading with `GetDefaultAudioEndpoint` or the endpoint's state after, returning expected and found on a mismatch. Done when: a fake backend that ignores the write gets both named, and a disabled endpoint reads active afterwards. Cheaper substitute: trusting the return code of the call.",
+        "Implement the first two checks of the repair as separate steps, `CheckServices()` reading `Audiosrv` and `AudioEndpointBuilder` with `QueryServiceStatusEx` and their start type, and `CheckEndpoint()` testing that a default playback endpoint exists, is active, is not muted and has a level above zero. Done when: a stopped `Audiosrv` and a muted default each fail their own step with the finding in words, and the steps after them are marked not run.",
+        "Implement the last two checks, `CheckRouting()` finding programs routed to a device that is disabled or not present, and `CheckDriver()` finding the sound adapter's device node with the configuration manager and reading its status with `CM_Get_DevNode_Status`, reporting the problem code. Done when: a fixture with a program routed to an unplugged device fails routing alone, and a node with a problem code fails the driver check with that code named.",
+        "Implement `RestartAudioService()` that stops and starts `Audiosrv` and its dependents and is refused by name before any change when the process is not elevated, with one activity record each. Done when: an unelevated test reports the refusal and the service state is unchanged. Cheaper substitute: letting the service call fail with access denied halfway through.",
+        "Cover every path in `tests/audio_engine_test.cpp` with the fake backend. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when the read-back comparison or the version check is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, including the corrupted-write, unknown-build, unelevated-restart and four-check cases, and fails when the read-back comparison is removed.",
+      "commit": "core: audio endpoints, defaults and sessions, the isolated policy module and the four checks"
+    },
+    "enhancements": [
+      {
+        "title": "Undo a Default Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before any default is changed, the default per flow and role is recorded, so Undo puts back the device that was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo action and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back the default device a change replaced. Consumer: the defaults per role, compared with the record.",
+          "treatment": "the Undo action names the device it will put back and for which role, restores it, and the screen re-reads Windows to show it. Cheaper substitute that fails the checkpoint: making the first device in the list the default, which is not what was there before."
+        },
+        "build": [
+          "Record the prior defaults through the repair contract in `src/core/AudioEngine.cpp`. Done when: a record exists on disk before the first change.",
+          "Wire Undo in `src/ui/DevicesView.cpp`. Done when: change then undo leaves the defaults as they were."
+        ],
+        "items": [
+          "Record the default for each flow and each of the three roles through the repair contract's restore record before any `SetDefault`. Done when: a test finds the record on disk before the call is made. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo in `src/core/AudioEngine.cpp` restoring each recorded role, and skipping with a stated reason a recorded device that is no longer present. Done when: change then undo leaves `ReadDefaults()` equal to before, and a record naming an unplugged device reports it and restores the other roles.",
+          "Disable Undo with a tooltip when there is nothing to undo, and say in the tooltip which device the next undo would put back. Done when: a first run shows it disabled and it enables after one change.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one role is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: a default change then undo leaves the defaults per role as they were.",
+        "commit": "feature: undo puts back the default that was there before"
+      },
+      {
+        "title": "Fix No Sound",
+        "intro": "The repair this tool owns from Complete Windows Repair (`docs/origin/resolute-D05-T07-s8.md:5`). It works through the causes in order: the audio services, the device, the routing and the driver. It stops at the first check that fails and names that cause, with what it found. A repair step that changes something is offered with its name and is never run without the user pressing it.",
+        "surface": {
+          "fidelity": "the Fix sound section and its check rows, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16, in light and dark.",
+          "job": "a person with no sound learns which one of four causes it is and can fix that one. Consumer: the check rows, compared with what Windows reports.",
+          "treatment": "four rows in order, each with an icon, a word (Passed, Failed or Not run) and one sentence of what it found, and a named action beside the failed one, such as Restart audio service. Cheaper substitute that fails the checkpoint: one button that restarts the audio service and says it is fixed, which names no cause and changes the system unasked."
+        },
+        "build": [
+          "Run the four checks in order from `src/core/AudioEngine.cpp`. Done when: the first failing check stops the run and is the one named.",
+          "Show the rows in `src/ui/FixSoundView.cpp`. Done when: each row shows its result and the failed one offers its action."
+        ],
+        "items": [
+          "Add `RunRepair()` in `src/core/AudioEngine.cpp` that runs `CheckServices`, `CheckEndpoint`, `CheckRouting` and `CheckDriver` in that order, stops at the first failure and returns that check as the cause with its finding. Done when: with two faults present only the earlier is named and the later is Not run, and with none the result says all four passed. Cheaper substitute: running all four and naming the last failure, which blames a cause that an earlier one produced.",
+          "Offer one named action per cause: Start audio services, Unmute and raise the level, Move the program to the default device, and Open Device Manager at the adapter. Done when: each action changes only what its name says and its result is read back with the same check.",
+          "Say before any service restart that it will briefly stop all sound, and refuse it by name without elevation. Done when: the unelevated row shows the reason and the restart does not run, and the elevated one asks first.",
+          "Build `src/ui/FixSoundView.cpp` showing the four rows through the framework's list. Done when: a fixture with a stopped service shows row one as Failed with its action and rows two to four as Not run.",
+          "Cover it in `tests/repair_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L repair` passes, and fails when the order of the checks is changed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L repair` passes: each of the four causes is found alone, the first failure is the one named, and a restart is refused without elevation.",
+        "commit": "feature: fix no sound, four causes in order and the one at fault named"
+      },
+      {
+        "title": "Show Hidden Devices",
+        "intro": "Windows hides disabled devices and devices that are not connected, so a headset that stopped working may simply be switched off in the Sound dialog's hidden list. This section shows them in the Devices screen with their state, and enables a disabled one from its row. It says plainly that an unplugged device cannot be enabled until it is connected (`docs/origin/resolute-D05-T07-s8.md:19`).",
+        "surface": {
+          "fidelity": "the Devices screen, its Disabled and Unplugged rows and the Enable action, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16, in light and dark.",
+          "job": "a person finds a device Windows hides and brings it back. Consumer: the device's state, read back.",
+          "treatment": "a row with the word Disabled or Unplugged and its icon, an Enable action only on a disabled one, and a sentence on an unplugged one saying it is not connected. Cheaper substitute that fails the checkpoint: listing only active devices, which hides the one the person is looking for."
+        },
+        "build": [
+          "Show disabled and unplugged devices in `src/ui/DevicesView.cpp`. Done when: a fixture with one of each shows two rows with their words.",
+          "Implement Enable in `src/core/AudioEngine.cpp` through the bridge. Done when: a disabled endpoint reads active after it."
+        ],
+        "items": [
+          "Show every endpoint the engine returns, with the state word and icon, in `src/ui/DevicesView.cpp`, and a switch to hide the disabled and unplugged ones that is off by default. Done when: a fixture with one active, one disabled and one unplugged device shows three rows. Cheaper substitute: marking the state by colour alone.",
+          "Add the Enable action to a disabled row, calling `EnableEndpoint` and re-reading the state. Done when: after it the row reads Ready and a device that did not change is reported by name. Cheaper substitute: reporting success from the return code.",
+          "Show for an unplugged row the sentence that it is not connected and that no action can enable it, and offer no Enable. Done when: a fixture with an unplugged device shows the sentence and no action.",
+          "Refuse Enable by name when the bridge reports that this Windows build is not recognised or that the change was denied, with the reason on the row. Done when: a fake bridge returning each refusal shows each reason and leaves the state unchanged.",
+          "Cover it in `tests/hidden_devices_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L hidden` passes, and fails when a disabled device is left out of the list."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L hidden` passes: disabled and unplugged devices are listed, a disabled one is enabled and read back, and an unplugged one offers no action.",
+        "commit": "feature: hidden devices shown, and a disabled one enabled"
+      },
+      {
+        "title": "Per-Program Output",
+        "intro": "A program can play through a different device from the system default. The Programs screen shows each program's volume and device, and routes one program to another device where this version of Windows allows it, through the same isolated module as the default. Where it does not, the screen says so in one sentence and offers no control that cannot work (`docs/origin/resolute-D05-T07-s8.md:19`).",
+        "surface": {
+          "fidelity": "the Programs screen and its device choice, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16, in light and dark.",
+          "job": "a person sends one program's sound to a chosen device and sees which device each program uses. Consumer: the program's session, read back.",
+          "treatment": "one row per program with its volume, mute and device, and a device choice on the row that is off, with the reason, when the bridge does not support this build. Cheaper substitute that fails the checkpoint: a device choice that appears to accept a value and does nothing on an unsupported build."
+        },
+        "build": [
+          "Implement `SetProgramEndpoint` use in `src/core/AudioEngine.cpp` with read-back. Done when: a program routed to a device reads that device afterwards.",
+          "Build the screen in `src/ui/ProgramsView.cpp`. Done when: each program shows its volume and device."
+        ],
+        "items": [
+          "List each program with its name, its `ISimpleAudioVolume` volume and mute, and its current device in `src/ui/ProgramsView.cpp`. Done when: with two programs playing, two rows show their own values and re-read after a change.",
+          "Change a program's volume or mute through `ISimpleAudioVolume` and read it back. Done when: a changed volume reads the same value afterwards. Cheaper substitute: moving the system volume, which changes every program.",
+          "Route a program to a chosen device through `SetProgramEndpoint` and re-read the program's device, returning expected and found on a mismatch. Done when: a fake bridge that ignores the call gets both named. Cheaper substitute: trusting the return code.",
+          "Disable the device choice with the reason when the bridge refuses this build, and say that a program already playing may need to be restarted for a new device to apply if Windows does not move it. Done when: a fake bridge refusing the build shows the reason and the choice is disabled.",
+          "Cover it in `tests/programs_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L programs` passes, and fails when the read-back comparison is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L programs` passes: volume and mute are changed and read back, a program is routed and read back, and an unsupported build disables the choice with its reason.",
+        "commit": "feature: per-program volume and output device, said honestly where Windows does not allow it"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine with more than one sound device the tool lists playback and recording devices in every state equal to Windows' Sound dialog with its hidden devices shown, sets a default and reads it back, and enables a disabled device.",
+      "Fix sound finds each of the four causes alone on a machine or fixture where it is made to happen, names the first failure only, and a default change is undone, with `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug` passing.",
+      "On a Windows build the isolated module does not recognise, the tool still lists and reads everything and refuses the default, routing and enable actions by name; the window works in light and dark and by keyboard alone."
+    ]
+  }
+}

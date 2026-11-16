@@ -1,0 +1,255 @@
+{
+  "name": "PermissionsCopier",
+  "slug": "permissionscopier",
+  "display": "Permissions Copier",
+  "job": "it copies the permissions of one file or folder onto another file, folder or whole folder tree, shows exactly what will change before anything is written, records every prior descriptor and can put each one back.",
+  "tagline": "Copy the permissions of one folder onto another, and see the change first",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Lime",
+    "light": "#BEF264",
+    "dark": "#65A30D",
+    "social_ground": "#16230A",
+    "social_muted": "#D6ECAE"
+  },
+  "icon": {
+    "idea": "A light padlock and a dark one: the same lock, copied.",
+    "points": [
+      "Free-standing, with no tile: two padlocks, the second lower and to the right.",
+      "The first padlock is Lime light and the second is Lime.",
+      "The small drawing, below 40 pixels, enlarges both padlocks and overlaps them more."
+    ],
+    "large": "<path d=\"M16 34 V26 A12 12 0 0 1 40 26 V34\" fill=\"none\" stroke=\"#BEF264\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"8\" y=\"32\" width=\"40\" height=\"30\" rx=\"7\" fill=\"#BEF264\"/><path d=\"M52 56 V48 A12 12 0 0 1 76 48 V56\" fill=\"none\" stroke=\"#65A30D\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"44\" y=\"54\" width=\"44\" height=\"34\" rx=\"8\" fill=\"#65A30D\"/>",
+    "small": "<path d=\"M14 34 V26 A14 14 0 0 1 42 26 V34\" fill=\"none\" stroke=\"#BEF264\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"4\" y=\"30\" width=\"48\" height=\"36\" rx=\"8\" fill=\"#BEF264\"/><path d=\"M50 56 V48 A14 14 0 0 1 78 48 V56\" fill=\"none\" stroke=\"#65A30D\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"38\" y=\"52\" width=\"52\" height=\"38\" rx=\"9\" fill=\"#65A30D\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Copy",
+        "Source and destination in the header, and the preview of every entry"
+      ],
+      [
+        "Results",
+        "What was changed, and each path that could not be, with the reason"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees, entry by entry, what copying one set of permissions onto another path will add, remove and keep, and then applies it with one button.",
+    "primary": "Copy permissions",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Account entry to add",
+        "Added"
+      ],
+      [
+        "Account entry to remove",
+        "Removed"
+      ],
+      [
+        "Account entry already present",
+        "Kept"
+      ],
+      [
+        "Entry inherited from a parent",
+        "Not copied"
+      ],
+      [
+        "Path that cannot be read",
+        "Skipped, with the reason"
+      ]
+    ],
+    "status": "3 added, 1 removed, 5 kept, 2 paths cannot be read",
+    "notes": [
+      "The header holds the source and the destination, each with a Browse button, and a switch for whole folder tree.",
+      "Each permission entry is one row: the account, what it may do in words, and whether it will be added, removed or kept, shown with an icon and a word, never by colour alone.",
+      "Copy permissions stays disabled until a preview has been shown for the current source and destination, and any change to either path clears the preview.",
+      "Undo puts every changed path back to its recorded descriptor and is disabled, with a tooltip, when nothing has been copied.",
+      "Copying the owner is an option, off by default, and its label says that the owner will change too.",
+      "The status bar counts rows by state in words, and a copy onto a whole tree shows real progress and a count of paths that could not be read.",
+      "Copy permissions and Undo refuse by name when the process is not elevated, before anything is read for writing or written."
+    ],
+    "cut": "There is no window from an earlier version: this tool is new and nothing is ported. It has no menus, no splash screen, no animations and no donate strip, because the suite's tool window does not carry them. The plan records the rest of what the suite's window leaves to the framework."
+  },
+  "readme": {
+    "lead": "Copy the permissions of one folder onto another, and see the change first.",
+    "what": [
+      "Permissions Copier reads the permissions of a source file or folder and applies them to a destination file, folder or whole folder tree. Before anything is written it shows each permission entry as a row: the account, what it may do, and whether it will be added, removed or kept.",
+      "It copies only the entries set directly on the source, adapts inheritance flags when the source is a folder and the destination is a file, and can copy the owner too when asked. Paths it cannot read are listed with the reason and never stop the rest of the copy. Every changed path has its prior descriptor recorded first, so Undo can put it back."
+    ],
+    "new_intro": "This is a new tool, not a port. Windows offers `icacls` for the same job, and this tool adds the parts `icacls` leaves to the operator.",
+    "new": [
+      [
+        "Preview first.",
+        "Every entry that will be added, removed or kept is listed before a single path is written."
+      ],
+      [
+        "Undo a copy.",
+        "The descriptor of every changed path is recorded first, and one button restores them all."
+      ],
+      [
+        "Whole folder tree.",
+        "The recursive case shows real progress, does not follow links, and counts the paths it could not read."
+      ],
+      [
+        "Owner only when asked.",
+        "Copying the owner is off by default, and the window says plainly when it is on."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The tool: engine, preview, window, tree copy, undo, owner, release",
+    "goal": "Permissions Copier ships as a complete, standalone C++ tool: it reads the explicit permission entries of a source, shows a preview of exactly what will be added, removed and kept on each destination, applies them with the prior descriptor of every changed path recorded first, walks a whole folder tree without following links and without stopping at a path it cannot read, reads every result back, and can put every changed path back.",
+    "current_state": "Nothing exists yet: there is no AutoIt original, no code and no baseline, because this is a new tool. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and one plan section under `docs/origin/resolute-D05-T07-s8.md` that names the tool in a list of small tools and requires it to be specified before it is built, covering the preview, inheritance, the recursive case and what happens when a path cannot be read. Its test checkpoint adds that the preview lists every change before applying and is undoable. The sources are that text and Windows' documented behaviour. The SDK's framework, repair contract and chart control, which this tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s8.md`: the plan section that names the tool and requires the preview, inheritance, recursion and unreadable-path cases to be specified.",
+      "The Windows security APIs: `GetNamedSecurityInfoW`, `SetNamedSecurityInfoW`, `TreeSetNamedSecurityInfoW` and its progress callback, `ConvertSecurityDescriptorToStringSecurityDescriptorW` for SDDL, and `icacls /save` and `/restore` as the system's own equivalent.",
+      "`DESIGN.md`: the tool's identity and its window's sections, and `sdk/DESIGN.md`, the suite's contract."
+    ],
+    "outcome": [
+      "`PermissionsCopier.exe` reads a source's explicit entries, shows the exact difference against each destination before any write, and applies it with the prior descriptor of each changed path recorded first.",
+      "A whole folder tree is copied without following links, an unreadable path is recorded with its reason and the walk carries on, every written descriptor is read back, and a mismatch is refused by name.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Copy screen, where each permission entry is a row with its account, what it may do and whether it will be added, removed or kept. Reporting is the Results section, and audit is the Activity section, which is the trail a support reader checks. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated run is refused by name before anything is written. Reverse anchors on the undo section: every changed path is put back to the descriptor recorded before the change.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Permissions Copy Engine",
+      "intro": "The tool's whole system effect, independent of any window: reading a source's explicit entries, computing the exact difference against each destination (the preview, a pure function), adapting inheritance flags between a folder and a file, applying with the prior descriptor recorded first, walking a tree without following links, and reading the result back. Only explicit entries are copied, because inherited ones come from the destination's own parent; they are copied only when inheritance is being broken on purpose.",
+      "needs": "windows-host",
+      "build": [
+        "Implement reading, comparing and adapting in `src/core/Acl.cpp` over a plain entry type in `src/core/Acl.h`. Done when: the unit tests for the preview pass on fixtures with no file system.",
+        "Implement apply, record, walk and read-back in `src/core/Apply.cpp` against a disposable folder tree. Done when: the tests pass on a fixture tree and an unelevated run is refused by name."
+      ],
+      "items": [
+        "Implement `ReadExplicit(path)` in `src/core/Acl.cpp` using `GetNamedSecurityInfoW` with `DACL_SECURITY_INFORMATION` and keeping only entries without the inherited flag. Done when: a fixture with two explicit and one inherited entry returns exactly the two. Cheaper substitute: copying the whole DACL, which carries inherited entries onto a path whose own parent already supplies them.",
+        "Implement `ComputePreview(source, destination)` in `src/core/Preview.cpp` as a pure function returning each entry as added, removed or kept with its account and rights in words. Done when: a test on fixtures covers all three states and an empty destination without touching the file system. Cheaper substitute: applying to a scratch copy and diffing, which writes.",
+        "Implement `AdaptFlags(entry, destinationIsFile)` in `src/core/Acl.cpp` dropping `CONTAINER_INHERIT_ACE`, `OBJECT_INHERIT_ACE`, `INHERIT_ONLY_ACE` and `NO_PROPAGATE_INHERIT_ACE` when the destination is a file, and keeping them when it is a folder. Done when: a folder entry with inheritance flags lands on a file without them, asserted, and an inherit-only entry that would mean nothing on a file is dropped and named in the preview.",
+        "Implement `Apply(destination, preview, protect)` in `src/core/Apply.cpp` calling `SetNamedSecurityInfoW` with `DACL_SECURITY_INFORMATION` plus `PROTECTED_DACL_SECURITY_INFORMATION` only when inheritance is being broken, and `UNPROTECTED_DACL_SECURITY_INFORMATION` otherwise. Done when: a test shows inheritance left on by default and cut only when asked. Cheaper substitute: always passing the protected flag, which silently severs inheritance on every destination.",
+        "Record the prior descriptor of each path before changing it, as SDDL from `ConvertSecurityDescriptorToStringSecurityDescriptorW`, in `src/core/Record.cpp`, written to disk before the first write. Done when: a test finds the record on disk before the first `SetNamedSecurityInfoW` call. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+        "Implement `WalkTree(root)` in `src/core/Walk.cpp` using long-path prefixes, not following any reparse point (junction or symbolic link), and recording each path it cannot read or write with its Win32 error and reason, then carrying on. Done when: a fixture tree with a junction loop and a path denied to the caller finishes, lists the denied path with its reason and visits the junction once, not through it. Cheaper substitute: stopping at the first error, which leaves a tree half copied.",
+        "Read every written descriptor back and return a mismatch as path, expected and found. Done when: a test that alters one entry after the write names it. Cheaper substitute: checking only the return code of `SetNamedSecurityInfoW`.",
+        "Refuse `Apply` and `Undo` by name when the process is not elevated, before any record or write, with one activity record. Done when: an unelevated test run reports the refusal and the fixture tree is unchanged. Cheaper substitute: letting a write fail with access denied halfway through.",
+        "Cover every path in `tests/acl_test.cpp`, `tests/preview_test.cpp` and `tests/walk_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when the preview marks one kept entry as added."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, including the preview fixtures, the file-versus-folder flags, the unreadable path, the link loop and the unelevated refusal.",
+      "commit": "core: the permissions copy, previewed, recorded first and read back"
+    },
+    "enhancements": [
+      {
+        "title": "Preview Before Anything Changes",
+        "intro": "The preview is the engine's pure difference shown as the Copy screen's rows, and nothing is written until it has been shown for the current source and destination. Changing either path clears it, so what is applied is always what was seen.",
+        "surface": {
+          "fidelity": "the Copy screen and its preview rows, against `DESIGN.md` section 2.",
+          "job": "a person sees exactly what will change before it does. Consumer: the rows, compared with the engine's preview for the same paths.",
+          "treatment": "one row per entry with the account, what it may do in words, and added, removed or kept shown with an icon and a word. Cheaper substitute that fails the checkpoint: a confirmation that says only 'copy permissions?' with no entries."
+        },
+        "build": [
+          "Build the preview rows in `src/ui/CopyView.cpp` from `ComputePreview`. Done when: every entry the engine returns is a row.",
+          "Gate the primary button on a shown preview. Done when: it is disabled until the preview of the current paths is shown."
+        ],
+        "items": [
+          "Show each entry of `ComputePreview` as a row in `src/ui/CopyView.cpp` with account, rights in words, and the state as an icon and a word. Done when: a fixture with added, removed and kept entries shows three rows with three words. Cheaper substitute: rows typed into the view, which show nothing real.",
+          "Disable `Copy permissions` until a preview has been shown, and clear the preview when the source, the destination, the owner option or the tree switch changes. Done when: editing the destination path disables the button again. Cheaper substitute: previewing on press and applying at once, which shows nothing before the write.",
+          "State inheritance in the preview: whether the destination keeps inheriting, and which inherited entries are not copied. Done when: a destination that inherits shows a line saying so, and one set to break inheritance shows what will be cut.",
+          "Show the unreadable source or destination as a row with the reason instead of an empty preview. Done when: a path denied to the caller gives a row naming the reason and keeps the button disabled.",
+          "Cover it in `tests/preview_view_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L preview` passes, and fails when the button is enabled before a preview is shown."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L preview` passes: the rows equal the engine's preview and the primary button is disabled until it has been shown.",
+        "commit": "feature: the preview shown before anything is written"
+      },
+      {
+        "title": "Whole Folder Tree",
+        "intro": "The recursive case: the source's explicit entries applied to a destination folder and everything under it, with real progress, no following of links, and a count of the paths that could not be read. Results lists each one with its reason.",
+        "surface": {
+          "fidelity": "the tree switch, progress and the Results section, against `DESIGN.md` section 2.",
+          "job": "a person copies onto a whole tree and sees how far it is and what could not be done. Consumer: the progress and Results list, compared with the walk's own record.",
+          "treatment": "progress from the walk's real count, and one Results row per path that could not be changed with the path and the reason. Cheaper substitute that fails the checkpoint: an indeterminate spinner and a single 'some paths failed' line."
+        },
+        "build": [
+          "Drive `TreeSetNamedSecurityInfoW` or the walk of `src/core/Walk.cpp` with a progress callback in `src/core/Tree.cpp`. Done when: the callback reports each path as it is visited.",
+          "Show progress and Results in `src/ui/ResultsView.cpp`. Done when: the list matches the walk's record path for path."
+        ],
+        "items": [
+          "Add the tree switch to `src/ui/CopyView.cpp` and run `WalkTree` from it on a worker thread, with the preview covering the destination root and a count of every path below it. Done when: a switch on a fixture tree previews the root and counts the paths. Cheaper substitute: previewing the root only and applying to all, which hides what happens below it.",
+          "Report real progress from the walk's callback in `src/core/Tree.cpp`, paths visited against paths found. Done when: a test on a fixture tree receives one callback per path in order.",
+          "Do not follow junctions or symbolic links, and list each as skipped in Results. Done when: a fixture with a link pointing outside the tree leaves the target unchanged, asserted. Cheaper substitute: following links and trusting the destination, which rewrites permissions outside the chosen tree.",
+          "List each path that could not be read or changed in `src/ui/ResultsView.cpp` with the path and its reason in words, and put their count in the status bar. Done when: a fixture with two denied paths shows two rows with two reasons and the count two.",
+          "Allow cancelling the walk, and say how many paths were changed and recorded so Undo covers them. Done when: a cancelled run leaves the changed paths undoable and names the count, asserted.",
+          "Cover it in `tests/tree_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L tree` passes, and fails when a link is followed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L tree` passes: a fixture tree with a link loop and denied paths finishes, the links are untouched, and every unreadable path is listed with its reason.",
+        "commit": "feature: the whole folder tree, with progress and the unreadable paths counted"
+      },
+      {
+        "title": "Undo a Copy",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before a path is changed, its prior descriptor is recorded as SDDL, so Undo restores what was there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists. Windows' own equivalent is `icacls /save` and `/restore`, which this tool does for every changed path without being asked.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back every path the last copy changed. Consumer: each path's descriptor, compared with the record.",
+          "treatment": "each changed path restored to its recorded descriptor, with the paths that could not be restored listed with the reason. Cheaper substitute that fails the checkpoint: an undo that removes the copied entries, which is not what was there before."
+        },
+        "build": [
+          "Record each prior descriptor through the repair contract in `src/core/Record.cpp`. Done when: a record exists on disk before the first write.",
+          "Wire Undo in `src/ui/CopyView.cpp` to restore from the record. Done when: copy then undo leaves every path with its prior descriptor."
+        ],
+        "items": [
+          "Store the recorded descriptors through the repair contract's restore record, with the owner, group and DACL of each path, before any write. Done when: a test finds the record on disk before the first value is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo in `src/core/Undo.cpp` restoring each path from its SDDL, including the inheritance protection it had. Done when: copy then undo on a fixture tree leaves every path's descriptor equal to before, asserted. Cheaper substitute: restoring the DACL only, which loses a changed owner.",
+          "List each path Undo could not restore, with the reason, in Results. Done when: a fixture path made unreadable after the copy is listed and the rest is restored.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one copy.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one path is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: copy then undo, for a single path and a fixture tree, leaves every path as it was.",
+        "commit": "feature: undo puts every changed path back to its recorded descriptor"
+      },
+      {
+        "title": "Copy the Owner Too",
+        "intro": "The owner is optional, off by default and said plainly. Setting an owner needs the restore privilege, and a copy that changes it is shown in the preview as a row of its own, so it is never a surprise.",
+        "surface": {
+          "fidelity": "the owner option and its preview row, against `sdk/DESIGN.md` section 11.",
+          "job": "a person copies the owner as well, knowing that they are doing so. Consumer: the owner of each destination, read back.",
+          "treatment": "an option whose label says 'the owner will change too', and an Owner row in the preview showing the old and new account. Cheaper substitute that fails the checkpoint: a hidden setting that copies the owner without saying."
+        },
+        "build": [
+          "Add the owner to `ComputePreview` and `Apply` in `src/core/Preview.cpp` and `src/core/Apply.cpp`. Done when: the owner is a row in the preview and a write only when asked.",
+          "Add the option to `src/ui/CopyView.cpp`. Done when: it is off at start and its label states the change."
+        ],
+        "items": [
+          "Enable `SeRestorePrivilege` and `SeBackupPrivilege` in `src/core/Privilege.cpp` only when the owner is copied or a path needs them, and report a missing privilege by name. Done when: a test with the privilege unavailable names it and writes nothing. Cheaper substitute: enabling every privilege at start, which holds rights the tool does not need.",
+          "Write the owner with `SetNamedSecurityInfoW` and `OWNER_SECURITY_INFORMATION`, only when the option is on. Done when: a fixture destination changes owner with the option on and keeps it with the option off, asserted.",
+          "Show an Owner row in the preview with the old and the new account, and include the owner in the recorded descriptor. Done when: Undo restores the previous owner on a fixture.",
+          "Cover it in `tests/owner_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L owner` passes, and fails when the owner is written with the option off."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L owner` passes: the owner changes only with the option on, shows in the preview, and is restored by Undo.",
+        "commit": "feature: the owner copied only when asked, previewed and undoable"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A copy of a source with explicit and inherited entries onto a file, a folder and a tree on a real machine shows the preview first, writes only the explicit entries, and reads each result back.",
+      "A fixture tree with a link loop and a path denied to the caller finishes, lists the denied path with its reason, and Undo restores every changed path, asserted against the recorded descriptors.",
+      "On a real machine the tool previews, copies, reports, undoes and refuses when not elevated, in light and dark, by keyboard alone."
+    ]
+  }
+}

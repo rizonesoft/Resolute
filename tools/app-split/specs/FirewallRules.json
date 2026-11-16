@@ -1,0 +1,256 @@
+{
+  "name": "FirewallRules",
+  "slug": "firewallrules",
+  "display": "Firewall Rules",
+  "job": "it lists the Windows Defender Firewall rules with their program, direction and profile, flags the rules that look wrong with the reason, and switches one rule off or on with an undo.",
+  "tagline": "See every firewall rule, and the ones that should not be there",
+  "frozen": true,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Brick",
+    "light": "#FDBA74",
+    "dark": "#C2410C",
+    "social_ground": "#2E1408",
+    "social_muted": "#F8D9BF"
+  },
+  "icon": {
+    "idea": "A brick wall with one brick picked out: the wall, and one rule in it.",
+    "points": [
+      "Free-standing with no tile behind it, three rows of rounded bricks.",
+      "The bricks are Brick and the centre one is Brick light.",
+      "The small drawing, used below 40 pixels, has two rows of larger bricks."
+    ],
+    "large": "<rect x=\"8\" y=\"12\" width=\"38\" height=\"20\" rx=\"5\" fill=\"#C2410C\"/><rect x=\"50\" y=\"12\" width=\"38\" height=\"20\" rx=\"5\" fill=\"#C2410C\"/><rect x=\"8\" y=\"38\" width=\"16\" height=\"20\" rx=\"5\" fill=\"#C2410C\"/><rect x=\"28\" y=\"38\" width=\"40\" height=\"20\" rx=\"5\" fill=\"#FDBA74\"/><rect x=\"72\" y=\"38\" width=\"16\" height=\"20\" rx=\"5\" fill=\"#C2410C\"/><rect x=\"8\" y=\"64\" width=\"38\" height=\"20\" rx=\"5\" fill=\"#C2410C\"/><rect x=\"50\" y=\"64\" width=\"38\" height=\"20\" rx=\"5\" fill=\"#C2410C\"/>",
+    "small": "<rect x=\"6\" y=\"14\" width=\"38\" height=\"30\" rx=\"6\" fill=\"#C2410C\"/><rect x=\"50\" y=\"14\" width=\"40\" height=\"30\" rx=\"6\" fill=\"#FDBA74\"/><rect x=\"6\" y=\"52\" width=\"24\" height=\"30\" rx=\"6\" fill=\"#C2410C\"/><rect x=\"36\" y=\"52\" width=\"54\" height=\"30\" rx=\"6\" fill=\"#C2410C\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Rules",
+        "One row per firewall rule: name, program, in or out, allow or block, profiles, on or off, and a flag with the reason when it looks wrong"
+      ],
+      [
+        "Details",
+        "The selected rule in full, and what made it where that is recorded"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every firewall rule with its program, direction and profile, spots the ones that look wrong and why, and switches one off or on with a way back.",
+    "primary": "Switch off",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Allow any program on any port, inbound",
+        "On, flagged, with the reason"
+      ],
+      [
+        "A rule for a program that is gone",
+        "On, flagged, program file missing"
+      ],
+      [
+        "A rule from group policy",
+        "On, locked, cannot be changed here"
+      ],
+      [
+        "A rule for a packaged app",
+        "On or off, named by its app"
+      ],
+      [
+        "An ordinary program rule",
+        "On or off, not flagged"
+      ]
+    ],
+    "status": "412 rules, 6 flagged, 31 off",
+    "notes": [
+      "Each rule is a row showing its name, its program, in or out, allow or block and its profiles. Its state is an icon and a word (On, Off, Locked by policy), never colour alone.",
+      "A flagged rule carries a flag icon and the reason in words in the same row, for example \"Inbound, allows any program on any port\". The Details section holds the full reasoning.",
+      "The primary button reads Switch off when the selected rule is on and Switch on when it is off. After the change the row is re-read from the firewall, not assumed.",
+      "Undo puts the selected change back to the state recorded before it. It is disabled with a tooltip when nothing has been changed.",
+      "A rule that group policy sets shows as locked and the primary button is disabled, with the reason in a tooltip. The tool never edits policy.",
+      "A change that would cut the connection the tool is being used over (a remote desktop session) asks first, names the rule and the session, and defaults to not applying it.",
+      "When the process is not elevated the list still loads and every change is refused by name before anything is written. The status bar counts rules, flagged rules and rules that are off. There is no control that switches the firewall itself off."
+    ],
+    "cut": "There is no earlier window to cut from, because the tool is new. It has no menus, no splash, no animations and no donate strip: the suite's tool window does not carry them. It has no way to add, edit or delete a rule or to switch the firewall or a profile off. It only reads rules and switches one rule off or on."
+  },
+  "readme": {
+    "lead": "Firewall Rules lists every Windows Defender Firewall rule, flags the ones that look wrong, and switches a rule off or on with an undo.",
+    "what": [
+      "Windows shows firewall rules in a console that lists thousands of rows with little context. Firewall Rules shows each rule with its program, direction, allow or block and profiles, says whether the program file still exists, and says what made the rule where Windows records it.",
+      "It flags rules that look wrong, such as an inbound rule that allows any program on any port, and gives the reason for each flag. It switches one rule off or on, reads the state back, and remembers the previous state so the change can be undone. It never switches the firewall itself off, and it warns before a change that would cut the remote session it is being used over."
+    ],
+    "new_intro": "Firewall Rules is a new tool, not a port, so everything it does is new.",
+    "new": [
+      [
+        "Every rule in one list.",
+        "Program, direction, action, profiles and on or off, with rules for packaged apps named by app and rules set by group policy shown as locked."
+      ],
+      [
+        "Flags with reasons.",
+        "A table of shapes that look wrong, each with the reasoning shown beside the rule and in its details."
+      ],
+      [
+        "Leftovers found.",
+        "Rules whose program file no longer exists, left by software that was uninstalled."
+      ],
+      [
+        "Undo.",
+        "Every switch records the state before it and can be put back."
+      ],
+      [
+        "A guard for remote sessions.",
+        "A change that would break the connection the tool is used over is warned about before it is applied."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: engine, window, features, release",
+    "goal": "Firewall Rules ships as a complete, standalone C++ tool: it lists the firewall's rules with program, direction, profile and creator where recorded, flags rules that look wrong with the reasoning, switches one rule off or on with the state read back and an undo, and warns before a change that would cut the remote session the tool is used over. It never switches the firewall itself off.",
+    "current_state": "Nothing exists yet. This is a new tool, with no AutoIt original, no reference folder and no measured figures. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan text in `docs/origin/resolute-D05-T07-s7.md`, whose network section also covers an adapter manager, a DNS selector and a proxy inspector that belong to other tools. The plan asks for a rule list with owning program, direction, profile and creator, a flag for rules that look wrong (an inbound allow-any rule), and a warning before a change that breaks the connection the tool is used over. The design rests on the firewall's `INetFwPolicy2` and `INetFwRule` COM interfaces, which a first section of the engine reads. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s7.md`: the plan section, of which only the firewall rules and the remote-session rule belong to this tool.",
+      "The `INetFwPolicy2` and `INetFwRule` COM interfaces (`netfw.h`), the group policy firewall registry keys and the firewall's audit events: the facts about Windows the tool reads.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the window and the controls every surface answers to."
+    ],
+    "outcome": [
+      "`FirewallRules.exe` lists every rule the system reports, with program, direction, action, profiles and state, and names the program that owns it or the app it belongs to.",
+      "Rules that look wrong, rules for programs that are gone and rules set by policy are marked with a reason in words, and a switch is read back, recorded, refused by name when not elevated or locked by policy, and undoable.",
+      "A change that would cut the active remote session is warned about before it is applied, and the Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone."
+    ],
+    "adjacency_rationale": "The list is the Rules screen, where a person finds a rule by what it does and sees what looks wrong, and Details holds the one selected rule. Reporting and audit are the Activity section, the trail of what the tool switched and what it refused. Settings are the framework's pages. Permissions anchor on the engine, where a change is refused by name when the process is not elevated or when policy owns the rule. Reverse anchors on the undo section: it restores the prior enabled state that was recorded before a switch, and it cannot restore a rule that was never changed.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Firewall Rule Engine",
+      "intro": "The tool's whole system effect, independent of any window: reading the firewall's rules, resolving each to its program and whether that program still exists, judging each against a table of shapes that look wrong, and switching one rule off or on with the state read back and the prior state recorded. Every change is refused by name when the process is not elevated or the rule comes from policy, and nothing in the engine can switch the firewall itself off.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the rule model and the looks-wrong table as data in `src/core/Rule.h` and `src/core/Shapes.h`. Done when: every shape is one row with its test and its reason, and the reasons are the only place the text is written.",
+        "Implement enumerate, resolve, judge and switch in `src/core/Firewall.cpp` behind a store interface the tests can fake. Done when: the unit tests pass against a fake store with no real firewall touched."
+      ],
+      "items": [
+        "Enumerate the rules in `src/core/Firewall.cpp` through `INetFwPolicy2::Rules`, reading `Name`, `ApplicationName`, `ServiceName`, `Direction`, `Action`, `Enabled`, `Profiles`, `LocalPorts`, `RemoteAddresses`, `Grouping` and `Description`. Done when: a test on a fake store returns every rule with every field, and on a real machine the count equals the count of `netsh advfirewall firewall show rule name=all`. Cheaper substitute: parsing `netsh` text, which changes with the display language.",
+        "Resolve each rule to its program in `src/core/Program.cpp`: expand environment variables in `ApplicationName`, test that the file exists, and take the app from `LocalAppUserId` for a packaged app and the service from `ServiceName`. Done when: a fixture with a present file, a missing file, a service rule and a packaged-app rule reports each as present, gone, service and package. Cheaper substitute: showing the raw `ApplicationName` string, which hides that the file is gone.",
+        "Record what made each rule where Windows says so, in `src/core/Origin.cpp`: the `Grouping` and `Description` the maker set, whether the rule sits in the group policy store under `HKLM\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\FirewallRules`, and a creator from the firewall's audit events 4946 and 4947 when they were logged. Done when: a fixture rule in the policy key reports policy, a fixture event reports its account, and a rule with neither reports \"not recorded\". Cheaper substitute: guessing a creator from the program path.",
+        "Declare in `src/core/Shapes.h` the table of shapes that look wrong, each with a test and its reason in words: inbound allow of any program on any port, inbound allow from any address to a sensitive port, an allow rule for a program that is gone, and a block rule that is off. Done when: a test feeds a fixture per shape and checks the flag and its reason text, and a fixture that matches none returns no flag.",
+        "Implement `SetEnabled(ruleName, bool)` in `src/core/Firewall.cpp` writing `INetFwRule::Enabled`, reading it back, and recording the prior state in the result. Done when: a test on the fake store switches a rule, finds the new state read back and the prior state recorded, and a store that ignores the write returns a mismatch naming the rule, expected and found. Cheaper substitute: trusting the return code of the write.",
+        "Refuse `SetEnabled` by name before any write when the process is not elevated or when the rule comes from policy, with one activity record each. Done when: an unelevated test and a policy-rule test each report the named refusal and leave the fake store unchanged. Cheaper substitute: letting the write fail with access denied.",
+        "Keep the firewall itself out of reach: the engine exposes no call that sets `FirewallEnabled`, `DefaultInboundAction` or `DefaultOutboundAction` on any profile. Done when: a test over the store interface asserts it has no such member and `git grep -n FirewallEnabled src` finds only reads. Cheaper substitute: a confirmation before switching the firewall off, which still lets it be done.",
+        "Cover every path in `tests/firewall_test.cpp` with the fake store. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L firewall` passes, and fails when one shape's reason or one refusal is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L firewall` passes, including the read-back mismatch, the unelevated and policy refusals and the no-firewall-off assertion, and fails when one shape or refusal is removed.",
+      "commit": "core: firewall rules read, judged and switched with read-back"
+    },
+    "enhancements": [
+      {
+        "title": "Undo Any Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Switching a rule off on a machine reached over the network can remove it from that network, so every switch records the rule's prior state first and Undo restores what was actually there. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts a rule back to the state it had before the last change. Consumer: the rule, read back from the firewall and compared with the record.",
+          "treatment": "the recorded prior state restored for each rule changed, and the row re-read. Cheaper substitute that fails the checkpoint: an undo that switches the rule on, which is wrong for a rule that was already off."
+        },
+        "build": [
+          "Record each rule's prior enabled state through the repair contract in `src/core/Firewall.cpp`. Done when: a record exists on disk before the first write.",
+          "Wire Undo in `src/ui/RulesView.cpp`. Done when: switch then undo leaves the rule as it was."
+        ],
+        "items": [
+          "Record the rule's name and prior `Enabled` value through the repair contract's restore record before the write. Done when: a test finds the record on disk before the fake store is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the recorded state and reading it back, for a rule switched off and a rule switched on. Done when: both leave the rule equal to before, asserted, and a rule deleted in between reports \"rule no longer exists\" by name.",
+          "Disable Undo with a tooltip when there is nothing to undo, in `src/ui/RulesView.cpp`. Done when: a first run shows it disabled and it enables after one change.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when the prior state is not restored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: switch off then undo and switch on then undo both leave the rule as it was.",
+        "commit": "feature: undo puts a rule back as it was"
+      },
+      {
+        "title": "Rules That Look Wrong",
+        "intro": "The list flags a rule whose shape matches the table of the engine and shows the reason beside it, so a person learns why and can judge it. A flag is advice: the rule stays as it is until the person switches it.",
+        "surface": {
+          "fidelity": "the flag column and the Details section, against `DESIGN.md` section 2.",
+          "job": "a person finds the rules that look wrong and reads why. Consumer: the rendered row and the Details text, compared with the engine's flags.",
+          "treatment": "a flag icon with the reason in words on the row, and the full reasoning in Details. Cheaper substitute that fails the checkpoint: a red row with no reason."
+        },
+        "build": [
+          "Show the flag and reason on each row in `src/ui/RulesView.cpp`. Done when: an inbound allow-any fixture shows its reason in the row.",
+          "Show the reasoning, and what would make the rule acceptable, in `src/ui/DetailsView.cpp`. Done when: the Details text equals the engine's reason for the same rule."
+        ],
+        "items": [
+          "Show each flag in `src/ui/RulesView.cpp` as an icon and the reason in words, and a count of flagged rules in the status bar. Done when: a fixture with one flagged rule shows one flag and \"1 flagged\".",
+          "Add a filter for flagged rules to the Rules section, in `src/ui/RulesView.cpp`. Done when: choosing it hides every unflagged row and clearing it restores them.",
+          "Write the reasoning for each shape in `src/core/Shapes.h` in plain sentences saying what is exposed and why that matters. Done when: a test requires every shape to have a reason of at least one sentence, and a shape without one fails.",
+          "Cover it in `tests/flags_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L flags` passes with an inbound allow-any fixture flagged with its reasoning, and fails when that shape is removed from the table."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L flags` passes: an inbound allow-any rule is flagged with its reasoning, and an ordinary program rule is not.",
+        "commit": "feature: rules that look wrong, with the reason"
+      },
+      {
+        "title": "Rules for Programs That Are Gone",
+        "intro": "Uninstalled software often leaves allow rules whose program file no longer exists. They do nothing today and are a risk if another file later appears at that path. The tool lists them as leftovers, separately from rules that look wrong, and offers the same switch off with undo.",
+        "surface": {
+          "fidelity": "the Gone filter and its rows, against `DESIGN.md` section 2.",
+          "job": "a person sees which rules belong to programs that no longer exist and switches them off. Consumer: the rule list, with each program's file checked again at the time.",
+          "treatment": "a Gone state in words on each row, with the missing path shown in Details. Cheaper substitute that fails the checkpoint: judging by the program name alone, which misses a file that moved."
+        },
+        "build": [
+          "Mark gone programs in `src/core/Program.cpp` and show them in `src/ui/RulesView.cpp`. Done when: a fixture with a missing file shows Gone.",
+          "Treat a rule for a packaged app by its package, not its path. Done when: a rule for an installed package is not marked gone and one for a removed package is."
+        ],
+        "items": [
+          "Check the program file again each time the list is read in `src/core/Program.cpp`, not once at start. Done when: a test that creates the file after the first read shows the rule no longer gone on the second.",
+          "Decide a packaged-app rule by whether the package is still installed, through `Windows.Management.Deployment` in `src/core/Program.cpp`, and a service rule by whether the service exists. Done when: a removed package and a removed service each report gone, and an installed one does not. Cheaper substitute: checking a path for a packaged app, which has none.",
+          "Add a Gone filter and a count in the status bar in `src/ui/RulesView.cpp`. Done when: the filter shows only gone rules and the count matches.",
+          "Cover it in `tests/gone_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L gone` passes, and fails when a missing file is treated as present."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L gone` passes: a missing file, a removed package and a removed service are gone, and a present one is not.",
+        "commit": "feature: rules left by programs that are gone"
+      },
+      {
+        "title": "Remote Session Guard",
+        "intro": "A rule change can cut the connection the tool is being used over, which a person cannot undo from a session they no longer have. Before a change is applied the tool detects whether it runs in a remote session and which rule carries that session, and warns when the change would affect it. This section records how that is detected.",
+        "surface": {
+          "fidelity": "the warning before a switch, against `sdk/DESIGN.md` section 11.",
+          "job": "a person is told before a change that would cut the session they are using, and chooses to go on or not. Consumer: the prompt, and the rule left unchanged when the person declines.",
+          "treatment": "a confirmation naming the rule and the session it would cut, defaulting to not applying. Cheaper substitute that fails the checkpoint: a generic \"are you sure\" shown for every change, which a person learns to dismiss."
+        },
+        "build": [
+          "Detect the remote session in `src/core/Session.cpp` and decide which rules carry it. Done when: a fixture session on port 3389 marks the rule for that port.",
+          "Warn before the change in `src/ui/RulesView.cpp` and record the detection in `docs/remote-detection.md`. Done when: switching a carrying rule shows the warning and the file states how it was found."
+        ],
+        "items": [
+          "Detect a remote session in `src/core/Session.cpp` with `GetSystemMetrics(SM_REMOTESESSION)` and read the client address of the session with `WTSQuerySessionInformationW` and `WTSClientAddress`. Done when: a test with the metric faked true reports remote, and one with it false does not. Cheaper substitute: checking the `SESSIONNAME` environment variable, which a service or a scheduled task does not set.",
+          "Read the port the session uses from `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp` value `PortNumber`, not a fixed 3389. Done when: a fixture with the port set to 3390 matches rules for 3390 and not 3389.",
+          "Decide in `src/core/Session.cpp` that a switch is dangerous when the rule is inbound, allow, TCP, on the session's profile, matches the port or the `TermService` service, and would be switched off, or when it is a block rule that matches the session and would be switched on. Done when: a table test covers each of the four cases and a rule on another port is not dangerous.",
+          "Warn before applying a dangerous switch, in `src/ui/RulesView.cpp`, naming the rule and the session, and apply nothing if the person declines. Done when: a driven test declines the warning and finds the fake store unchanged. Cheaper substitute: warning after the change, which is too late.",
+          "Record in `docs/remote-detection.md` how the session and its port are detected and what the guard cannot see, such as a session carried by another tool or a VPN. Done when: the file names each call, key and the limits.",
+          "Cover it in `tests/session_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L session` passes, and fails when the port is read as a fixed value."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L session` passes: a switch of the rule carrying a faked remote session is warned about first, and declining leaves the rule unchanged.",
+        "commit": "feature: warn before a change that would cut the remote session"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine the tool's rule count equals the system's, the flags and Gone marks agree with a manual check of three rules, and policy rules show as locked.",
+      "A switch is read back and undone, a switch on a rule that carries a real remote desktop session is warned about before it is applied, and no path switches the firewall itself off.",
+      "The window works in light and dark at 100 and 150 percent by keyboard alone, elevated and unelevated, and the tool ships with its settings, packs, documents and update file."
+    ]
+  }
+}

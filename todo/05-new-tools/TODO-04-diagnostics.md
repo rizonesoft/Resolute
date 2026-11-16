@@ -189,12 +189,12 @@ Two small tools, grouped because each is a single explanatory surface over one o
 **Chrome:** consume the framework. Neither tool changes anything, so neither consumes the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] ~~Report the activation state, licence type, and any grace period. Done when: all three render and a machine in each state is driven.~~ -> `rizonesoft/ActivationDiagnostics`
-- [ ] ~~Decode activation error codes into plain words with a likely cause. Done when: a fixture set of common codes each render an explanation, and an unknown code says so rather than guessing.~~ -> `rizonesoft/ActivationDiagnostics`
-- [ ] ~~Never handle, display, or store a product key. Done when: this section records that as a rule and a search proves no key is read or written. Cheaper substitute that fails the checkpoint: displaying the key as a convenience, which turns a diagnostic into a credential leak.~~ -> `rizonesoft/ActivationDiagnostics`
-- [ ] ~~Diagnose a failing share connection across its real causes: name resolution, the protocol version negotiated, credentials, network discovery, and the firewall. Done when: a fixture failure in each category is attributed correctly.~~ -> `rizonesoft/ActivationDiagnostics`
-- [ ] ~~Say which step failed and what would change it. Done when: each result names the failing step and an action, rather than reporting that the connection failed.~~ -> `rizonesoft/ActivationDiagnostics`
-- [ ] Commit: ~~`"activation and share diagnostics: decode the opaque failures"`~~ -> `rizonesoft/ActivationDiagnostics`
+- [ ] ~~Report the activation state, licence type, and any grace period. Done when: all three render and a machine in each state is driven.~~ -> `rizonesoft/ActivationDiagnostics`, `rizonesoft/ShareDiagnostics`
+- [ ] ~~Decode activation error codes into plain words with a likely cause. Done when: a fixture set of common codes each render an explanation, and an unknown code says so rather than guessing.~~ -> `rizonesoft/ActivationDiagnostics`, `rizonesoft/ShareDiagnostics`
+- [ ] ~~Never handle, display, or store a product key. Done when: this section records that as a rule and a search proves no key is read or written. Cheaper substitute that fails the checkpoint: displaying the key as a convenience, which turns a diagnostic into a credential leak.~~ -> `rizonesoft/ActivationDiagnostics`, `rizonesoft/ShareDiagnostics`
+- [ ] ~~Diagnose a failing share connection across its real causes: name resolution, the protocol version negotiated, credentials, network discovery, and the firewall. Done when: a fixture failure in each category is attributed correctly.~~ -> `rizonesoft/ActivationDiagnostics`, `rizonesoft/ShareDiagnostics`
+- [ ] ~~Say which step failed and what would change it. Done when: each result names the failing step and an action, rather than reporting that the connection failed.~~ -> `rizonesoft/ActivationDiagnostics`, `rizonesoft/ShareDiagnostics`
+- [ ] Commit: ~~`"activation and share diagnostics: decode the opaque failures"`~~ -> `rizonesoft/ActivationDiagnostics`, `rizonesoft/ShareDiagnostics`
 
 **Test checkpoint:** Moved with the section. The `rizonesoft/ActivationDiagnostics` repository's plan carries it.
 

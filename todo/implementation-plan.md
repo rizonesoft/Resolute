@@ -314,17 +314,17 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T02 §5` | Search across hives                  |   5   |
 | [ ] | `D05 T02 §6` | Backup, restore, and `.reg` exchange |   7   |
 
-> **Moved:** `D05 T07 §7` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/FirewallRules` repository (`D:\Resolute_Bin\FirewallRules`) by its own plan.
-> **Moved:** `D05 T07 §8` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/LinkManager` repository (`D:\Resolute_Bin\LinkManager`) by its own plan.
-> **Moved:** `D05 T07 §9` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PrinterManager` repository (`D:\Resolute_Bin\PrinterManager`) by its own plan.
+> **Moved:** `D05 T07 §7` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/FirewallRules`, `rizonesoft/AdapterManager`, `rizonesoft/DNSSelector` and `rizonesoft/ProxyInspector` repositories (under `D:\Resolute_Bin`), each by its own plan.
+> **Moved:** `D05 T07 §8` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/LinkManager`, `rizonesoft/PermissionsCopier`, `rizonesoft/HashVerifier`, `rizonesoft/LongPathEnabler`, `rizonesoft/BootManager`, `rizonesoft/PageFileManager`, `rizonesoft/AudioDevices`, `rizonesoft/ColorProfiles` and `rizonesoft/SoftwareInventory` repositories (under `D:\Resolute_Bin`), each by its own plan.
+> **Moved:** `D05 T07 §9` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PrinterManager`, `rizonesoft/SearchManager` and `rizonesoft/TaskManager` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
-> **Moved:** `D05 T06 §7` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/CredentialViewer` repository (`D:\Resolute_Bin\CredentialViewer`) by its own plan.
-> **Moved:** `D05 T07 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/UpdateBlocker` repository (`D:\Resolute_Bin\UpdateBlocker`) by its own plan.
-> **Moved:** `D05 T07 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ShellBisector` repository (`D:\Resolute_Bin\ShellBisector`) by its own plan.
-> **Moved:** `D05 T07 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DefenderManager` repository (`D:\Resolute_Bin\DefenderManager`) by its own plan.
-> **Moved:** `D05 T07 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BitLockerStatus` repository (`D:\Resolute_Bin\BitLockerStatus`) by its own plan.
+> **Moved:** `D05 T06 §7` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/CredentialViewer`, `rizonesoft/DisplayInfo` and `rizonesoft/ConnectionViewer` repositories (under `D:\Resolute_Bin`), each by its own plan.
+> **Moved:** `D05 T07 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/UpdateBlocker` and `rizonesoft/UpdateHistory` repositories (under `D:\Resolute_Bin`), each by its own plan.
+> **Moved:** `D05 T07 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ShellBisector` and `rizonesoft/ExplorerPerformance` repositories (under `D:\Resolute_Bin`), each by its own plan.
+> **Moved:** `D05 T07 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DefenderManager` and `rizonesoft/SecurityStatus` repositories (under `D:\Resolute_Bin`), each by its own plan.
+> **Moved:** `D05 T07 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BitLockerStatus`, `rizonesoft/CertificateManager` and `rizonesoft/RecoveryManager` repositories (under `D:\Resolute_Bin`), each by its own plan.
 > **Moved:** `D05 T07 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PrivacySettings` repository (`D:\Resolute_Bin\PrivacySettings`) by its own plan.
-> **Moved:** `D05 T07 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/EnvironmentEditor` repository (`D:\Resolute_Bin\EnvironmentEditor`) by its own plan.
+> **Moved:** `D05 T07 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/EnvironmentEditor`, `rizonesoft/WindowsFeatures`, `rizonesoft/PowerPlans` and `rizonesoft/LocaleFixer` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 > **Moved:** `D05 T06 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ShadowBrowser` repository (`D:\Resolute_Bin\ShadowBrowser`) by its own plan.
 > **Moved:** `D05 T06 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/WindowsDiskSpace` repository (`D:\Resolute_Bin\WindowsDiskSpace`) by its own plan.
@@ -348,7 +348,7 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 > **Moved:** `D05 T04 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RepairHistory` repository (`D:\Resolute_Bin\RepairHistory`) by its own plan.
 > **Moved:** `D05 T04 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/SleepWakeDiagnostics` repository (`D:\Resolute_Bin\SleepWakeDiagnostics`) by its own plan.
 
-> **Moved:** `D05 T01 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/StartupManager` and `rizonesoft/HostsEditor` repositories (`D:\Resolute_Bin\StartupManager`, `D:\Resolute_Bin\HostsEditor`), each by its own plan.
+> **Moved:** `D05 T01 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/StartupManager` and `rizonesoft/HostsEditor` repositories (under `D:\Resolute_Bin`), each by its own plan.
 
 > **Moved:** `D05 T03 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RestorePointManager` repository (`D:\Resolute_Bin\RestorePointManager`) by its own plan.
 > **Moved:** `D05 T03 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DriverManager` repository (`D:\Resolute_Bin\DriverManager`) by its own plan.

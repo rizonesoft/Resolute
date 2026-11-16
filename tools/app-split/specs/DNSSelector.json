@@ -1,0 +1,252 @@
+{
+  "name": "DNSSelector",
+  "slug": "dnsselector",
+  "display": "DNS Selector",
+  "job": "it measures how fast each DNS resolver answers from this machine, says which one is in use and where that setting comes from, and switches the adapter to the chosen one with an undo.",
+  "tagline": "Find the fastest DNS server from where you are, and switch to it",
+  "frozen": true,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Electric violet",
+    "light": "#C4B5FD",
+    "dark": "#7C3AED",
+    "social_ground": "#1B0F38",
+    "social_muted": "#DDD4F7"
+  },
+  "icon": {
+    "idea": "Two servers, one marked with a bolt: the fastest one picked.",
+    "points": [
+      "Free-standing with no tile behind it: two rounded server bars stacked, each with a light dot.",
+      "The servers are Electric violet and the bolt on the upper one is Electric violet light.",
+      "The small drawing below 40 pixels drops the dots and enlarges the bolt."
+    ],
+    "large": "<rect x=\"10\" y=\"12\" width=\"76\" height=\"30\" rx=\"9\" fill=\"#7C3AED\"/><rect x=\"10\" y=\"54\" width=\"76\" height=\"30\" rx=\"9\" fill=\"#7C3AED\"/><circle cx=\"26\" cy=\"27\" r=\"6\" fill=\"#C4B5FD\"/><circle cx=\"26\" cy=\"69\" r=\"6\" fill=\"#C4B5FD\"/><path d=\"M66 14 L54 30 H62 L58 42 L72 24 H64 Z\" fill=\"#C4B5FD\" stroke=\"#C4B5FD\" stroke-width=\"2\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M44 69 H72\" fill=\"none\" stroke=\"#C4B5FD\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<rect x=\"8\" y=\"10\" width=\"80\" height=\"34\" rx=\"10\" fill=\"#7C3AED\"/><rect x=\"8\" y=\"52\" width=\"80\" height=\"34\" rx=\"10\" fill=\"#7C3AED\"/><path d=\"M56 12 L40 32 H50 L44 46 L64 24 H54 Z\" fill=\"#C4B5FD\" stroke=\"#C4B5FD\" stroke-width=\"2\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Servers",
+        "The resolver in use now, and each known resolver with its measured time and reliability"
+      ],
+      [
+        "This connection",
+        "Each adapter's DNS setting and where it comes from"
+      ],
+      [
+        "Activity",
+        "What the tool measured and changed, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which DNS resolver answers fastest from this machine and switches to it with one button, knowing it can be undone.",
+    "primary": "Measure",
+    "secondary": "Use this server",
+    "rows": [
+      [
+        "Cloudflare",
+        "In use, or Fast, with a median time in milliseconds"
+      ],
+      [
+        "Google Public DNS",
+        "Measured, with a median time and a failure count"
+      ],
+      [
+        "Quad9",
+        "Measured, with a median time and a failure count"
+      ],
+      [
+        "Router (DHCP)",
+        "In use, or Not measured yet"
+      ],
+      [
+        "Your own server",
+        "Added by the person, or Did not answer"
+      ]
+    ],
+    "status": "5 measured, fastest 12 ms, in use: router",
+    "notes": [
+      "The header names the resolver in use now and where it comes from (the router by DHCP, a manual setting, a VPN or a policy), so the person knows what a switch replaces.",
+      "Each resolver is a row with its name, its operator, its median response time, how many of its queries failed, and whether it is the one in use. Every state is shown with an icon and a word: In use, Fast, Slow, Did not answer, Not measured yet.",
+      "Measure is the accent button. It sends real queries from this machine to every row, with a time limit per query, and fills in the times as they arrive. No time is ever shown from a list.",
+      "Use this server is enabled for one selected row that answered. It names the adapter it will change and warns first when the change could cut the connection the tool is used over, then switches, tests and says what it did.",
+      "Undo returns the adapter to the recorded setting, including automatic from the router. It is disabled with a tooltip when there is nothing to undo.",
+      "The status bar says how many resolvers were measured, the fastest median, and which one is in use, in words.",
+      "When the process is not elevated, Use this server is refused by name before anything is written, and Measure still works."
+    ],
+    "cut": "There is no source tool window to compare with, because nothing is ported. The window has no menu bar, no splash, no animation of its own and no donate strip: the suite's sidebar window, Activity, Settings and About come from the framework and the plan records that as the design."
+  },
+  "readme": {
+    "lead": "DNS Selector finds the DNS server that answers fastest from your own machine and switches your connection to it.",
+    "what": [
+      "DNS Selector sends real DNS queries from this machine to a table of well-known public resolvers and to any server you add, times each answer, repeats the test and reports the median and how many queries failed. The times are measured where you are, never copied from a list, because the fastest resolver depends on your network.",
+      "It also tells you which resolver your connection uses now and where that setting comes from: the router by DHCP, a manual setting, a VPN or a policy. When you choose a resolver it sets it on the adapter, reads the setting back, checks that a test query is answered, and keeps the old setting so you can undo the switch."
+    ],
+    "new_intro": "This is a new tool of the suite. Nothing is ported from an earlier version.",
+    "new": [
+      [
+        "Measured here.",
+        "Every response time comes from a query sent from this machine during the test."
+      ],
+      [
+        "The source is named.",
+        "It shows whether the setting in use came from the router, a manual setting, a VPN or a policy."
+      ],
+      [
+        "A switch you can undo.",
+        "The previous setting is recorded, including automatic from the router, and one button puts it back."
+      ],
+      [
+        "A wrong server cannot strand you.",
+        "If the test query through the new server fails, the switch is reversed at once and the tool says so."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "DNS Selector ships as a complete, standalone C++ tool: it measures every resolver in its table from this machine with real queries, shows which resolver is in use and where that setting comes from, switches the adapter to the chosen one with the setting read back and a test query through it, records the prior setting, rolls back by itself when the test fails, and can undo the switch.",
+    "current_state": "Nothing exists yet. This is a new tool and nothing is ported: there is no AutoIt original and no `reference/au3/` folder. The repository holds the generated skeleton, the chosen identity under `brand/` once built, `DESIGN.md` with the Sidebar window, and the plan section that named it, `docs/origin/resolute-D05-T07-s7.md`, which covers four network tools and gives DNS Selector one line: measure resolver latency from this machine, offer to switch, make switching undoable, and warn before a change that breaks the connection the tool is used over. No C++ exists. The SDK's framework, repair contract and chart control, which this tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s7.md`: the plan section, of which only the DNS line and the rule about warning before a connection-breaking change apply.",
+      "`sdk/DESIGN.md` and `DESIGN.md`: the suite's design contract and this tool's identity and window sections.",
+      "Windows itself: the DNS client API (`DnsQueryEx`), `GetAdaptersAddresses` and `SetInterfaceDnsSettings`, read from the Windows SDK headers in `sdk/reskit/`."
+    ],
+    "outcome": [
+      "`DNSSelector.exe` measures each resolver with real queries from this machine, reports a median and failures, and never shows a figure it did not measure.",
+      "It names the resolver in use and where the setting comes from, switches with the setting read back and a test query through the new server, and reverses the switch by itself when that query fails.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Servers screen, where a person compares resolvers and picks one. Reporting and audit are the Activity section, which records each measurement and each switch with its outcome. Settings are the framework's pages. Permissions anchor on the engine, where a switch without elevation is refused by name before any write, while measuring needs no rights. Reverse anchors on the undo section: it restores the recorded prior setting, including automatic from the router, and is also what the automatic roll-back uses.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Resolver Measurement and Switch",
+      "intro": "The tool's whole system effect, independent of any window: the resolver table as data, real queries timed from this machine, each adapter's DNS setting and its source read from Windows, and a switch that is verified, tested and rolled back when it breaks name resolution.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the resolvers as data in `src/core/Resolvers.h` and measure them in `src/core/Measure.cpp`. Done when: a test measures a local fake server and reports its median and its failures.",
+        "Read and set each adapter's DNS in `src/core/Adapters.cpp` against an adapter interface the tests can fake. Done when: the unit tests pass against the fake and one real read of this machine lists its adapters."
+      ],
+      "items": [
+        "Declare the well-known public resolvers in `src/core/Resolvers.h` as a table: name, operator, IPv4 and IPv6 addresses, DNS over HTTPS template where one exists, and a one-line privacy note. Done when: every row has all fields filled and a test fails when one is empty. Cheaper substitute: a list of addresses with no operator or privacy note, which hides what a person is choosing.",
+        "Implement `MeasureResolver(server, name, attempts, timeout)` in `src/core/Measure.cpp` that sends a real DNS query over UDP port 53 to the chosen server with `DnsQueryEx` and a custom server list, times each answer and returns the median, the failures and the timeouts. Done when: a test against a local fake server with a fixed delay reports that delay within a stated tolerance and counts a dropped query as a failure. Cheaper substitute: pinging the address or quoting a stored time, which says nothing about answering queries from here.",
+        "Measure uncached and cached names separately in `src/core/Measure.cpp`: a name made unique per attempt for the uncached time and a repeated name for the cached time. Done when: the fake server sees each unique name once and the report carries both medians.",
+        "Bound every query by a time limit and stop all of them when the person cancels, in `src/core/Measure.cpp`. Done when: a fake server that never answers ends the run at the limit with every attempt counted as a failure, and a cancel returns within one limit. Cheaper substitute: waiting on the system's default timeout, which can leave the window frozen.",
+        "Read each adapter's DNS servers in `src/core/Adapters.cpp` with `GetAdaptersAddresses` and name the source: the router by DHCP, a manual setting, a VPN adapter, or a policy. Done when: a fixture for each of the four sources reports the right source and a real run lists this machine's adapters. Cheaper substitute: reporting the addresses only, which does not say where the setting comes from.",
+        "Implement `UseServer(adapter, server)` in `src/core/Adapters.cpp`: record the adapter's prior setting, set the servers with `SetInterfaceDnsSettings`, read them back, send a test query through the new server, and flush the resolver cache. Done when: a fake adapter ends with the new servers, the prior setting is on disk before the write, and a test finds the cache flushed. Cheaper substitute: writing the address and trusting the return code, which can leave a wrong server in place.",
+        "Roll back automatically in `src/core/Adapters.cpp` when the test query through the new server fails, restoring the recorded setting and returning the failure by name. Done when: a fake server that never answers leaves the adapter as it was and the result says the switch was reversed. Cheaper substitute: leaving the new server in place and reporting an error, which leaves the machine with no name resolution.",
+        "Warn before a connection-breaking change in `src/core/Adapters.cpp`: when the adapter to change carries the route the tool is being used over, or the chosen server did not answer, return a warning before any write. Done when: a fixture where the adapter is the active route returns the warning and nothing is written until it is confirmed.",
+        "Refuse `UseServer` by name when the process is not elevated, before any write, with one activity record, and cover every path in `tests/dns_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L dns` passes and an unelevated run leaves the fake adapter unchanged. Cheaper substitute: letting the write fail with access denied halfway through."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L dns` passes, including the fake-server timing, the failed-test roll-back and the unelevated refusal.",
+      "commit": "core: measured resolver times, a verified switch and an automatic roll-back"
+    },
+    "enhancements": [
+      {
+        "title": "Undo the Switch",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before every switch the adapter's prior DNS setting is recorded, and Undo puts exactly that back, including automatic from the router, so a person who dislikes the new resolver is one button from where they started. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back the DNS setting the last switch replaced. Consumer: the adapter's DNS setting, compared with the record.",
+          "treatment": "the recorded setting restored and read back, with the result in words. Cheaper substitute that fails the checkpoint: an undo that sets a public server, which is not what was there before."
+        },
+        "build": [
+          "Record the prior setting through the repair contract in `src/core/Adapters.cpp`. Done when: a record exists on disk before the first write.",
+          "Wire Undo in `src/ui/ServersView.cpp`. Done when: switch then undo leaves the adapter as it was."
+        ],
+        "items": [
+          "Record the adapter's prior DNS setting, including that it was automatic from the router, through the repair contract's restore record before the switch writes. Done when: a test finds the record on disk before the first write. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo in `src/core/Adapters.cpp` restoring the record and reading the adapter back. Done when: switch then undo leaves a manual setting and an automatic one each equal to before, asserted.",
+          "Disable Undo with a tooltip in `src/ui/ServersView.cpp` when there is nothing to undo. Done when: a first run shows it disabled and it enables after one switch.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when the restore leaves one server behind."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: switch then undo leaves manual and automatic settings as they were.",
+        "commit": "feature: undo puts back the DNS setting that was there before"
+      },
+      {
+        "title": "Roll Back When It Does Not Answer",
+        "intro": "A wrong server leaves the machine with no name resolution, and a person without names cannot even search for the fix. When the test query through the new server fails, the switch is reversed at once and the tool says so. The engine does the reversal; this section makes it visible and keeps it honest.",
+        "surface": {
+          "fidelity": "the switch result message, against `sdk/DESIGN.md` section 11.",
+          "job": "a person who picked a server that does not answer is told, and is back on the old setting. Consumer: the adapter's setting, read back after the failure.",
+          "treatment": "a message saying the new server did not answer, that the old setting was restored, and what it was. Cheaper substitute that fails the checkpoint: a generic error with the new server left in place."
+        },
+        "build": [
+          "Show the roll-back result in `src/ui/ServersView.cpp`. Done when: a failing server produces the message and the old setting is shown in the header.",
+          "Record it in `src/core/Activity.cpp`. Done when: the Activity list has one line for the switch and one for the roll-back."
+        ],
+        "items": [
+          "Show the roll-back in `src/ui/ServersView.cpp` through the framework's message surface, naming the server that failed and the setting restored. Done when: a fake server that never answers produces the message and the header shows the old resolver. Cheaper substitute: a private dialog.",
+          "Add the failed server's row state Did not answer in `src/ui/ServersView.cpp` after a roll-back. Done when: the row shows the icon and the words, not colour alone.",
+          "Record the roll-back in the activity record with the prior setting and the reason. Done when: a test finds one switch record and one roll-back record for one failed switch.",
+          "Cover it in `tests/rollback_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L rollback` passes, and fails when the roll-back is skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L rollback` passes: a switch to a silent server is reversed and the message names both settings.",
+        "commit": "feature: a switch that breaks name resolution is reversed and said so"
+      },
+      {
+        "title": "Add Your Own Server",
+        "intro": "The built-in table covers well-known public resolvers, but a person may run a resolver at home, at work or in the cloud. This section lets them add one by address, measure it like the others and switch to it the same way.",
+        "surface": {
+          "fidelity": "the add-server form, against `sdk/DESIGN.md` sections on forms and validation.",
+          "job": "a person adds a resolver the table does not know and measures it. Consumer: the Servers list and the settings file, read back.",
+          "treatment": "a name and an address, validated before it is saved, listed in the same rows as the built-in ones and marked as added by the person. Cheaper substitute that fails the checkpoint: an address typed into the measure button, which is lost on the next start."
+        },
+        "build": [
+          "Store added servers through the framework in `src/core/Resolvers.cpp`. Done when: an added server is read back after a restart.",
+          "Add the form in `src/ui/AddServerView.cpp`. Done when: an address that is not valid is refused with its reason."
+        ],
+        "items": [
+          "Add the form in `src/ui/AddServerView.cpp` with a name and an IPv4 or IPv6 address, validated before saving. Done when: a malformed address is refused with a sentence and a valid one is saved. Cheaper substitute: accepting any text and failing at measure time.",
+          "Persist added servers through the framework's settings in `src/core/Resolvers.cpp`, never in a private file. Done when: a server added, then the tool restarted, appears again with its name.",
+          "Measure and switch to an added server through the same engine calls as the built-in rows. Done when: a fake server added by the test is measured and switched to by the same code path.",
+          "Cover it in `tests/custom_server_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L custom` passes, and fails when an invalid address is accepted."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L custom` passes: a valid server persists across a restart and an invalid one is refused.",
+        "commit": "feature: add your own DNS server"
+      },
+      {
+        "title": "Response Time Chart",
+        "needs": "sdk-framework",
+        "intro": "A table of medians hides how steady a resolver is. This section charts each resolver's measured attempts with the SDK's chart control, so a person sees the spread and the failures, not only one number.",
+        "surface": {
+          "fidelity": "the chart on the Servers screen, against `sdk/DESIGN.md` section on charts, in light and dark.",
+          "job": "a person sees how steady each resolver's answers were. Consumer: the chart, compared with the measured attempts.",
+          "treatment": "one series per resolver from the measured attempts, failures marked as gaps with a word, the axis in milliseconds. Cheaper substitute that fails the checkpoint: a hand-drawn chart in the tool, which the contract forbids."
+        },
+        "build": [
+          "Keep every attempt's time in `src/core/Measure.cpp`. Done when: a report holds each attempt, not only the median.",
+          "Bind the SDK's chart control in `src/ui/ServersView.cpp`. Done when: the chart equals the measured attempts."
+        ],
+        "items": [
+          "Return every attempt's time and outcome from `MeasureResolver` in `src/core/Measure.cpp`, not only the median. Done when: a test with a fake server of known delays gets every one back in order.",
+          "Bind the SDK's chart control in `src/ui/ServersView.cpp` to those attempts, one series per resolver. Done when: the plotted points equal the measured ones in a driven test. Cheaper substitute: a private drawing routine.",
+          "Mark a failed attempt as a gap with a word, and keep the series readable in light and dark and at 150 percent. Done when: four captures are committed under `docs/captures/` with their provenance.",
+          "Cover it in `tests/chart_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L chart` passes, and fails when an attempt is dropped from the series."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L chart` passes and the chart shows exactly the measured attempts, failures included.",
+        "commit": "feature: the response time chart"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A measurement of a fake server with a known delay reports that delay, and no figure anywhere in the tool comes from a stored list.",
+      "A switch to a server that does not answer is reversed at once, and a switch to a working one is undone back to the recorded setting, including automatic from the router.",
+      "On a real machine the tool measures, names the source of the current setting, switches, tests and undoes, in light and dark, by keyboard alone."
+    ]
+  }
+}

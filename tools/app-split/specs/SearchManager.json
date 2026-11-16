@@ -1,0 +1,259 @@
+{
+  "name": "SearchManager",
+  "slug": "searchmanager",
+  "display": "Search Manager",
+  "job": "it shows the state of the Windows search index, tells you why one file is not found, and rebuilds the index while saying plainly that search is incomplete until it finishes.",
+  "tagline": "Find out why Windows search cannot find your file",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Spruce",
+    "light": "#99F6E4",
+    "dark": "#0F766E",
+    "social_ground": "#06261F",
+    "social_muted": "#BFEBE3"
+  },
+  "icon": {
+    "idea": "A magnifier with index lines inside it: the search index.",
+    "points": [
+      "Free-standing with no tile: a ring with a slanted handle.",
+      "The lens and handle are Spruce, and the two lines inside the lens are Spruce light.",
+      "The small drawing, used below 40 pixels, keeps one thicker line."
+    ],
+    "large": "<circle cx=\"40\" cy=\"40\" r=\"27\" fill=\"none\" stroke=\"#0F766E\" stroke-width=\"11\"/><path d=\"M61 61 L84 84\" fill=\"none\" stroke=\"#0F766E\" stroke-width=\"13\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M29 34 H51 M29 47 H44\" fill=\"none\" stroke=\"#99F6E4\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<circle cx=\"40\" cy=\"40\" r=\"27\" fill=\"none\" stroke=\"#0F766E\" stroke-width=\"13\"/><path d=\"M62 62 L84 84\" fill=\"none\" stroke=\"#0F766E\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M28 40 H52\" fill=\"none\" stroke=\"#99F6E4\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Index",
+        "A one-sentence verdict, then the service, status, item counts and size as rows"
+      ],
+      [
+        "Why not found",
+        "Choose a file and read why search does not find it"
+      ],
+      [
+        "Locations",
+        "The indexed locations and the exclusions"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees at once whether Windows search is healthy, and knows what to do when a file is not found.",
+    "primary": "Check a file",
+    "secondary": "Rebuild",
+    "rows": [
+      [
+        "Search service",
+        "Running, Stopped or Disabled"
+      ],
+      [
+        "Index status",
+        "Ready, Indexing, Paused or Not available"
+      ],
+      [
+        "Items in the index",
+        "A count, or Unknown"
+      ],
+      [
+        "Items waiting",
+        "A count, or None"
+      ],
+      [
+        "Size on disk",
+        "A size, or Not found"
+      ]
+    ],
+    "status": "Ready, 1 location excluded, no items waiting",
+    "notes": [
+      "The first line is one sentence of verdict, for example that the index is ready or that it is still being built, written from the rows below it.",
+      "Each row shows its state with an icon and a word, never colour alone: the service, the index status, the items held, the items waiting and the size on disk.",
+      "Check a file is the accent button: it opens a file chooser and moves to the Why not found section with the answer.",
+      "Rebuild is the second button. It first states that search will be incomplete until the rebuild finishes, that it can take hours, and that it cannot be undone once started, and it starts only on a second confirmation.",
+      "Rebuild and every other change are refused by name when the process is not elevated, before anything is touched; reading is allowed.",
+      "While a rebuild runs the Index section shows the items indexed and the items still waiting, read from the indexer, and the status bar says search is incomplete.",
+      "The status bar reads the rows in words and changes when they change."
+    ],
+    "cut": "There is no original window to cut from, because nothing is ported. The window deliberately has no menus, no splash, no animations, no donate strip and no control that restarts the Windows Search service and calls it a repair; each of those is a decision recorded here and in the plan."
+  },
+  "readme": {
+    "lead": "Search Manager tells you why Windows search cannot find your file, and rebuilds the index when that is the honest fix.",
+    "what": [
+      "Windows search fails for several unrelated reasons: the file is outside the indexed locations, its type is indexed by name only, it is marked not to be indexed, or the indexer cannot read it. Windows gives no screen that tells these apart. Search Manager reads the index and checks the one file you choose, then names the cause and what to do about it.",
+      "It also shows the state of the index itself: whether the Windows Search service is running, the index status, how many items it holds and how many are waiting, its size on disk, the indexed locations and the exclusions. A rebuild is offered last, with a plain statement that search is incomplete until it finishes."
+    ],
+    "new_intro": "Search Manager is a new tool: nothing is ported from an earlier version.",
+    "new": [
+      [
+        "Diagnosis before repair.",
+        "A file that is not found gets a named cause from an ordered set of checks, not a restart button."
+      ],
+      [
+        "One screen for the index.",
+        "The service, status, item counts, size, locations and exclusions are in one window instead of Indexing Options, Services and a folder on disk."
+      ],
+      [
+        "A rebuild that is honest.",
+        "It says search will be incomplete until it finishes, shows progress from the indexer's own counts, and says it cannot be undone."
+      ],
+      [
+        "Locations that can be put back.",
+        "Adding or removing an indexed location records the earlier scope first, so the change can be reversed."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "New tool: index status, not-found diagnosis, honest rebuild",
+    "goal": "Search Manager ships as a complete, standalone C++ tool that shows the state of the Windows search index, tells apart why one file is not found (outside the indexed locations, excluded, indexed by name only, marked not to be indexed, not readable by the indexer, waiting in the queue, or in the index after all), and rebuilds the index while stating that search is incomplete until it finishes, with progress read from the indexer.",
+    "current_state": "Nothing exists yet: there is no AutoIt original, no C++ code and no baseline, because Search Manager is a new tool. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan text as it stood in the Resolute repository (`docs/origin/resolute-D05-T07-s9.md`, section 9, which also covers a printer manager and a scheduled task manager that are not this tool). The binding scope is its item at line 14: index status, size, indexed locations and exclusions; the not-found diagnosis; and a rebuild that states search will be incomplete until it finishes and gives an estimate. The tool will use the Windows Search service (`WSearch`) through the `ISearchManager`, `ISearchCatalogManager` and `ISearchCrawlScopeManager` COM interfaces and a query through the `SystemIndex` OLE DB provider. The SDK's framework, repair contract and chart control, which the tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s9.md`: the plan section, whose `SearchManager` item at line 14 is the binding scope.",
+      "The Windows Search COM interfaces `ISearchManager`, `ISearchCatalogManager` and `ISearchCrawlScopeManager`, and the `SystemIndex` OLE DB provider, read against the Windows SDK headers `searchapi.h` and `searchapi.idl`.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the tool's identity and window, and the suite's contract every surface answers to."
+    ],
+    "outcome": [
+      "`SearchManager.exe` reads the service state, the index status, the item and queue counts, the size on disk, the scope rules and the exclusions, and shows them in the Index and Locations sections.",
+      "Choosing a file gives one named result from an ordered set of checks, each cause with what to do, and the result is checked against a real index query for the same path.",
+      "A rebuild states before it starts that search is incomplete until it finishes and cannot be undone, gives an estimate, shows progress from the indexer's own counts, and is refused by name when the process is not elevated."
+    ],
+    "adjacency_rationale": "The list is the Index screen, where each fact is a row, and the Locations screen, where each scope rule is a row. Reporting and audit are the Activity section, which records each check, rebuild and location change. Settings are the framework's pages. Permissions anchor on the engine, where a rebuild or scope change without elevation is refused by name before any call is made. Reverse anchors on the section that adds or removes a location, which records the prior scope; a rebuild has no reverse and says so in its confirmation, because a reset discards the index.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Search Index Engine",
+      "intro": "The tool's whole system effect, independent of any window: reading the index status, counts and size, listing the scope rules, diagnosing one path as an ordered set of checks with a named result, and starting a rebuild. Reads need no elevation; a rebuild is refused by name when the process is not elevated.",
+      "needs": "windows-host",
+      "build": [
+        "Wrap the Windows Search interfaces behind one interface in `src/core/IndexSource.h` with a fake in `tests/fakes/FakeIndex.cpp`. Done when: the engine's tests run with no Windows Search service present.",
+        "Implement status, scope listing, diagnosis and rebuild in `src/core/SearchIndex.cpp` and `src/core/Diagnose.cpp`. Done when: the unit tests pass against the fake and a read-only run on a real machine matches Indexing Options."
+      ],
+      "items": [
+        "Implement `ReadStatus()` in `src/core/SearchIndex.cpp` returning the state of the `WSearch` service, the catalog status from `ISearchCatalogManager::GetCatalogStatus`, the item count from `NumberOfItems`, the number waiting from the catalog's indexer queue counts, and the size of the index database file (`Windows.edb`, or `Windows.db` where the build uses it). Done when: each field is filled on a real machine and equals what Indexing Options shows, and a fake with the service stopped returns Stopped with no counts. Cheaper substitute: reading only the service state, which says nothing about the index.",
+        "Implement `ListScope()` returning every rule from `ISearchCrawlScopeManager::EnumerateScopeRules`, each as a path, whether it includes or excludes, and whether it is a default or a user rule. Done when: the list equals the Indexing Options location list on a real machine, with exclusions named.",
+        "Implement `DiagnosePath(path)` in `src/core/Diagnose.cpp` running ordered checks and returning one named result: not in an indexed location, excluded by rule (using `ISearchCrawlScopeManager::IncludedInCrawlScope` and its reason), type indexed by name only, marked not to be indexed (`FILE_ATTRIBUTE_NOT_CONTENT_INDEXED`), not readable by the indexer, waiting in the queue, or in the index after all. Done when: one fixture per result returns exactly that name and the order is asserted. Cheaper substitute: a single yes or no, which does not tell the user what to do.",
+        "Implement the type check in `src/core/FileTypes.cpp`: read how the file's extension is handled (by properties only or by contents, and whether a filter handler is registered) from the Windows Search file type settings. Done when: a fixture extension with no handler reports indexed by name only, and one with a handler reports contents.",
+        "Implement the in-the-index check in `src/core/Diagnose.cpp` with a query through the `SystemIndex` OLE DB provider for the one path (`System.ItemUrl` or `System.ItemPathDisplay`). Done when: a file the real index holds returns in the index after all, and the query is built with the path as a bound value, never joined into the text. Cheaper substitute: inferring presence from the scope rules alone.",
+        "Implement `Rebuild()` calling `ISearchCatalogManager::Reset`, refusing by name before any call when the process is not elevated, and recording one activity entry. Done when: an unelevated test run reports the refusal and the fake is untouched. Cheaper substitute: restarting the `WSearch` service, which does not rebuild the index.",
+        "Implement `RebuildProgress()` returning items indexed and items waiting from the catalog, and an estimate computed from the rate measured over the last interval of the run, or the word Unknown when no rate has been measured yet. Done when: a fake that advances its counts yields a rising progress and a falling estimate, and a fake with no change yields Unknown. Cheaper substitute: a fixed estimate typed into the tool, which would be invented.",
+        "Cover every path in `tests/search_test.cpp` against the fake. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L search` passes and fails when a check in the ordered set is skipped."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L search` passes for every diagnosis result, the unelevated refusal and the progress cases, and fails when one check is removed.",
+      "commit": "core: index status, scope, not-found diagnosis and rebuild"
+    },
+    "enhancements": [
+      {
+        "title": "Why Not Found",
+        "intro": "The diagnosis as a screen: a person chooses a file and reads which of the causes applies, each with what to do about it. The causes are the engine's named results, so the screen shows what the engine decided and invents nothing. Windows has no interface that tells these apart.",
+        "surface": {
+          "fidelity": "the Why not found section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16.",
+          "job": "a person whose search finds nothing learns why for one file and what to do. Consumer: the index, queried for the same path.",
+          "treatment": "the checks listed in order, each with a word and an icon, the deciding one marked, and one plain sentence of advice under it. Cheaper substitute that fails the checkpoint: a single message saying the file is not indexed, which is the complaint the tool exists to answer."
+        },
+        "build": [
+          "Build the screen in `src/ui/WhyNotFoundView.cpp` from the engine's result. Done when: a chosen file shows its checks and its result.",
+          "Wire the Check a file button and the file chooser in `src/ui/MainWindow.cpp`. Done when: the button opens the chooser and lands on this section with the answer."
+        ],
+        "items": [
+          "Create `src/ui/WhyNotFoundView.cpp` listing the ordered checks as rows with an icon and a word, and marking the one that decided the result. Done when: a fixture file excluded by rule shows that row as the cause and the later rows as not reached. Cheaper substitute: a private list control, which the contract forbids.",
+          "Write the advice for each result in `resources/strings.rc` as a key, not in code: add the location, remove the exclusion, accept name-only search or install a filter, clear the not-indexed attribute, fix the permission, wait for the queue, or look elsewhere because the file is indexed. Done when: every result has a sentence and a search of `src/` finds no advice literal.",
+          "Let the person drop a file onto the section or press Check a file. Done when: both routes give the same result for the same file.",
+          "Offer the advice as an action only where the tool can do it, with the engine's refusal shown when not elevated. Done when: clearing the not-indexed attribute on a fixture file is offered, and offered for no other result. Cheaper substitute: an action on every result, which would do nothing for most causes.",
+          "Add a driven test in `tests/whynotfound_test.cpp` that reads the rows through UI Automation and compares them with the engine. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L whynotfound` passes, and fails when a result's advice is blank."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L whynotfound` passes for every result and the screen is operated by keyboard alone.",
+        "commit": "feature: the not-found diagnosis, each cause with what to do"
+      },
+      {
+        "title": "Rebuild, Said Honestly",
+        "intro": "The rebuild as the origin text requires it: before it starts, the tool states that search will be incomplete until it finishes and gives an estimate, a rebuild can take hours, and it cannot be undone once started because a reset discards the index. While it runs, progress comes from the indexer's own counts, never from a timer.",
+        "surface": {
+          "fidelity": "the Rebuild confirmation and the Index section while a rebuild runs, against `sdk/DESIGN.md` section 11.",
+          "job": "a person decides on a rebuild knowing what it costs, and sees how far it has got. Consumer: the catalog's counts, read back during the run.",
+          "treatment": "a confirmation that names the three facts in plain words, then a progress row with items indexed, items waiting and the estimate, with search incomplete stated in the status bar. Cheaper substitute that fails the checkpoint: a Rebuild button that starts at once with a generic warning, or a progress bar driven by elapsed time."
+        },
+        "build": [
+          "Build the confirmation and the progress rows in `src/ui/RebuildView.cpp`. Done when: the confirmation states the three facts and the rows update from the engine.",
+          "Poll `RebuildProgress()` on a timer in `src/ui/IndexView.cpp`. Done when: the counts on screen equal the engine's after each poll."
+        ],
+        "items": [
+          "Show a confirmation before `Rebuild()` stating that search is incomplete until it finishes, that it can take hours, that it cannot be undone once started, and the estimate or the word Unknown, through the framework's message surface. Done when: a driven test finds all four statements and that Cancel starts nothing. Cheaper substitute: a private dialog.",
+          "Require a second explicit action to start, with the safe choice as the default. Done when: pressing Enter on the opened confirmation does not start the rebuild.",
+          "Show progress in the Index section from `RebuildProgress()`: items indexed, items waiting, the estimate, and a status bar line saying search is incomplete. Done when: a fake that advances its counts updates all three, and the line clears when the catalog reports Ready.",
+          "Keep the progress read-only and keep the window usable: the person may check a file during a rebuild and the result says the answer may change. Done when: Check a file during a fake rebuild adds the sentence that the index is incomplete.",
+          "Cover it in `tests/rebuild_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L rebuild` passes, and fails when the incomplete-search statement is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L rebuild` passes: the confirmation states the facts, the unelevated refusal holds and progress follows the counts.",
+        "commit": "feature: a rebuild that says search is incomplete until it finishes"
+      },
+      {
+        "title": "Add or Remove a Location",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A person adds a folder to the indexed locations, or removes one, from the Locations section. Before each change the prior scope is recorded, so Undo restores the rules that were actually there. The record and the undo are the SDK repair contract's, which this section consumes once it exists. A rebuild is not part of this: it cannot be undone and says so.",
+        "surface": {
+          "fidelity": "the Locations section and its Undo, against `DESIGN.md` section 2.",
+          "job": "a person changes what is indexed and can put it back. Consumer: the scope rules, listed again and compared with the record.",
+          "treatment": "the rules as rows with include or exclude in words, an add and a remove action, and Undo restoring the recorded rules. Cheaper substitute that fails the checkpoint: an undo that removes what was added without restoring the earlier rules."
+        },
+        "build": [
+          "Add and remove a scope rule through `ISearchCrawlScopeManager` in `src/core/Scope.cpp`, recording the prior rules first. Done when: a record exists before the first change.",
+          "Build the Locations rows and Undo in `src/ui/LocationsView.cpp`. Done when: add then undo leaves the rule list as it was."
+        ],
+        "items": [
+          "Implement `AddLocation(path)` and `RemoveLocation(path)` in `src/core/Scope.cpp` using `AddUserScopeRule`, `RemoveScopeRule` and `SaveAll`, refusing by name when not elevated. Done when: a fake shows the rule added or removed, and an unelevated run changes nothing. Cheaper substitute: editing the registry directly, which the indexer does not pick up reliably.",
+          "Record the prior rule list through the repair contract's restore record before any change. Done when: a test finds the record on disk before the first rule is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the recorded rules exactly. Done when: add then undo, and remove then undo, each leave the rule list equal to before, asserted.",
+          "Show the rules in `src/ui/LocationsView.cpp` as rows with a path, include or exclude in words, and whether it is a default or the user's. Done when: the rows equal `ListScope()` after each change, re-read and not assumed.",
+          "Say after an add that items already on disk are indexed in the background and may not be searchable yet. Done when: the result line states it and shows the waiting count.",
+          "Cover it in `tests/scope_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L scope` passes, and fails when one prior rule is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L scope` passes: add then undo and remove then undo both leave the rules as they were.",
+        "commit": "feature: add or remove a location, with the prior scope recorded"
+      },
+      {
+        "title": "Index Size Explained",
+        "intro": "The size on disk is the number people ask about when the index grows and a disk fills. This section shows what the number is made of that the tool can read: the index database file, its location, the item count, and how the size compares with the item count over this machine's own history in the tool's log.",
+        "surface": {
+          "fidelity": "the size panel of the Index section, against `sdk/DESIGN.md` and its chart control where that exists.",
+          "job": "a person understands why the index is the size it is and whether it is growing. Consumer: the database file's size and the catalog's item count.",
+          "treatment": "the size, the file's name and folder, the item count, and a plain sentence on whether the size is unusual for the count, from measured readings only. Cheaper substitute that fails the checkpoint: a size with no explanation, or a threshold typed into the tool and called normal."
+        },
+        "build": [
+          "Record each reading of size and item count in `src/core/SizeHistory.cpp`. Done when: a reading is stored with the time on each refresh.",
+          "Show the panel in `src/ui/IndexView.cpp`. Done when: the panel shows the file, its folder, the count and the history."
+        ],
+        "items": [
+          "Add `src/core/SizeHistory.cpp` storing readings of size and item count through the framework's data folder. Done when: two refreshes produce two stored readings read back in order.",
+          "Show in the Index section the index file's name and folder, its size and the item count, with the folder opened in Explorer on request. Done when: the file named on screen exists at the folder named.",
+          "Say what the tool can and cannot tell: it reports growth between its own readings and gives no verdict when it has fewer than two. Done when: a first run shows no verdict and a run with two readings shows the change. Cheaper substitute: a typed threshold, which would be an invented figure.",
+          "Show the history as the SDK's chart control once the framework has it. Done when: the chart plots the stored readings, and until then the panel shows them as a list.",
+          "Cover it in `tests/size_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L size` passes, and fails when a reading is stored out of order."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L size` passes and the panel names a file that exists.",
+        "commit": "feature: the index size, explained from measured readings"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "Each diagnosis result is reproduced on a real machine with a file that has that cause, and the result is checked against a `SystemIndex` query for the same path.",
+      "The Index and Locations sections equal what Indexing Options and the Windows Search service show on the same machine.",
+      "On a real machine the tool reads, diagnoses, adds and removes a location and undoes it, and rebuilds with the confirmation and the progress, in light and dark, by keyboard alone."
+    ]
+  }
+}

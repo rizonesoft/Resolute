@@ -1,0 +1,250 @@
+{
+  "name": "LongPathEnabler",
+  "slug": "longpathenabler",
+  "display": "Long Path Enabler",
+  "job": "it reports and sets the Windows long-path setting, says plainly that a program must also opt in through its manifest, checks a program for that opt-in, verifies its change by read-back and can undo it.",
+  "tagline": "Turn on long paths in Windows, and find out which programs can use them",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Ochre",
+    "light": "#FCD34D",
+    "dark": "#B45309",
+    "social_ground": "#2B1A05",
+    "social_muted": "#F5DFAE"
+  },
+  "icon": {
+    "idea": "One long double-ended arrow: length.",
+    "points": [
+      "Free-standing with no tile: the arrow is the whole icon.",
+      "A horizontal line with an arrowhead at each end, all with rounded ends.",
+      "The whole arrow is Ochre; the small drawing below 40 pixels thickens it."
+    ],
+    "large": "<path d=\"M8 48 H88 M22 32 L8 48 L22 64 M74 32 L88 48 L74 64\" fill=\"none\" stroke=\"#B45309\" stroke-width=\"11\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M8 48 H88 M24 30 L8 48 L24 66 M72 30 L88 48 L72 66\" fill=\"none\" stroke=\"#B45309\" stroke-width=\"14\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Setting",
+        "A one-sentence verdict, then each fact as a row with its state"
+      ],
+      [
+        "Programs",
+        "Choose a program and see whether it has opted in to long paths"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees whether Windows allows long paths, turns the setting on with one button, and learns that programs must opt in too.",
+    "primary": "Turn on",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Windows setting",
+        "On or Off"
+      ],
+      [
+        "Policy",
+        "Fixes the value or Not set"
+      ],
+      [
+        "Windows version",
+        "Supported or Too old"
+      ],
+      [
+        "File Explorer",
+        "Cannot use long paths"
+      ]
+    ],
+    "status": "Setting is off, Windows 11 supports it",
+    "notes": [
+      "The first line of the Setting screen is a one-sentence verdict, for example that the setting is on but File Explorer and many programs still cannot use long paths.",
+      "Each fact is a row with its name and its state shown as an icon and a word: the Windows setting, whether a policy fixes it, the Windows version, and whether File Explorer can use long paths.",
+      "A note beside the switch states that the setting alone does nothing for a program until that program also opts in through its manifest.",
+      "Turn on is the accent button and becomes Turn off when the setting is on. It is disabled with its reason in words when a policy fixes the value or the Windows version is too old.",
+      "Undo restores the value read before the last change, including 'not set', and is disabled with a tooltip when there is nothing to undo.",
+      "The status bar says the state in words and changes with the rows. After a change the rows are re-read, not assumed, and the screen says a running program picks the setting up at its next start.",
+      "When the process is not elevated, Turn on and Undo are refused by name before any write, and the screen says to start the tool as administrator."
+    ],
+    "cut": "There is no earlier window: this tool is new and nothing is ported, so nothing of an old interface is cut. The window has none of the extras the suite's older tools carried (a menu bar, a splash, animations, a donate strip); the shared window of `sdk/DESIGN.md` does not include them and the plan records no feature built to replace them."
+  },
+  "readme": {
+    "lead": "Long Path Enabler turns on long paths in Windows and tells you which programs can use them.",
+    "what": [
+      "Windows limits a file path to 260 characters (MAX_PATH) unless long paths are turned on. Long Path Enabler shows whether the setting is on, whether a group policy fixes it, whether your Windows version supports it, and what that means for File Explorer. One button turns it on, the value is read back to prove it changed, and Undo puts back what was there.",
+      "Most guides stop at the setting. It is not enough: a program only uses long paths if it also opts in through its manifest, so File Explorer and many other programs still fail on long paths. Long Path Enabler says this beside the switch and can read a program's manifest to tell you whether that program opted in."
+    ],
+    "new_intro": "This is a new tool, written in C++ for the Resolute suite.",
+    "new": [
+      [
+        "Setting and policy in one view.",
+        "It reads the long-path value and whether a group policy controls it, and refuses to change a value a policy fixes."
+      ],
+      [
+        "Programs must opt in, said plainly.",
+        "The screen states that the setting alone does nothing for a program that has not opted in."
+      ],
+      [
+        "Check a program.",
+        "Choose a program file and see whether its manifest opts in to long paths."
+      ],
+      [
+        "Verified and undoable.",
+        "Every change is read back, the prior value is recorded and Undo restores it."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new tool: build, engine, window, features, release",
+    "goal": "Long Path Enabler ships as a complete, standalone C++ tool that reports the Windows long-path setting and whether a policy fixes it, turns the setting on with the value read back and the prior value recorded, can undo the change, states plainly that a program must also opt in through its manifest, and reads a program's manifest to say whether it opted in.",
+    "current_state": "Nothing exists yet: this is a new tool and nothing is ported, so there is no AutoIt original, no `reference/au3/` folder and no baseline to match. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T07-s8.md`, whose plan section for this tool is a single line: report and set the long-path setting, including the manifest requirement most guides omit, done when the setting is changed, verified by read-back, and the surface states that applications must opt in too. The SDK's framework, repair contract and chart control, which the tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s8.md`: the plan section as it stood in the Resolute repository, of which only the long-path line concerns this tool.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the tool's identity and window sections, and the suite's contract every surface answers to.",
+      "Microsoft's published documentation of `LongPathsEnabled`, the `Enable Win32 long paths` policy and the `longPathAware` manifest element, read once and recorded in `docs/notes/windows-long-paths.md`."
+    ],
+    "outcome": [
+      "`LongPathEnabler.exe` reads the setting and whether a policy controls it, turns the setting on and off with the value read back and the prior value recorded, and refuses by name when it is not elevated or a policy fixes the value.",
+      "The Setting screen gives a one-sentence verdict, shows every fact with an icon and a word, and states that programs must opt in too; the Programs screen says whether a chosen program opted in; the last change can be undone.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Setting screen, where each fact about long paths is a row. Reporting and audit are the Activity section, which records every change and refusal. Settings are the framework's pages. Permissions anchor on the engine, where a change without elevation is refused by name before any write. Reverse anchors on the undo section: the value read before a change is recorded, and Undo restores it, including the state of not being set at all.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Long Path Setting Engine",
+      "intro": "The tool's whole system effect and its reading, independent of any window: the `LongPathsEnabled` value under `HKLM\\SYSTEM\\CurrentControlSet\\Control\\FileSystem`, the group policy that can fix it, the Windows version it needs (10 version 1607 or later), changing it with the value read back and the prior value recorded, and reading a program file's embedded manifest for `longPathAware`. Reading needs no elevation; changing does.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the setting, the policy location and the version floor as data in `src/core/LongPathSetting.h`. Done when: the key, the value name, the policy's location and build 14393 are each stated once.",
+        "Implement read, change, verify and manifest reading in `src/core/LongPathSetting.cpp` and `src/core/Manifest.cpp` against a registry root and a file path the tests can redirect. Done when: the unit tests pass against a disposable key and fixture executables."
+      ],
+      "items": [
+        "Declare in `src/core/LongPathSetting.h` the value `LongPathsEnabled` (DWORD) under `SYSTEM\\CurrentControlSet\\Control\\FileSystem` and the policy's registry location taken from the `Enable Win32 long paths` policy template. Done when: both are stated once with a comment naming the Microsoft page they come from, and `docs/notes/windows-long-paths.md` records the policy location confirmed on a real machine with the policy set. Cheaper substitute: a policy path remembered from a forum post and never checked on a machine.",
+        "Implement `ReadSetting()` in `src/core/LongPathSetting.cpp` returning on, off or not set, the value as stored, and whether it was readable. Done when: a test under a disposable root returns each of the three states and an unreadable key as its own result, not as off.",
+        "Implement `ReadPolicy()` returning whether a policy sets the value and what it sets it to. Done when: a fixture with the policy on, the policy off and no policy each report correctly, and the setting is reported as fixed by policy in the first two.",
+        "Implement `WindowsSupport()` reading the Windows build and returning supported or too old against build 14393 (version 1607). Done when: a test passes builds 14392, 14393 and 26100 and gets too old, supported, supported. Cheaper substitute: comparing the version string text, which orders 10.0.9 wrongly.",
+        "Implement `Change(bool on)` writing `LongPathsEnabled`, recording the prior state (a value or not set) first, then reading the value back and returning a mismatch as expected and found. Done when: a test under a disposable root changes the value, finds the prior state recorded before the write, and a test that corrupts the value after the write gets the mismatch named. Cheaper substitute: writing through `reg.exe` and trusting its exit code, which cannot be redirected for a test and does not read back.",
+        "Refuse `Change` by name before any write when the process is not elevated, or when a policy fixes the value, or when the Windows version is too old. Done when: an unelevated test, a policy-fixed test and a too-old test each report their own named refusal and leave the fixture unchanged. Cheaper substitute: letting the write fail with access denied, which names none of the three causes.",
+        "Implement `ReadManifest(path)` in `src/core/Manifest.cpp` loading the program file as data only (`LoadLibraryExW` with `LOAD_LIBRARY_AS_DATAFILE`, never run), reading resource type 24 (RT_MANIFEST) and returning whether `longPathAware` is true, false, absent, or the file has no embedded manifest or is not a program. Done when: fixture executables with each case return the matching result and none of them is started.",
+        "Treat a sidecar `<program>.exe.manifest` file as a separate, named result and not as the embedded manifest. Done when: a fixture with a sidecar only reports that the sidecar exists and the embedded manifest is absent, so a person is not told a program opted in on the strength of a file Windows may ignore.",
+        "Cover every path in `tests/long_path_test.cpp` and `tests/manifest_test.cpp` with a disposable root and fixture files. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L longpath` passes, and fails when the declared value name is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L longpath` passes, including the corrupted-write, unelevated, policy-fixed, too-old and every manifest case, and fails when the declared value name is changed.",
+      "commit": "core: read and set the long-path setting with read-back, and read a manifest"
+    },
+    "enhancements": [
+      {
+        "title": "Undo the Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before a change the prior state of `LongPathsEnabled` is recorded, so Undo restores what was actually there, which may be a value of 0, a value of 1, or no value at all. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back what the last action changed. Consumer: the registry value, compared with the record.",
+          "treatment": "the recorded prior state restored exactly, including deleting a value that was not there before. Cheaper substitute that fails the checkpoint: an undo that always writes 0, which leaves a value behind where there was none."
+        },
+        "build": [
+          "Record the prior state through the repair contract in `src/core/LongPathSetting.cpp`. Done when: a record exists on disk before the first write.",
+          "Wire Undo in `src/ui/SettingView.cpp`. Done when: turning on and then undoing leaves the value as it was."
+        ],
+        "items": [
+          "Record the prior state (value and type, or not set) through the repair contract's restore record before any write. Done when: a test finds the record on disk before the value is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record: write the recorded value, or delete the value when it was not set, then read back. Done when: turn on then undo, and turn off then undo, each leave `LongPathsEnabled` equal to before, asserted, including from the not-set start.",
+          "Wire the Undo button in `src/ui/SettingView.cpp`, disabled with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one change. Cheaper substitute: a button that is always enabled and fails silently.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when the not-set case is restored as 0."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: turn on then undo and turn off then undo both leave the value as it was, including not set.",
+        "commit": "feature: undo puts back the value that was there before"
+      },
+      {
+        "title": "Programs Must Opt In, Said Plainly",
+        "intro": "The setting alone does nothing for a program that has not opted in through its manifest, which is why File Explorer and many programs still fail on long paths. This is the requirement most guides omit, so the Setting screen states it beside the switch and in the verdict, and shows File Explorer as a row of its own.",
+        "surface": {
+          "fidelity": "the Setting screen's verdict, rows and note, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16, in light and dark.",
+          "job": "a person who turned the setting on is not left believing every program now works. Consumer: the rendered screen, read through UI Automation.",
+          "treatment": "a one-sentence verdict and a note beside the switch that name the opt-in requirement in words. Cheaper substitute that fails the checkpoint: a tooltip or an About paragraph, which a person turning the switch on never reads."
+        },
+        "build": [
+          "Write the verdict logic in `src/core/Verdict.cpp`. Done when: each combination of setting, policy and version returns one sentence.",
+          "Show the verdict, the File Explorer row and the note in `src/ui/SettingView.cpp`. Done when: the screen states the opt-in requirement whether the setting is on or off."
+        ],
+        "items": [
+          "Implement `Verdict()` in `src/core/Verdict.cpp` returning one sentence for each of: setting off, setting on, fixed by policy, Windows too old. Done when: a test asserts the sentence for each case and that every case that has the setting on mentions that programs must opt in.",
+          "Show File Explorer as a row in `src/ui/SettingView.cpp` stating that it cannot use long paths even with the setting on. Done when: the row reads that state with an icon and a word in every case, matched to what the verdict says. Cheaper substitute: leaving File Explorer out because it is not a setting.",
+          "Place the note beside the Turn on button, stating that the setting alone does nothing for a program until it opts in through its manifest and that a running program picks the setting up at its next start. Done when: the note is visible without scrolling at 100 and 150 percent and is read by a UI Automation walk. Cheaper substitute: a link to a web page.",
+          "Add the opt-in sentence to the confirmation shown after a change. Done when: a driven test turns the setting on and finds the sentence in the result text.",
+          "Cover it in `tests/verdict_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L verdict` passes, and fails when the opt-in sentence is removed from a verdict."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L verdict` passes, and a captured Setting screen in light and dark shows the note beside the switch.",
+        "commit": "feature: the Setting screen says that programs must opt in too"
+      },
+      {
+        "title": "Check a Program",
+        "intro": "The Programs section reads a chosen program file's embedded manifest and says whether it will use long paths. The answer depends on both the Windows setting and the manifest, so it is stated as a sentence that names which is missing. The file is read as data and never run.",
+        "surface": {
+          "fidelity": "the Programs section, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16, in light and dark at 100 and 150 percent.",
+          "job": "a person finds out whether one program can use long paths. Consumer: the rendered result, compared with the manifest read by the engine.",
+          "treatment": "a file chooser, then a one-sentence answer and the manifest's finding as a row with an icon and a word. Cheaper substitute that fails the checkpoint: showing the raw manifest XML, which leaves the person to read it."
+        },
+        "build": [
+          "Build the Programs screen in `src/ui/ProgramsView.cpp` from the SDK's controls. Done when: choosing a program shows its answer.",
+          "Combine the setting and the manifest in `src/core/ProgramCheck.cpp`. Done when: each of setting on or off with manifest opted in, not opted in or absent returns one sentence."
+        ],
+        "items": [
+          "Implement `CheckProgram(path)` in `src/core/ProgramCheck.cpp` combining `ReadSetting()` and `ReadManifest(path)` into one sentence naming what is missing. Done when: a test covers the six combinations of setting (on, off) and manifest (true, false, absent) with a distinct sentence for each.",
+          "Build `src/ui/ProgramsView.cpp` with a file chooser from the SDK and drag and drop of one file. Done when: choosing a fixture executable shows its answer, and a file that is not a program shows a named message, not an empty result. Cheaper substitute: a text box for a typed path, which gives no feedback on a wrong one.",
+          "Show the manifest finding as a row (opted in, not opted in, no manifest, sidecar only) with an icon and a word. Done when: each of the four renders and is read through UI Automation.",
+          "State when the answer is about a different program than the one that matters: a program that loads other files at run time may still fail. Done when: the screen carries one sentence saying the check reads this file's manifest only.",
+          "Cover it in `tests/program_check_test.cpp` and `tests/programs_window_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L programs` passes, and fails when a manifest that is absent is reported as opted in."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L programs` passes for all six combinations and the file-chooser case, and the Programs screen is operated by keyboard alone.",
+        "commit": "feature: check whether a program has opted in to long paths"
+      },
+      {
+        "title": "Find Paths That Are Too Long",
+        "intro": "A read-only scan of a chosen folder that lists every path longer than the limit, so a person sees what long paths they actually have. It has no write path at all.",
+        "surface": {
+          "fidelity": "the scan result inside the Programs section, against `sdk/DESIGN.md` section 16.",
+          "job": "a person sees which paths in a folder exceed 260 characters. Consumer: the list, compared with a folder of known paths.",
+          "treatment": "a list of the paths with their lengths, longest first, with a count in the status bar. Cheaper substitute that fails the checkpoint: a count with no paths, which cannot be acted on."
+        },
+        "build": [
+          "Implement the scan in `src/core/PathScan.cpp` using extended-length (`\\\\?\\`) paths to read the folder. Done when: a fixture folder with a path over 260 characters is listed.",
+          "Show the result in `src/ui/ProgramsView.cpp`. Done when: the list shows each path and its length."
+        ],
+        "items": [
+          "Implement `ScanFolder(root, limit)` in `src/core/PathScan.cpp` that walks the tree with `\\\\?\\` prefixed paths and returns each path whose length is over the limit, with its length. Done when: a fixture tree with paths of 259, 260 and 261 characters returns only the 261 one. Cheaper substitute: walking with ordinary paths, which cannot see the very paths the scan looks for.",
+          "Make the scan cancellable and run off the interface thread, reporting a folder it could not read by name. Done when: a test cancels a scan halfway and gets a partial result marked as partial, and an unreadable folder appears in the result.",
+          "Show the results in `src/ui/ProgramsView.cpp` as a list, longest first, with the count in the status bar, and make a line copyable. Done when: Ctrl+C on a selected line puts its path on the clipboard.",
+          "Write nothing: the scan must not open any file for writing or change any name. Done when: a test runs the scan over a read-only fixture and finds it unchanged.",
+          "Cover it in `tests/path_scan_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L scan` passes, and fails when the limit comparison is changed from over to at least."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L scan` passes: 259 and 260 are not listed, 261 is, and a cancelled scan is marked partial.",
+        "commit": "feature: a read-only scan for paths over the limit"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "Every behaviour in `docs/notes/windows-long-paths.md` has a test in `tests/` that names it.",
+      "On a real machine the tool reads the setting, turns it on, reads it back, undoes it and restores not set, and refuses when unelevated or when a policy fixes the value.",
+      "The Setting screen states that programs must opt in too, and the Programs screen reports a fixture program that opted in and one that did not, in light and dark, by keyboard alone."
+    ]
+  }
+}

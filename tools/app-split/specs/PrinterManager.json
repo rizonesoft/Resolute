@@ -1,0 +1,255 @@
+{
+  "name": "PrinterManager",
+  "slug": "printermanager",
+  "display": "Printer Manager",
+  "job": "it shows printers, their queues, drivers and ports in one place, finds out why a printer will not print, clears a stuck queue (restarting the print spooler when it has to) and removes a printer together with its driver.",
+  "tagline": "Printers, queues and drivers in one place, and a fix for the queue that will not clear",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Steel",
+    "light": "#CBD5E1",
+    "dark": "#475569",
+    "social_ground": "#161D29",
+    "social_muted": "#D5DCE6"
+  },
+  "icon": {
+    "idea": "A printer.",
+    "points": [
+      "Free-standing, with no tile: a rounded printer body with paper above and below.",
+      "The body is Steel; the two sheets and the small light are Steel light.",
+      "The small drawing, below 40 pixels, drops the light and enlarges the sheets."
+    ],
+    "large": "<rect x=\"6\" y=\"34\" width=\"84\" height=\"38\" rx=\"11\" fill=\"#475569\"/><rect x=\"24\" y=\"8\" width=\"48\" height=\"28\" rx=\"6\" fill=\"#CBD5E1\"/><rect x=\"24\" y=\"56\" width=\"48\" height=\"32\" rx=\"6\" fill=\"#CBD5E1\"/><circle cx=\"76\" cy=\"46\" r=\"4.5\" fill=\"#CBD5E1\"/>",
+    "small": "<rect x=\"4\" y=\"32\" width=\"88\" height=\"40\" rx=\"12\" fill=\"#475569\"/><rect x=\"22\" y=\"6\" width=\"52\" height=\"30\" rx=\"7\" fill=\"#CBD5E1\"/><rect x=\"22\" y=\"54\" width=\"52\" height=\"36\" rx=\"7\" fill=\"#CBD5E1\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Printers",
+        "Each printer as a row: name, state in words, jobs waiting, driver and port"
+      ],
+      [
+        "Queue",
+        "The selected printer's jobs with owner, size and state, and the one that is blocking"
+      ],
+      [
+        "Drivers and ports",
+        "Installed drivers and ports, each with what uses it"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every printer with its state, jobs, driver and port, and clears a queue that will not move with one button.",
+    "primary": "Clear queue",
+    "secondary": "Diagnose",
+    "rows": [
+      [
+        "Office laser",
+        "Ready, 0 jobs"
+      ],
+      [
+        "Front desk",
+        "Offline, 3 jobs waiting"
+      ],
+      [
+        "Accounts",
+        "Error, paper jam, 1 job"
+      ],
+      [
+        "Old plotter",
+        "Paused, 2 jobs"
+      ],
+      [
+        "PDF printer",
+        "Ready, 0 jobs"
+      ]
+    ],
+    "status": "5 printers, 1 offline, 6 jobs waiting",
+    "notes": [
+      "Each printer row shows an icon and a word for its state (Ready, Printing, Paused, Offline, Error), never colour alone, then the number of jobs waiting, its driver and its port.",
+      "Clear queue is the accent button. It first asks the spooler to cancel the selected printer's jobs; only when that fails does it offer the spooler restart, and it says before it acts that the restart stops printing on every printer and deletes every waiting job.",
+      "Diagnose runs the ordered checks on the selected printer, shows each check by name with its result, and names the first cause found.",
+      "Selecting a row opens its jobs in Queue, where the job that is blocking is marked in words.",
+      "Reading the lists needs no elevation. Every change is refused by name when the tool is not elevated, before anything is touched.",
+      "Removing a printer asks first, names its driver, and refuses by name when another printer still uses that driver.",
+      "The status bar states the totals in words, for example \"5 printers, 1 offline, 6 jobs waiting\", and updates when the list is re-read."
+    ],
+    "cut": "There is no earlier window: Printer Manager is a new tool and nothing is ported. It has none of the chrome the AutoIt tools of the suite carried: no File or Help menus, no splash screen, no animations and no donate strip. Settings and About come from the framework, and the plan records that nothing else is added."
+  },
+  "readme": {
+    "lead": "See every printer, its jobs, its driver and its port in one window, and fix the queue that will not clear.",
+    "what": [
+      "Windows spreads printing over three places: Settings, the old Devices and Printers page and Print Management. When a printer will not print, none of them says why. Printer Manager lists printers, queues, drivers and ports together and shows, for each printer, its state in words, the jobs waiting and what it uses.",
+      "It looks before it changes anything. Diagnose walks an ordered list of checks (the print spooler, the driver, the port, offline and error status, and a queue blocked by one failed job) and names the first cause it finds. Clear queue cancels jobs through the spooler first and restarts the spooler and empties its spool folder only when that fails. Removing a printer also removes its driver, unless another printer still uses that driver."
+    ],
+    "new_intro": "Printer Manager is a new tool, written in C++ for the suite from the start.",
+    "new": [
+      [
+        "One place for the whole print subsystem.",
+        "Printers, queues, drivers and ports are on one screen, each with what uses it."
+      ],
+      [
+        "A real fix for a stuck queue.",
+        "Jobs are cancelled through the spooler, and the spooler restart is the second step, stated before it happens."
+      ],
+      [
+        "A diagnosis, not a restart button.",
+        "Each check is named, and the result names the first cause found."
+      ],
+      [
+        "Remove a printer with its driver.",
+        "The printer's settings are saved first so it can be recreated, and a driver another printer uses is never removed."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "New tool: build, engine, window, features, release",
+    "goal": "Printer Manager ships as a complete, standalone C++ tool that shows printers, queues, drivers and ports in one place, clears a stuck queue (cancelling through the spooler first, then restarting the spooler and emptying its spool folder when that fails), diagnoses a printer that will not print across spooler state, driver, port, offline status and a queue blocked by one failed job, and removes a printer together with its driver while refusing a driver another printer still uses.",
+    "current_state": "Nothing exists yet. Printer Manager is a new tool, so there is no AutoIt original, no `reference/au3/` folder and nothing to port: the repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the tool's plan text under `docs/origin/`, which fixes the required scope. The behaviour comes from that text and from the Windows print APIs: `EnumPrinters`, `EnumJobs`, `SetJob`, `SetPrinter` with the purge command, `EnumPrinterDrivers`, `DeletePrinterDriverEx`, `EnumPorts`, `DeletePrinter` and the Spooler service. Reading these needs no elevation; deleting jobs from another user, stopping the Spooler service, deleting files in `System32\\spool\\PRINTERS` and removing printers or drivers do. The SDK's framework and repair contract, which the tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s9.md`: the plan text and the printer item, which is the binding scope.",
+      "`brand/build.py` and `DESIGN.md`: the chosen identity and the window's sections.",
+      "`sdk.json`: the pinned Resolute-SDK commit the framework and the repair contract come from."
+    ],
+    "outcome": [
+      "`PrinterManager.exe` lists printers, jobs, drivers and ports with real state, and a queue stuck on one failed job is cleared and confirmed empty, with the spooler restart used only when cancelling through the spooler fails.",
+      "Diagnose names the first cause across spooler state, driver, port, offline status and a blocked queue, and a printer can be removed with its driver, refusing a driver still in use and saving settings first so it can be recreated.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Printers screen, where a person finds a printer by its state, with Queue and Drivers and ports as the other two lists. Reporting and audit are the Activity section, which records each cancel, restart, removal and test page. Settings are the framework's pages. Permissions anchor on the engine, where every change is refused by name when the process is not elevated. Reverse anchors on the printer removal section: the printer's settings are recorded before it is deleted, so Undo recreates it. A cleared queue and a restarted spooler cannot be reversed, because the jobs are deleted, and the tool says so before it acts.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Print Subsystem Engine",
+      "intro": "The tool's whole system effect, independent of any window: enumerating printers, jobs, drivers and ports, the stuck-queue fix, the ordered diagnosis declared as data, and removing a printer and then its driver. Every Windows call goes through one interface the tests can replace, and every change is refused by name when the process is not elevated.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the print API seam in `src/core/PrintApi.h` and its Windows implementation in `src/core/PrintApi.cpp`. Done when: the unit tests run the engine against a fake implementation with no printer installed.",
+        "Implement enumeration, the queue fix, the diagnosis and removal in `src/core/Printers.cpp`, `src/core/Jobs.cpp`, `src/core/Drivers.cpp`, `src/core/QueueFix.cpp`, `src/core/Diagnose.cpp` and `src/core/Remove.cpp`. Done when: `tests/printer_test.cpp` passes against the fake."
+      ],
+      "items": [
+        "Enumerate printers with `EnumPrinters` (level 2, local and connections) in `src/core/Printers.cpp`, turning `PRINTER_INFO_2` status and the `PRINTER_ATTRIBUTE_WORK_OFFLINE` attribute into one state in words (Ready, Printing, Paused, Offline, Error, with the error named, such as paper jam or out of paper) plus job count, driver and port. Done when: fixtures with paused, work-offline, paper-jam and error status each read their word. Cheaper substitute: showing the raw status number, which a person cannot read.",
+        "Enumerate a printer's jobs with `EnumJobs` (level 2) in `src/core/Jobs.cpp` with owner, size, submitted time and state in words, and mark the blocking job: the oldest job with `JOB_STATUS_ERROR`, `JOB_STATUS_BLOCKED_DEVQ` or `JOB_STATUS_USER_INTERVENTION` that sits ahead of waiting ones. Done when: a fixture queue of one failed job and four good ones marks exactly the failed one. Cheaper substitute: marking the first job in the list, which is wrong when the first job is printing normally.",
+        "Enumerate drivers with `EnumPrinterDrivers` and ports with `EnumPorts` (level 2) in `src/core/Drivers.cpp`, each with the printers that use it, and a port kind (local, TCP/IP, WSD) read from its monitor name. Done when: a fixture with two printers on one driver lists both under it, and a driver or port no printer uses lists none.",
+        "Implement `ClearQueue(printer)` in `src/core/QueueFix.cpp`: cancel each job with `SetJob` and the delete command, then `SetPrinter` with the purge command, and re-read the queue. When jobs remain, stop the Spooler service through the service manager (waiting for its dependent services to stop and for the stopped state), delete only the `.SPL` and `.SHD` files in the spool folder named by the `DefaultSpoolDirectory` value under `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Print\\Printers` (default `System32\\spool\\PRINTERS`), start the service and confirm it reports running. Done when: a fake whose jobs refuse `SetJob` ends with an empty spool folder, a running spooler and a reported count of zero, and a fake whose spooler does not start reports that by name. Cheaper substitute: restarting the spooler without cancelling jobs first, or reporting success after the start call without reading the state back.",
+        "Declare the diagnosis as ordered data in `src/core/Checks.h`, one entry per check (name, what it reads, the cause it names, the fix it offers): spooler service running, printer paused, printer set offline, printer in an error state, driver installed, port present and, for a TCP/IP or WSD port, reachable, and queue blocked by one failed job. Implement `Diagnose(printer)` in `src/core/Diagnose.cpp` to run them in that order and return every result with the first failing check named as the cause. Done when: a fixture that fails two checks names the earlier one, and changing the order in `Checks.h` changes which is named. Cheaper substitute: a chain of if statements in code, which cannot be listed, reordered or tested one check at a time.",
+        "Implement `RemovePrinterAndDriver(printer)` in `src/core/Remove.cpp`: refuse by name when another printer uses the same driver, otherwise record the printer's settings, delete it with `DeletePrinter`, read back that it is gone, then call `DeletePrinterDriverEx` with the delete-unused-files flag and read back that the driver is gone. When the driver stays because the spooler still holds it, report that by name and do not restart the spooler. Done when: a fixture with a shared driver is refused and left untouched, and a fixture with an unshared driver ends with neither printer nor driver. Cheaper substitute: deleting the driver and trusting the return code, which leaves a driver that other printers still need removed.",
+        "Refuse every change by name when the process is not elevated, before any call that writes, with one activity record, in `src/core/Elevation.cpp`. Enumeration stays allowed. Done when: an unelevated run of Clear queue, Remove and the spooler restart each report the refusal and the fake records no write. Cheaper substitute: letting the first write fail with access denied halfway through a restart, which can leave the spooler stopped.",
+        "Cover every path in `tests/printer_test.cpp` against the fake. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L printer` passes, and fails when one check in `Checks.h` is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L printer` passes, including the refused shared driver, the failed-spooler-start and the unelevated cases.",
+      "commit": "core: printer, queue, driver and port engine with the stuck-queue fix and the ordered diagnosis"
+    },
+    "enhancements": [
+      {
+        "title": "Fix a Stuck Queue",
+        "intro": "The Clear queue button is the tool's primary action. It says before it acts what the fix will interrupt, because stopping the spooler stops printing on every printer and the spool folder holds every waiting job, not only the selected printer's.",
+        "surface": {
+          "fidelity": "the Clear queue confirmation and result, against `sdk/DESIGN.md` section 11.",
+          "job": "a person clears a queue that will not move and sees that it is empty and that printing works again. Consumer: the spooler, read back.",
+          "treatment": "a confirmation that names what will be interrupted and what will be deleted, then a result that states how many jobs were cancelled and whether the spooler was restarted. Cheaper substitute that fails the checkpoint: a restart-the-service button labelled as a repair, which hides that every printer's jobs were lost."
+        },
+        "build": [
+          "Build the confirmation and the result in `src/ui/QueueView.cpp`. Done when: the confirmation differs between the cancel-only path and the restart path.",
+          "Wire Clear queue in `src/ui/PrintersView.cpp` to `ClearQueue`. Done when: the queue is re-read from the spooler after the action."
+        ],
+        "items": [
+          "Show before the first step: \"Cancel the jobs of this printer through the spooler\", and show before the second step, only when the first failed: \"Stop the print spooler, delete every waiting job on every printer, start it again\", naming how many jobs on how many printers will be lost. Done when: a fixture with jobs on two printers shows both counts before anything is touched. Cheaper substitute: one generic confirmation for both paths, which hides the restart.",
+          "Run `ClearQueue` from the Clear queue button and show the outcome in words: jobs cancelled, spooler restarted or not, spooler running, jobs now waiting. Done when: the result is read from a fresh `EnumJobs`, not from the return codes.",
+          "Record the action in the Activity section with the path taken. Done when: one press adds one record that names cancel-only or restart.",
+          "Cover it in `tests/queue_fix_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L queuefix` passes, and fails when the restart warning is dropped from the confirmation."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L queuefix` passes for the cancel-only and the restart paths.",
+        "commit": "feature: fix a stuck queue, with the spooler restart stated before it happens"
+      },
+      {
+        "title": "Why Will It Not Print",
+        "intro": "Diagnose runs the ordered checks of `src/core/Checks.h` on the selected printer and shows each by name with its result, so a person sees what was looked at and what was found. It diagnoses before it offers any change.",
+        "surface": {
+          "fidelity": "the Diagnose result list, against `sdk/DESIGN.md` section 16.",
+          "job": "a person learns why one printer will not print, from the checks themselves. Consumer: the engine's check results, read back.",
+          "treatment": "every check listed by name in order with a pass or fail in words, the first failing check named as the cause, and one offered fix that matches it. Cheaper substitute that fails the checkpoint: a single message saying the printer has a problem, or a restart button offered whatever the cause."
+        },
+        "build": [
+          "Build the result list in `src/ui/DiagnoseView.cpp` from the engine's results. Done when: every check in `Checks.h` appears in order.",
+          "Offer the matching action beside the named cause. Done when: a paused printer offers Resume and an offline printer offers Use online, and neither offers a restart."
+        ],
+        "items": [
+          "List every check by name in order with its result in words and an icon, and mark the first failing one as the cause. Done when: a fixture failing the port check lists the spooler and driver checks as passed above it. Cheaper substitute: listing only failures, which hides what was looked at.",
+          "Offer one fix beside the named cause, drawn from the `Checks.h` entry: Resume for a paused printer, Use online for an offline one, Clear queue for a blocked queue, and for a missing driver or unreachable port only a statement of what to repair. Done when: each fixture cause shows its own fix and none shows another. Cheaper substitute: the same restart button for every cause.",
+          "Run Diagnose from the secondary button and from a printer's row menu, and record the result in Activity. Done when: both entry points show the same list for the same printer.",
+          "Cover it in `tests/diagnose_view_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L diagnose` passes, and fails when a check is shown without its name."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L diagnose` passes: the spooler, driver, port, offline and blocked-queue fixtures each name their own cause.",
+        "commit": "feature: the ordered diagnosis, each check named"
+      },
+      {
+        "title": "Remove a Printer and Its Driver",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Removing a printer also removes its driver, so no driver is left behind, and a driver another printer still uses is refused by name. Before the printer is deleted its settings are recorded through the SDK repair contract, so Undo can recreate it. The record and the undo are the contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the removal confirmation and the Undo result, against `sdk/DESIGN.md` section 11.",
+          "job": "a person removes a printer and its driver, or is told why the driver stays, and can put the printer back. Consumer: the printer and driver lists, read back.",
+          "treatment": "a confirmation naming the printer, its driver and any printer that uses that driver, and an Undo that recreates the printer from the record. Cheaper substitute that fails the checkpoint: deleting the printer and the driver with no record, which cannot be undone."
+        },
+        "build": [
+          "Record the printer's settings through the repair contract in `src/core/Remove.cpp`. Done when: a record exists on disk before `DeletePrinter` is called.",
+          "Wire Remove and Undo in `src/ui/PrintersView.cpp`. Done when: remove then undo leaves the printer in the list with its port and driver."
+        ],
+        "items": [
+          "Record, through the repair contract's restore record and before any delete, the printer's name, driver name, port, share name, location, comment, attributes and default device settings (`DEVMODE`). Done when: a test finds the record on disk before the first delete call. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Show a confirmation naming the printer and its driver, and when another printer uses that driver, refuse by naming that printer and leave everything unchanged. Done when: a fixture with a shared driver shows the refusal and the engine records no delete.",
+          "Implement Undo recreating the printer with `AddPrinter` from the record, with the driver from the driver store when it is still there, and stating by name when the driver files are gone. Done when: remove then undo leaves the printer list equal to before, asserted on a fixture, and a fixture with the driver files gone reports the missing driver by name. Cheaper substitute: an undo that creates a printer with a generic driver, which is not what was there.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one removal.",
+          "Cover it in `tests/remove_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L remove` passes, and fails when the shared-driver check is skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L remove` passes: the unshared driver is removed with the printer, the shared driver is refused, and Undo recreates the printer.",
+        "commit": "feature: remove a printer with its driver, settings saved so it can be recreated"
+      },
+      {
+        "title": "Print a Test Page",
+        "intro": "A test page shows, after a fix or a diagnosis, whether the printer prints. It is an ordinary document sent through the same queue, so a page that does not come out is seen in Queue.",
+        "surface": {
+          "fidelity": "the Print test page action and its result, against `sdk/DESIGN.md` section 11.",
+          "job": "a person confirms that a printer prints after a fix. Consumer: the printer's queue, read back.",
+          "treatment": "a page that names the printer, its driver and its port, sent as a job whose state is then followed in Queue. Cheaper substitute that fails the checkpoint: reporting success because the job was accepted, which says nothing about whether it printed."
+        },
+        "build": [
+          "Implement `PrintTestPage(printer)` in `src/core/TestPage.cpp`. Done when: the fake receives one job whose text names the printer, driver and port.",
+          "Add the action to the printer's row menu in `src/ui/PrintersView.cpp`. Done when: the job appears in Queue."
+        ],
+        "items": [
+          "Draw the test page through a printer device context (`CreateDC`, `StartDoc`, `EndDoc`) in `src/core/TestPage.cpp`, with the printer name, driver, port and the time. Done when: the fake records one document with those lines. Cheaper substitute: writing a raw text job, which prints as junk on drivers that do not take raw text.",
+          "After submitting, follow the job with `EnumJobs` until it leaves the queue or enters an error state, and show which in words. Done when: a fixture that errors shows the error, and one that completes shows that it left the queue.",
+          "Record it in Activity. Done when: one press adds one record with the outcome.",
+          "Cover it in `tests/testpage_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L testpage` passes, and fails when the outcome is reported before the queue is re-read."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L testpage` passes for the completed and the errored fixtures.",
+        "commit": "feature: print a test page and follow it through the queue"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine with a printer whose queue holds one failed job, Clear queue empties it, the spooler runs and a test page prints.",
+      "Diagnose names the right first cause for each of a stopped spooler, a paused printer, an offline printer, a missing driver, an unreachable port and a blocked queue, and Remove refuses a driver another printer uses.",
+      "The tool lists, fixes, removes and undoes in light and dark, by keyboard alone, and every change is refused by name when it is not elevated."
+    ]
+  }
+}

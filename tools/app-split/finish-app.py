@@ -209,8 +209,12 @@ The scripts cannot be compiled from this folder alone. They include the suite's 
 
 def agents_section(s: dict) -> str:
     name = s["display"]
-    frozen = ("- **The effect is frozen.** What the AutoIt original computes and writes is reproduced exactly and proven by the parity check. Restructuring is allowed; changing the effect is not.\n"
-              if s.get("frozen") else "")
+    if s.get("frozen") and s.get("au3"):
+        frozen = "- **The effect is frozen.** What the AutoIt original computes and writes is reproduced exactly and proven by the parity check. Restructuring is allowed; changing the effect is not.\n"
+    elif s.get("frozen"):
+        frozen = "- **The effect is frozen.** What the tool writes to the system is stated by the fixtures under `tests/fixtures/` and proven by the engine's tests. Restructuring is allowed; changing what is written needs the operator's decision.\n"
+    else:
+        frozen = ""
     ref = "| `reference/au3/` | The AutoIt original. Frozen: read, never edited |\n" if s.get("au3") else ""
     return f"""## This project
 
@@ -257,8 +261,21 @@ def plan_md(s: dict) -> tuple[str, list[str]]:
     research = bool(s.get("research"))
     first = win["sections"][0][0]
     ctest = "sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug"
-    fr_ref = "Nothing under `reference/au3/` changes, checked with `git status --short reference`." if frozen else None
-    fr_parity = "The parity check of §5 re-runs with zero differing fields." if frozen else None
+    # A frozen port is held to its AutoIt original; a frozen new tool has no original, so it is held to the fixtures
+    # that state what it writes. The port's wording on a new tool named a reference folder and a parity section that
+    # do not exist (Boot Options, Boot Manager, Scheduled Tasks).
+    if frozen and port:
+        fr_ref = "Nothing under `reference/au3/` changes, checked with `git status --short reference`."
+        fr_parity = "The parity check of §5 re-runs with zero differing fields."
+        fr_engine = "The fixtures under `tests/fixtures/` that state the original's effect do not change in this section."
+    elif frozen:
+        # The plan's validator wants a freeze check on every section of a frozen file, the skeleton's included.
+        fr_ref = "No fixture under `tests/fixtures/` that states what the tool writes is added or changed in this section, checked with `git status --short tests/fixtures`."
+        fr_parity = "The engine's tests over `tests/fixtures/` re-run and pass, and `git status --short tests/fixtures` shows no fixture changed."
+        fr_engine = ("The fixtures under `tests/fixtures/` state exactly what the tool writes to the system. Once this section has committed them, "
+                     "a later change to one is a change to the frozen effect and needs the operator's decision.")
+    else:
+        fr_ref = fr_parity = fr_engine = None
     secs: list[tuple[str, str, str]] = []   # title, depends, body
 
     def add(title, depends, **kw):
@@ -305,7 +322,7 @@ def plan_md(s: dict) -> tuple[str, list[str]]:
     base = "§3" if port else "§1"
     eng = p["engine"]
     engine_n = add(eng["title"], base, phase=2, needs=eng.get("needs", "windows-host"), intro=eng["intro"], build=eng["build"], items=eng["items"],
-                   checkpoint=eng["checkpoint"], commit=eng["commit"], freeze="The fixtures under `tests/fixtures/` that state the original's effect do not change in this section." if frozen else None)
+                   checkpoint=eng["checkpoint"], commit=eng["commit"], freeze=fr_engine)
     if port:
         add("Round Trip Proven" if research else "Parity Against the AutoIt Original", f"§{engine_n}", phase=2, needs="windows-host, attended",
             freeze="The baseline under `docs/baseline/` does not change; a difference is fixed in the C++ tool." if frozen else None,
