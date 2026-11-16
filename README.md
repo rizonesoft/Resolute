@@ -5,6 +5,8 @@
   <img src="resources/logos/rizonesoft-logo-dark.svg" alt="Rizonesoft" width="320">
 </picture>
 
+<img src="brand/resolute-icon-192.png" alt="Resolute's icon: a gold spanner crossed with a blue-handled screwdriver" width="128">
+
 # Resolute
 
 **Windows repair and system tools that fix the problem, show what they changed, and can put it back.**

@@ -479,6 +479,9 @@ def main() -> int:
                  "needs": ["windows-host", "display-session", "attended", "owner-decision", WAIT], "waiting": ["owner-decision", WAIT]}
     files = {
         "brand/build.py": build_py(s), "DESIGN.md": design_md(s), "README.md": readme_md(s),
+        # --check compares each asset byte for byte, so the SVGs keep one line ending on every checkout.
+        "brand/.gitattributes": ("# Brand assets are compared byte for byte with what brand/build.py builds: LF on every checkout, "
+                                 "whatever core.autocrlf says.\n*.svg text eol=lf\n"),
         f"todo/00-{slug}/TODO-01-{slug}.md": plan,
         f"todo/00-{slug}/INDEX.md": f"# 00-{slug} -- Domain Index\n\n| File | Scope | Status |\n| ---- | ----- | ------ |\n| TODO-01-{slug}.md | {scope} | active |\n\n## Completed\n",
         "todo/TODO-00-INDEX.md": ("# TODO-00 -- Root Index\n\nGoverning documents: [AGENTS.md](../AGENTS.md) for what this repository is, [DESIGN.md](../DESIGN.md) for the tool's identity and window. "

@@ -1,0 +1,2 @@
+# Brand assets are compared byte for byte with what brand/build.py builds: LF on every checkout, whatever core.autocrlf says.
+*.svg text eol=lf
