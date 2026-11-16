@@ -1,0 +1,259 @@
+{
+  "name": "EnvironmentEditor",
+  "slug": "environmenteditor",
+  "display": "Environment Editor",
+  "job": "it edits the Windows environment variables of the user and of the system, shows PATH as one row per entry that can be reordered, flags duplicate entries and folders that do not exist, and lets every change be undone.",
+  "tagline": "Edit PATH and the other environment variables without breaking them",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Deep teal",
+    "light": "#5EEAD4",
+    "dark": "#0F766E",
+    "social_ground": "#06261F",
+    "social_muted": "#BFEBE3"
+  },
+  "icon": {
+    "idea": "Curly braces around an equals sign: a variable and its value.",
+    "points": [
+      "Free-standing with no tile: a pair of curly braces with rounded ends.",
+      "The braces are Deep teal and the equals sign between them is Deep teal light.",
+      "The small drawing, below 40 pixels, thickens the braces and the bars."
+    ],
+    "large": "<path d=\"M34 12 C22 12 26 30 24 38 C23 44 18 48 12 48 C18 48 23 52 24 58 C26 66 22 84 34 84\" fill=\"none\" stroke=\"#0F766E\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M62 12 C74 12 70 30 72 38 C73 44 78 48 84 48 C78 48 73 52 72 58 C70 66 74 84 62 84\" fill=\"none\" stroke=\"#0F766E\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M38 40 H58 M38 56 H58\" fill=\"none\" stroke=\"#5EEAD4\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M34 12 C22 12 26 30 24 38 C23 44 18 48 12 48 C18 48 23 52 24 58 C26 66 22 84 34 84\" fill=\"none\" stroke=\"#0F766E\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M62 12 C74 12 70 30 72 38 C73 44 78 48 84 48 C78 48 73 52 72 58 C70 66 74 84 62 84\" fill=\"none\" stroke=\"#0F766E\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M40 40 H56 M40 56 H56\" fill=\"none\" stroke=\"#5EEAD4\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Variables",
+        "User and system variables as rows with name, value and kind; PATH opens as one row per entry"
+      ],
+      [
+        "Changes",
+        "What was changed, each change with its own Undo"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person reads and edits user and system variables, sees which PATH entries are wrong, and saves with a way back.",
+    "primary": "Save",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Path (user)",
+        "Each entry fine, duplicate or folder not found"
+      ],
+      [
+        "Path (system)",
+        "Each entry fine, duplicate or folder not found"
+      ],
+      [
+        "PATHEXT",
+        "A list of extensions, kind Expandable or Text"
+      ],
+      [
+        "TEMP",
+        "Text, with its kind shown"
+      ],
+      [
+        "JAVA_HOME",
+        "Text, folder found or folder not found"
+      ]
+    ],
+    "status": "User scope, 1 unsaved change, 2 duplicates, 1 folder not found",
+    "notes": [
+      "Each variable is one row with its name, its value and its kind (Text or Expandable). A list-like variable such as PATH opens as one row per entry.",
+      "Each PATH entry shows its state with an icon and a word: Fine, Duplicate or Folder not found. A reference such as `%SystemRoot%` is shown as written and checked after expansion.",
+      "Save is the accent button and writes only what changed. It reads the value back, records the prior value first, and then tells running programs about the change. Undo sits beside it.",
+      "A scope switch chooses User or System. System rows can be read without elevation, and Save on a system change is refused by name with the reason, before anything is written.",
+      "Entries are reordered by drag or by keyboard, and the effective order across system and user (system first, then user) is shown beside the list.",
+      "The status bar says in words what is pending and what is wrong, for example \"1 unsaved change, 2 duplicates, 1 folder not found\".",
+      "A confirmation names the variable and the length before any write that would pass a documented limit, and a change that would shorten a value says so in words."
+    ],
+    "cut": "There is no earlier window to compare with: this tool is new, so no menus, splash, animations or donate strip are carried over, and none are planned. The Windows System Properties dialog it replaces has a two-line value box with no state, no order and no way back; none of that is copied. Settings and About are the framework's pages, not pages of the tool's own."
+  },
+  "readme": {
+    "lead": "Edit PATH and the other environment variables, user and system, without breaking them.",
+    "what": [
+      "Environment Editor lists the user and system environment variables of the machine with their names, values and kinds. PATH and other list-like variables open as one row per entry, so an entry can be edited, added, removed or moved without retyping a long line.",
+      "It flags the entries that cause trouble: duplicates, folders that do not exist, references that do not expand and values too long to be safe. Every change records the prior value first and can be undone."
+    ],
+    "new_intro": "This tool is new in Resolute. It has no earlier version.",
+    "new": [
+      [
+        "One row per PATH entry.",
+        "Reorder, add and remove entries without editing a long text line."
+      ],
+      [
+        "Problems are named.",
+        "Duplicates, missing folders and unexpanded references each show with an icon and a word."
+      ],
+      [
+        "The type is kept.",
+        "A value read as Expandable is written back as Expandable, so `%SystemRoot%` entries keep working."
+      ],
+      [
+        "Every change can be undone.",
+        "The prior value is recorded before any write, and Undo restores what was actually there."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Environment Editor ships as a complete, standalone C++ tool: it reads and writes user and system environment variables with their value types preserved, shows PATH as reorderable rows, flags duplicates and missing folders, verifies every write by reading it back, records the prior value first, tells running programs, and undoes any change.",
+    "current_state": "Nothing exists yet. There is no earlier version and no source to port: the repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan text as it stood in the Resolute repository (`docs/origin/resolute-D05-T07-s6.md`, section 6, where the environment editor is one line, line 11, and the rule that every change is reversible is line 15). The behaviour comes from how Windows stores environment variables: user variables under `HKCU\\Environment` and system variables under `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment`, each value `REG_SZ` or `REG_EXPAND_SZ`. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s6.md`: the plan text, taking only the environment editor line and the reversibility rule.",
+      "`HKCU\\Environment` and `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment`: the two stores, read on a real machine as the fixture for every test.",
+      "`sdk/DESIGN.md`: the suite's contract every surface answers to."
+    ],
+    "outcome": [
+      "`EnvironmentEditor.exe` reads both scopes with value types preserved, and a variable that is split and joined again is byte-identical, proven by a round-trip test over every variable on the development machine.",
+      "Every write is read back, the prior value is recorded before it, running programs are told with `WM_SETTINGCHANGE`, and a system write without elevation is refused by name before anything changes.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Variables screen, where a person finds a variable and sees each PATH entry with its state. Reporting and audit are the Activity section, the readable trail of what a save did. Settings are the framework's pages. Permissions anchor on the engine only for the system scope: user variables need no elevation, and a system write is refused by name without it, so the tool does not itself require elevation. Reverse anchors on the Changes section, where each recorded change can be undone by restoring the prior value that was read before the write. Exchange anchors on Export and Import.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Environment Variable Engine",
+      "intro": "The tool's whole system effect: reading and writing environment variables in both scopes with the type kept, validating them, recording the prior value, reading each write back, and telling running programs. Nothing here depends on a window. Windows appends the user PATH to the system PATH, so the engine models the effective order as system entries then user entries.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the two stores and the variable model in `src/core/Variable.h`. Done when: scope, name, value and kind (`REG_SZ` or `REG_EXPAND_SZ`) are stated once and the two registry paths appear nowhere else.",
+        "Implement read, write, split, join and validate in `src/core/Environment.cpp` against a registry root the tests can redirect. Done when: the unit tests pass against a disposable key."
+      ],
+      "items": [
+        "Implement `ReadAll(Scope)` in `src/core/Environment.cpp` returning name, raw value and kind for every value under the scope's key, with the value left unexpanded. Done when: a test over a disposable key holding one `REG_SZ` and one `REG_EXPAND_SZ` value with `%SystemRoot%` returns both with their kinds and the reference unexpanded. Cheaper substitute: `GetEnvironmentVariable` or `GetEnvironmentStrings`, which return expanded values and lose the kind.",
+        "Implement `SplitList(value)` and `JoinList(entries)` in `src/core/PathList.cpp` for semicolon lists, keeping empty entries, quoted entries, trailing slashes and a trailing semicolon exactly. Done when: a test splits and joins every list variable on the development machine and the result equals the original string. Cheaper substitute: `std::getline` on `;` and a join, which drops a trailing empty entry.",
+        "Implement `Validate(scope, entries)` in `src/core/Validate.cpp` reporting a duplicate (case-insensitive, trailing slash ignored, across user and system), a folder that does not exist after expansion, an unexpanded reference to a variable that is not defined, and a value over the documented length limit (32,767 characters for one value, to be confirmed against Microsoft's documentation and cited in the file). Done when: a fixture with one of each returns four findings with the entry index and the reason. Cheaper substitute: checking existence on the unexpanded text, which reports every `%SystemRoot%` entry as missing.",
+        "Implement `Write(scope, name, value)` in `src/core/Environment.cpp` choosing the kind: keep the kind read, use `REG_EXPAND_SZ` for a new value that holds a `%` reference and `REG_SZ` otherwise, never write PATH as `REG_SZ` when it held `REG_EXPAND_SZ`. Done when: a test writes PATH with a `%SystemRoot%` entry under a disposable key and reads back `REG_EXPAND_SZ` with the reference intact. Cheaper substitute: `setx.exe`, which writes `REG_SZ` and cuts a value at 1024 characters.",
+        "Record the prior value in `src/core/Journal.cpp` before the first write: scope, name, raw value, kind and time, saved to disk and flushed. Done when: a test finds the record on disk with the old value before the new value is written, and a write that fails leaves the record in place. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+        "Read every value back after a write and return a mismatch as scope, name, expected, found and kind. Done when: a test that alters the stored value after the write gets all of them named. Cheaper substitute: checking only the return code of `RegSetValueExW`.",
+        "Implement `Broadcast()` in `src/core/Broadcast.cpp` sending `WM_SETTINGCHANGE` with the string \"Environment\" to `HWND_BROADCAST` through `SendMessageTimeoutW` with `SMTO_ABORTIFHUNG` and a bounded timeout. Done when: a test window receives the message with \"Environment\" after a write and the call returns within the timeout when another window hangs. Cheaper substitute: `SendMessage`, which blocks for as long as any program is hung.",
+        "Refuse a system-scope write or delete by name when the process is not elevated, before any write, with one activity record naming the variable. Done when: an unelevated run reports the refusal and the system fixture is unchanged, while a user write succeeds in the same run. Cheaper substitute: letting `RegSetValueExW` fail with access denied after the journal record was made.",
+        "Cover every path in `tests/environment_test.cpp` with a disposable root. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L environment` passes, and fails when the kind is dropped on write."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L environment` passes, including the kind round trip, the lossless split and join, the read-back mismatch and the unelevated refusal, and fails when the kind is dropped.",
+      "commit": "core: variables read and written with their type kept, journalled, verified and broadcast"
+    },
+    "enhancements": [
+      {
+        "title": "Undo Any Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Every save already records the prior value in the engine. This section shows those records as the Changes section and restores any one of them, through the SDK repair contract once it exists. Undo restores what was actually there, including the kind, and is itself recorded so it can be undone.",
+        "surface": {
+          "fidelity": "the Changes section and the Undo button, against `DESIGN.md` section 2.",
+          "job": "a person puts back any earlier value of a variable. Consumer: the stored variable, compared with the record.",
+          "treatment": "a list of changes newest first, each with its variable, scope, time, old and new value and an Undo action. Cheaper substitute that fails the checkpoint: undoing only the last change, or restoring by writing a remembered string without its kind."
+        },
+        "build": [
+          "Hand the journal to the repair contract in `src/core/Journal.cpp`. Done when: a record exists in the contract's store before the first write.",
+          "Build the Changes section in `src/ui/ChangesView.cpp`. Done when: every journal record is listed and Undo restores it."
+        ],
+        "items": [
+          "Implement `Undo(recordId)` in `src/core/Journal.cpp` restoring the recorded raw value and kind, and a variable that did not exist before is deleted. Done when: write then undo, and add then undo, each leave the store equal to before, value and kind asserted. Cheaper substitute: writing the old value as `REG_SZ`.",
+          "Refuse an undo of a system change without elevation by name, and refuse an undo when the variable has changed since the record, offering the choice to restore anyway. Done when: a fixture changed by another program after the record shows the refusal naming both values.",
+          "Record each undo as a change of its own and broadcast it. Done when: undoing an undo restores the state before it, asserted, and a test window receives `WM_SETTINGCHANGE` for each.",
+          "Build `src/ui/ChangesView.cpp` listing the records newest first with an Undo button on each, disabled with a tooltip when the record is already undone. Done when: after two saves the list shows two rows and Undo on the older one restores only that variable. Cheaper substitute: a private list control, which the contract forbids.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one kind is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: write, add and delete each undo to the exact prior value and kind, and an undo is itself undoable.",
+        "commit": "feature: any change can be undone, with its type"
+      },
+      {
+        "title": "Reorder PATH Entries",
+        "needs": "sdk-framework",
+        "intro": "Order in PATH decides which program runs when two share a name. This section lets entries be moved by drag or by keyboard and always shows the effective order the system will use: system entries first, then user entries, which Windows appends.",
+        "surface": {
+          "fidelity": "the PATH rows and the effective-order pane, against `DESIGN.md` section 2.",
+          "job": "a person puts entries in the order they want and sees the order Windows will actually use. Consumer: the saved value, read back.",
+          "treatment": "one row per entry with a drag handle, move up and move down by keyboard, and a second list of the effective order labelled by scope. Cheaper substitute that fails the checkpoint: a multi-line text box, which has no per-entry state and no keyboard move."
+        },
+        "build": [
+          "Implement the move operations in `src/core/PathList.cpp`. Done when: moving an entry changes only its position and the joined value keeps every other entry and the kind.",
+          "Build the rows and the effective-order pane in `src/ui/VariablesView.cpp`. Done when: a drag and a keyboard move produce the same value."
+        ],
+        "items": [
+          "Implement `Move(entries, from, to)`, `Insert` and `Remove` in `src/core/PathList.cpp` returning a new list and leaving the input unchanged. Done when: a test moves the first entry to the last place and the join contains the same entries in the new order. Cheaper substitute: rebuilding the list from the display text, which loses empty and quoted entries.",
+          "Implement `EffectiveOrder(system, user)` returning the system entries then the user entries, each with its scope. Done when: a fixture with a shared entry shows it twice, in that order, with both scopes.",
+          "Build the PATH rows in `src/ui/VariablesView.cpp` with drag reorder through the SDK's list control, and Alt+Up and Alt+Down for keyboard reorder. Done when: the order is changed with the mouse and then again with the keyboard alone, and each produces the unsaved-change count in the status bar. Cheaper substitute: a private drag implementation.",
+          "Show the effective-order pane beside the list, updating on every move. Done when: moving a user entry changes its position in the pane without a save, and the pane marks which entries come from which scope.",
+          "Cover it in `tests/pathlist_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L pathlist` passes, and fails when a move drops an empty entry."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L pathlist` passes, and a reorder by drag and by keyboard produce the same saved value.",
+        "commit": "feature: reorder PATH entries, with the effective order shown"
+      },
+      {
+        "title": "Find What Is Wrong",
+        "needs": "sdk-framework",
+        "intro": "Beyond the engine's checks, this section finds entries that hide another program of the same name: when two folders on PATH hold a file with the same name, the earlier one wins, and the later one never runs. It lists every finding with the entry, the reason and a suggested fix, and applies a fix only on request.",
+        "surface": {
+          "fidelity": "the findings list and the row states, against `DESIGN.md` section 2.",
+          "job": "a person sees what is wrong with PATH and fixes it with one action per finding. Consumer: the re-run of the checks after the fix.",
+          "treatment": "one finding per line with an icon and a word (Duplicate, Folder not found, Hides another program, Too long), the entry and the fix offered. Cheaper substitute that fails the checkpoint: colouring rows with no reason given, which shows state by colour alone."
+        },
+        "build": [
+          "Implement the shadow check in `src/core/Shadow.cpp`. Done when: a fixture with the same executable name in two folders reports the later entry as hidden by the earlier.",
+          "Show the findings in `src/ui/FindingsPanel.cpp`. Done when: each finding selects its row and offers its fix."
+        ],
+        "items": [
+          "Implement `FindShadowed(entries, pathext)` in `src/core/Shadow.cpp` listing, for each entry, the file names it holds that an earlier entry also holds, using the extensions in `PATHEXT` and the effective order of system then user. Done when: a fixture with `tool.exe` in two folders reports the second folder and names the file. Cheaper substitute: comparing folder names only, which finds duplicates and not shadowing.",
+          "Limit the scan to what is quick and say so: a bounded number of files per folder, and a finding when a folder is skipped. Done when: a folder with more files than the bound is listed as not fully scanned, never silently passed.",
+          "Offer one fix per finding: remove a duplicate, remove a dead entry, or move the shadowing entry; each is applied as an ordinary change with its journal record. Done when: applying a fix then undoing it restores the value, asserted.",
+          "Build `src/ui/FindingsPanel.cpp` with the findings, the counts in the status bar and a Fix button per line. Done when: choosing a finding selects its PATH row and the Fix button changes the unsaved-change count. Cheaper substitute: a message box listing the text.",
+          "Cover it in `tests/findings_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L findings` passes, and fails when the shadow check ignores `PATHEXT`."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L findings` passes for duplicates, dead folders, hidden programs and an over-long value, and each fix undoes.",
+        "commit": "feature: find duplicates, dead folders and hidden programs"
+      },
+      {
+        "title": "Export and Import",
+        "needs": "sdk-framework",
+        "intro": "A set of variables can be saved to a text file and brought back on this or another machine. An import is previewed first, shows what would change in each variable, and is applied as ordinary changes so that it can be undone.",
+        "surface": {
+          "fidelity": "the export dialog and the import preview, against `DESIGN.md` section 2.",
+          "job": "a person moves a set of variables between machines and sees exactly what an import will change. Consumer: the variables after the import, compared with the file.",
+          "treatment": "a preview listing each variable as added, changed or unchanged, with old and new values and its kind, and a count before the Apply button. Cheaper substitute that fails the checkpoint: importing straight into the registry, which gives no preview and no way back."
+        },
+        "build": [
+          "Implement the file format in `src/core/Exchange.cpp`. Done when: an export followed by an import of the same file on the same machine changes nothing.",
+          "Build the preview in `src/ui/ImportView.cpp`. Done when: nothing is written until Apply is pressed."
+        ],
+        "items": [
+          "Define a plain UTF-8 text format in `src/core/Exchange.cpp`: one line per variable with scope, kind, name and value, with the format version on the first line. Done when: the file for the development machine reads back to an equal set. Cheaper substitute: a `.reg` file, which cannot hold a scope switch and writes straight to the registry on a double click.",
+          "Implement `Export(scope, names)` choosing all or selected variables and `Preview(file)` returning each variable as added, changed or unchanged against the machine. Done when: a fixture file with one of each returns exactly that.",
+          "Apply an import as ordinary changes through `Write`, one journal record per variable, refused by name for system variables without elevation. Done when: an import then an undo restores every variable, asserted, and an unelevated import of a system variable changes nothing.",
+          "Reject a file with a bad version, a bad kind or a value over the length limit, naming the line. Done when: a file with each fault is refused with the line number and nothing is written.",
+          "Build `src/ui/ImportView.cpp` showing the preview and the counts, and the export action in the Variables header. Done when: Apply is disabled until the preview is shown and the status bar says how many variables will change. Cheaper substitute: a private file dialog, which the contract forbids.",
+          "Cover it in `tests/exchange_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L exchange` passes, and fails when the kind is left out of the file."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L exchange` passes: export, preview, import and undo round trip with kinds intact, and a faulty file writes nothing.",
+        "commit": "feature: export and import variables, previewed and undoable"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A round trip over every variable on the development machine reads, splits, joins and writes back to a disposable key with equal values and kinds.",
+      "On a real machine a user variable is added, a PATH entry is moved, the change is saved, a new console sees it, and Undo restores the prior value and kind.",
+      "An unelevated attempt to change a system variable is refused by name with nothing written, and an elevated one succeeds and is read back."
+    ]
+  }
+}

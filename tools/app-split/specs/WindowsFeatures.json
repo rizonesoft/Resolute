@@ -1,0 +1,269 @@
+{
+  "name": "WindowsFeatures",
+  "slug": "windowsfeatures",
+  "display": "Windows Features",
+  "job": "it lists the optional Windows features and capabilities, turns them on and off with the real progress of the servicing API, says plainly whether a restart is needed, and can turn a change back.",
+  "tagline": "Turn optional parts of Windows on and off, and see it actually happening",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Cornflower",
+    "light": "#93C5FD",
+    "dark": "#2563EB",
+    "social_ground": "#0B1B3F",
+    "social_muted": "#C9DAF8"
+  },
+  "icon": {
+    "idea": "Two switches, one on and one off.",
+    "points": [
+      "Free-standing, with no tile behind it: two pill-shaped switches stacked.",
+      "The upper switch is Cornflower with a Cornflower light knob at the right; the lower one is Cornflower light with a Cornflower knob at the left.",
+      "The small drawing, used below 40 pixels, enlarges the knobs."
+    ],
+    "large": "<rect x=\"8\" y=\"12\" width=\"80\" height=\"32\" rx=\"16\" fill=\"#2563EB\"/><circle cx=\"70\" cy=\"28\" r=\"11\" fill=\"#93C5FD\"/><rect x=\"8\" y=\"52\" width=\"80\" height=\"32\" rx=\"16\" fill=\"#93C5FD\"/><circle cx=\"26\" cy=\"68\" r=\"11\" fill=\"#2563EB\"/>",
+    "small": "<rect x=\"6\" y=\"8\" width=\"84\" height=\"36\" rx=\"18\" fill=\"#2563EB\"/><circle cx=\"70\" cy=\"26\" r=\"13\" fill=\"#93C5FD\"/><rect x=\"6\" y=\"52\" width=\"84\" height=\"36\" rx=\"18\" fill=\"#93C5FD\"/><circle cx=\"26\" cy=\"70\" r=\"13\" fill=\"#2563EB\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Features",
+        "One row per feature: name, what it is, state, restart pending; children under their parent"
+      ],
+      [
+        "Changes",
+        "What was turned on or off and when, each with a way back"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which optional parts of Windows are on, turns some on or off, watches real progress, and is told honestly whether a restart is needed.",
+    "primary": "Apply",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Telnet Client",
+        "Off"
+      ],
+      [
+        "Hyper-V",
+        "On, with its children indented below"
+      ],
+      [
+        "Windows Sandbox",
+        "Turning on, with a percentage"
+      ],
+      [
+        "Windows Subsystem for Linux",
+        "On, restart needed"
+      ],
+      [
+        "Legacy component",
+        "Off, files removed: needs a source"
+      ]
+    ],
+    "status": "3 changes ready, 1 waiting for a restart",
+    "notes": [
+      "Each feature is a row with its name, what it is in a few words and its state, shown as an icon and a word: On, Off, Turning on, Turning off, or Off with files removed. A change waiting for a restart is marked on the row itself.",
+      "Children are indented under their parent. Turning a parent off names the children that go with it before anything is changed.",
+      "The tick boxes only stage a change. Apply is the accent button and does the work; the rows then update from a re-read of the real state, not from the request.",
+      "While Apply runs, the percentage on the row and in the status bar is the servicing API's own, and a Cancel is offered. Nothing is shown as done until the state has been read back.",
+      "Undo turns the last change back to the state recorded before it. It is disabled with a tooltip when there is nothing to undo.",
+      "A feature whose files are not on the machine says so, and asks before downloading them. Features other programs depend on carry a warning.",
+      "When the process is not elevated, Apply and Undo are refused by name before anything starts, and the list is still readable."
+    ],
+    "cut": "There is no earlier window to cut from: this tool is new and nothing is ported. The Windows dialog it replaces (Turn Windows features on or off) has a tree of tick boxes with a spinner and no progress, a separate Control Panel route and no history. None of that is copied: the list is the first screen, and reporting and audit are the Activity and Changes sections. No menus, splash, animations or donate strip are planned, and the plan records each cut."
+  },
+  "readme": {
+    "lead": "Windows Features turns optional parts of Windows on and off and shows the work as it happens.",
+    "what": [
+      "Windows keeps a list of optional components, such as Hyper-V, Windows Sandbox, the Telnet client and the Linux subsystem, plus newer optional features delivered on demand. The built-in dialog shows a spinner, gives no percentage and does not say clearly whether a restart is needed.",
+      "Windows Features lists them with their state, lets you stage changes and apply them in one go, reads the state back afterwards, and keeps a record of each change so that it can be turned back. It needs administrator rights to change anything and says so by name when it does not have them."
+    ],
+    "new_intro": "This is a new tool, not a port: nothing exists yet, and the plan builds it directly in C++.",
+    "new": [
+      [
+        "Real progress.",
+        "The percentage comes from the Windows servicing API while it works, never from a timer."
+      ],
+      [
+        "An honest restart answer.",
+        "A change that needs a restart is shown as pending until the restart has happened."
+      ],
+      [
+        "Every change can be undone.",
+        "Before a change, the prior state is recorded, so Undo turns a feature back to what it was."
+      ],
+      [
+        "Explained and searchable.",
+        "Each feature has a plain-words description, and the ones other programs depend on carry a warning."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The new tool: build, engine, window, undo, progress, release",
+    "goal": "Windows Features ships as a complete, standalone C++ tool: it lists optional Windows features and capabilities with their real states, enables and disables them through the servicing API with the API's own progress, reports honestly whether a restart is needed, reads the state back after every change, and can turn each change back.",
+    "current_state": "Nothing exists yet. There is no earlier tool and no AutoIt source: the repository holds `docs/origin/resolute-D05-T07-s6.md` (the plan section of 25 lines, which also describes an environment editor, a power plans tool and a locale fixer that are not part of this tool), the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The only requirement the origin text states for this tool is that enabling and disabling both report progress and verify by reading the feature state back, and that every change is reversible (`docs/origin/resolute-D05-T07-s6.md:12`, `:15`). Everything else in this plan comes from the servicing API's documented behaviour (the DISM API: `DismInitialize`, `DismOpenSession` on the online image, `DismGetFeatures`, `DismGetFeatureInfo`, `DismEnableFeature` and `DismDisableFeature` with a progress callback, `DismGetCapabilities` and `DismAddCapability`) and has not yet been confirmed on a machine. The SDK's framework, repair contract and chart control, which this tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s6.md`: the plan section as it stood in the Resolute repository, of which only the Windows features line and the reversibility line concern this tool.",
+      "The Windows servicing API (`dismapi.h`, `dismapi.dll`), documented by Microsoft, read for the feature states, the progress callback and the restart-required result.",
+      "A disposable Windows machine or virtual machine on which features may be turned on and off, for the baseline and the round trip."
+    ],
+    "outcome": [
+      "`WindowsFeatures.exe` lists features and capabilities with their states, enables and disables them with the API's real progress, and reads the state back after every change.",
+      "A restart is reported as needed only when the API says so, a pending change shows as pending until the restart, and every change can be undone from a record kept before it.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Features screen, where a person finds a feature by name and sees its state, with children under their parent. Reporting and audit are the Activity section, which is the trail of what the tool did, and the Changes section, which is the record of what was turned on or off. Settings are the framework's pages. Permissions anchor on the engine, where an unelevated change is refused by name before it starts. Reverse anchors on the Undo enhancement: it turns a feature back to the state recorded before the change, which is not always the opposite of the action (a feature that was already on stays on).",
+    "baseline_items": [
+      "Measure how Windows behaves for a few features on a disposable machine: read the state with `dism /online /get-features` and `Get-WindowsOptionalFeature -Online`, turn one feature on and off, and note what each reports. Done when: `docs/baseline/states.json` lists, for each feature tried, its state before, during and after, and the Windows build it was taken on.",
+      "Measure restart behaviour and removed-payload behaviour on the same machine: one feature that asks for a restart and one that is off with its files removed. Done when: `docs/baseline/restart.json` records the restart-required value the servicing API returned and the state shown before and after the restart, and `docs/baseline/payload.json` records what enabling the removed one did with and without a source.",
+      "Record exactly how each measurement was made in `docs/baseline/README.md`. Done when: another person could repeat every measurement from the file."
+    ],
+    "inventory_items": [
+      "Record the servicing API calls the tool uses in `docs/inventory.md`: `DismInitialize`, `DismOpenSession`, `DismGetFeatures`, `DismGetFeatureInfo`, `DismGetFeatureParent`, `DismEnableFeature`, `DismDisableFeature`, `DismGetCapabilities`, `DismAddCapability`, `DismRemoveCapability`, `DismCloseSession`, `DismShutdown`. Done when: each is listed with what it returns and the part of the engine that calls it.",
+      "Record the states and results the tool must show in `docs/inventory.md`: enabled, disabled, enable pending, disable pending, disabled with payload removed, and the restart results. Done when: each state is named with the word the window shows for it, and every one is matched to a value the baseline measured.",
+      "Record the risky features in `docs/inventory.md`: the ones other programs depend on, such as .NET Framework and the print components, with a plain-words reason for each. Done when: each has a one-line warning text and a note on what stops working.",
+      "Record the settings, strings, activity record and ship list. Done when: every setting, log line and shipped file is marked keep, cut or remapped, and the window sections of `DESIGN.md` are each listed with their controls."
+    ],
+    "engine": {
+      "title": "Servicing Engine",
+      "intro": "The tool's whole system effect: listing features and capabilities with their states through the servicing API, enabling and disabling them with the API's real progress passed to the framework's task runner, reporting restart-required honestly, and reading the state back. Every action is refused by name when the process is not elevated, and a feature whose files are not on the machine says so before anything is downloaded. It stands on its own, without any window.",
+      "needs": "windows-host",
+      "build": [
+        "Wrap the servicing API behind one interface in `src/core/Servicing.h` and `src/core/Servicing.cpp`, with a fake the tests can use. Done when: the unit tests run against the fake and one test run uses the real API read-only.",
+        "Write the state, parent and restart model in `src/core/Feature.h`. Done when: every state in `docs/inventory.md` is a named value and the window never sees a raw API code."
+      ],
+      "items": [
+        "Implement `Servicing::Open()` and `Close()` in `src/core/Servicing.cpp`: `DismInitialize`, a session on the online image through `DismOpenSession`, and `DismCloseSession` and `DismShutdown` on every exit path. Done when: a test that fails midway leaves no open session, asserted by a second `Open()` succeeding. Cheaper substitute: starting `dism.exe` and reading its text, which gives no real progress and breaks with the system language.",
+        "Implement `ListFeatures()` returning name, display name, state, restart-required and parent for each feature, using `DismGetFeatures`, `DismGetFeatureInfo` and `DismGetFeatureParent` in `src/core/Servicing.cpp`. Done when: the list equals `docs/baseline/states.json` on the baseline machine and a child feature carries its parent's name.",
+        "Implement `ListCapabilities()` using `DismGetCapabilities` and `DismGetCapabilityInfo`, with capabilities add and remove through `DismAddCapability` and `DismRemoveCapability`. Done when: a test lists the capabilities on the real machine, and an add and a remove on the fake change the state read back.",
+        "Implement `Enable(name, source)` and `Disable(name)` in `src/core/Servicing.cpp` through `DismEnableFeature` and `DismDisableFeature`, passing the API's progress callback and a cancel event to the framework's task runner. Done when: a test on the fake sees progress values arrive in order from the callback and a cancel stops the work. Cheaper substitute: a progress value counted from elapsed time, which would show a number the API never gave.",
+        "Read the state back after every change and return a mismatch as feature, asked, expected and found. Done when: a fake that reports success but leaves the state unchanged gets the mismatch named. Cheaper substitute: trusting the return code of the call.",
+        "Report restart honestly: carry the API's restart-required result, and show a feature in the pending state as enable pending or disable pending until a re-read says otherwise. Done when: a fake returning restart-required marks the feature pending, and after the fake changes its state the next `ListFeatures()` clears the mark. Cheaper substitute: always saying a restart is needed, or never.",
+        "Detect a feature that is disabled with its payload removed and refuse to enable it without a source, naming it and saying its files must be downloaded or supplied. Done when: a fake in that state returns the named refusal, and the same call with a source path proceeds. Cheaper substitute: letting the call fail with a raw error code.",
+        "Refuse `Enable`, `Disable` and the capability calls by name when the process is not elevated, before any session change, with one activity record. Done when: an unelevated test run reports the refusal and the fake is unchanged. Cheaper substitute: letting the API return access denied after the work has started.",
+        "Cover every path in `tests/servicing_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L servicing` passes, and fails when the read-back check is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L servicing` passes, including the unchanged-after-success, restart-pending, removed-payload and unelevated cases, and fails when the read-back is removed.",
+      "commit": "core: servicing engine with real progress, read-back and honest restart"
+    },
+    "parity_items": [
+      "Compare the engine's real-machine reads with the measurements of the baseline. Done when: `tests/fixtures/baseline/` is copied from `docs/baseline/` at configure time and the round-trip test reads it, with no path typed into a tracked build file.",
+      "Prove the round trip on a disposable machine: turn a feature on, read it back, turn it off, read it back. Done when: the test covers an ordinary feature, one that needs a restart and one with its payload removed, and each ends in the state the baseline recorded."
+    ],
+    "enhancements": [
+      {
+        "title": "Undo a Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before an enable or a disable, the prior state of the affected features is recorded, so Undo turns each back to what was actually there and not to a guess: a feature that was already on stays on. The record and the undo are the SDK repair contract's, which this section consumes once it exists. The Changes section lists each recorded change with its time.",
+        "surface": {
+          "fidelity": "the Undo button and the Changes section, against `DESIGN.md` section 2.",
+          "job": "a person turns back what the last change did, or an older one. Consumer: the features' states, compared with the record.",
+          "treatment": "each change listed with its time and what it changed, and Undo restoring the recorded state feature by feature. Cheaper substitute that fails the checkpoint: an undo that simply does the opposite action, which is wrong for a feature that was already in the state requested."
+        },
+        "build": [
+          "Record the prior state through the repair contract in `src/core/Changes.cpp`. Done when: a record exists on disk before the first call to the API.",
+          "Wire the Changes section and Undo in `src/ui/ChangesView.cpp`. Done when: enable then undo leaves the features as they were."
+        ],
+        "items": [
+          "Record the prior state of every feature a change touches, including its children, through the repair contract's restore record before any API call. Done when: a test finds the record on disk before the first `DismEnableFeature` call is made. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo in `src/core/Changes.cpp` restoring the recorded state through the same engine, with progress and read-back. Done when: enable then undo, and disable then undo, each leave the features equal to before, asserted, and a feature already on before an enable stays on after undo.",
+          "List recorded changes newest first in `src/ui/ChangesView.cpp` with time, features and what changed, and an Undo for each. Done when: after two changes the list shows two entries and undoing the older one is offered with the effect on the newer one named.",
+          "Disable Undo with a tooltip when there is nothing to undo, and say when a record cannot be restored (a removed payload with no source). Done when: a first run shows it disabled, and a record needing a source asks for one.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one feature is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: enable then undo and disable then undo both leave the features as they were.",
+        "commit": "feature: undo turns a change back to the recorded state"
+      },
+      {
+        "title": "Real Progress",
+        "needs": "sdk-framework",
+        "intro": "The percentage a person sees comes from the servicing API's progress callback and from nothing else. It goes through the framework's task runner, so the window, the status bar and the activity record all show the same number, and a Cancel stops the work through the API's cancel event.",
+        "surface": {
+          "fidelity": "the row progress and the status bar, against `sdk/DESIGN.md`.",
+          "job": "a person sees how far a change has got while it runs, and can stop it. Consumer: the progress shown, compared with the values the API reported.",
+          "treatment": "a percentage on the row being changed and a matching line in the status bar, with Cancel. Cheaper substitute that fails the checkpoint: an indeterminate spinner or a timer-driven bar, which is the thing this tool replaces."
+        },
+        "build": [
+          "Pass the API's progress to the framework's task runner in `src/core/Servicing.cpp`. Done when: a test sees each callback value arrive at the runner unchanged.",
+          "Show the progress on the row and in the status bar in `src/ui/FeaturesView.cpp`. Done when: the shown value equals the last value reported."
+        ],
+        "items": [
+          "Forward each progress callback of `DismEnableFeature` and `DismDisableFeature` to the framework's task runner without smoothing or estimating. Done when: a test with a fake emitting 0, 30 and 100 shows exactly those three values. Cheaper substitute: a timer that moves the bar between callbacks.",
+          "Show the percentage on the row being changed and in the status bar from the same value. Done when: a driven test reads both through UI Automation and they are equal at each step.",
+          "Wire Cancel to the API's cancel event and show the outcome in words, with the feature's real state read back. Done when: cancelling a fake mid-change ends with the state shown as it really is, not as requested.",
+          "Cover it in `tests/progress_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L progress` passes, and fails when the shown value is taken from a clock."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L progress` passes and a driven run shows the same percentage on the row and in the status bar at every step.",
+        "commit": "feature: progress shown is the servicing API's own"
+      },
+      {
+        "title": "Restart Needed, Said Plainly",
+        "needs": "sdk-framework",
+        "intro": "A restart is stated only when the servicing API says one is needed. A change waiting for a restart shows as pending on its row, and as one line in the status bar, until a re-read after the restart says it has taken effect. The tool never restarts the machine by itself.",
+        "surface": {
+          "fidelity": "the pending marks on the rows and the status bar, against `sdk/DESIGN.md`.",
+          "job": "a person knows which changes are waiting for a restart and which are done. Consumer: the rows, compared with the API's restart-required results.",
+          "treatment": "an icon and the words 'waiting for restart' on the row, and a count in the status bar, with a Restart now button that asks first. Cheaper substitute that fails the checkpoint: a generic 'you may need to restart' banner after every change."
+        },
+        "build": [
+          "Carry the restart result per feature in `src/core/Feature.h` and `src/core/Servicing.cpp`. Done when: the model holds one restart value per feature.",
+          "Show pending marks and the status count in `src/ui/FeaturesView.cpp`. Done when: a fake returning restart-required marks exactly that row."
+        ],
+        "items": [
+          "Mark a row as waiting for a restart only when its restart-required result says so or its state is enable pending or disable pending. Done when: a fake with one such feature and one without marks one row. Cheaper substitute: marking every changed row.",
+          "Clear the mark only when a re-read of the real state shows the change in effect. Done when: a fake that changes state on its next read clears the mark, and one that does not keeps it.",
+          "Show the number of waiting changes in the status bar in words (for example '1 change waiting for a restart'). Done when: the text changes with the rows.",
+          "Offer a Restart now button that asks first and names what is waiting. Done when: declining leaves everything as it was and the tool never calls the restart itself without the press. Cheaper substitute: restarting automatically, which can lose a person's open work.",
+          "Cover it in `tests/restart_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restart` passes, and fails when a mark is shown without the API's result."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restart` passes: a change that needs a restart shows pending until a re-read says otherwise, and one that does not never does.",
+        "commit": "feature: restart needed is shown only when the API says so"
+      },
+      {
+        "title": "Search and Explain",
+        "needs": "sdk-framework",
+        "intro": "Windows lists features by technical name, so most are meaningless to the person reading them. Each feature gets a plain-words description from a data table, a search over names and descriptions, and a warning on the ones other programs depend on, such as .NET Framework and the print components.",
+        "surface": {
+          "fidelity": "the description text, the search box and the warnings, against `sdk/DESIGN.md`.",
+          "job": "a person finds a feature and understands what turning it off would do. Consumer: the rows and the warning, compared with the data table.",
+          "treatment": "a few words under the name, a search box above the list, and a warning with its reason before a risky change is applied. Cheaper substitute that fails the checkpoint: showing only the technical name, which tells a person nothing."
+        },
+        "build": [
+          "Write the descriptions and warnings as data in `resources/features.json`. Done when: each entry names a feature, a description of at most one sentence and an optional warning.",
+          "Load them in `src/core/Describe.cpp` and show them in `src/ui/FeaturesView.cpp`. Done when: a known feature shows its description and an unknown one shows its technical name."
+        ],
+        "items": [
+          "Write `resources/features.json` with a plain-words description for each feature in the inventory, and a warning for each risky one with what stops working. Done when: a test checks every entry has a description and every risky feature of `docs/inventory.md` has a warning. Cheaper substitute: descriptions typed into the view, which cannot be checked or translated.",
+          "Implement the lookup in `src/core/Describe.cpp` and show the description under the name on each row. Done when: a feature missing from the table shows its technical name and no invented text.",
+          "Add a search box that filters the list by name and description, keeping parents of matching children visible. Done when: a driven test searching a child name shows the child under its parent.",
+          "Show the warning in the confirmation before a risky feature is turned off, naming it. Done when: turning off a feature with a warning asks first and declining changes nothing.",
+          "Cover it in `tests/describe_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L describe` passes, and fails when a risky feature loses its warning."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L describe` passes: every feature in the inventory has a description, every risky one a warning, and search keeps parents of matches.",
+        "commit": "feature: plain-words descriptions, search and warnings"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A walk of `docs/origin/resolute-D05-T07-s6.md` finds its Windows features line and its reversibility line both met, with the proof named in `docs/inventory.md`.",
+      "The round trip on a disposable machine turns a feature on, reads it back, turns it off and reads it back, for an ordinary feature, one needing a restart and one with its payload removed.",
+      "On a real machine the tool lists, changes with real progress, reports restart honestly, refuses when not elevated and undoes, in light and dark, by keyboard alone."
+    ]
+  }
+}

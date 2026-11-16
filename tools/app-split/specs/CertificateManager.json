@@ -1,0 +1,253 @@
+{
+  "name": "CertificateManager",
+  "slug": "certificatemanager",
+  "display": "Certificate Manager",
+  "job": "it inspects the Windows certificate stores for what breaks secure web connections (expired roots, missing or untrusted intermediates, roots outside Microsoft's trusted root programme and a wrong system clock), explains each finding in plain words, and moves a chosen certificate out of a trusted store after saving it.",
+  "tagline": "Find the certificates that break secure websites",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Royal purple",
+    "light": "#C4B5FD",
+    "dark": "#6D28D9",
+    "social_ground": "#1D1238",
+    "social_muted": "#DDD4F7"
+  },
+  "icon": {
+    "idea": "A certificate with a ribbon seal.",
+    "points": [
+      "Free-standing, with no tile behind it: a rounded card with two lines and a seal with ribbon tails at its lower right.",
+      "The card is Royal purple; the lines and the seal are Royal purple light.",
+      "The small drawing, used below 40 pixels, has one line and a larger seal."
+    ],
+    "large": "<rect x=\"8\" y=\"14\" width=\"80\" height=\"56\" rx=\"10\" fill=\"#6D28D9\"/><path d=\"M20 32 H50 M20 46 H42\" fill=\"none\" stroke=\"#C4B5FD\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"66\" cy=\"50\" r=\"11\" fill=\"#C4B5FD\"/><path d=\"M60 60 V84 L66 78 L72 84 V60\" fill=\"none\" stroke=\"#C4B5FD\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<rect x=\"6\" y=\"12\" width=\"84\" height=\"58\" rx=\"11\" fill=\"#6D28D9\"/><path d=\"M18 34 H44\" fill=\"none\" stroke=\"#C4B5FD\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"66\" cy=\"46\" r=\"14\" fill=\"#C4B5FD\"/><path d=\"M59 58 V86 L66 79 L73 86 V58\" fill=\"none\" stroke=\"#C4B5FD\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Findings",
+        "A one-sentence verdict first, then each problem certificate as a row: its name, its store, what is wrong and how serious it is"
+      ],
+      [
+        "Stores",
+        "Every certificate in a chosen store, with its issuer, its dates and its state"
+      ],
+      [
+        "Activity",
+        "What the tool scanned and moved, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which certificates would break secure websites, why, and moves a bad one out of a trusted store with it saved first.",
+    "primary": "Scan",
+    "secondary": "Remove trust",
+    "rows": [
+      [
+        "Expired root certificate",
+        "Serious, in Root"
+      ],
+      [
+        "Root outside Microsoft's trusted programme",
+        "Warning, in Root"
+      ],
+      [
+        "Weak signature algorithm",
+        "Warning, in CA"
+      ],
+      [
+        "Duplicate certificate",
+        "Note, in Root"
+      ],
+      [
+        "In the Disallowed store and also trusted",
+        "Serious, in Root"
+      ]
+    ],
+    "status": "3 problems: 1 serious, 2 warnings",
+    "notes": [
+      "The first line of the Findings screen is one sentence of verdict, for example that a clock that is wrong is the likely cause, or that no problem certificate was found. A wrong system clock is named before any certificate, because it makes every certificate look invalid.",
+      "Each problem is a row with the certificate's name, its store, what is wrong in plain words and how serious it is. Serious, Warning and Note each show an icon and a word, never colour alone.",
+      "Scan is the accent button: it reads every store again and rebuilds the rows. Nothing is changed by a scan.",
+      "Remove trust moves the selected certificate out of its trusted store. A confirmation first names the certificate, its store and where the saved copy goes, and declining changes nothing.",
+      "Undo a removal puts the saved certificate back in the store it came from. It is disabled, with a tooltip, until a removal has been made.",
+      "Removing from a machine store when the tool is not elevated is refused by name before anything is saved or changed, and the screen says how to start the tool as administrator. Scanning works unelevated and says the machine stores are read-only in that case.",
+      "The status bar says the counts in words, for example \"3 problems: 1 serious, 2 warnings\"."
+    ],
+    "cut": "There is no source window to compare with, so nothing is cut from one. The window deliberately has no menu bar, splash, animation or donate strip, and no screen that shows a private key or exports a certificate chain for sharing: the suite's sidebar window, its framework pages and the two screens above are all it has. The plan records this in the sections that build the window."
+  },
+  "readme": {
+    "lead": "Certificate Manager finds the certificates on a Windows PC that break secure websites, and says in plain words what is wrong with each one.",
+    "what": [
+      "It reads the certificate stores of the machine and of the signed-in user: Root, CA (intermediates), My, Disallowed and AuthRoot. It flags expired and not-yet-valid certificates, weak signature algorithms such as SHA-1 and MD5, duplicates, certificates in the Disallowed store that are also trusted, and root certificates that do not come from Microsoft's trusted root programme, which security software, a proxy or malware often adds. It also checks the system clock, because a wrong date makes every certificate look invalid.",
+      "It is an inspector first. The one change it makes is moving a chosen certificate out of a trusted store, and it saves that certificate before it does. It never reads, copies or exports a private key."
+    ],
+    "new_intro": "Certificate Manager is a new tool, not a port: there is no earlier version.",
+    "new": [
+      [
+        "A verdict first.",
+        "The Findings screen opens with one sentence, then one row per problem certificate with its store, what is wrong and how serious it is."
+      ],
+      [
+        "A chain that says where it breaks.",
+        "Give it a website and it names the link of the chain that fails and why, in words."
+      ],
+      [
+        "Removal with a way back.",
+        "A certificate is saved before it leaves a trusted store, and Undo puts it back."
+      ],
+      [
+        "Public certificates only.",
+        "The tool never touches a private key."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "Certificate Manager ships as a complete, standalone C++ tool that reads the Windows certificate stores, flags what breaks secure web connections with a plain-words explanation and a severity, says which link of a named website's chain fails, checks the system clock, and moves a chosen certificate out of a trusted store with it saved first, never touching a private key, and can put that certificate back.",
+    "current_state": "Nothing exists yet: this is a new tool and nothing is ported, so there is no AutoIt original and no `reference/au3/`. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T07-s4.md`, a plan section that covers three tools, of which only two bullets concern certificates (`docs/origin/resolute-D05-T07-s4.md:13-14`): inspect the stores for expired roots, untrusted intermediates and anything that would break HTTPS, flagging a fixture expired root with what it affects, and hand off to the suite's ComIntRep tool when a certificate fault is the real cause. The rest of the tool is designed from the Windows certificate APIs: `CertOpenStore` and `CertEnumCertificatesInStore` to read stores, `CertGetCertificateChain` and `CertVerifyCertificateChainPolicy` to build and judge a chain, and `certutil` as Windows' own tool for the Microsoft trusted root list. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s4.md`: the plan section as it stood in the Resolute repository. Only its certificate bullets (lines 13-14) and its recovery-key treatment (lines 6-7, never exporting secrets) apply here; the BitLocker and recovery tools in it are other tools.",
+      "The Windows certificate APIs, read from Microsoft's documentation on the build machine: `CertOpenStore`, `CertEnumCertificatesInStore`, `CertGetCertificateChain`, `CertVerifyCertificateChainPolicy` and `CertSerializeCertificateStoreElement`.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the tool's identity and window sections, and the suite's design contract."
+    ],
+    "outcome": [
+      "`CertificateManager.exe` lists every certificate of the five stores in both locations, flags each problem with a name, a store, a plain explanation and a severity, and says which link of a named website's chain fails.",
+      "A chosen certificate moves out of a trusted store only after it is saved and read back, the move is refused by name when the tool is not elevated for a machine store, no code path reads a private key, and Undo puts the certificate back.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Findings screen, where a person finds a problem certificate by what is wrong with it, with the Stores screen as the full list of a chosen store. Reporting and audit are the Activity section: what was scanned and which certificate was moved, with the time. Settings are the framework's pages. Permissions anchor on the engine, where a machine-store removal is refused by name when the process is not elevated. Reverse anchors on the Undo a Removal section: the saved certificate is the record, and putting it back restores the store as it was.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Certificate Store Engine",
+      "intro": "The tool's core, independent of any window: reading the stores, a table of checks declared as data, building a chain to say which link fails, comparing the system clock with a reference, and moving one certificate out of a trusted store with it saved first. It never touches a private key, and it refuses by name when it is not elevated for a machine store.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the stores and the checks as data in `src/core/Checks.h`. Done when: the five stores, the two locations and the six checks are each stated once with their plain-words explanation and severity.",
+        "Implement enumeration, the checks, chain building and the guarded move in `src/core/CertStore.cpp` against a store the tests can redirect. Done when: the unit tests pass against an in-memory store holding fixture certificates."
+      ],
+      "items": [
+        "Enumerate every certificate of Root, CA, My, Disallowed and AuthRoot in the machine and current-user locations in `src/core/CertStore.cpp` with `CertOpenStore` and `CertEnumCertificatesInStore`, read-only, returning subject, issuer, thumbprint, validity dates, signature algorithm and store. Done when: a test over an in-memory store of fixture certificates returns each with all seven fields. Cheaper substitute: running `certutil -store` and parsing its text, which changes with the Windows language.",
+        "Declare the checks as a table in `src/core/Checks.h`, each with an id, a test, a plain-words explanation and a severity: expired, not yet valid, weak signature algorithm (SHA-1 or MD5), root outside the trusted programme, duplicate, and in the Disallowed store yet also trusted. Done when: adding a seventh row to the table is the only change needed to add a check, proven by a test that adds a fixture row. Cheaper substitute: a chain of `if` statements in the scan, which cannot be listed or tested one by one.",
+        "Implement the expired and not-yet-valid checks against a clock passed in, so a test can set the time. Done when: a fixture root that ended yesterday is flagged expired with what it affects (every site whose chain ends at it), and a fixture that starts tomorrow is flagged not yet valid, matching `docs/origin/resolute-D05-T07-s4.md:13`.",
+        "Implement the root-outside-the-trusted-programme check from Microsoft's trusted root list, read from the list Windows keeps (the AuthRoot store, refreshed with `certutil` where it can be) and compared by thumbprint. Done when: a fixture root absent from the list is flagged, and with no list available every root is reported as not judged and none is flagged. Cheaper substitute: flagging every root that is not in the machine Root store, which flags the roots Windows adds on demand.",
+        "Build a chain for one certificate in `src/core/Chain.cpp` with `CertGetCertificateChain` and judge it with `CertVerifyCertificateChainPolicy`, returning the first failing link, its position, and the trust-status bit as plain words (expired, untrusted root, missing intermediate, name mismatch, revoked). Done when: fixture chains with a missing intermediate, an expired intermediate and an untrusted root each name the right link. Cheaper substitute: reporting only that verification failed, which cannot say which link breaks the site.",
+        "Compare the system clock with a reference time in `src/core/Clock.cpp` and re-run the validity checks with each, reporting the skew and whether any verdict changes. Done when: a test with a clock one year wrong reports that it turns valid certificates into expired ones and names the clock as the cause before any certificate.",
+        "Implement `MoveOut(cert, store)` in `src/core/CertStore.cpp`: serialise the certificate with `CertSerializeCertificateStoreElement` to a saved file, read the file back and compare its thumbprint, then delete the certificate from the store, allowed for Root, CA and AuthRoot only. Done when: a test shows the saved file exists and verifies before the store loses the certificate, and a corrupted save leaves the store unchanged. Cheaper substitute: deleting first and exporting afterwards, which loses the certificate when the export fails.",
+        "Refuse `MoveOut` on a machine store when the process is not elevated, by name, before saving or deleting anything, with one activity record, and never open a private key: no call to `CryptAcquireCertificatePrivateKey` or `NCryptExportKey` anywhere. Done when: an unelevated test run reports the refusal with the store unchanged, and a search of `src/` finds no call to either function. Cheaper substitute: letting the delete fail with access denied after the file is saved.",
+        "Cover every path in `tests/certstore_test.cpp` with an in-memory store. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L certstore` passes, and fails when one check's test is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L certstore` passes, including the missing-intermediate, wrong-clock, corrupted-save and unelevated cases, and fails when one declared check is changed.",
+      "commit": "core: stores, checks, chains and a guarded move, with no private key"
+    },
+    "enhancements": [
+      {
+        "title": "Undo a Removal",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A removal saves the certificate first, so Undo puts the saved certificate back in the store it came from, with its properties. The record and the undo are the SDK repair contract's, which this section consumes once it exists. A removal that could not be saved never happens, so there is no removal without an undo.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back the certificate they moved out of a trusted store. Consumer: the store, compared with the saved file.",
+          "treatment": "the saved certificate added back to the same store and location, then found there. Cheaper substitute that fails the checkpoint: importing the file into whichever store is open, which can restore trust in the wrong place."
+        },
+        "build": [
+          "Record each removal through the repair contract in `src/core/Restore.cpp`. Done when: a record naming the certificate, its store and the saved file exists before the delete.",
+          "Wire Undo in `src/ui/FindingsView.cpp`. Done when: removing then undoing leaves the store as it was."
+        ],
+        "items": [
+          "Write the restore record (thumbprint, store, location, saved file) through the repair contract's record in `src/core/Restore.cpp` before the delete. Done when: a test finds the record on disk before the certificate leaves the store. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement `Undo()` reading the saved file back with `CertAddSerializedElementToStore` into the recorded store and location. Done when: remove then undo leaves the store equal to before, thumbprints compared, and the certificate's properties are present.",
+          "Refuse an undo by name when the saved file is missing or its thumbprint no longer matches, leaving the store unchanged. Done when: a test with a tampered file reports the refusal. Cheaper substitute: importing whatever the file holds.",
+          "Disable Undo with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one removal.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one restored certificate is left out."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: remove then undo leaves the store as it was, and a tampered saved file is refused.",
+        "commit": "feature: undo puts a removed certificate back"
+      },
+      {
+        "title": "Test a Website",
+        "intro": "A person types a website and the tool fetches its certificate chain and says which link breaks it and why, in plain words, using the chain engine of the core section. It reads the certificate the site presents and never sends anything but the connection handshake.",
+        "surface": {
+          "fidelity": "the site box and its result on the Findings screen, against `DESIGN.md` section 2.",
+          "job": "a person finds out why one website fails. Consumer: the chain result for that site, read back.",
+          "treatment": "a box for the site name and a result line naming the failing link, its place in the chain and the reason in words. Cheaper substitute that fails the checkpoint: a pass or fail icon with no link named."
+        },
+        "build": [
+          "Fetch the presented chain in `src/core/SiteChain.cpp`. Done when: a local test server's certificate chain is returned without being trusted first.",
+          "Show the result in `src/ui/FindingsView.cpp`. Done when: the failing link is named on the screen."
+        ],
+        "items": [
+          "Open a connection to the named host in `src/core/SiteChain.cpp` through Schannel with manual validation, so the handshake completes and the presented certificate is read, and hand it to the chain engine. Done when: a local test server with an expired intermediate returns its chain and the engine names the intermediate. Cheaper substitute: a default connection, which stops at the failure and returns no chain to inspect.",
+          "Report a site that cannot be reached separately from a site whose chain fails. Done when: a closed port and a bad chain give two different sentences.",
+          "Put the site box and result line on the Findings screen in `src/ui/FindingsView.cpp`, with an accessible name. Done when: typing a host and pressing Enter shows the result, by keyboard alone.",
+          "Cover it in `tests/site_test.cpp` against a local test server. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L site` passes, and fails when the named link is wrong."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L site` passes for the expired-intermediate, untrusted-root and unreachable cases, each with its own sentence.",
+        "commit": "feature: test a website's chain and name the link that breaks"
+      },
+      {
+        "title": "Roots Windows Did Not Ship",
+        "intro": "The roots flagged as outside Microsoft's trusted root programme are listed together, each with what most likely added it (a security product, a company proxy or inspection device, a development tool, or unknown), so a person can tell a corporate root from a rogue one. The likely source is a statement from the certificate's own name, never a verdict.",
+        "surface": {
+          "fidelity": "the third-party roots group on the Findings screen, against `DESIGN.md` section 2.",
+          "job": "a person sees which roots Windows did not ship and what probably added each. Consumer: the roots flagged by the engine, read back.",
+          "treatment": "one row per root with its subject, its issuer, its dates and one sentence of likely source, marked as a guess. Cheaper substitute that fails the checkpoint: a bare list of subject names, which does not help tell the root's origin."
+        },
+        "build": [
+          "Declare the likely-source rules as data in `src/core/Origins.h`. Done when: each rule is a pattern of a subject or issuer with the source it suggests.",
+          "Group the flagged roots in `src/ui/FindingsView.cpp`. Done when: each row shows its likely source."
+        ],
+        "items": [
+          "Declare the likely-source rules in `src/core/Origins.h` as a table of subject or issuer patterns, each with a source word and a sentence, with `unknown` as the last row. Done when: the table is the only place a source is named, and a test adds a fixture rule.",
+          "Attach the likely source to every root flagged by the programme check. Done when: a fixture root issued by a proxy-style name gets that source and an unmatched one gets unknown, never a blank.",
+          "State in every row that the source is a guess from the name and that only the person who manages the machine can confirm it. Done when: the sentence is present on each row. Cheaper substitute: presenting the guess as a fact.",
+          "Cover it in `tests/origins_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L origins` passes, and fails when the unknown row is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L origins` passes, and every flagged root in the fixture shows a source or unknown, marked as a guess.",
+        "commit": "feature: third-party roots grouped with their likely source"
+      },
+      {
+        "title": "Hand Off to ComIntRep",
+        "intro": "When the scan or a website test shows that a certificate fault is the real cause of a connection problem, the Findings screen offers to open the suite's Complete Internet Repair tool (ComIntRep) with the finding. When the chain is sound and the connection still fails, it says the fault is not a certificate and offers the same tool for the connection. The tool does not depend on ComIntRep at runtime: the offer appears only when ComIntRep is installed, and nothing else changes when it is not.",
+        "surface": {
+          "fidelity": "the hand-off button on the Findings screen, against `DESIGN.md` section 2.",
+          "job": "a person who has found the real cause goes to the tool that repairs the connection, carrying what was found. Consumer: the launched tool's command line, read back.",
+          "treatment": "a button named for the tool and the reason, shown only when ComIntRep is installed, that starts it with the finding. Cheaper substitute that fails the checkpoint: a button that always shows and opens the tool with no finding."
+        },
+        "build": [
+          "Detect an installed ComIntRep in `src/core/HandOff.cpp`. Done when: a fixture install path is found and a missing one is reported as absent.",
+          "Show the button in `src/ui/FindingsView.cpp`. Done when: it appears only when the tool is installed and a cause has been decided."
+        ],
+        "items": [
+          "Detect whether ComIntRep is installed by its registered install location in `src/core/HandOff.cpp`, without loading or calling it. Done when: a fixture registry root with the entry reports installed and without it reports absent. Cheaper substitute: guessing a folder path, which fails on a portable copy.",
+          "Decide the cause from the scan and the site test: a certificate fault when a serious finding or a failing chain link exists, and not a certificate otherwise. Done when: a fixture with an expired root decides certificate and a fixture with a sound chain decides not a certificate.",
+          "Start ComIntRep with the finding on its command line as plain text, naming the subject, the store and the reason, and nothing from a private key. Done when: a test with a stand-in executable receives exactly that text. Cheaper substitute: starting the tool with no argument, which drops the finding.",
+          "Show the button only when ComIntRep is installed, with its reason in the label. Done when: with it absent the button is not on the screen and no message complains.",
+          "Cover it in `tests/handoff_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes, and fails when the finding is dropped from the command line."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L handoff` passes for installed and absent, certificate and not a certificate, and the stand-in tool receives the finding.",
+        "commit": "feature: hand a certificate cause to ComIntRep when it is installed"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "A fixture store holding an expired root, an untrusted root, a missing intermediate and a weak signature is scanned and every one is flagged with its store, a plain explanation and a severity.",
+      "A removal saves the certificate, reads the file back, and then deletes; an unelevated machine-store removal is refused by name; a search of `src/` finds no call that reads or exports a private key; Undo puts the certificate back.",
+      "On a real machine the tool scans, explains, tests a website, removes, undoes and hands off, in light and dark, by keyboard alone."
+    ]
+  }
+}

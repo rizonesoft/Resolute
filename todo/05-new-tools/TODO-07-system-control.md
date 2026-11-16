@@ -190,6 +190,8 @@ Four configuration surfaces Windows ships with interfaces that are worse than no
 
 ## 7. Network Configuration Tools
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/FirewallRules` repository (`D:\Resolute_Bin\FirewallRules`) by its own plan.
+
 `ComIntRep` repairs the stack and `Wi-Fi Diagnostics` covers the radio. These four cover the configuration between them, which Windows exposes only through `netsh` and a Control Panel page that has not changed since Windows 7.
 
 **Fidelity:** each tool's surface, against `DESIGN.md`.
@@ -198,19 +200,21 @@ Four configuration surfaces Windows ships with interfaces that are worse than no
 **Chrome:** consume the framework and the repair contract.
 **Needs:** Windows host (build/test)
 
-- [ ] Build `extensions/FirewallRules/` listing rules with program, direction, profile, and what created them. Done when: the list matches what the system reports and a rule's owning program is named where recorded.
-- [ ] Flag rules that look wrong. Done when: an inbound allow-any rule is flagged with its reasoning.
-- [ ] Build `extensions/AdapterManager/` covering adapter state, binding order, and interface metrics. Done when: changing a metric verifies by read-back and is undoable.
-- [ ] Build `extensions/DNSSelector/`, measuring resolver latency from this machine and offering to switch. Done when: measurements are taken from the actual machine rather than quoted, and switching is undoable.
-- [ ] Build `extensions/ProxyInspector/`, reporting system proxy, per-application proxy, PAC scripts, and VPN state. Done when: a machine behind a proxy reports all of it and the source of each is named.
-- [ ] Protect the remote case. Done when: a change that would break the connection the tool is being used over is warned about before it is applied, and this section records how that is detected.
-- [ ] Commit: `"network configuration: firewall, adapters, dns, and proxy"`
+- [ ] ~~Build `extensions/FirewallRules/` listing rules with program, direction, profile, and what created them. Done when: the list matches what the system reports and a rule's owning program is named where recorded.~~ -> `rizonesoft/FirewallRules`
+- [ ] ~~Flag rules that look wrong. Done when: an inbound allow-any rule is flagged with its reasoning.~~ -> `rizonesoft/FirewallRules`
+- [ ] ~~Build `extensions/AdapterManager/` covering adapter state, binding order, and interface metrics. Done when: changing a metric verifies by read-back and is undoable.~~ -> `rizonesoft/FirewallRules`
+- [ ] ~~Build `extensions/DNSSelector/`, measuring resolver latency from this machine and offering to switch. Done when: measurements are taken from the actual machine rather than quoted, and switching is undoable.~~ -> `rizonesoft/FirewallRules`
+- [ ] ~~Build `extensions/ProxyInspector/`, reporting system proxy, per-application proxy, PAC scripts, and VPN state. Done when: a machine behind a proxy reports all of it and the source of each is named.~~ -> `rizonesoft/FirewallRules`
+- [ ] ~~Protect the remote case. Done when: a change that would break the connection the tool is being used over is warned about before it is applied, and this section records how that is detected.~~ -> `rizonesoft/FirewallRules`
+- [ ] Commit: ~~`"network configuration: firewall, adapters, dns, and proxy"`~~ -> `rizonesoft/FirewallRules`
 
 **Freeze check:** What a rule or adapter change writes is frozen once shipped, because a wrong one removes a machine from the network it is being repaired over. Evidence is a fixture configuration round-tripped through change and undo, compared field by field. Fixture source: `tests/fixtures/network/`.
 
-**Test checkpoint:** The firewall list matches the system with owning programs named. An inbound allow-any rule is flagged. A metric change verifies by read-back and is undoable. DNS latency is measured from the machine, not quoted. A proxied machine reports every layer with its source. A connection-breaking change is warned about first.
+**Test checkpoint:** Moved with the section. The `rizonesoft/FirewallRules` repository's plan carries it.
 
 ## 8. Files, Boot, Audio, and Inventory
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/LinkManager` repository (`D:\Resolute_Bin\LinkManager`) by its own plan.
 
 Nine tools. **Most are one surface over one thing and are built from the items below; three are not, and are specified first.**
 
@@ -222,23 +226,25 @@ Nine tools. **Most are one surface over one thing and are built from the items b
 **Chrome:** consume the framework, and the repair contract only where a tool changes something.
 **Needs:** Windows host (build/test)
 
-- [ ] `extensions/LinkManager/`: create and inspect junctions, symlinks, and hard links, which Windows offers only through `mklink`. Done when: each type is created and identified, and a broken link is reported as broken.
-- [ ] **Specify** `PermissionsCopier` in its own TODO file before building it, covering the preview, inheritance, the recursive case, and what happens when a path cannot be read. Done when: the file exists, validates, and its sections appear in the plan.
-- [ ] `extensions/HashVerifier/`: compute and compare file hashes against an expected value. Done when: a matching and a mismatching file are each reported clearly.
-- [ ] `extensions/LongPathEnabler/`: report and set the long-path setting, including the manifest requirement most guides omit. Done when: the setting is changed, verified by read-back, and the surface states that applications must opt in too.
-- [ ] **Specify** `BootManager` in its own TODO file before building it, covering entries, order, timeout, the recovery path when a machine will not boot, and the freeze check below. Done when: the file exists, validates, and its sections appear in the plan.
-- [ ] `extensions/PageFileManager/`: page file location and size per volume. Done when: a change verifies by read-back and states that it needs a restart.
-- [ ] `extensions/AudioDevices/`: default device per role, per-application routing, and devices Windows has hidden. Done when: a hidden device is surfaced and setting a default verifies by read-back.
-- [ ] **Specify** `AudioDevices` in its own TODO file before building it, covering device enumeration, per-role defaults, per-application routing, hidden devices, and the audio repair it owns from Complete Windows Repair across the service, endpoint, routing, and driver causes. Done when: the file exists, validates, and its sections appear in the plan.
-- [ ] `extensions/ColorProfiles/`: profiles per display, with association and reset. Done when: association and reset both verify by read-back.
-- [ ] `extensions/SoftwareInventory/`: installed software with version, publisher, size, and install date, exportable into the System Report. Done when: the list matches what the system reports and the export feeds `D05 T03 §6`.
-- [ ] Commit: `"link, permissions, hash, boot, page file, audio, colour, and inventory tools"`
+- [ ] ~~`extensions/LinkManager/`: create and inspect junctions, symlinks, and hard links, which Windows offers only through `mklink`. Done when: each type is created and identified, and a broken link is reported as broken.~~ -> `rizonesoft/LinkManager`
+- [ ] ~~**Specify** `PermissionsCopier` in its own TODO file before building it, covering the preview, inheritance, the recursive case, and what happens when a path cannot be read. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/LinkManager`
+- [ ] ~~`extensions/HashVerifier/`: compute and compare file hashes against an expected value. Done when: a matching and a mismatching file are each reported clearly.~~ -> `rizonesoft/LinkManager`
+- [ ] ~~`extensions/LongPathEnabler/`: report and set the long-path setting, including the manifest requirement most guides omit. Done when: the setting is changed, verified by read-back, and the surface states that applications must opt in too.~~ -> `rizonesoft/LinkManager`
+- [ ] ~~**Specify** `BootManager` in its own TODO file before building it, covering entries, order, timeout, the recovery path when a machine will not boot, and the freeze check below. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/LinkManager`
+- [ ] ~~`extensions/PageFileManager/`: page file location and size per volume. Done when: a change verifies by read-back and states that it needs a restart.~~ -> `rizonesoft/LinkManager`
+- [ ] ~~`extensions/AudioDevices/`: default device per role, per-application routing, and devices Windows has hidden. Done when: a hidden device is surfaced and setting a default verifies by read-back.~~ -> `rizonesoft/LinkManager`
+- [ ] ~~**Specify** `AudioDevices` in its own TODO file before building it, covering device enumeration, per-role defaults, per-application routing, hidden devices, and the audio repair it owns from Complete Windows Repair across the service, endpoint, routing, and driver causes. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/LinkManager`
+- [ ] ~~`extensions/ColorProfiles/`: profiles per display, with association and reset. Done when: association and reset both verify by read-back.~~ -> `rizonesoft/LinkManager`
+- [ ] ~~`extensions/SoftwareInventory/`: installed software with version, publisher, size, and install date, exportable into the System Report. Done when: the list matches what the system reports and the export feeds `D05 T03 §6`.~~ -> `rizonesoft/LinkManager`
+- [ ] Commit: ~~`"link, permissions, hash, boot, page file, audio, colour, and inventory tools"`~~ -> `rizonesoft/LinkManager`
 
 **Freeze check:** What `BootManager` writes to the boot configuration is frozen once shipped, because a mistake there costs the user their machine. Evidence is a fixture boot entry changed and undone, reproducing the original exactly, entry for entry. Fixture source: `tests/fixtures/boot/`.
 
-**Test checkpoint:** `BootManager`, `PermissionsCopier`, and `AudioDevices` each have an authored TODO file that validates and appears in the plan. For the tools built here: each link type is created and identified and a broken link is reported. The permissions preview lists every change before applying and is undoable. Matching and mismatching hashes are both reported clearly. Long path is set, verified, and the opt-in requirement stated. Boot, page file, audio, and colour changes each verify by read-back. The inventory matches the system and feeds the System Report.
+**Test checkpoint:** Moved with the section. The `rizonesoft/LinkManager` repository's plan carries it.
 
 ## 9. Printing, Search, and Scheduled Tasks
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PrinterManager` repository (`D:\Resolute_Bin\PrinterManager`) by its own plan.
 
 **All three are specified before they are built.** Each replaces a Windows interface that is split across several places or is actively avoided, and none is a one-section job. This section authors their TODO files; those files are what gets built.
 
@@ -250,16 +256,16 @@ Three surfaces where Windows ships an interface so poor that the usual advice is
 **Chrome:** consume the framework and the repair contract. Take scheduled-task enumeration from `D05 T01 §5` rather than writing a second one.
 **Needs:** Windows host (build/test)
 
-- [ ] **Specify** `PrinterManager` in its own TODO file. Required scope: printers, queues, drivers, and ports in one place; the stuck-queue case including the spooler restart it needs; diagnosis across spooler state, driver, port, offline status, and a queue blocked by one failed job; and removing a printer with its driver while refusing a driver still in use. Done when: the file exists, validates, and its sections appear in the plan.
-- [ ] **Specify** `SearchManager` in its own TODO file. Required scope: index status, size, indexed locations, and exclusions; the not-found diagnosis distinguishing a file outside indexed locations, one excluded by type, and one the indexer cannot read; and a rebuild that states search will be incomplete until it finishes and gives an estimate. Done when: the file exists, validates, and its sections appear in the plan.
-- [ ] **Specify** `TaskManager` in its own TODO file. Required scope: view, create, edit, enable, and disable over scheduled tasks; the triggers and conditions Task Scheduler buries; every change as a repair-contract item with undo restoring the definition exactly; and flagging a task running from a temporary directory or pointing at a missing executable. Done when: the file exists, validates, and its sections appear in the plan.
-- [ ] Take the task enumeration from `D05 T01 §5` rather than writing a second one, and record that in each spec. Done when: all three specs name what they consume rather than what they will reimplement.
-- [ ] Carry the freeze check below into the `TaskManager` spec. Done when: that file owns it, because a freeze check belongs with the section that does the writing.
-- [ ] Commit: `"printer, search, and scheduled task managers"`
+- [ ] ~~**Specify** `PrinterManager` in its own TODO file. Required scope: printers, queues, drivers, and ports in one place; the stuck-queue case including the spooler restart it needs; diagnosis across spooler state, driver, port, offline status, and a queue blocked by one failed job; and removing a printer with its driver while refusing a driver still in use. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/PrinterManager`
+- [ ] ~~**Specify** `SearchManager` in its own TODO file. Required scope: index status, size, indexed locations, and exclusions; the not-found diagnosis distinguishing a file outside indexed locations, one excluded by type, and one the indexer cannot read; and a rebuild that states search will be incomplete until it finishes and gives an estimate. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/PrinterManager`
+- [ ] ~~**Specify** `TaskManager` in its own TODO file. Required scope: view, create, edit, enable, and disable over scheduled tasks; the triggers and conditions Task Scheduler buries; every change as a repair-contract item with undo restoring the definition exactly; and flagging a task running from a temporary directory or pointing at a missing executable. Done when: the file exists, validates, and its sections appear in the plan.~~ -> `rizonesoft/PrinterManager`
+- [ ] ~~Take the task enumeration from `D05 T01 §5` rather than writing a second one, and record that in each spec. Done when: all three specs name what they consume rather than what they will reimplement.~~ -> `rizonesoft/PrinterManager`
+- [ ] ~~Carry the freeze check below into the `TaskManager` spec. Done when: that file owns it, because a freeze check belongs with the section that does the writing.~~ -> `rizonesoft/PrinterManager`
+- [ ] Commit: ~~`"printer, search, and scheduled task managers"`~~ -> `rizonesoft/PrinterManager`
 
 **Freeze check:** What `TaskManager` writes to a task definition is frozen once shipped, because a malformed definition can stop a task a machine depends on. Evidence is a fixture task round-tripped through edit and undo, compared field by field. **This check transfers to the `TaskManager` spec**, which is where the writing happens. Fixture source: `tests/fixtures/tasks/`.
 
-**Test checkpoint:** Three TODO files exist, validate, and appear in the plan, one per tool. Each names its required scope above and each names what it consumes rather than reimplements. The `TaskManager` spec carries the freeze check. `python scripts/todo-graph.py validate` is clean and `plan --check` is current after all three are synced.
+**Test checkpoint:** Moved with the section. The `rizonesoft/PrinterManager` repository's plan carries it.
 
 ## Verification
 

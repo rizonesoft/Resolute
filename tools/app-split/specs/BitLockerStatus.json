@@ -1,0 +1,250 @@
+{
+  "name": "BitLockerStatus",
+  "slug": "bitlockerstatus",
+  "display": "BitLocker Status",
+  "job": "it reports, for each drive, whether BitLocker protects it, by what method, how far encryption has got and where its recovery key is kept, and it reveals one key at a time only on request.",
+  "tagline": "Are your drives encrypted, and do you still have the key",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Brass",
+    "light": "#FCD34D",
+    "dark": "#D97706",
+    "social_ground": "#2B1A05",
+    "social_muted": "#F5DFAE"
+  },
+  "icon": {
+    "idea": "A padlock sitting on a drive: a locked drive.",
+    "points": [
+      "Free-standing with no tile: a rounded drive body with a padlock above it.",
+      "The drive is Brass and the padlock Brass light, with a Brass keyhole.",
+      "The small drawing, used below 40 pixels, enlarges the padlock."
+    ],
+    "large": "<rect x=\"6\" y=\"52\" width=\"84\" height=\"36\" rx=\"10\" fill=\"#D97706\"/><circle cx=\"74\" cy=\"70\" r=\"4.5\" fill=\"#FCD34D\"/><path d=\"M37 28 V20 A11 11 0 0 1 59 20 V28\" fill=\"none\" stroke=\"#FCD34D\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"29\" y=\"26\" width=\"38\" height=\"30\" rx=\"7\" fill=\"#FCD34D\"/><circle cx=\"48\" cy=\"41\" r=\"4.5\" fill=\"#D97706\"/>",
+    "small": "<rect x=\"6\" y=\"56\" width=\"84\" height=\"32\" rx=\"10\" fill=\"#D97706\"/><path d=\"M34 30 V20 A14 14 0 0 1 62 20 V30\" fill=\"none\" stroke=\"#FCD34D\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"24\" y=\"26\" width=\"48\" height=\"36\" rx=\"8\" fill=\"#FCD34D\"/><circle cx=\"48\" cy=\"44\" r=\"6\" fill=\"#D97706\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Drives",
+        "One row per volume: letter, label, encrypted or not, method, how it unlocks, key backup"
+      ],
+      [
+        "Recovery key",
+        "The selected volume's key protectors, each masked, and what to do with no known backup"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees which drives are encrypted and whether the recovery key is saved somewhere, before Windows asks for it.",
+    "primary": "Refresh",
+    "secondary": "Show key",
+    "rows": [
+      [
+        "Protection",
+        "Protected, Not protected, or Cannot tell"
+      ],
+      [
+        "Method",
+        "The encryption method, or None"
+      ],
+      [
+        "Progress",
+        "Percent encrypted, or Fully encrypted, or Not encrypted"
+      ],
+      [
+        "Unlocks with",
+        "TPM, a password, a key file or a smart card, as the key protectors say"
+      ],
+      [
+        "Recovery key",
+        "Saved to a Microsoft account, a directory or a file, or No known backup"
+      ]
+    ],
+    "status": "3 drives: 2 encrypted, 1 with no known backup",
+    "notes": [
+      "Each volume is one row: its letter and label, then an icon and a word for each state. Protected, Not protected and Cannot tell are never shown by colour alone.",
+      "The verdict is one plain phrase per row: encrypted with a known backup, encrypted with no known backup, not encrypted, or cannot tell. An encrypted drive with no known backup carries a warning icon and the word Warning.",
+      "Refresh is the accent button. It re-reads every volume and the rows update from that read, not from an assumption. The tool changes nothing, so there is no undo.",
+      "Show key is disabled until one encrypted volume is selected. It asks for confirmation naming the volume, shows that one key, and hides it again when the person leaves the screen or presses Hide. The key is never in the list.",
+      "When the tool is not elevated, the screen says by name that BitLocker Status needs administrator rights, shows no drive rows, and Show key is disabled with the same reason.",
+      "The status bar counts what the rows say, for example \"3 drives: 2 encrypted, 1 with no known backup\", and changes with each refresh."
+    ],
+    "cut": "There is no earlier window: the tool is new, so nothing is cut from an original. The window has none of the usual extras either: no menus, no splash, no animations and no donate strip, because the suite's tool window does not have them. A plan section for BitLocker appears in the Resolute plan beside a certificate manager and a recovery manager, and neither of those is part of this window or this tool."
+  },
+  "readme": {
+    "lead": "BitLocker Status tells you which of your drives are encrypted and whether you still have the recovery key.",
+    "what": [
+      "BitLocker encrypts a drive so that nobody can read it without the right key. Many people find out they have it only when Windows stops at a blue screen and asks for a recovery key they never saved. This tool shows, for each drive, whether it is protected, which encryption method it uses, how far encryption has got, how it unlocks, and where the recovery key was backed up: a Microsoft account, a directory, a file, or nowhere the tool can see.",
+      "It only reads. It never turns encryption on or off and never suspends it. The recovery key is never shown by default: you reveal one drive's key at a time, on request, and only when the tool runs as administrator. Each reveal writes one log line naming the drive and never the key."
+    ],
+    "new_intro": "This is a new tool, not a port, and it is built around the moment you need a key.",
+    "new": [
+      [
+        "Every drive on one screen.",
+        "Letter, label, protection, method, progress and how it unlocks, read from Windows' own BitLocker interface."
+      ],
+      [
+        "A warning where it matters.",
+        "An encrypted drive whose key has no known backup is marked with an icon and a word, with the steps to save it."
+      ],
+      [
+        "One key at a time.",
+        "There is no reveal-all and no export-all: the source has exactly one place that reads a key, and a test proves it."
+      ],
+      [
+        "A summary you can share safely.",
+        "Copy the status of every drive to the clipboard. The summary never contains a key."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The tool: build, engine, window, features, release",
+    "goal": "BitLocker Status ships as a new, standalone C++ tool that reports each volume's protection state, encryption method, conversion progress, key protectors and the recovery key's known backup, gives a verdict in plain words, and reveals a single recovery key only on explicit request while elevated, with one log line naming the volume and never the key. It never turns encryption on, off or on hold.",
+    "current_state": "Nothing exists yet: there is no code, no AutoIt original and no `reference/au3/` folder. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and `docs/origin/resolute-D05-T07-s4.md`, a 22-line plan section that also describes a certificate manager and a recovery manager, of which only the BitLocker lines concern this tool (`docs/origin/resolute-D05-T07-s4.md:11-12`). That text asks for status per volume with protection state, method and where the recovery key is escrowed, a volume with no escrow flagged as the dangerous case, and any key reveal gated, logged without the key and limited, with no export-all path proven by search. The tool's sources of truth are Windows': the `Win32_EncryptableVolume` class in `root\\CIMV2\\Security\\MicrosoftVolumeEncryption` and the records Windows keeps of a key backup. All of it needs elevation. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s4.md`: the plan section as it stood in the Resolute repository, of which lines 11 and 12 and the treatment line concern this tool.",
+      "The `Win32_EncryptableVolume` class in `root\\CIMV2\\Security\\MicrosoftVolumeEncryption` and its methods `GetProtectionStatus`, `GetConversionStatus`, `GetEncryptionMethod`, `GetKeyProtectors` and `GetKeyProtectorNumericalPassword`, read on a real machine.",
+      "Windows' own tools as the cross-check: `manage-bde -status` and `manage-bde -protectors -get`, and the `BackupToAAD-BitLockerKeyProtector` events that record a key being backed up to a Microsoft account."
+    ],
+    "outcome": [
+      "`BitLockerStatus.exe` lists every volume with its protection, method, progress, key protectors and a verdict in plain words, matching `manage-bde -status` for the same volume on a real machine.",
+      "An encrypted volume with no known backup is flagged by icon and word, one recovery key can be revealed on request when elevated, and a search of the source proves no path reveals or exports more than one.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Drives screen, where a person finds a volume by its letter and label. Reporting and audit are the Activity section, which holds the refresh results and the one line each key reveal writes. Settings are the framework's pages. Permissions anchor on the engine, where every read and the reveal are refused by name when the process is not elevated. Reverse does not apply: the tool reads the encryption state and changes nothing, so there is nothing to put back.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "BitLocker State Engine",
+      "intro": "The tool's whole system effect is reading: each volume's protection state, conversion state, method and key protectors from `Win32_EncryptableVolume`, never reading a key into the list, working out where the recovery key was backed up from what Windows records, giving a verdict in plain words, and the one gated reveal. Every call is refused by name when the process is not elevated. Nothing here turns encryption on, off or on hold.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the volume model, the key protector types and the four verdicts as data in `src/core/Volume.h`. Done when: every field the window shows is stated once, with the Windows value it comes from, and no field can hold a key.",
+        "Implement the reads, the backup lookup and the gated reveal in `src/core/BitLocker.cpp` against a source the tests can replace. Done when: the unit tests pass against recorded fixtures with no real BitLocker volume."
+      ],
+      "items": [
+        "Implement `ReadVolumes()` in `src/core/BitLocker.cpp`: connect to `root\\CIMV2\\Security\\MicrosoftVolumeEncryption`, enumerate `Win32_EncryptableVolume`, and call `GetProtectionStatus`, `GetConversionStatus` and `GetEncryptionMethod` for each. Done when: on a real machine each volume's state equals what `manage-bde -status` prints for it, and a fixture with a volume mid-conversion reports its percent. Cheaper substitute: running `manage-bde` and scraping its text, which changes with the Windows language.",
+        "Read key protectors with `GetKeyProtectors` and `GetKeyProtectorType`, keeping each protector's identifier and type (TPM, numerical password, external key and the others) and no key material. Done when: a fixture with a TPM and a numerical password protector yields two entries with identifiers and types, and a test that searches the returned structures for the password text finds none.",
+        "Work out where the recovery key was backed up in `src/core/KeyBackup.cpp`: a recovery protector whose backup to a Microsoft account is recorded by a `BackupToAAD-BitLockerKeyProtector` event for its identifier, a directory backup that Windows records for the same identifier, and a saved file named for the identifier in the user's Documents, Desktop and Downloads folders (names only, content never read). Done when: fixtures for each place report that place, and a protector found in none reports No known backup. Cheaper substitute: treating a numerical password protector as backed up, which is the dangerous false comfort.",
+        "Record in `docs/events.md` the event log, event identifiers and fields read from a real machine for a successful and a failed backup to a Microsoft account, and state the limit that a key written down or printed leaves no record. Done when: the file names each event as seen on a real machine and the limit in one sentence.",
+        "Decide the verdict in `src/core/Verdict.cpp`: encrypted with a known backup, encrypted with no known backup, not encrypted, cannot tell (a read failed, or the volume is locked). Done when: a table-driven test covers each protection and backup combination and a failed read yields cannot tell, never not encrypted. Cheaper substitute: mapping a failed read to not encrypted, which hides a drive that is encrypted.",
+        "Implement `RevealKey(volumeLetter)` as the only function that calls `GetKeyProtectorNumericalPassword`: it checks elevation first and refuses by name (`BitLocker Status needs administrator rights to show a recovery key`) before any call, reads one volume's key, writes exactly one Activity line naming the volume and never the key, and returns the key to the caller once. Done when: an unelevated test is refused by that message with nothing read and nothing logged as a read, and an elevated test against a fixture returns one key and adds one line that does not contain it. Cheaper substitute: refusing in the window, which a second caller would bypass.",
+        "Refuse `ReadVolumes()` by name when the process is not elevated, before any connection, with one Activity record. Done when: an unelevated test reports the refusal naming the administrator right and returns no rows. Cheaper substitute: letting the connection fail with access denied and showing that code.",
+        "Prove there is no reveal-all or export-all path in `tests/reveal_search_test.cpp`: search the tree under `src/` for `GetKeyProtectorNumericalPassword` and require exactly one occurrence, inside `RevealKey`, called with one volume and in no loop, and require that no function writes a key to a file or a stream. Done when: the test passes and fails when a second call site is added. Cheaper substitute: reviewing the code by eye once, which does not hold after the next change.",
+        "Cover every path in `tests/bitlocker_test.cpp` and `tests/verdict_test.cpp` against fixtures under `tests/fixtures/`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes and fails when one verdict rule is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, including the unelevated refusals, the cannot-tell case and the one-call-site search, and fails when a second call that reads a key is added.",
+      "commit": "core: read BitLocker state and backup, one gated reveal, nothing else"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Reveal One Recovery Key",
+        "intro": "The engine holds the only function that reads a key. This section is its face in the window: Show key on the selected volume, with a confirmation naming the volume, the key shown for that one volume only, and the proof that no reveal-all or export-all path exists. The key is never in the list, never copied by the tool and never written to the log.",
+        "surface": {
+          "fidelity": "the Recovery key screen and the Show key confirmation, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 11.",
+          "job": "a person who needs a recovery key reads one drive's key on request, and no other key is exposed. Consumer: the rendered screen, the Activity line and the source search.",
+          "treatment": "the masked protectors by default, one volume's key after an explicit confirmation that names the volume, hidden again on leaving the screen. Cheaper substitute that fails the checkpoint: a Show all keys button, or a key placed in the list column behind a toggle."
+        },
+        "build": [
+          "Build the Show key confirmation and the key display in `src/ui/RecoveryKeyView.cpp`, calling only `RevealKey`. Done when: the key appears for the selected volume after confirmation and for no other.",
+          "Cover the gate end to end in `tests/reveal_test.cpp`. Done when: the refusal, the single log line and the source search all pass in one run."
+        ],
+        "items": [
+          "Show the selected volume's protectors in `src/ui/RecoveryKeyView.cpp`, each as type, identifier and a masked value. Done when: no screen state before the confirmation contains any digit of a key. Cheaper substitute: a hidden text box that still holds the key.",
+          "Make Show key ask for confirmation through the framework's message surface, naming the volume by letter and label, and call `RevealKey` only on accept. Done when: declining performs nothing and adds no Activity line, and accepting shows one key. Cheaper substitute: a private dialog.",
+          "Hide the key again when the person presses Hide, selects another volume or leaves the screen, and clear it from the control's memory. Done when: a driven test finds the control empty after each of the three.",
+          "Disable Show key with a tooltip stating the reason when the tool is not elevated, nothing is selected, or the selected volume is not encrypted. Done when: each case shows the disabled button and its reason, and an elevated selected encrypted volume enables it.",
+          "Run the source search of `tests/reveal_search_test.cpp` as part of this section too, over `src/ui/`. Done when: it still reports exactly one call that reads a key and no second path, and fails when `src/ui/` gains one.",
+          "Cover the section in `tests/reveal_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L reveal` passes and fails when the log line contains a key."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L reveal` passes: an unelevated reveal is refused by name with nothing read, one elevated reveal writes one line naming the volume and not the key, and the search finds no reveal-all path.",
+        "commit": "feature: reveal one recovery key, gated, logged and provably single"
+      },
+      {
+        "title": "No Backup Warning",
+        "intro": "The dangerous case is an encrypted drive whose key has no known backup. This section makes it impossible to miss: an icon and a word on the row, and a short statement of how to save the key. The tool does not make the backup itself, because that would put the key on a path of its own.",
+        "surface": {
+          "fidelity": "the Drives screen row and the Recovery key screen, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 11.",
+          "job": "a person sees at a glance which encrypted drive has no known key backup and what to do about it. Consumer: the rows, read back against the verdicts.",
+          "treatment": "a warning icon and the word Warning on the row, and on the Recovery key screen the steps: open Manage BitLocker and choose Back up your recovery key. Cheaper substitute that fails the checkpoint: a red row with no word."
+        },
+        "build": [
+          "Mark the rows in `src/ui/DrivesView.cpp` from the engine's verdict. Done when: only encrypted volumes with no known backup carry the warning.",
+          "Write the guidance text on the Recovery key screen in `src/ui/RecoveryKeyView.cpp`. Done when: selecting a flagged volume shows the steps and a volume with a known backup does not."
+        ],
+        "items": [
+          "Mark a row with the warning icon and the word Warning when its verdict is encrypted with no known backup. Done when: a fixture with one such volume among three flags exactly that one. Cheaper substitute: colouring the row, which carries no word.",
+          "Show on the Recovery key screen, for a flagged volume, where Windows keeps its own backup options and the steps to save the key, and that this tool cannot make the copy. Done when: the text appears for the flagged volume and not for the others, and every string is a language-pack key.",
+          "Count flagged volumes in the status bar and keep it true after each refresh. Done when: the count changes from one to zero after a fixture's backup event appears and Refresh is pressed.",
+          "Treat a volume the tool cannot read as cannot tell and never flag it as safe or as unsafe. Done when: a fixture with a failed read shows Cannot tell with no warning and no backup claim.",
+          "Cover it in `tests/warning_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L warning` passes and fails when a no-backup volume is not marked."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L warning` passes: the volume with no known backup is flagged by icon and word, and a volume with a known backup and a volume that cannot be read are not.",
+        "commit": "feature: flag an encrypted drive whose key has no known backup"
+      },
+      {
+        "title": "Open Windows Encryption Settings",
+        "intro": "Turning encryption on or off, suspending it and backing up a key are Windows' jobs, not this tool's. This section gives a one-press way to Windows' own pages for them, so the tool stays read-only while a person can act on what it shows. Device encryption on Home editions, which turns on by itself when a Microsoft account signs in, is managed on the same pages.",
+        "surface": {
+          "fidelity": "the Drives screen header action, against `sdk/DESIGN.md` section 11.",
+          "job": "a person goes from what the tool shows to the Windows page that can change it. Consumer: the opened Windows page.",
+          "treatment": "a plain action labelled Open Windows encryption settings that opens Manage BitLocker, or Device encryption where that is the page Windows has. Cheaper substitute that fails the checkpoint: a button that runs `manage-bde` to change state, which makes the tool a controller."
+        },
+        "build": [
+          "Choose the page in `src/core/WindowsPages.cpp`. Done when: it returns Manage BitLocker where it exists and Device encryption otherwise.",
+          "Add the action in `src/ui/DrivesView.cpp`. Done when: pressing it opens that page and changes nothing in the tool."
+        ],
+        "items": [
+          "Implement `PageToOpen()` in `src/core/WindowsPages.cpp` returning the Manage BitLocker page on editions that have it and the Device encryption settings page otherwise. Done when: a test with an edition fixture returns each. Cheaper substitute: a fixed page that does not exist on Home.",
+          "Add the header action in `src/ui/DrivesView.cpp` opening that page through the shell. Done when: pressing it opens the page and adds one Activity line saying so.",
+          "State beside the action that the tool changes nothing itself. Done when: the line is present and is a language-pack key.",
+          "Cover it in `tests/pages_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L pages` passes and fails when the action calls a command that changes encryption."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L pages` passes: the right Windows page is chosen per edition and no code path changes encryption state.",
+        "commit": "feature: open Windows' own encryption settings from the tool"
+      },
+      {
+        "title": "Copy a Status Summary",
+        "intro": "People ask for help with a drive and need to say what state it is in. This section copies one plain-text summary of every volume to the clipboard, built so that it cannot hold a key.",
+        "surface": {
+          "fidelity": "the Drives screen header action, against `sdk/DESIGN.md` section 11.",
+          "job": "a person pastes the state of their drives into a message without exposing a key. Consumer: the clipboard text.",
+          "treatment": "one line per volume with letter, label, protection, method, progress and backup place, ending with the tool's name and version. Cheaper substitute that fails the checkpoint: copying the list with its protector detail, which could carry a key one day."
+        },
+        "build": [
+          "Build the summary text in `src/core/Summary.cpp` from the volume model only. Done when: a test over fixtures produces one line per volume.",
+          "Add the Copy summary action in `src/ui/DrivesView.cpp`. Done when: pressing it puts the text on the clipboard."
+        ],
+        "items": [
+          "Implement `BuildSummary()` in `src/core/Summary.cpp` over the `Volume` type, which has no key field. Done when: a test produces one line per volume and a search of the output for the digit groups of a fixture key finds nothing. Cheaper substitute: filtering a key out of finished text with a pattern, which is a render filter and not a fix.",
+          "Add the Copy summary action to `src/ui/DrivesView.cpp`, placing the text on the clipboard. Done when: pasting into an empty text box shows the summary and the action adds one Activity line.",
+          "Cover it in `tests/summary_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes and fails when `Volume` gains a field that holds a key."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes: the summary has one line per volume and no key, and the build fails when the model could carry one.",
+        "commit": "feature: copy a status summary that can never hold a key"
+      }
+    ],
+    "no_reverse": "the tool reads the encryption state and changes nothing; it never turns encryption on, off or on hold",
+    "verification": [
+      "On a real machine with at least one BitLocker volume, the tool's rows match `manage-bde -status` and `manage-bde -protectors -get` for the same volume, and a volume with no recorded backup is flagged.",
+      "An unelevated start refuses by name with no rows and no readable key, and `tests/reveal_search_test.cpp` proves exactly one place in the source reads a recovery key.",
+      "On a real machine the tool lists, warns, reveals one key and copies a summary, in light and dark, by keyboard alone."
+    ]
+  }
+}

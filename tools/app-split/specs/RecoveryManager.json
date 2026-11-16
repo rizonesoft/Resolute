@@ -1,0 +1,252 @@
+{
+  "name": "RecoveryManager",
+  "slug": "recoverymanager",
+  "display": "Recovery Manager",
+  "job": "it reports whether the Windows Recovery Environment is present, enabled and reachable, repairs it when it is not, and starts Windows' own recovery drive maker after a confirmation that names the drive it will erase.",
+  "tagline": "Make sure Windows can repair itself, before you need it to",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Aqua",
+    "light": "#67E8F9",
+    "dark": "#0891B2",
+    "social_ground": "#06242C",
+    "social_muted": "#BFE9F1"
+  },
+  "icon": {
+    "idea": "A first-aid kit.",
+    "points": [
+      "Free-standing with no tile: a rounded case with a handle.",
+      "The case is Aqua and the cross is Aqua light.",
+      "The small drawing below 40 pixels drops the handle and thickens the cross."
+    ],
+    "large": "<path d=\"M34 28 V16 H62 V28\" fill=\"none\" stroke=\"#0891B2\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><rect x=\"8\" y=\"26\" width=\"80\" height=\"60\" rx=\"12\" fill=\"#0891B2\"/><path d=\"M48 40 V72 M32 56 H64\" fill=\"none\" stroke=\"#67E8F9\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<rect x=\"6\" y=\"18\" width=\"84\" height=\"66\" rx=\"13\" fill=\"#0891B2\"/><path d=\"M48 32 V70 M29 51 H67\" fill=\"none\" stroke=\"#67E8F9\" stroke-width=\"13\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Recovery",
+        "A one-sentence verdict, then one row per check with its name, its state and what it found"
+      ],
+      [
+        "Recovery drive",
+        "The removable drives that could be used, each with its letter, label and size, and what will be erased"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person learns in one sentence whether Windows can repair itself, sees which check failed and why, and repairs it or makes a recovery drive without leaving the window.",
+    "primary": "Check",
+    "secondary": "Repair",
+    "rows": [
+      [
+        "Present",
+        "Found or Missing"
+      ],
+      [
+        "Enabled",
+        "Enabled or Disabled"
+      ],
+      [
+        "Reachable",
+        "Reachable or Broken"
+      ],
+      [
+        "Image version",
+        "Matches Windows or Out of date"
+      ],
+      [
+        "Partition space",
+        "Enough or Too small"
+      ]
+    ],
+    "status": "Recovery environment disabled, image found",
+    "notes": [
+      "The first line is the verdict in one sentence, such as \"Windows can repair itself\" or \"The recovery environment is disabled, and its image is still on disk\". It is built from the rows below it and says which check decided it.",
+      "Each row shows an icon and a word for its state (present, enabled, reachable, image version, partition space) and one line of what was found, such as the location Windows has recorded and whether the image file is there.",
+      "Check is the accent button and re-reads Windows' record and the disk. Repair is beside it and is available only when a check has failed; it names what it will do, such as re-enable or re-register the image.",
+      "Before Repair changes anything, the recovery configuration as it was is recorded, so the Undo a Repair section can put it back.",
+      "On the Recovery drive screen the confirmation names the target by its letter, its label and its size, says it will be erased, and declining changes nothing.",
+      "The status bar says the verdict in words. When the tool is not running elevated it says so, and Check, Repair and the recovery drive are refused by name before anything is attempted."
+    ],
+    "cut": "There is no earlier window to cut from: Recovery Manager is a new tool and nothing is ported. It has no menu bar, no splash, no animations and no donate strip. The suite's framework supplies preferences and About, and the window shows only the sections named above."
+  },
+  "readme": {
+    "lead": "Find out whether Windows can repair itself, and fix it while you still can.",
+    "what": [
+      "Recovery Manager reads the state of the Windows Recovery Environment from Windows' own record and from the disk. It tells you whether the environment is present, enabled and reachable, which version of the recovery image is installed, and whether the recovery partition has room for it. A recovery environment that is broken is normally found only when it is needed, which is the worst time.",
+      "When something is wrong it says what, with the evidence, and can repair it: re-enable the environment or register the image again. It also starts Windows' own recovery drive maker, after a confirmation that names the drive by letter, label and size and says it will be erased."
+    ],
+    "new_intro": "This is a new tool, written in C++ from the start.",
+    "new": [
+      [
+        "A verdict, not a dump.",
+        "It tells disabled from missing from broken, and shows the evidence for each."
+      ],
+      [
+        "Repair with a way back.",
+        "The configuration is recorded before a repair, and Undo puts it back as it was."
+      ],
+      [
+        "A named confirmation.",
+        "A recovery drive is never started until you have seen the drive's letter, label and size and agreed that it will be erased."
+      ],
+      [
+        "Refuses by name.",
+        "Without elevation it says so and changes nothing."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "Check, repair and recovery drive for the Windows Recovery Environment",
+    "goal": "Recovery Manager ships as a complete, standalone C++ tool: it reports whether the Windows Recovery Environment is present, enabled and reachable, tells disabled from missing from broken with the evidence, repairs it with the prior state recorded, and starts Windows' own recovery drive maker only after a confirmation that names the target by letter, label and size and says it will be erased.",
+    "current_state": "Nothing exists yet: there is no AutoIt version and no C++ code. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and one plan section under `docs/origin/` (`resolute-D05-T07-s4.md`), which covers three tools and of which only the recovery lines apply. That section asks for a report of whether Windows Recovery Environment (WinRE) is present, enabled and reachable, so that a broken or missing one is reported as such, and for a recovery drive whose confirmation names the target by letter, label and size, where declining performs nothing. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s4.md`: the plan section, of which the WinRE report and the recovery drive lines are this tool's.",
+      "`reagentc /info`, `reagentc /enable` and `reagentc /disable`: Windows' own interface to the recovery environment, and the record it keeps in `C:\\Windows\\System32\\Recovery\\ReAgent.xml`.",
+      "`RecoveryDrive.exe`: Windows' own recovery drive maker, which this tool starts and never replaces."
+    ],
+    "outcome": [
+      "`RecoveryManager.exe` reads the recovery environment's state from Windows' record and from the disk and gives a verdict that tells disabled from missing from broken, with the evidence.",
+      "A repair records the prior configuration first, re-enables or re-registers the image, reads the result back, and can be undone; every action is refused by name when the process is not elevated.",
+      "A recovery drive is started only after a confirmation naming the drive's letter, label and size and saying it will be erased, and declining changes nothing."
+    ],
+    "adjacency_rationale": "The list is the Recovery screen, where each check is a row, and the Recovery drive screen, where each usable removable drive is a row. Reporting and audit are the Activity section: what was checked, repaired or started, and when. Settings are the framework's pages. Permissions anchor on the engine, because `reagentc` needs elevation and the tool refuses by name before it runs anything. Reverse anchors on the Undo a Repair section, which puts the recovery configuration back as it was recorded; creating a recovery drive has no reverse because it erases the target, and the confirmation is its safeguard.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Recovery State and Repair Engine",
+      "intro": "The tool's whole system effect: reading the recovery environment's state, giving a verdict, repairing it with the prior state recorded, listing removable drives, and starting Windows' own recovery drive maker only when handed a confirmation that names the drive. Every action is refused by name when the process is not elevated.",
+      "needs": "windows-host",
+      "build": [
+        "Implement the state reader and the verdict in `src/core/RecoveryState.cpp` against a reader the tests can replace. Done when: unit tests give the verdict for recorded fixtures of an enabled, a disabled, a missing and a broken environment.",
+        "Implement repair, drive listing and the recovery drive launch in `src/core/Repair.cpp` and `src/core/Drives.cpp`. Done when: the unit tests pass against fakes and nothing launches without a confirmation."
+      ],
+      "items": [
+        "Implement `ReadState()` in `src/core/RecoveryState.cpp` returning the fields of `reagentc /info` (status, location, boot configuration entry, image path) and the `C:\\Windows\\System32\\Recovery\\ReAgent.xml` record. Done when: a test parses recorded `reagentc /info` output of an enabled and of a disabled environment into the right fields. Cheaper substitute: matching the word Enabled anywhere in the output, which breaks on a localised Windows.",
+        "Check the disk in `ReadState()`: whether `winre.wim` exists under the recorded location (`Recovery\\WindowsRE`) or under `C:\\Windows\\System32\\Recovery`, and whether that location's volume exists. Done when: a fixture with the image on the recovery partition, one with it back under System32 and one with no image give three different results.",
+        "Implement `Verdict()` returning one of healthy, disabled, missing or broken with the evidence that decided it: disabled means the record says disabled and the image is on disk; missing means no `winre.wim` is found anywhere; broken means the record says enabled but its location or image cannot be reached. Done when: each of the four fixtures returns its verdict and a sentence naming the evidence. Cheaper substitute: one failed flag for every problem, which cannot tell a person what to repair.",
+        "Read the image version and the partition space in `src/core/RecoveryState.cpp`: the version of `winre.wim` against the installed Windows build, and the free space of the recovery partition. Done when: a fixture with an older image reports out of date with both versions, and a fixture of a full partition reports its free space. Cheaper substitute: reporting only that the file exists, which misses an image Windows updates have outgrown.",
+        "Refuse every action by name when the process is not elevated, before any `reagentc` call, with one activity record. Done when: an unelevated test run reports the refusal naming Check, Repair or Recovery drive, and no process was started. Cheaper substitute: letting `reagentc` fail with access denied, which looks like a broken environment.",
+        "Implement `Repair()` in `src/core/Repair.cpp`: record the prior state (the `reagentc /info` output and a copy of `ReAgent.xml`) to disk, then run `reagentc /enable` for a disabled environment, or `reagentc /setreimage` for a missing registration, then read the state again. Done when: a test with a fake `reagentc` finds the record on disk before the first command and the verdict healthy after. Cheaper substitute: running `reagentc /enable` for every verdict without recording anything.",
+        "Read back after every repair and refuse a result that is not healthy by name, with the command, its exit code and the state found. Done when: a fake that exits 0 but leaves the environment disabled is reported as a failed repair.",
+        "Implement `RemovableDrives()` in `src/core/Drives.cpp` returning each removable drive with its letter, label and size, and never a system or boot volume. Done when: a fixture of three volumes (system, fixed data, one USB drive) lists only the USB drive. Cheaper substitute: listing every drive and letting the person choose, which makes erasing the system disk one click.",
+        "Implement `StartRecoveryDrive(confirmation)` launching `RecoveryDrive.exe` only when the confirmation names the drive's letter, label and size as `RemovableDrives()` returned them just now. Done when: a test with no confirmation, and one naming a stale label, start nothing, and a valid one starts it once. Cheaper substitute: starting the maker and trusting its own prompt, which does not name the drive in this tool's terms.",
+        "Cover every path in `tests/recovery_test.cpp` with the fake reader and fake `reagentc`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L recovery` passes, and fails when the missing verdict is made to return disabled."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L recovery` passes, including the four verdicts, the unelevated refusal and the unconfirmed drive launch, and fails when one verdict is changed.",
+      "commit": "core: recovery state, verdict, repair and confirmed drive launch"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Undo a Repair",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "A repair changes the recovery configuration, so the prior state recorded before it is what Undo restores, not a guess about what it was. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts the recovery configuration back as it was before the last repair. Consumer: `reagentc /info` and `ReAgent.xml`, compared with the record.",
+          "treatment": "the recorded state restored, then read back and shown against the record. Cheaper substitute that fails the checkpoint: running `reagentc /disable`, which is not what was there before if it was enabled."
+        },
+        "build": [
+          "Record the prior state through the repair contract in `src/core/Repair.cpp`. Done when: a record exists on disk before the first command of a repair.",
+          "Wire Undo in `src/ui/RecoveryView.cpp`. Done when: repair then undo leaves the state equal to the record."
+        ],
+        "items": [
+          "Store the prior state through the repair contract's restore record before any `reagentc` command. Done when: a test finds the record on disk before the first command runs. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement `Undo()` in `src/core/Repair.cpp` putting the recorded status and image location back with `reagentc /disable` or `/enable` and `/setreimage`, then reading the state again. Done when: repair then undo, on a disabled fixture and on a missing-registration fixture, each leave the state equal to the record, asserted.",
+          "Refuse Undo by name when not elevated, and disable it with a tooltip when there is nothing to undo. Done when: a first run shows it disabled and it enables after one repair.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one recorded field is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: repair then undo leaves the recovery configuration as it was recorded.",
+        "commit": "feature: undo puts the recovery configuration back as recorded"
+      },
+      {
+        "title": "Create a Recovery Drive",
+        "intro": "Windows' own recovery drive maker erases the drive it is given. The Recovery drive section lists the removable drives that could be used, and nothing starts until the person has seen the target named by letter, label and size and agreed that it will be erased. Declining changes nothing.",
+        "surface": {
+          "fidelity": "the Recovery drive screen and its confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person makes a recovery drive knowing exactly which drive will be erased. Consumer: the drive list and `RecoveryDrive.exe`, read back.",
+          "treatment": "a confirmation naming the letter, the label and the size, saying the drive will be erased, with the safe choice as default. Cheaper substitute that fails the checkpoint: a generic are-you-sure that does not name the drive."
+        },
+        "build": [
+          "Build the Recovery drive screen in `src/ui/RecoveryDriveView.cpp` from the SDK's list control. Done when: each usable removable drive is a row with its letter, label, size and what will be erased.",
+          "Show the named confirmation through the framework's message surface. Done when: the text holds the letter, label and size of the selected row."
+        ],
+        "items": [
+          "List the drives from `RemovableDrives()` in `src/ui/RecoveryDriveView.cpp`, each row with letter, label, size and the words \"everything on it will be erased\". Done when: a fixture with two USB drives shows two rows and one with none shows an empty state saying so. Cheaper substitute: a drive picker with no description of the effect.",
+          "Show a confirmation naming the target by letter, label and size and saying it will be erased, through the framework's message surface. Done when: the dialog text for a drive E: labelled BACKUP of a stated size contains all three. Cheaper substitute: a private dialog.",
+          "Make declining and closing the dialog do nothing: no process is started and no activity line says a drive was made. Done when: a test that cancels leaves the fake maker's start count at zero.",
+          "Read the drive list again when the confirmation is accepted and refuse by name if the named drive has changed or gone. Done when: a drive removed between the list and the accept starts nothing and says why.",
+          "Cover it in `tests/drive_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L drive` passes, and fails when the confirmation omits the size."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L drive` passes: the confirmation names letter, label and size, declining starts nothing, and a changed drive is refused.",
+        "commit": "feature: a recovery drive only after a confirmation that names the drive"
+      },
+      {
+        "title": "Partition Too Small",
+        "intro": "When the recovery partition cannot hold an updated recovery image, Windows updates that replace it fail. The tool says so before that happens, with the free space it measured, and points to what Microsoft documents for it. It never resizes a partition by itself.",
+        "surface": {
+          "fidelity": "the Partition space row and its detail, against `DESIGN.md` section 2.",
+          "job": "a person learns that the recovery partition is too small and what to do about it. Consumer: the partition's measured free space and the image's size.",
+          "treatment": "the state in words with the free space and the size the image needs, and a link to Microsoft's documented steps. Cheaper substitute that fails the checkpoint: a Repair button that resizes the partition, which risks the disk."
+        },
+        "build": [
+          "Compare free space with the image size in `src/core/RecoveryState.cpp`. Done when: a fixture too small for its image reports too small with both sizes.",
+          "Show the detail in `src/ui/RecoveryView.cpp`. Done when: the row names the shortfall and the documented guidance."
+        ],
+        "items": [
+          "Add `PartitionFits()` to `src/core/RecoveryState.cpp` comparing the recovery partition's free space with the size of `winre.wim` and the room an update needs. Done when: fixtures of a roomy and a too-small partition return fits and too small, with the sizes read from the fixture and not typed in.",
+          "Show the Partition space row as too small, with the free space and the shortfall, and the page of Microsoft's documentation on a recovery partition too small for the update. Done when: the row shows the words and an openable link. Cheaper substitute: a colour change with no explanation.",
+          "Keep Repair from touching partitions: no code path calls a partition resize. Done when: a search of `src/` for disk partition calls finds none, and the row says that resizing is left to the person.",
+          "Cover it in `tests/partition_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L partition` passes, and fails when a too-small fixture is reported as fitting."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L partition` passes and the too-small fixture is reported with both sizes and the guidance.",
+        "commit": "feature: say when the recovery partition is too small, resize nothing"
+      },
+      {
+        "title": "Restart Into Recovery",
+        "intro": "The only way to know the recovery environment works is to start it. After a confirmation, the tool sets Windows to boot into recovery once and restarts, so a person can prove the environment reaches its menu while they can still fix it.",
+        "surface": {
+          "fidelity": "the Restart into recovery action and its confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person tests that Windows boots into recovery. Consumer: the next boot, and `reagentc /info` before it.",
+          "treatment": "a confirmation saying the computer will restart now and unsaved work will be lost, and nothing happens when declined. Cheaper substitute that fails the checkpoint: restarting without a prompt."
+        },
+        "build": [
+          "Implement `RestartIntoRecovery()` in `src/core/Repair.cpp` with `reagentc /boottore`. Done when: a fake records the command only after a confirmation.",
+          "Add the action and its confirmation in `src/ui/RecoveryView.cpp`. Done when: declining starts nothing."
+        ],
+        "items": [
+          "Implement `RestartIntoRecovery(confirmation)` in `src/core/Repair.cpp`: refuse when not elevated or when the verdict is not healthy, otherwise run `reagentc /boottore` and then restart. Done when: tests with a fake show an unconfirmed call and a call on a broken verdict run nothing. Cheaper substitute: running `shutdown /r` first, which restarts into normal Windows.",
+          "Show a confirmation through the framework's message surface saying the computer restarts now and into recovery, and that unsaved work is lost. Done when: declining leaves the activity list and the fake's command log unchanged.",
+          "Add one activity line before the restart naming the action. Done when: the line is in the log after a confirmed call.",
+          "Cover it in `tests/restart_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restart` passes, and fails when the confirmation is skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restart` passes: nothing runs unconfirmed, unelevated or on a broken verdict.",
+        "commit": "feature: restart into recovery, after a confirmation"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine the tool reports the state of its recovery environment, and the verdict matches `reagentc /info` and the files on disk.",
+      "On a machine or virtual machine with the environment disabled, a repair re-enables it, the result is read back, and Undo puts the recorded state back.",
+      "The recovery drive confirmation names the letter, label and size, declining changes nothing, and the tool works in light and dark by keyboard alone."
+    ]
+  }
+}

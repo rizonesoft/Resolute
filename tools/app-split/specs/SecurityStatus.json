@@ -1,0 +1,251 @@
+{
+  "name": "SecurityStatus",
+  "slug": "securitystatus",
+  "display": "Security Status",
+  "job": "it reports in plain words whether the antivirus, firewall, User Account Control, SmartScreen, Core Isolation and Secure Boot are protecting this PC, and opens the Windows page that fixes each one.",
+  "tagline": "Is this PC protected? One plain report",
+  "frozen": false,
+  "elevated": false,
+  "au3": [],
+  "hue": {
+    "name": "Forest",
+    "light": "#86EFAC",
+    "dark": "#15803D",
+    "social_ground": "#0A2614",
+    "social_muted": "#C4EFD2"
+  },
+  "icon": {
+    "idea": "A shield with a tick: protected.",
+    "points": [
+      "Free-standing with no tile: a shield with a rounded point.",
+      "The shield is Forest and the tick is Forest light.",
+      "The small drawing, used below 40 pixels, thickens the tick."
+    ],
+    "large": "<path d=\"M48 10 L80 22 V46 C80 66 66 80 48 88 C30 80 16 66 16 46 V22 Z\" fill=\"#15803D\" stroke=\"#15803D\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M33 48 L44 59 L64 36\" fill=\"none\" stroke=\"#86EFAC\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+    "small": "<path d=\"M48 10 L80 22 V46 C80 66 66 80 48 88 C30 80 16 66 16 46 V22 Z\" fill=\"#15803D\" stroke=\"#15803D\" stroke-width=\"4\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><path d=\"M31 48 L43 60 L66 34\" fill=\"none\" stroke=\"#86EFAC\" stroke-width=\"12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Status",
+        "A one-sentence verdict, then one row per protection with its state in words and what that means"
+      ],
+      [
+        "Details",
+        "The selected protection explained, with why it is in that state where Windows records it"
+      ],
+      [
+        "Activity",
+        "What the tool read and when, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees in one place and in plain words which protections are on, which are off and which could not be read.",
+    "primary": "Refresh",
+    "secondary": "Open setting",
+    "rows": [
+      [
+        "Antivirus",
+        "Active, Off or Not found"
+      ],
+      [
+        "Firewall",
+        "On for all networks, On for some, or Off"
+      ],
+      [
+        "User Account Control",
+        "Always notify, Default, Lower or Off"
+      ],
+      [
+        "SmartScreen",
+        "On, Warn only or Off"
+      ],
+      [
+        "Core Isolation",
+        "On, Off or Not supported"
+      ]
+    ],
+    "status": "4 protected, 1 off, 1 could not be read",
+    "notes": [
+      "The first line is the verdict in one sentence. It says everything is protected only when every check was read and is on; a check that could not be read is named in the sentence and the verdict never says protected.",
+      "Each row shows an icon, the protection's name, its state in a word, and one line on what that means for this PC. Colour is never the only signal.",
+      "Secure Boot is the sixth row, below the five above, in the same form.",
+      "Refresh is the primary action: it reads every check again, each on its own, so one failure leaves the other rows intact.",
+      "Open setting opens the Windows page that fixes the selected row. The tool changes nothing itself and has no Undo.",
+      "The status bar says the counts in words, for example \"4 protected, 1 off, 1 could not be read\", and the time of the last read.",
+      "The tool does not need elevation: every check is a read that a standard user can make. A check that needs more says so on its row."
+    ],
+    "cut": "The tool is new, so there is no earlier window to cut. It has no menu bar, splash, animation or donate strip: the suite's Sidebar tool window supplies the sections, the status bar and the framework's pages, and the tool draws nothing of its own. Defender's own detail (real-time and cloud protection, exclusions, definition age) belongs to the Defender Manager tool and is not shown here beyond whether an antivirus is active."
+  },
+  "readme": {
+    "lead": "Security Status tells you in plain words whether this PC is protected.",
+    "what": [
+      "It reads the firewall, User Account Control, SmartScreen, Core Isolation (memory integrity), Secure Boot and whether an antivirus is active, and shows each as a row with its state in words and what that means.",
+      "It only reads. When something is off, one button opens the exact Windows settings page that fixes it, and the fix is made there."
+    ],
+    "new_intro": "Security Status is a new tool, not a port, and it is built around four ideas.",
+    "new": [
+      [
+        "One verdict.",
+        "A single sentence says whether the PC is protected, and it never says so when a check could not be read."
+      ],
+      [
+        "Each check on its own.",
+        "A check that fails to read shows as could not be read and does not hide the others."
+      ],
+      [
+        "The reason, where Windows records it.",
+        "A protection that is off is explained as your choice, a policy, or not supported by this hardware."
+      ],
+      [
+        "The right page.",
+        "Each row opens the Windows settings page for that protection, not the top of Settings."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The new tool: engine, window, features, release",
+    "goal": "Security Status ships as a complete, standalone C++ tool that reports the wider security posture of a Windows PC in one place and in plain words: the antivirus, firewall, User Account Control, SmartScreen, Core Isolation and Secure Boot. Every check is read independently, the overall verdict never says protected when a check could not be read, and every fix is made in Windows' own settings, which the tool opens at the right page.",
+    "current_state": "Nothing exists yet: the tool is new and there is no earlier version, no AutoIt original and no code to port. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits and `docs/origin/resolute-D05-T07-s3.md`, the plan section as it stood in the Resolute repository. That section mostly describes the Defender Manager tool; the one line that concerns this tool asks for the firewall state, the User Account Control level, SmartScreen and Core Isolation, each rendered with its consequence when off. The sibling Defender Manager tool covers Defender's own detail. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s3.md`: the plan section; only its Security Status line applies (the wider posture: firewall, User Account Control, SmartScreen, Core Isolation).",
+      "Windows' own interfaces, read without elevation: `INetFwPolicy2` for the firewall, `root\\SecurityCenter2` for the antivirus list, `root\\Microsoft\\Windows\\DeviceGuard` for Core Isolation and the registry keys named in the engine section.",
+      "`DESIGN.md` and `sdk/DESIGN.md`: the tool's identity and window, and the suite's contract every surface answers to."
+    ],
+    "outcome": [
+      "`SecurityStatus.exe` reads six protections, each on its own, and shows each as a row with its state in words and what that means; a check that could not be read shows as such and keeps the verdict from saying protected.",
+      "Each row opens the exact Windows settings page that fixes it, explains why it is off where Windows records the reason, and the tool writes nothing to the system.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Status screen, where a person sees every protection and its state at a glance. Reporting and audit are the Activity section, which records what each read found and when. Settings are the framework's pages. Permissions do not apply: every check is a read a standard user can make, and the tool never needs elevation. Reverse does not apply: the tool changes nothing, so there is nothing to put back, and every fix is made in Windows' own settings.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "engine": {
+      "title": "Security Checks Engine",
+      "intro": "The tool's core, independent of any window: one table of checks declared as data (what is read, how, what each state means, which Windows page fixes it), each read independently so one failure does not hide the rest, and an overall verdict that never says protected when a check could not be read. It reads only and writes nothing.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the checks as data in `src/core/Checks.h`. Done when: the six checks, their sources, their states and their fix pages are stated once and a test lists them.",
+        "Implement the readers and the verdict in `src/core/Reader.cpp` and `src/core/Verdict.cpp` against a source the tests can replace. Done when: the unit tests pass with fixture sources and one real read on a Windows machine."
+      ],
+      "items": [
+        "Declare in `src/core/Checks.h` one table row per protection: name, how it is read, the states it can have in words, what each state means and the settings page that fixes it. Done when: antivirus, firewall, User Account Control, SmartScreen, Core Isolation and Secure Boot are each one row and no reader holds a state string of its own.",
+        "Implement the firewall reader in `src/core/Reader.cpp` through `INetFwPolicy2`, reading `get_FirewallEnabled` for the domain, private and public profiles and `CurrentProfileTypes` for the active one. Done when: a fixture with the public profile off reports firewall on for some networks, and the active profile is named.",
+        "Implement the User Account Control reader: `EnableLUA` and `ConsentPromptBehaviorAdmin` and `PromptOnSecureDesktop` under `HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System`, mapped to four levels (always notify, default, notify without dimming, never) and to off when `EnableLUA` is 0. Done when: a table test covers every combination and names the level.",
+        "Implement the SmartScreen reader: the setting for apps and files at `HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\SmartScreenEnabled`, the policy `EnableSmartScreen`, and the Microsoft Edge setting, reporting on, warn only or off. Done when: a fixture where the policy forces it off reports off by policy.",
+        "Implement the Core Isolation and Secure Boot readers: `Win32_DeviceGuard` in `root\\Microsoft\\Windows\\DeviceGuard` with `HypervisorEnforcedCodeIntegrity` under `HKLM\\SYSTEM\\CurrentControlSet\\Control\\DeviceGuard\\Scenarios`, and `UEFISecureBootEnabled` under `HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State`. Done when: a legacy BIOS fixture reports Secure Boot not supported and not off.",
+        "Implement the antivirus reader through the `AntiVirusProduct` class in `root\\SecurityCenter2`, decoding each product's `productState` into active, off or out of date, and reporting Not found when the list is empty. Done when: a fixture with Defender active reports active with its name, and an empty list reports Not found.",
+        "Read every check independently in `src/core/Verdict.cpp`, so a failed read becomes the state could not be read with the reason, and compute the overall verdict from the six. Done when: a test where one reader throws still shows the other five, and the verdict never says protected. Cheaper substitute: one try block around all six reads, which hides five results when one fails.",
+        "Cover every reader and the verdict in `tests/checks_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L checks` passes, and fails when one state in `Checks.h` is changed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L checks` passes, including the failed-read and all-on cases, and fails when one declared state is changed.",
+      "commit": "core: the six checks as data, read independently, with an honest verdict"
+    },
+    "parity_items": [],
+    "enhancements": [
+      {
+        "title": "Open the Right Windows Page",
+        "intro": "Every row's fix opens the exact Windows page for that protection, so a person never hunts through Settings. The page is declared with the check as data. The tool changes nothing itself.",
+        "surface": {
+          "fidelity": "the Open setting action and its result, against `sdk/DESIGN.md` section 11.",
+          "job": "a person fixes a protection in one step from the row that reports it. Consumer: the Windows page that opens.",
+          "treatment": "the selected row's own page opened through its declared link, and a row with no page of its own says so. Cheaper substitute that fails the checkpoint: opening the top of Windows Security for every row."
+        },
+        "build": [
+          "Declare each row's link in `src/core/Checks.h` and open it in `src/ui/StatusView.cpp`. Done when: each row opens a different page.",
+          "Handle a link that fails to open. Done when: the tool says so on the row and offers the manual path."
+        ],
+        "items": [
+          "Declare the fix page of each check in `src/core/Checks.h`: `windowsdefender://network` for the firewall, `windowsdefender://coreisolation` for Core Isolation, `windowsdefender://appbrowser` for SmartScreen, `ms-settings:windowsdefender` for antivirus and `UserAccountControlSettings.exe` for User Account Control. Done when: a test lists one link per check and none is empty.",
+          "Open the selected row's link from `Open setting` in `src/ui/StatusView.cpp` through the shell. Done when: pressing it on each of the six rows opens a different page on a real machine. Cheaper substitute: one shared link, which fails five rows.",
+          "Say so when a protection has no direct page (Secure Boot is a firmware setting) and show the steps to reach it instead. Done when: the Secure Boot row shows the manual path and its button explains rather than opens.",
+          "Report a link that fails to open on the row and in Activity, without an error dialog. Done when: a test with a failing shell call shows the message on the row.",
+          "Cover it in `tests/links_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L links` passes, and fails when a link is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L links` passes and each of the six rows opens its own page on a real machine.",
+        "commit": "feature: each row opens the exact Windows page that fixes it"
+      },
+      {
+        "title": "Why It Is Off",
+        "intro": "A protection that is off is explained where Windows records the reason: a choice the user made, a policy set by an administrator, or a feature this hardware does not support. The three are never merged, because each has a different fix.",
+        "surface": {
+          "fidelity": "the Details section, against `DESIGN.md` section 2.",
+          "job": "a person knows why a protection is off and who can change it. Consumer: the Details section, compared with the registry and the hardware flags read.",
+          "treatment": "one sentence naming the reason and who can change it, and the plain statement that the reason is not recorded when Windows does not record it. Cheaper substitute that fails the checkpoint: guessing a reason when none is recorded."
+        },
+        "build": [
+          "Read the policy and the hardware-support flags beside each state in `src/core/Reasons.cpp`. Done when: each off state carries a reason or the statement that none is recorded.",
+          "Show it in `src/ui/DetailsView.cpp`. Done when: the selected row's Details shows the reason."
+        ],
+        "items": [
+          "Add `src/core/Reasons.cpp` that classifies an off state as user choice, policy or not supported by this hardware, from the policy keys under `HKLM\\SOFTWARE\\Policies\\Microsoft` and the DeviceGuard availability flags. Done when: a fixture of each of the three is attributed correctly.",
+          "State a third-party product taking over where Windows records it, using the `AntiVirusProduct` entry that is active. Done when: a fixture with another antivirus active reports the firewall or antivirus as managed by it, by name.",
+          "Show the reason and who can change it in `src/ui/DetailsView.cpp`, with the plain statement that the reason is not recorded when it is not. Done when: all four outcomes render for their fixtures.",
+          "Cover it in `tests/reasons_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L reasons` passes, and fails when a policy fixture is attributed to user choice."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L reasons` passes: user choice, policy and not supported are told apart on fixtures, and an unrecorded reason is stated as such.",
+        "commit": "feature: say why a protection is off, from what Windows records"
+      },
+      {
+        "title": "Copy a Summary for Support",
+        "intro": "One action copies the whole report as plain text a person can paste into an email or a support ticket. It states each protection, its state in words and the time of the read, and contains nothing that identifies the user beyond the computer name they choose to include.",
+        "surface": {
+          "fidelity": "the copy action and its confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person gives a helper the exact security state without describing screens. Consumer: the text on the clipboard.",
+          "treatment": "a plain-text report equal to the rows on screen, with a confirmation that it was copied. Cheaper substitute that fails the checkpoint: a screenshot, which cannot be searched or pasted into a ticket."
+        },
+        "build": [
+          "Format the report in `src/core/Summary.cpp` from the same rows the window shows. Done when: the text equals the rows.",
+          "Add the copy action in `src/ui/StatusView.cpp`. Done when: the clipboard holds the text after pressing it."
+        ],
+        "items": [
+          "Write `src/core/Summary.cpp` that formats the verdict and the six rows as plain text with the time of the read. Done when: a test shows the text equals the rows of the same read, and a could-not-be-read row is stated as such.",
+          "Leave out the computer name and the user name unless the person ticks the option to include them. Done when: a test finds neither in the default text.",
+          "Add Copy summary to the Status header in `src/ui/StatusView.cpp` and confirm it in the status bar. Done when: pressing it puts the text on the clipboard and the status bar says so.",
+          "Cover it in `tests/summary_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes, and fails when a row is dropped from the text."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L summary` passes and the copied text equals the rows on screen.",
+        "commit": "feature: copy the security report as plain text for support"
+      },
+      {
+        "title": "Changes Since Last Time",
+        "needs": "sdk-framework",
+        "intro": "The tool remembers the last read and says when a protection that was on is now off, so a quiet change is noticed. The record is the framework's settings file and holds states only, never anything about the user.",
+        "surface": {
+          "fidelity": "the verdict line and the Activity section, against `DESIGN.md` section 2.",
+          "job": "a person is told that something that was protected no longer is. Consumer: the verdict line and Activity, compared with the stored last read.",
+          "treatment": "a sentence naming the protection, its earlier state and its state now, shown above the verdict and written to Activity. Cheaper substitute that fails the checkpoint: showing only the current state, which hides that anything changed."
+        },
+        "build": [
+          "Store the last read through the framework in `src/core/LastRead.cpp`. Done when: the states are read back after a restart.",
+          "Compare and show the changes in `src/ui/StatusView.cpp`. Done when: a protection that was on and is now off is named above the verdict."
+        ],
+        "items": [
+          "Store the six states of each read through the framework's settings in `src/core/LastRead.cpp`. Done when: a test reads them back after a restart. Cheaper substitute: a private file, which the framework forbids.",
+          "Compare the new read with the stored one and produce the list of changes, covering on to off, off to on and could not be read. Done when: a fixture pair of each is reported correctly and an unchanged read reports none.",
+          "Show a change above the verdict and write it to Activity, in words and not by colour alone. Done when: an on-to-off fixture shows the sentence and one Activity line.",
+          "Keep the first run quiet: with no stored read, nothing is reported as changed. Done when: a first run shows no change sentence.",
+          "Cover it in `tests/changes_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L changes` passes, and fails when an on-to-off change is not reported."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L changes` passes: on to off is named, an unchanged read is silent and the first run is quiet.",
+        "commit": "feature: say when a protection that was on is now off"
+      }
+    ],
+    "no_reverse": "the tool reads the security state and changes nothing; every fix is made in Windows' own settings",
+    "verification": [
+      "On a real machine each of the six rows matches what Windows Security and the settings pages show for the same protection.",
+      "A forced failure of one reader leaves the other five rows intact and the verdict does not say protected.",
+      "The tool reads, shows, explains and opens the right page, in light and dark, by keyboard alone, and writes nothing to the system."
+    ]
+  }
+}

@@ -1,0 +1,255 @@
+{
+  "name": "PowerPlans",
+  "slug": "powerplans",
+  "display": "Power Plans",
+  "job": "it lists, switches, creates, duplicates, renames and deletes Windows power plans, shows and edits every power setting of a plan including those Windows hides, and can reverse each change.",
+  "tagline": "Power plans, and the power settings Windows hides",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Volt",
+    "light": "#FDE047",
+    "dark": "#CA8A04",
+    "social_ground": "#2A2106",
+    "social_muted": "#F4E7AE"
+  },
+  "icon": {
+    "idea": "A lightning bolt in a ring: power.",
+    "points": [
+      "It is free-standing with no tile: a ring with a bolt across its centre.",
+      "The ring is Volt and the bolt is Volt light.",
+      "The small drawing, used below 40 pixels, thickens the ring and enlarges the bolt."
+    ],
+    "large": "<circle cx=\"48\" cy=\"48\" r=\"34\" fill=\"none\" stroke=\"#CA8A04\" stroke-width=\"11\"/><path d=\"M54 22 L32 52 H46 L42 74 L64 44 H50 Z\" fill=\"#FDE047\" stroke=\"#FDE047\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>",
+    "small": "<circle cx=\"48\" cy=\"48\" r=\"34\" fill=\"none\" stroke=\"#CA8A04\" stroke-width=\"14\"/><path d=\"M56 18 L28 54 H46 L40 78 L68 42 H50 Z\" fill=\"#FDE047\" stroke=\"#FDE047\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Plans",
+        "One row per power plan: its name, whether it is active, and whether Windows or the user made it"
+      ],
+      [
+        "Settings in the plan",
+        "Every setting of the selected plan, grouped as Windows groups them"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Options",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees every power plan on the machine, switches between them, and changes any power setting, hidden ones included, knowing each change can be reversed.",
+    "primary": "Make active",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Balanced",
+        "Active, Windows plan"
+      ],
+      [
+        "High performance",
+        "Windows plan"
+      ],
+      [
+        "Power saver",
+        "Windows plan"
+      ],
+      [
+        "Ultimate Performance",
+        "Windows plan, hidden until created"
+      ],
+      [
+        "Office laptop",
+        "Your plan"
+      ]
+    ],
+    "status": "5 plans, Balanced is active",
+    "notes": [
+      "Each plan is a row with an icon and a word for its state: Active or Inactive, and Windows plan or Your plan. Colour is never the only signal.",
+      "Make active, the primary action, switches the system to the selected plan, then re-reads the active plan to confirm it. It is disabled on the plan that is already active.",
+      "Undo, the secondary action, reverses the last change this tool made and names what it will put back. It is disabled when there is nothing to undo.",
+      "A machine with Modern Standby shows only the Balanced plan, and the screen says why in one sentence instead of looking empty.",
+      "When the process is not elevated, or a policy fixes the active plan, the actions that need it are disabled and a line names the reason.",
+      "Create, duplicate, rename and delete are in the header's more menu. Deleting asks first, and the active plan cannot be deleted.",
+      "The status bar says the plan count and the active plan in words, for example \"5 plans, Balanced is active\"."
+    ],
+    "cut": "There is no original window, so nothing is cut from one. The window has no menu bar, splash, animation or donate strip: the plan's sections cover what the suite's other tools get from those, and the Control Panel's legacy dialog is not copied."
+  },
+  "readme": {
+    "lead": "Power Plans manages your Windows power plans and shows the power settings Windows hides.",
+    "what": [
+      "Power Plans lists every power plan on the machine and lets you switch, create, duplicate, rename and delete them, or restore the ones Windows ships with. For the selected plan it lists every setting grouped as Windows groups them, with the plugged-in value and the on-battery value side by side.",
+      "Windows keeps many settings out of its Settings app and out of the classic advanced dialog. Power Plans shows them with a mark and a plain explanation, and edits them on request. Every change records the value it replaced, reads the new value back, and can be undone."
+    ],
+    "new_intro": "Power Plans is a new tool, written in C++ from the start, not a port.",
+    "new": [
+      [
+        "Hidden settings are visible.",
+        "Settings Windows hides are listed with a mark. They stay hidden in Windows unless you ask otherwise."
+      ],
+      [
+        "Every change can be undone.",
+        "The prior value is recorded before any write, and Undo puts back what was there."
+      ],
+      [
+        "Plans can move between machines.",
+        "Export a plan to a file and import it elsewhere after a preview of what it would set."
+      ],
+      [
+        "Defaults come back safely.",
+        "Restoring Windows' default plans exports your current plans first and asks before it acts."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "New tool: build, engine, window, features, release",
+    "goal": "Power Plans ships as a complete, standalone C++ tool: it lists, switches, creates, duplicates, renames and deletes Windows power plans and restores the defaults, shows every setting of a plan with its plugged-in and on-battery values and a mark when Windows hides it, writes a value only after recording the prior one and reads it back, refuses by name when not elevated or when a policy fixes the plan, and can reverse every change.",
+    "current_state": "Nothing exists yet. This is a new tool with no AutoIt original and no code: the repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, and the kits. The only source is `docs/origin/resolute-D05-T07-s6.md`, a plan section that described a power plan editor in one line (`:13`) beside an environment editor, a Windows features tool and a locale fixer, and set the rule that every change is reversible (`:15`). The rest comes from the Windows power management API: `PowerEnumerate` over schemes, subgroups and settings, `PowerGetActiveScheme` and `PowerSetActiveScheme`, `PowerReadACValueIndex` and `PowerReadDCValueIndex` with their write counterparts, `PowerReadFriendlyName`, `PowerReadDescription`, `PowerReadPossibleValue`, `PowerDuplicateScheme` and `PowerDeleteScheme`, and the `Attributes` value that hides a setting. `powercfg` is Windows' own tool for the same job, with `-restoredefaultschemes` and the hidden Ultimate Performance plan. Modern Standby machines expose only the Balanced plan, plugged-in and on-battery values differ, and a policy can fix the active plan. The SDK's framework and repair contract, which this tool consumes, are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s6.md`: the plan section this tool came from; only its power plan line and its reversibility rule apply.",
+      "`DESIGN.md` and `brand/`: the tool's identity and the sections of its window.",
+      "The Windows power management API and `powercfg`, read on a real machine, which is the source of truth for plans, groups, settings, ranges and hidden state."
+    ],
+    "outcome": [
+      "`PowerPlans.exe` lists, switches, creates, duplicates, renames, deletes and restores power plans, each verified by reading the plans back from Windows.",
+      "Every setting of the selected plan shows with its group, unit, range, plugged-in and on-battery values and a mark when hidden; a write records the prior value, is read back, and is refused by name when not elevated or when a policy fixes the plan.",
+      "Every change can be undone, the Sidebar window of `DESIGN.md` works in light and dark at every scale and by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Plans screen, with the selected plan's settings beside it in Settings in the plan. Reporting and audit are the Activity section: what the tool changed, when, and from which prior value. Settings are the framework's pages, named Options in this window so they do not clash with the power settings. Permissions anchor on the engine, where an unelevated write and a policy-fixed plan are refused by name before any change. Exchange applies through plan export and import. Reverse anchors on the undo section: the prior value of every write, plan operation and restore is recorded first, so Undo puts back what was there.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Power Plan Engine",
+      "intro": "The tool's whole system effect, independent of any window: enumerating plans, groups and settings with their friendly names, units, ranges and hidden state, reading and writing a value for plugged-in and on-battery with the value read back and the prior value recorded, and the plan operations. Every action is refused by name when the process is not elevated or when a policy fixes the plan.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the engine's types in `src/core/PowerModel.h`. Done when: plan, group, setting, value pair and prior-value record are stated once and a test builds each.",
+        "Implement enumeration, reading, writing and the plan operations in `src/core/PowerEngine.cpp` behind a power backend the tests can replace. Done when: the unit tests pass against a fake backend."
+      ],
+      "items": [
+        "Implement `EnumeratePlans()` in `src/core/PowerEngine.cpp` with `PowerEnumerate` over `ACCESS_SCHEME`, reading each name with `PowerReadFriendlyName` and the active plan with `PowerGetActiveScheme`. Done when: on a real machine the list equals `powercfg /list` in names and GUIDs, and exactly one plan is marked active.",
+        "Mark each plan as Windows' own or the user's by comparing its GUID with the defaults Windows ships (Balanced, High performance, Power saver, Ultimate Performance). Done when: a plan made by duplication shows as the user's and a default shows as Windows'. Cheaper substitute: judging by the plan's name, which a rename defeats.",
+        "Implement `EnumerateSettings(plan)` walking `ACCESS_SUBGROUP` and `ACCESS_INDIVIDUAL_SETTING`, reading the friendly name, description, `PowerReadPossibleValue` range and unit, and the `Attributes` hidden bit. Done when: a fixture backend with one hidden setting reports it with its mark, and a real run lists more settings than the classic advanced dialog shows.",
+        "Read the plugged-in value with `PowerReadACValueIndex` and the on-battery value with `PowerReadDCValueIndex` for every setting. Done when: on a machine with a battery the two values differ for at least one setting, and on a desktop the on-battery column is reported as not applicable and not as zero.",
+        "Implement `WriteValue(plan, setting, source, value)` that records the prior value first, writes with `PowerWriteACValueIndex` or `PowerWriteDCValueIndex`, re-applies the plan with `PowerSetActiveScheme` when it is the active one, and reads the value back, returning expected and found on a mismatch. Done when: a test that corrupts the written value gets both numbers named. Cheaper substitute: trusting the return code of the write.",
+        "Implement the plan operations `Activate`, `Duplicate`, `Rename`, `Delete` and `CreateUltimate` with `PowerSetActiveScheme`, `PowerDuplicateScheme`, `PowerWriteFriendlyName` and `PowerDeleteScheme`, each followed by a re-enumeration that confirms the result. Done when: duplicating then deleting leaves the plan list as it was, and deleting the active plan is refused by name.",
+        "Refuse every write by name before any change when the process is not elevated or when a policy fixes the plan, read from `HKLM\\SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\ActivePowerScheme`, with one activity record. Done when: an unelevated test and a policy-fixed test each report their own refusal and the backend is unchanged. Cheaper substitute: letting the write fail with access denied halfway through.",
+        "Report a Modern Standby machine as having only the Balanced plan, with the reason, and never treat the missing plans as an error. Done when: a fixture with one plan shows the explanation and every read still works.",
+        "Cover every path in `tests/power_engine_test.cpp` with the fake backend. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when the read-back comparison is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, including the corrupted-write, unelevated, policy-fixed and Modern Standby cases, and fails when the read-back comparison is removed.",
+      "commit": "core: power plans and settings, verified after every write and refused when unelevated"
+    },
+    "enhancements": [
+      {
+        "title": "Undo Any Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "The origin's rule is that every change is reversible (`docs/origin/resolute-D05-T07-s6.md:15`). Before any write, plan operation or restore, the prior state is recorded, so Undo restores what was actually there and not a guess. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back what the last change altered. Consumer: the plans and values, compared with the record.",
+          "treatment": "the Undo button names what it will restore, restores the recorded value or plan, and the screen re-reads Windows to show it. Cheaper substitute that fails the checkpoint: writing a default value, which is not what was there before."
+        },
+        "build": [
+          "Record the prior state through the repair contract in `src/core/PowerEngine.cpp`. Done when: a record exists on disk before the first write.",
+          "Wire Undo in `src/ui/PlansView.cpp`. Done when: change then undo leaves the plans and values as they were."
+        ],
+        "items": [
+          "Record the prior value, the source (plugged-in or on-battery), the setting and the plan through the repair contract's restore record before any write. Done when: a test finds the record on disk before the value is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Record the full plan, including every value, before a delete or a restore of defaults. Done when: deleting a user plan then undoing it brings back a plan with the same name and every value equal, asserted.",
+          "Implement Undo in `src/core/PowerEngine.cpp` for a value write, a switch of the active plan, a rename, a duplicate and a delete. Done when: each of the five, done then undone, leaves `EnumeratePlans()` and every value equal to before.",
+          "Disable Undo with a tooltip when there is nothing to undo, and say in the tooltip what the next undo would reverse. Done when: a first run shows it disabled and it enables after one action.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: each of the five operations, done then undone, leaves the plans and values as they were.",
+        "commit": "feature: undo puts back what was there before"
+      },
+      {
+        "title": "Hidden Settings",
+        "intro": "Windows hides many power settings with the `Attributes` value, so neither the modern Settings app nor the classic advanced dialog shows them. This section shows them in the plan's settings with a mark and an explanation of what the setting does. They are edited like any other setting. The tool never unhides one in Windows itself unless the user asks, because that changes what the classic dialog shows for everyone on the machine.",
+        "surface": {
+          "fidelity": "the Settings in the plan screen and its hidden mark, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 16, in light and dark.",
+          "job": "a person finds and changes a setting Windows hides and understands what it does before changing it. Consumer: the setting's value, read back.",
+          "treatment": "a mark with the word Hidden beside the name, the setting's description underneath, and a separate action Show in Windows that is off until asked for. Cheaper substitute that fails the checkpoint: clearing the hidden bit on every setting at start, which changes the system without being asked."
+        },
+        "build": [
+          "List hidden settings with their mark in `src/ui/SettingsInPlanView.cpp`. Done when: a hidden setting shows the mark and its description.",
+          "Implement the optional unhide in `src/core/PowerEngine.cpp`. Done when: it changes one setting's `Attributes` value only on request and a record of the old value exists."
+        ],
+        "items": [
+          "Read the hidden state of every setting from its `Attributes` value and show a Hidden mark with an icon and a word in `src/ui/SettingsInPlanView.cpp`. Done when: a fixture with two hidden settings shows two marks. Cheaper substitute: marking by colour alone.",
+          "Show each setting's `PowerReadDescription` text and its unit and range under its name, and a plain sentence for a hidden one saying why Windows may hide it. Done when: selecting a hidden setting shows all three.",
+          "Add the action Show in Windows that clears the hidden bit of one selected setting, with a confirmation naming the setting and what changes in the classic dialog, and records the old `Attributes` value first. Done when: the setting appears in `powercfg /qh` and the classic dialog, and Undo restores the hidden bit. Cheaper substitute: unhiding every setting at once.",
+          "Check that editing a hidden setting never changes its hidden state. Done when: a test writes a hidden setting and finds its `Attributes` value unchanged.",
+          "Cover it in `tests/hidden_settings_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L hidden` passes, and fails when an edit clears the hidden bit."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L hidden` passes: hidden settings are marked, edited without being unhidden, and unhidden only on request and reversibly.",
+        "commit": "feature: hidden power settings shown, marked and explained"
+      },
+      {
+        "title": "Export and Import a Plan",
+        "intro": "A plan can be saved to a file and brought back on this machine or another. Import shows a preview of every value it would set, with the current value beside it, before it changes anything, and the import is recorded so Undo reverses it. The file format is `powercfg`'s own, read and written through its `-export` and `-import` so the plan stays usable outside the tool.",
+        "surface": {
+          "fidelity": "the export and import actions and the import preview, against `DESIGN.md` section 2 and `sdk/DESIGN.md` section 11.",
+          "job": "a person moves a plan between machines and sees what an import will change before it does. Consumer: the imported plan, compared with the file.",
+          "treatment": "a preview table with setting, current value and incoming value, and an Import button that stays off until the preview is shown. Cheaper substitute that fails the checkpoint: importing straight from the file, which changes the plan list blind."
+        },
+        "build": [
+          "Implement export and import in `src/core/PlanFile.cpp`. Done when: a plan exported then imported equals the original value for value.",
+          "Build the preview in `src/ui/ImportPreview.cpp`. Done when: it lists every value that differs before anything is written."
+        ],
+        "items": [
+          "Implement `ExportPlan(plan, path)` in `src/core/PlanFile.cpp` writing a file `powercfg /import` accepts. Done when: the exported file imports through `powercfg` on a second machine without error.",
+          "Implement `PreviewImport(path)` that reads the file without importing it and returns each setting with its incoming value and the current value of the matching plan. Done when: a test with a changed file lists exactly the changed settings, and nothing in the plan list changes.",
+          "Show the preview and require a press of Import after it, through the framework's message surface. Done when: Import is disabled until the preview has been shown and the file is valid. Cheaper substitute: a private dialog.",
+          "Import under a new plan GUID, never over an existing plan, and record it for Undo. Done when: importing the same file twice yields two plans and Undo removes the last.",
+          "Cover it in `tests/plan_file_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L exchange` passes, and fails when the preview writes."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L exchange` passes: a plan exports, previews without writing, imports as a new plan and is undone.",
+        "commit": "feature: export and import a plan, previewed before it changes anything"
+      },
+      {
+        "title": "Restore Windows' Default Plans",
+        "intro": "This runs `powercfg -restoredefaultschemes`, which replaces every plan with Windows' defaults and deletes the user's. It is confirmed, and it exports the current plans first so nothing a user built is lost and Undo can bring it back.",
+        "surface": {
+          "fidelity": "the restore confirmation, against `sdk/DESIGN.md` section 11.",
+          "job": "a person returns the machine to Windows' own plans without losing the plans they made. Consumer: the plan list and the export files.",
+          "treatment": "a confirmation that names every plan that will be removed and the folder the export goes to, with Restore disabled until the export has succeeded. Cheaper substitute that fails the checkpoint: restoring silently, which destroys the user's plans."
+        },
+        "build": [
+          "Export every current plan, then restore, in `src/core/PowerEngine.cpp`. Done when: the export files exist before the restore starts.",
+          "Confirm in `src/ui/PlansView.cpp`. Done when: the confirmation names each plan that will go."
+        ],
+        "items": [
+          "Export every current plan to a dated folder through `ExportPlan` before the restore starts, and stop if one export fails. Done when: a test with a failing export leaves the plans unchanged. Cheaper substitute: restoring first and exporting what is left.",
+          "Run the restore through `powercfg -restoredefaultschemes` and re-enumerate to confirm the defaults are present and the user's plans are gone. Done when: after it, `EnumeratePlans()` lists only Windows' plans and the activity record names the export folder.",
+          "Show a confirmation naming every plan that will be removed and the export folder, through the framework's message surface. Done when: a machine with two user plans names both. Cheaper substitute: a generic are you sure.",
+          "Make Undo import the exported plans back and re-activate the plan that was active. Done when: restore then undo leaves the plan list and the active plan as they were, asserted.",
+          "Cover it in `tests/restore_defaults_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restore` passes, and fails when the export is skipped."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L restore` passes: plans are exported first, defaults restored, and restore then undo brings back the original plans.",
+        "commit": "feature: restore Windows' default plans, exported first and confirmed"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "On a real machine the tool lists plans equal to `powercfg /list`, switches the active plan, changes a hidden setting for plugged-in and on-battery, and the values read back match.",
+      "Every change type is undone and an unelevated run and a policy-fixed run are each refused by name, with `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug` passing.",
+      "The window works in light and dark, by keyboard alone, and on a Modern Standby machine it shows only Balanced with the reason."
+    ]
+  }
+}

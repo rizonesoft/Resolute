@@ -1,0 +1,251 @@
+{
+  "name": "PrivacySettings",
+  "slug": "privacysettings",
+  "display": "Privacy Settings",
+  "job": "it lists the privacy and telemetry settings of Windows with each one's current state and where it is controlled, states what each change costs before making it, changes the ones that are safe to change and can put any of them back to exactly the previous value.",
+  "tagline": "Every Windows privacy setting in one place, with what each change costs",
+  "frozen": false,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Orchid purple",
+    "light": "#F0ABFC",
+    "dark": "#A21CAF",
+    "social_ground": "#2A0A2E",
+    "social_muted": "#F2D3F7"
+  },
+  "icon": {
+    "idea": "A masquerade mask: private.",
+    "points": [
+      "Free-standing with no tile: one wide mask with a dip at the nose.",
+      "The mask is Orchid purple and its two eye holes are Orchid purple light.",
+      "The small drawing below 40 pixels enlarges the eye holes."
+    ],
+    "large": "<path d=\"M8 34 C24 26 36 30 48 36 C60 30 72 26 88 34 C88 58 76 68 64 66 C56 65 52 58 48 58 C44 58 40 65 32 66 C20 68 8 58 8 34 Z\" fill=\"#A21CAF\" stroke=\"#A21CAF\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"30\" cy=\"46\" r=\"7\" fill=\"#F0ABFC\"/><circle cx=\"66\" cy=\"46\" r=\"7\" fill=\"#F0ABFC\"/>",
+    "small": "<path d=\"M6 30 C24 22 36 26 48 34 C60 26 72 22 90 30 C90 60 76 72 64 70 C56 69 52 60 48 60 C44 60 40 69 32 70 C20 72 6 60 6 30 Z\" fill=\"#A21CAF\" stroke=\"#A21CAF\" stroke-width=\"3\" stroke-linejoin=\"round\" fill-rule=\"evenodd\"/><circle cx=\"28\" cy=\"46\" r=\"9\" fill=\"#F0ABFC\"/><circle cx=\"68\" cy=\"46\" r=\"9\" fill=\"#F0ABFC\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Settings",
+        "Each privacy setting as a row: its name, its state now, where it is controlled, and what changing it costs"
+      ],
+      [
+        "Changes",
+        "What this tool has changed, each one undoable"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Options",
+        "The suite's settings pages from the framework, named Options here so they do not clash with the Settings section"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person sees what their machine reports, where each setting is controlled and what turning it off would lose, and changes a setting with the cost in front of them.",
+    "primary": "Apply",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "Diagnostic data",
+        "Required only, set by your user setting, turning it down further is not available on this edition"
+      ],
+      [
+        "Advertising ID",
+        "On, your user setting, costs less relevant ads in apps"
+      ],
+      [
+        "Activity history",
+        "Off, set by a policy, the organisation's setting wins"
+      ],
+      [
+        "Location",
+        "Allowed, your user setting, costs apps that need your position"
+      ],
+      [
+        "Hosts file block of Microsoft servers",
+        "Not offered, it breaks Windows Update"
+      ]
+    ],
+    "status": "12 settings, 2 set by policy, 1 not offered",
+    "notes": [
+      "Each row shows its state with an icon and a word: On, Off, Set by policy, Not available on this edition or Not offered. Colour is never the only signal, and a second column says where the value is controlled: your setting, a policy, or nowhere you can change it.",
+      "Selecting a row shows what changing it costs, in plain words, before Apply can be pressed: what stops working, and for anything that touches Windows Update, activation or search, that stated first and prominently.",
+      "Apply is the accent button and acts on the one selected row. There is no apply-all button and nothing is recommended or pre-selected: the tool shows the current state and the cost and leaves the choice to the person.",
+      "Undo is beside Apply and puts the selected change back to exactly the previous value. It is disabled with a tooltip until there is something to undo, and the Changes section lists every change still undoable.",
+      "A setting controlled by a policy is shown as such with the policy named, and Apply is refused by name for that row: the organisation's setting wins and this tool does not override it.",
+      "The status bar says how many settings are listed, how many are set by policy and how many are not offered, in words.",
+      "When the process is not elevated, a machine-wide change is refused by name before anything is written, and the list stays readable and per-user changes still work."
+    ],
+    "cut": "The tool is new and has no earlier window, so nothing is cut from an original. It has no menus, no splash, no animations and no donate strip, as no tool of the suite does. Its framework settings are hosted as the Options section and the About page as the framework's own, and the plan records both as their own section."
+  },
+  "readme": {
+    "lead": "Privacy Settings lists every Windows privacy and telemetry setting with where it is controlled, and tells you what each change costs before you make it.",
+    "what": [
+      "Windows reports diagnostic data, an advertising identifier, activity history, location, camera and microphone use, speech and typing data. Privacy Settings shows each of these with its current state and where it is controlled: your own user setting, a policy that overrides you, or a setting this edition of Windows does not let you change.",
+      "Before it changes anything it says what that change stops working. Every change can be undone to exactly the previous value. Settings that are known to break Windows Update, activation or search are not offered, or carry an explicit warning, and the tool says which and why. It has no apply-all button and recommends nothing: it shows the facts and you choose."
+    ],
+    "new_intro": "Privacy Settings is a new tool, not a port, so everything in it is new.",
+    "new": [
+      [
+        "It states the cost first.",
+        "Every setting says what turning it off actually loses, before the change is made, and a test fails if a setting has no cost text."
+      ],
+      [
+        "It shows who controls each setting.",
+        "A row says whether the value is your setting, a policy, or not available on your edition, and a policy is named."
+      ],
+      [
+        "It undoes exactly.",
+        "The previous value is recorded before every change, so Undo restores what was there and not a guess."
+      ],
+      [
+        "Its list is data.",
+        "The settings are a data file, so when a Windows release moves a setting the fix is a change to data and not to code."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "A new tool: settings data, engine, window, costs, undo",
+    "goal": "Privacy Settings ships as a complete, standalone C++ tool that lists the privacy and telemetry settings of Windows from a data file, reads each one's effective state and who controls it, states what changing it costs before it is changed, changes the ones that are safe to offer with the value read back and the prior value recorded, refuses a policy-controlled setting and an unelevated machine-wide change by name, does not offer the settings known to break Windows Update, activation or search, and can put any change back to exactly the previous value.",
+    "current_state": "Nothing exists yet: this is a new tool and no code, no original and no reference material exist for it. The repository holds the chosen identity under `brand/`, `DESIGN.md` with the Sidebar window, the kits, and the plan text of the Resolute repository in `docs/origin/resolute-D05-T07-s5.md`. The design rests on how Windows stores these settings: the diagnostic data level in the `AllowTelemetry` policy value under `HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection`, where Home and Pro cannot go below Required; the advertising identifier under `HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo`; activity history, tailored experiences, online speech recognition and inking and typing personalisation under per-user keys with a Policies tree that overrides each; location, camera and microphone consent under `CapabilityAccessManager\\ConsentStore` in both hives; and the `DiagTrack` service. A policy value overrides the user's own, which is why state and controller are read together. Blocking Microsoft servers in the hosts file or disabling services can break Windows Update, which is why such changes are not offered. The exact key and value of each setting, and which Windows builds move them, are not yet confirmed against a real machine and are recorded in the data file with the build they were checked on. The SDK's framework, repair contract and chart control are planned in Resolute-SDK and not built.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T07-s5.md`: the plan section as it stood in the Resolute repository, with the rules this tool is built to.",
+      "`HKLM` and `HKCU` under `Software\\Microsoft\\Windows\\CurrentVersion` (`AdvertisingInfo`, `Privacy`, `CapabilityAccessManager\\ConsentStore`), `Software\\Policies\\Microsoft\\Windows` (`DataCollection`, `AdvertisingInfo`, `System`, `AppPrivacy`, `CloudContent`) and `Software\\Microsoft\\InputPersonalization`: what the engine reads and writes.",
+      "`resources/settings.json`: the settings table, which is data the tool reads and the plan's own deliverable."
+    ],
+    "outcome": [
+      "`PrivacySettings.exe` lists every setting in the data file with its effective state and its controller (user setting, policy, or unavailable on this edition), and shows what changing it costs before it can be applied.",
+      "A change is written with the value read back and the prior value recorded; a policy-controlled setting and an unelevated machine-wide change are refused by name; settings that break Update, activation or search are listed as not offered with the reason.",
+      "The Sidebar window of `DESIGN.md` works in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Settings screen, where a person finds a setting by name and reads its state, its controller and its cost. Reporting and audit are the Activity section, the trail of every change and refusal. The framework's settings pages are the Options section, so they do not clash with this tool's own Settings. Permissions anchor on the engine, where a machine-wide change when not elevated and a policy-controlled setting are refused by name before any write. Reverse anchors on the undo section: the prior value of every changed setting, including that it was absent, is recorded before the write and restored exactly.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "engine": {
+      "title": "Privacy Settings Engine",
+      "intro": "The tool's whole system effect and everything it knows, independent of any window: loading the settings table from its data file, reading each setting's effective state and its controller across the per-user and per-machine locations and the Policies trees that override them, and writing one with the value read back and the prior value recorded. A policy-controlled setting is refused by name, and a machine-wide change is refused by name when the process is not elevated.",
+      "needs": "windows-host",
+      "build": [
+        "Declare the settings table as data in `resources/settings.json` and load it in `src/core/SettingsTable.cpp`. Done when: every setting is described once, with its identity, its location per Windows version, its values, its cost text and whether it is offered.",
+        "Implement read, controller detection, write and verify in `src/core/Privacy.cpp` against a registry root the tests can redirect. Done when: the unit tests pass against a disposable key."
+      ],
+      "items": [
+        "Write `resources/settings.json` with one record per setting: `id`, display name, the locations per Windows build range (hive, key, value name, type), the values that mean on and off, the `cost` text, the `offered` flag with a `why_not` reason, and the `scope` (user or machine). Done when: a schema check in `tests/table_test.cpp` accepts the file and rejects a record missing any of those fields. Cheaper substitute: settings declared in a C++ header, which makes a moved setting a code change.",
+        "Implement `LoadTable()` in `src/core/SettingsTable.cpp` reading the file embedded in the executable and, when present, a newer `settings.json` beside it. Done when: a fixture file adding one setting makes it appear in the list with no code change.",
+        "Implement `ReadState(setting)` in `src/core/Privacy.cpp` returning the effective value and its controller as one of user setting, policy (naming the policy key) or unavailable on this edition, checking the Policies tree before the user's own value. Done when: a fixture with a user value and a policy value returns the policy as controller and the policy's value as effective, and a fixture of an edition floor (diagnostic data below Required) returns unavailable. Cheaper substitute: reading only the user value, which reports a setting as changeable when a policy overrides it.",
+        "Implement `Apply(setting, value)` in `src/core/Privacy.cpp` recording the prior value (or its absence) and then writing the new value, through the registry root passed in. Done when: a test under a disposable root finds the prior value recorded before the write and the new value after it. Cheaper substitute: writing through `reg.exe`, which cannot be redirected for a test.",
+        "Read every value back after writing and return a mismatch as setting, value, expected and found. Done when: a test that corrupts one value after the write gets all four named. Cheaper substitute: checking only the return code of the write.",
+        "Refuse `Apply` by name when the setting's controller is a policy, and when a machine-wide setting is changed while the process is not elevated, before any write, with one activity record. Done when: a policy fixture and an unelevated run each report the refusal and the fixture is unchanged. Cheaper substitute: letting the write fail with access denied halfway through, or overwriting the policy value.",
+        "Refuse every setting whose `offered` flag is false, returning its `why_not` reason. Done when: a fixture record with `offered` false is refused with its reason and is never written. Cheaper substitute: hiding the setting from the list, which leaves the person to find it elsewhere with no warning.",
+        "Cover every path in `tests/privacy_test.cpp` with a disposable root. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L privacy` passes, and fails when a refusal or the policy check is removed."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L privacy` passes, including the policy refusal, the unelevated refusal, the corrupted-write case and a setting added by data alone, and fails when the policy check is removed.",
+      "commit": "core: the settings table as data, state and controller read, changes verified and refused by name"
+    },
+    "enhancements": [
+      {
+        "title": "Undo Any Change",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Before every change the prior value is recorded, including that the value was absent, so Undo restores what was actually there and not a default. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the Changes section, the Undo button and its result, against `DESIGN.md` section 2.",
+          "job": "a person puts back a setting this tool changed, to exactly the previous value. Consumer: the registry, compared with the record.",
+          "treatment": "the recorded prior value restored, or the value removed when it was absent before. Cheaper substitute that fails the checkpoint: an undo that writes the setting's default, which is not what was there before."
+        },
+        "build": [
+          "Record the prior value through the repair contract in `src/core/Privacy.cpp`. Done when: a record exists on disk before the first write.",
+          "Wire Undo and the Changes list in `src/ui/ChangesView.cpp`. Done when: apply then undo leaves the registry as it was."
+        ],
+        "items": [
+          "Record the prior value (type and data, or its absence) through the repair contract's restore record before any write. Done when: a test finds the record on disk before the value is written. Cheaper substitute: keeping it in memory, which is lost if the tool closes.",
+          "Implement Undo restoring the record, including deleting a value that was absent before. Done when: apply then undo leaves the registry equal to before, asserted for a present value and for an absent one.",
+          "List every undoable change in `src/ui/ChangesView.cpp` with the setting, the old and new state in words, and the time. Done when: after two changes the list shows two rows and Undo on one leaves the other.",
+          "Disable Undo with a tooltip when there is nothing to undo, and refuse it by name when the setting has since come under a policy. Done when: a first run shows it disabled and a fixture that gains a policy between apply and undo returns the refusal.",
+          "Cover it in `tests/undo_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes, and fails when one value is left unrestored."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: apply then undo restores the previous value exactly, for a present value and for an absent one.",
+        "commit": "feature: undo puts back the previous value exactly"
+      },
+      {
+        "title": "What It Costs",
+        "intro": "Every setting states what turning it off actually loses, in plain words, before the change is made. This is the rule the tool exists for: a list of toggles that hides the cost is how a privacy tool breaks things for people who did not know what they were agreeing to.",
+        "surface": {
+          "fidelity": "the cost text on the Settings screen, against `DESIGN.md` section 2.",
+          "job": "a person reads what a change stops working before making it. Consumer: the cost text, read back from the data file.",
+          "treatment": "the cost shown beside the setting and again in the confirmation before Apply writes. Cheaper substitute that fails the checkpoint: a cost shown only in a tooltip or after the change."
+        },
+        "build": [
+          "Write a cost for every record in `resources/settings.json`. Done when: no offered setting has an empty `cost`.",
+          "Show the cost in `src/ui/SettingsView.cpp` and in the confirmation. Done when: Apply cannot run without the cost having been shown."
+        ],
+        "items": [
+          "Write the `cost` of every setting in `resources/settings.json` in one or two plain sentences saying what stops working. Done when: `tests/cost_test.cpp` fails for any record, offered or not, whose cost is empty.",
+          "Show the selected row's cost in the detail pane of `src/ui/SettingsView.cpp`, with Windows Update, activation or search effects stated first. Done when: a fixture row flagged `affects_update` shows that sentence before the rest. Cheaper substitute: the same text for every row.",
+          "Show the cost again in the confirmation before Apply writes, through the framework's message surface. Done when: pressing Apply opens a confirmation containing the cost and the write happens only after it is accepted.",
+          "Cover it in `tests/cost_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L cost` passes, and fails when a record's cost is emptied."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L cost` passes: every setting in the data file has a cost, and the confirmation shows it before any write.",
+        "commit": "feature: every setting states what turning it off costs"
+      },
+      {
+        "title": "Not Offered, and Why",
+        "intro": "Some changes are known to break Windows Update, activation or search: blocking Microsoft servers in the hosts file, and disabling the services those depend on. They are listed as not offered, with the reason, so a person who goes looking for them finds why they are absent. This section records which and why.",
+        "surface": {
+          "fidelity": "the not-offered rows on the Settings screen, against `DESIGN.md` section 2.",
+          "job": "a person learns that a setting is deliberately absent and why. Consumer: the row and the data file's `why_not` text.",
+          "treatment": "a row marked Not offered with its reason in words and Apply disabled. Cheaper substitute that fails the checkpoint: leaving the setting out of the list, which hides it and lets the person do it elsewhere unwarned."
+        },
+        "build": [
+          "Add the not-offered records to `resources/settings.json` with a `why_not`. Done when: each names what it would break.",
+          "Show them in `src/ui/SettingsView.cpp`. Done when: the row is listed and Apply is disabled."
+        ],
+        "items": [
+          "Add records with `offered` false to `resources/settings.json` for the hosts-file block of Microsoft telemetry servers, disabling `DiagTrack` and `dmwappushservice` as a way to stop diagnostics, and disabling the services Windows Update and search rely on, each with a `why_not` stating what it breaks. Done when: each record names Update, activation or search in its reason, and the file lists which settings are not offered. Cheaper substitute: a general warning screen, which names nothing.",
+          "List a not-offered row with the word Not offered and the reason in its detail, Apply disabled. Done when: selecting such a fixture row shows the reason and Apply does nothing.",
+          "Record the not-offered list and its reasons in `docs/not-offered.md`, generated from the data file. Done when: the file lists every record with `offered` false and a test fails if it differs from the data.",
+          "Cover it in `tests/offered_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L offered` passes, and fails when a not-offered record is made offered without a reason."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L offered` passes: not-offered settings are listed with a reason, refused by the engine, and recorded in `docs/not-offered.md`.",
+        "commit": "feature: settings that break Update, activation or search are not offered, with the reason"
+      },
+      {
+        "title": "Controlled by Policy",
+        "intro": "When a policy sets a value, the policy wins over the user's own setting, and an organisation's policy is somebody else's decision. The row says which policy controls it and that the organisation's setting wins, and the tool does not write over it.",
+        "surface": {
+          "fidelity": "the Controlled by column and the row detail on the Settings screen, against `DESIGN.md` section 2.",
+          "job": "a person learns that a setting is controlled by a policy, which one, and that this tool will not change it. Consumer: the engine's controller result, read back.",
+          "treatment": "the policy key named in the row detail with the sentence that the organisation's setting wins, and Apply refused by name. Cheaper substitute that fails the checkpoint: a disabled Apply button with no reason."
+        },
+        "build": [
+          "Show the controller in `src/ui/SettingsView.cpp` from `ReadState()`. Done when: each row shows your setting, policy or unavailable on this edition.",
+          "Show the policy detail. Done when: a policy row names the key and states that the organisation's setting wins."
+        ],
+        "items": [
+          "Add a Controlled by column to `src/ui/SettingsView.cpp` showing your setting, policy or unavailable on this edition in words with an icon. Done when: three fixture rows show the three values.",
+          "Show, for a policy row, the policy key and the sentence that the organisation's setting wins and this tool will not change it. Done when: a policy fixture shows the key and the sentence. Cheaper substitute: the word Managed with no key, which gives a person nothing to act on.",
+          "Refuse Apply on a policy row by name in the message surface, naming the policy. Done when: pressing Apply on the fixture shows the refusal and the registry is unchanged.",
+          "Cover it in `tests/controller_test.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L controller` passes, and fails when the policy refusal is removed."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L controller` passes: user setting, policy and edition-unavailable are distinguishable, and a policy row is refused by name.",
+        "commit": "feature: show which policy controls a setting, and respect it"
+      }
+    ],
+    "no_reverse": "",
+    "verification": [
+      "Settings render with user setting, policy and unavailable on this edition distinguishable, every setting states its cost before the change is made, and a setting added to the data file appears with no code change.",
+      "Apply then Undo restores the previous value exactly, asserted, and the settings known to break Update, activation or search are not offered and are recorded with the reason.",
+      "On a real machine the tool lists, states costs, applies, refuses a policy-controlled setting and undoes, in light and dark, by keyboard alone."
+    ]
+  }
+}
