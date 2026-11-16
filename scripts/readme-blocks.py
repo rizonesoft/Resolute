@@ -157,6 +157,25 @@ def gallery(repo: Path, tools_map: dict) -> tuple[str, dict[str, bytes]]:
     if missing:
         raise Stale(f"docs/readme/tools.json has no row for {', '.join(missing)}, which the tree has")
     icons, lines = {}, []
+    # Since the split of 2026-11 every tool is developed in its own repository; `moved` lists them, and `tools` holds
+    # only what this repository still builds beside the launcher (nothing, once RegStudio left on 2026-11-16).
+    moved = tools_map.get("moved", [])
+    if moved:
+        lines.append("| | Tool | What it does |")
+        lines.append("| :-: | --- | --- |")
+        for row in moved:
+            rel = f"docs/readme/icons/{row['name']}.png"
+            if not (repo / rel).is_file():
+                raise Stale(f"{row['display']}'s icon {rel} does not exist; it is the 48 pixel render from the tool's own brand/ folder")
+            icons[rel] = (repo / rel).read_bytes()
+            lines.append(f"| <img src=\"{rel}\" width=\"32\" height=\"32\" alt=\"{row['display']} icon\"> | **{row['display']}** | {row['job']} |")
+        lines.append("")
+        lines.append(f"Each of these {len(moved)} tools is developed and released from its own repository, on the shared code of "
+                     "[Resolute-SDK](https://github.com/rizonesoft/Resolute-SDK), and is bundled with the launcher when a distribution is built.")
+    if not rows:
+        return "\n".join(lines), icons
+    if moved:
+        lines.append("")
     lines.append("| | Tool | What it does | Today | C++ |")
     lines.append("| :-: | --- | --- | --- | --- |")
     for row in rows:

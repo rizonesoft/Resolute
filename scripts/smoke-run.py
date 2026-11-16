@@ -18,7 +18,7 @@ A collecting run stands down when operator input resumes.
 
 Usage:
   python scripts/smoke-run.py [--visible] [--drill] [--tools A,B]
-  python scripts/smoke-run.py --elevate --visible --tools RegStudio
+  python scripts/smoke-run.py --elevate --visible --tools Resolute
   python scripts/smoke-run.py --self-test
 
 `--elevate` relaunches this driver through the shell's `runas` consent
@@ -60,13 +60,14 @@ if not os.environ.get("RESOLUTE_SMOKE_ROOT"):
     sys.path.insert(0, str(ROOT / "scripts"))
 
 # Per-tool expected surfaces beyond start/main/exit, as shipped today.
-# Preferences ships for neither tool yet (D01 T03 S2 owns the shell); About
-# ships only in RegStudio (Help > About). The step activates for a tool
-# when its surface ships: flipping a value here is the whole change.
-ABOUT_IDM = 4001  # RegStudio IDM_HELP_ABOUT; the launcher has no menu.
+# Preferences does not ship yet (D01 T03 S2 owns the shell), and the launcher
+# has no menu and so no About. The step activates for a tool when its
+# surface ships: flipping a value here is the whole change. The About step
+# is kept, and exercised by the drill tool below, for the day the launcher
+# gets one; RegStudio, which had one, left for its own repository on 2026-11-16.
+ABOUT_IDM = 4001  # the menu command an About surface answers to
 EXPECTED = {
     "Resolute": {"about": False, "preferences": False},
-    "RegStudio": {"about": True, "preferences": False},
 }
 DEFAULT_EXPECTED = {"about": False, "preferences": False}
 EXPECTED["SmokeDrillDeaf"] = {"about": True, "preferences": False}
@@ -1394,8 +1395,8 @@ def elevation_rows(only, result, detail):
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0],
                                  formatter_class=argparse.RawDescriptionHelpFormatter,
-                                 epilog="Elevated RegStudio pass:\n"
-                                        "  python scripts/smoke-run.py --elevate --visible --tools RegStudio")
+                                 epilog="Elevated pass:\n"
+                                        "  python scripts/smoke-run.py --elevate --visible --tools Resolute")
     ap.add_argument("--visible", action="store_true", help="operator asked: run visibly now")
     ap.add_argument("--drill", action="store_true", help="add the broken-tool fixture entries")
     ap.add_argument("--tools", default="", help="comma-separated subset of registered tools")
@@ -1567,10 +1568,10 @@ def self_test() -> int:
 
     # Inventory comes from the conformance registry, unlisted here.
     tools = load_tools()
-    check("inventory enumerates the conformance tools", set(tools) == {"Resolute", "RegStudio"})
+    check("inventory enumerates the conformance tools", set(tools) == {"Resolute"})
     check("Resolute step table", step_table("Resolute") == [
         ("start", True), ("main", True), ("about", False), ("preferences", False), ("exit", True)])
-    check("RegStudio expects About", dict(step_table("RegStudio"))["about"] is True)
+    check("a tool that ships About expects it", dict(step_table("SmokeDrillDeaf"))["about"] is True)
     check("unknown tool defaults absent", dict(step_table("Nope"))["about"] is False)
 
     # The elevated task launches only a staged copy that matches the operator's run manifest (D07 T01 section 7).
@@ -1620,8 +1621,7 @@ def self_test() -> int:
 
     # Flavor maps the registry's release paths onto the built flavor.
     debug_exes = {r.name: str(r.exe) for r in real_tools(flavor="Debug")}
-    check("debug flavor drives Bin/Debug", debug_exes["Resolute"].endswith("Bin\\Debug\\Resolute.exe")
-          and debug_exes["RegStudio"].endswith("Bin\\Debug\\System\\RegStudio.exe"))
+    check("debug flavor drives Bin/Debug", debug_exes["Resolute"].endswith("Bin\\Debug\\Resolute.exe"))
     check("release flavor drives Bin/Release",
           str(real_tools()[0].exe).endswith("Bin\\Release\\Resolute.exe"))
 
@@ -2426,8 +2426,8 @@ def self_test() -> int:
     # at the parent-child boundary, and main() branch behaviour, all with
     # the shell and wait APIs stubbed so no prompt and no window appears.
     check("elevated child args drop --elevate and mark the child",
-          elevated_child_args(["--elevate", "--visible", "--tools", "RegStudio"])
-          == ["--visible", "--tools", "RegStudio", "--elevated-child"])
+          elevated_child_args(["--elevate", "--visible", "--tools", "Resolute"])
+          == ["--visible", "--tools", "Resolute", "--elevated-child"])
     check("elevated child args keep an existing marker",
           elevated_child_args(["--elevated-child"]) == ["--elevated-child"])
     _elev_saved = {k: globals()[k] for k in
@@ -2629,15 +2629,15 @@ def self_test() -> int:
             globals()["is_elevated"] = lambda: False
             buf = _io.StringIO()
             with _redir(buf):
-                rc = main(["--elevated-child", "--tools", "RegStudio"])
+                rc = main(["--elevated-child", "--tools", "Resolute"])
             report = (Path(td) / "smoke" / "smoke-report.md").read_text(encoding="utf-8")
             check("unelevated child refuses by name, launches nothing, exits 2",
                   rc == 2 and not launched and "without elevation" in report
-                  and report.count("| RegStudio |") == 5)
+                  and report.count("| Resolute |") == 5)
             globals()["is_elevated"] = lambda: None
             buf = _io.StringIO()
             with _redir(buf):
-                rc = main(["--elevate", "--tools", "RegStudio"])
+                rc = main(["--elevate", "--tools", "Resolute"])
             check("an unverifiable token refuses by name and exits 2",
                   rc == 2 and "could not be verified" in buf.getvalue())
             # Exit-code forwarding preserves the child's report byte-for-byte.
@@ -2652,7 +2652,7 @@ def self_test() -> int:
                 globals()["relaunch_elevated"] = (lambda w: lambda argv: w)(want)
                 buf = _io.StringIO()
                 with _redir(buf):
-                    rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
+                    rc = main(["--elevate", "--visible", "--tools", "Resolute"])
                 forwarded = forwarded and rc == want and sentinel.read_text(encoding="utf-8") == "child report sentinel"
             check("child exit codes 0, 1, 2 forward and preserve its report", forwarded)
             # Declined consent through main(): blocked rows, exit 2.
@@ -2661,10 +2661,10 @@ def self_test() -> int:
             globals()["relaunch_elevated"] = _decline
             buf = _io.StringIO()
             with _redir(buf):
-                rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
+                rc = main(["--elevate", "--visible", "--tools", "Resolute"])
             report = sentinel.read_text(encoding="utf-8")
             check("declined consent records blocked naming the decline, exit 2",
-                  rc == 2 and "consent declined" in report and "| RegStudio | start | blocked |" in report)
+                  rc == 2 and "consent declined" in report and "| Resolute | start | blocked |" in report)
             # A failure after launch never claims nothing was launched.
             def _launched_fail(argv):
                 raise ElevationFailed("interrupted while the elevated child was owned; "
@@ -2672,7 +2672,7 @@ def self_test() -> int:
             globals()["relaunch_elevated"] = _launched_fail
             buf = _io.StringIO()
             with _redir(buf):
-                rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
+                rc = main(["--elevate", "--visible", "--tools", "Resolute"])
             report = sentinel.read_text(encoding="utf-8")
             check("a post-launch failure records the launch, never a false no-launch",
                   rc == 2 and "child was launched" in report
@@ -2684,7 +2684,7 @@ def self_test() -> int:
             globals()["is_elevated"] = lambda: False
             buf = _io.StringIO()
             with _redir(buf):
-                rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
+                rc = main(["--elevate", "--visible", "--tools", "Resolute"])
             report = sentinel.read_text(encoding="utf-8")
             check("a missing handle through main reports launch unverified, exit 2",
                   rc == 2 and "could not be verified" in report
@@ -2697,7 +2697,7 @@ def self_test() -> int:
                 rc = main(["--elevate", "--visible"])
             report = sentinel.read_text(encoding="utf-8")
             check("declined with default selection reports all registered tools",
-                  rc == 2 and report.count("| RegStudio |") == 5
+                  rc == 2 and report.count("| Resolute |") == 5
                   and report.count("| Resolute |") == 5)
             # Report-write failure on the elevation path prints the report.
             _blocker = Path(td) / "blocker"
@@ -2705,18 +2705,18 @@ def self_test() -> int:
             globals()["SMOKE_DIR"] = _blocker / "smoke"
             buf = _io.StringIO()
             with _redir(buf):
-                rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
+                rc = main(["--elevate", "--visible", "--tools", "Resolute"])
             _out = buf.getvalue()
             globals()["SMOKE_DIR"] = Path(td) / "smoke"
             check("elevation report-write failure prints diagnostic and report",
                   rc == 2 and "could not write" in _out
-                  and "| RegStudio | start | blocked |" in _out)
+                  and "| Resolute | start | blocked |" in _out)
             # Already elevated: no relaunch, the normal driver path completes.
             globals()["is_elevated"] = lambda: True
             globals()["relaunch_elevated"] = lambda argv: 99
             buf = _io.StringIO()
             with _redir(buf):
-                rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
+                rc = main(["--elevate", "--visible", "--tools", "Resolute"])
             check("already-elevated runs the driver inline without relaunching",
                   rc == 0 and "Suite verdict" in (Path(td) / "smoke" / "smoke-report.md").read_text(encoding="utf-8"))
     finally:
@@ -2732,8 +2732,8 @@ def self_test() -> int:
             main(["--help"])
     except SystemExit as _help_exc:
         _help_code = _help_exc.code
-    check("--help names the elevated RegStudio command",
-          _help_code == 0 and "python scripts/smoke-run.py --elevate --visible --tools RegStudio" in _help_buf.getvalue())
+    check("--help names the elevated command",
+          _help_code == 0 and "python scripts/smoke-run.py --elevate --visible --tools Resolute" in _help_buf.getvalue())
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])

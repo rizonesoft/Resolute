@@ -55,6 +55,8 @@ track: P3
 
 ## 1. RegStudio on the Shared Framework
 
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RegStudio` repository (`D:\Resolute_Bin\RegStudio`) by its own plan.
+
 1,086 lines in one file, on control primitives the rest of the suite does not use. This section makes it a Resolute tool rather than a standalone program that happens to live in the repository.
 
 **Fidelity:** the RegStudio main window, against `DESIGN.md` and `docs/captures/house-style/`. The existing window is a starting point, not a baseline to preserve: its `comctl32` controls are being replaced.
@@ -63,18 +65,20 @@ track: P3
 **Chrome:** consume the framework and the shared UI library. Do not keep a private control layer, settings writer, or theme handling.
 **Needs:** C++ toolchain (compile)
 
-- [ ] Reconcile the two copies and record which was taken. Done when: only one RegStudio source tree exists in the repository and this section names the commit it came from (**Groomed 2026-09-23:** the Done-when already reads true in tracked files, per the Current state's `862cfb5` and `1b99463`; the section ticks it when it runs, and deletes the untracked on-disk leftovers `samples/RegStudio` and `samples/ExoSuite/extensions/RegStudio` or records why not).
-- [ ] Split `main.cpp` into the structure its own layout intends: registry logic under `core/`, surfaces under `ui/`, and an entry point that does neither. Done when: no file mixes registry access with rendering, and `core/` has no dependency on any UI header.
-- [ ] Replace the `comctl32` control layer with the shared UI library. Done when: no `WC_TREEVIEW`, `WC_LISTVIEW`, or `comctl32` control remains, proven by search.
-- [ ] Remove its private dark-title-bar handling in favour of the framework's theme. Done when: the tool's own `DwmSetWindowAttribute` call is gone and the window still themes correctly in both appearances.
-- [ ] Route its settings through the shared writer: window geometry, pane ratio, last-visited key. Done when: all three persist and survive a restart, proven by readback.
-- [ ] Localize every string. Done when: driving with an incomplete pack lists the missing keys and nothing renders as bare English.
-- [ ] Declare RegStudio to the launcher: a `resext.json` (name, description, version, category, as `docs/extensions.md` specifies) embedded as the `RESEXT` `RCDATA` resource, so the launcher's `ScanExtensions` lists it; and correct `docs/extensions.md`'s example tree, which marks `RegStudio.exe` "has RESEXT, discovered" though no build has embedded it. Done when: the built `Bin\Release\System\RegStudio.exe` reads back a `RESEXT` resource holding that JSON (`FindResourceW`), and the launcher started beside it lists RegStudio with that name, description and version, captured. **Filed 2026-11-13** from `D00 T05 §2`'s Usage check: `FindResourceW(..., "RESEXT", RT_RCDATA)` on `Bin\Release\System\RegStudio.exe` returned nothing, and the extension has no `resext.json`, so the launcher's list is empty.
-- [ ] Commit: `"regstudio: rebuild on the shared framework and ui library"`
+- [ ] ~~Reconcile the two copies and record which was taken. Done when: only one RegStudio source tree exists in the repository and this section names the commit it came from (**Groomed 2026-09-23:** the Done-when already reads true in tracked files, per the Current state's `862cfb5` and `1b99463`; the section ticks it when it runs, and deletes the untracked on-disk leftovers `samples/RegStudio` and `samples/ExoSuite/extensions/RegStudio` or records why not).~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Split `main.cpp` into the structure its own layout intends: registry logic under `core/`, surfaces under `ui/`, and an entry point that does neither. Done when: no file mixes registry access with rendering, and `core/` has no dependency on any UI header.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Replace the `comctl32` control layer with the shared UI library. Done when: no `WC_TREEVIEW`, `WC_LISTVIEW`, or `comctl32` control remains, proven by search.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Remove its private dark-title-bar handling in favour of the framework's theme. Done when: the tool's own `DwmSetWindowAttribute` call is gone and the window still themes correctly in both appearances.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Route its settings through the shared writer: window geometry, pane ratio, last-visited key. Done when: all three persist and survive a restart, proven by readback.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Localize every string. Done when: driving with an incomplete pack lists the missing keys and nothing renders as bare English.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Declare RegStudio to the launcher: a `resext.json` (name, description, version, category, as `docs/extensions.md` specifies) embedded as the `RESEXT` `RCDATA` resource, so the launcher's `ScanExtensions` lists it; and correct `docs/extensions.md`'s example tree, which marks `RegStudio.exe` "has RESEXT, discovered" though no build has embedded it. Done when: the built `Bin\Release\System\RegStudio.exe` reads back a `RESEXT` resource holding that JSON (`FindResourceW`), and the launcher started beside it lists RegStudio with that name, description and version, captured. **Filed 2026-11-13** from `D00 T05 §2`'s Usage check: `FindResourceW(..., "RESEXT", RT_RCDATA)` on `Bin\Release\System\RegStudio.exe` returned nothing, and the extension has no `resext.json`, so the launcher's list is empty.~~ -> `rizonesoft/RegStudio`
+- [ ] Commit: ~~`"regstudio: rebuild on the shared framework and ui library"`~~ -> `rizonesoft/RegStudio`
 
-**Test checkpoint:** No `comctl32` control and no private theme call remains, both proven by search. `core/` has no UI dependency. Window geometry, pane ratio, and last key persist across a restart, quoted. An incomplete pack produces a missing-key list. The window is captured in both appearances and compared against `DESIGN.md`.
+**Test checkpoint:** Moved with the section. The `rizonesoft/RegStudio` repository's plan carries it.
 
 ## 2. The Registry Engine
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RegStudio` repository (`D:\Resolute_Bin\RegStudio`) by its own plan.
 
 The part that does not exist yet. Six registry calls in a UI file is a demo; this section is the real thing, and it is deliberately separated from the surface so it can be tested without a window.
 
@@ -92,19 +96,21 @@ The part that does not exist yet. Six registry calls in a UI file is a demo; thi
 6. **Add writes last**, each behind the elevation guard at the call. Done when: an unelevated write is refused by name and nothing changes.
 7. **Assert headlessly.** Done when: enumeration, every type, both views, and the denied case all run with no window created.
 
-- [ ] Implement key enumeration, value enumeration, and read across every hive, with RAII handles. Done when: a fixture key tree is enumerated completely and no handle leaks under a repeated-open assertion.
-- [ ] Support every value type Windows defines, including the ones editors commonly skip: `REG_MULTI_SZ`, `REG_EXPAND_SZ`, `REG_QWORD`, `REG_BINARY`, and unknown types preserved rather than dropped. Done when: a fixture carrying every type round-trips byte-identically.
-- [ ] Handle the 32-bit and 64-bit registry views explicitly. Done when: a value written to the `WOW6432Node` view is distinguishable from its 64-bit counterpart, and the surface can say which it is showing.
-- [ ] Report access failures as a named outcome rather than an empty result. Done when: a key the process cannot read is reported as denied, not as empty, and the two are distinguishable in the engine's return.
-- [ ] Guard every write behind the framework's elevation check, at the call rather than at startup. Done when: an unelevated write is refused by name and nothing is changed.
-- [ ] Add engine assertions that run with no window created. Done when: enumeration, every value type, both views, and the denied case all assert headlessly.
-- [ ] Commit: `"regstudio: the registry engine"`
+- [ ] ~~Implement key enumeration, value enumeration, and read across every hive, with RAII handles. Done when: a fixture key tree is enumerated completely and no handle leaks under a repeated-open assertion.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Support every value type Windows defines, including the ones editors commonly skip: `REG_MULTI_SZ`, `REG_EXPAND_SZ`, `REG_QWORD`, `REG_BINARY`, and unknown types preserved rather than dropped. Done when: a fixture carrying every type round-trips byte-identically.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Handle the 32-bit and 64-bit registry views explicitly. Done when: a value written to the `WOW6432Node` view is distinguishable from its 64-bit counterpart, and the surface can say which it is showing.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Report access failures as a named outcome rather than an empty result. Done when: a key the process cannot read is reported as denied, not as empty, and the two are distinguishable in the engine's return.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Guard every write behind the framework's elevation check, at the call rather than at startup. Done when: an unelevated write is refused by name and nothing is changed.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Add engine assertions that run with no window created. Done when: enumeration, every value type, both views, and the denied case all assert headlessly.~~ -> `rizonesoft/RegStudio`
+- [ ] Commit: ~~`"regstudio: the registry engine"`~~ -> `rizonesoft/RegStudio`
 
 **Freeze check:** What this engine writes to the registry is frozen from the moment it ships. A fixture key tree, written and read back, must produce byte-identical values and types across changes. Fixture source: `tests/fixtures/regstudio/`.
 
-**Test checkpoint:** A fixture tree enumerates completely with no handle leak under repeated open. Every value type round-trips byte-identically, quoted per type. The two registry views are distinguishable. A denied key reports denied rather than empty. An unelevated write is refused by name. All assertions run headlessly.
+**Test checkpoint:** Moved with the section. The `rizonesoft/RegStudio` repository's plan carries it.
 
 ## 3. Browse, Display, and Virtualize
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RegStudio` repository (`D:\Resolute_Bin\RegStudio`) by its own plan.
 
 A registry browser that stutters on a large key is a browser people stop trusting, and some real keys hold thousands of values.
 
@@ -114,16 +120,18 @@ A registry browser that stutters on a large key is a browser people stop trustin
 **Chrome:** consume the shared tree and list controls, and the monospace rule from `DESIGN.md` section 4 for paths and values.
 **Needs:** Windows host (build/test)
 
-- [ ] Populate the tree lazily, one level at a time. Done when: expanding a key with a large subtree returns immediately, measured and quoted.
-- [ ] Render values through the shared virtualized list. Done when: a fixture key with 10,000 values scrolls smoothly and the render cost is quoted.
-- [ ] Render machine values in monospace and make them selectable and copyable. Done when: a path and a binary value are each selected and copied, both driven.
-- [ ] Show the full key path, and which registry view is being shown. Done when: both render and the view indicator changes when the view changes.
-- [ ] Handle a key that disappears while being viewed. Done when: deleting the viewed key externally produces a named message rather than a stale display or a crash.
-- [ ] Commit: `"regstudio: lazy tree, virtualized values"`
+- [ ] ~~Populate the tree lazily, one level at a time. Done when: expanding a key with a large subtree returns immediately, measured and quoted.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Render values through the shared virtualized list. Done when: a fixture key with 10,000 values scrolls smoothly and the render cost is quoted.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Render machine values in monospace and make them selectable and copyable. Done when: a path and a binary value are each selected and copied, both driven.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Show the full key path, and which registry view is being shown. Done when: both render and the view indicator changes when the view changes.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Handle a key that disappears while being viewed. Done when: deleting the viewed key externally produces a named message rather than a stale display or a crash.~~ -> `rizonesoft/RegStudio`
+- [ ] Commit: ~~`"regstudio: lazy tree, virtualized values"`~~ -> `rizonesoft/RegStudio`
 
-**Test checkpoint:** Expanding a large subtree returns immediately, timing quoted. A 10,000-value fixture scrolls smoothly with render cost quoted. A path and a binary value are copied, both driven. The view indicator tracks the active view. An externally deleted key produces a named message.
+**Test checkpoint:** Moved with the section. The `rizonesoft/RegStudio` repository's plan carries it.
 
 ## 4. Editing, With a Reverse
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RegStudio` repository (`D:\Resolute_Bin\RegStudio`) by its own plan.
 
 The reason this tool is worth building. Every registry editor can change a value; the one everybody already has cannot put it back. That is the whole differentiator, and it is what makes this a repair-contract tool rather than a viewer.
 
@@ -133,20 +141,22 @@ The reason this tool is worth building. Every registry editor can change a value
 **Chrome:** consume the repair contract for the restore record and undo, and the framework's dialogs and logging.
 **Needs:** Windows host (build/test)
 
-- [ ] Implement create, rename, modify, and delete for keys and values, each as a repair-contract item. Done when: all four are declared items and none writes outside the contract's loop.
-- [ ] Capture prior state before every write, into a restore record. Done when: each of the four operations against the fixture writes a record naming the target and its prior value and type.
-- [ ] Verify every write by reading it back. Done when: a write whose effect is deliberately suppressed reports failed rather than succeeded.
-- [ ] Implement undo, including after a restart. Done when: an edit, a full application restart, and then an undo returns the fixture to its pre-edit state, compared value by value and type by type.
-- [ ] Confirm destructive operations by naming exactly what will be affected: the key path, and the count of values or subkeys. Done when: deleting a key with children names both and declining performs nothing.
-- [ ] Refuse by name without the privilege, and log every write and every refusal exactly once. Done when: an unelevated delete is refused naming the key, and a mixed session produces one line per operation.
-- [ ] Protect the paths that break a running Windows. Done when: a declared protected-path set requires a second, explicit confirmation naming the risk, and the set is listed here with its reasoning.
-- [ ] Commit: `"regstudio: registry editing with a real undo"`
+- [ ] ~~Implement create, rename, modify, and delete for keys and values, each as a repair-contract item. Done when: all four are declared items and none writes outside the contract's loop.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Capture prior state before every write, into a restore record. Done when: each of the four operations against the fixture writes a record naming the target and its prior value and type.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Verify every write by reading it back. Done when: a write whose effect is deliberately suppressed reports failed rather than succeeded.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Implement undo, including after a restart. Done when: an edit, a full application restart, and then an undo returns the fixture to its pre-edit state, compared value by value and type by type.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Confirm destructive operations by naming exactly what will be affected: the key path, and the count of values or subkeys. Done when: deleting a key with children names both and declining performs nothing.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Refuse by name without the privilege, and log every write and every refusal exactly once. Done when: an unelevated delete is refused naming the key, and a mixed session produces one line per operation.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Protect the paths that break a running Windows. Done when: a declared protected-path set requires a second, explicit confirmation naming the risk, and the set is listed here with its reasoning.~~ -> `rizonesoft/RegStudio`
+- [ ] Commit: ~~`"regstudio: registry editing with a real undo"`~~ -> `rizonesoft/RegStudio`
 
 **Freeze check:** What an edit writes does not change once shipped. Evidence is an edit and undo cycle against `tests/fixtures/regstudio/` reproducing the pre-edit state value for value and type for type.
 
-**Test checkpoint:** All four operations are declared contract items and none writes outside the loop, proven by search. Each writes a restore record naming prior value and type. A suppressed write reports failed. An edit, restart, and undo restores the fixture exactly, asserted. Deleting a key with children names path and count; declining does nothing. An unelevated delete is refused by name. A protected path requires a second confirmation.
+**Test checkpoint:** Moved with the section. The `rizonesoft/RegStudio` repository's plan carries it.
 
 ## 5. Search Across Hives
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RegStudio` repository (`D:\Resolute_Bin\RegStudio`) by its own plan.
 
 A registry editor is mostly used by someone who was told a key exists somewhere and cannot find it.
 
@@ -156,15 +166,17 @@ A registry editor is mostly used by someone who was told a key exists somewhere 
 **Chrome:** consume the shared list control and the progress surface.
 **Needs:** Windows host (build/test)
 
-- [ ] Search key names, value names, and value data, each independently selectable. Done when: a fixture planted with a distinct string is found by each of the three modes.
-- [ ] Run the search off the UI thread, with progress and a working cancel. Done when: a search across a large hive leaves the window responsive and cancel stops it within a stated time.
-- [ ] Show results as a list that navigates to the hit. Done when: selecting a result opens the containing key with the hit selected.
-- [ ] Report a search that could not read part of the tree. Done when: a denied subtree is reported rather than silently skipped, so the user knows the result set is incomplete.
-- [ ] Commit: `"regstudio: search across hives"`
+- [ ] ~~Search key names, value names, and value data, each independently selectable. Done when: a fixture planted with a distinct string is found by each of the three modes.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Run the search off the UI thread, with progress and a working cancel. Done when: a search across a large hive leaves the window responsive and cancel stops it within a stated time.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Show results as a list that navigates to the hit. Done when: selecting a result opens the containing key with the hit selected.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Report a search that could not read part of the tree. Done when: a denied subtree is reported rather than silently skipped, so the user knows the result set is incomplete.~~ -> `rizonesoft/RegStudio`
+- [ ] Commit: ~~`"regstudio: search across hives"`~~ -> `rizonesoft/RegStudio`
 
-**Test checkpoint:** A planted fixture string is found by name, value-name, and data search, each quoted. A large-hive search leaves the window responsive and cancels within the stated time, both driven. Selecting a result navigates to the hit. A denied subtree is reported rather than skipped.
+**Test checkpoint:** Moved with the section. The `rizonesoft/RegStudio` repository's plan carries it.
 
 ## 6. Backup, Restore, and `.reg` Exchange
+
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/RegStudio` repository (`D:\Resolute_Bin\RegStudio`) by its own plan.
 
 A `.reg` file is the registry's exchange format, and importing one is the most dangerous single action this tool can take, because the file may have come from anywhere.
 
@@ -174,17 +186,17 @@ A `.reg` file is the registry's exchange format, and importing one is the most d
 **Chrome:** consume the repair contract, the shared result list, and the framework's file dialogs.
 **Needs:** Windows host (build/test)
 
-- [ ] Export a key subtree to a `.reg` file that Windows itself accepts. Done when: an exported fixture subtree is imported by `regedit` on a clean machine and produces identical state.
-- [ ] Export atomically and read back before reporting success. Done when: an export to a read-only target reports failure rather than claiming success.
-- [ ] Treat an imported `.reg` as untrusted input. Done when: a malformed file, a truncated file, and a file containing a protected path are each refused with a named message, and nothing is written in any of the three cases.
-- [ ] Preview an import as a change set before applying. Done when: the preview lists create, modify, and delete per entry, and the counts match what is applied.
-- [ ] Apply an import through the repair contract so it is undoable as one run. Done when: importing a fixture and then undoing it returns the registry to its pre-import state exactly.
-- [ ] Support the full-hive backup and restore path, or state plainly that it is out of scope and what the user should use instead. Done when: the behavior is one of those two and this section records which.
-- [ ] Commit: `"regstudio: reg export, previewed import, and undoable restore"`
+- [ ] ~~Export a key subtree to a `.reg` file that Windows itself accepts. Done when: an exported fixture subtree is imported by `regedit` on a clean machine and produces identical state.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Export atomically and read back before reporting success. Done when: an export to a read-only target reports failure rather than claiming success.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Treat an imported `.reg` as untrusted input. Done when: a malformed file, a truncated file, and a file containing a protected path are each refused with a named message, and nothing is written in any of the three cases.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Preview an import as a change set before applying. Done when: the preview lists create, modify, and delete per entry, and the counts match what is applied.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Apply an import through the repair contract so it is undoable as one run. Done when: importing a fixture and then undoing it returns the registry to its pre-import state exactly.~~ -> `rizonesoft/RegStudio`
+- [ ] ~~Support the full-hive backup and restore path, or state plainly that it is out of scope and what the user should use instead. Done when: the behavior is one of those two and this section records which.~~ -> `rizonesoft/RegStudio`
+- [ ] Commit: ~~`"regstudio: reg export, previewed import, and undoable restore"`~~ -> `rizonesoft/RegStudio`
 
 **Freeze check:** The format RegStudio exports does not change once shipped, because users keep those files. Evidence is an exported fixture that `regedit` imports to identical state, re-run after any change to the export path.
 
-**Test checkpoint:** An exported subtree is imported by `regedit` on a clean machine to identical state. An export to a read-only target reports failure. Malformed, truncated, and protected-path imports are each refused with nothing written, all three quoted. An import preview's counts match what is applied. Import followed by undo restores the pre-import state exactly.
+**Test checkpoint:** Moved with the section. The `rizonesoft/RegStudio` repository's plan carries it.
 
 ## Verification
 

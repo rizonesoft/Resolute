@@ -22,9 +22,12 @@
 # Raised total 169 -> 184 on 2026-11-09: tree drift since the 2026-09-17 measurement, proven tooling-independent below
 # Raised root 122 -> 137 on 2026-11-09: tree drift since the 2026-09-17 measurement, proven tooling-independent below
 
-count: 184
+#
+# Lowered 184 -> 137 on 2026-11-16: RegStudio left for its own repository
+# (docs/plans/2026-11-15-app-split.md), taking its target and its 47 findings
+# with it. The root target did not move: 137 stayed 137.
+count: 137
 target root: 137
-target RegStudio: 47
 
 # ── Raised 103 -> 169 on 2026-09-17: a stronger analyser, not worse code
 #

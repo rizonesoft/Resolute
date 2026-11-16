@@ -240,13 +240,8 @@ try {
             }
             Pop-Location
             # Standing smoke run at the same candidate (D07 T01 section 4).
-            # RegStudio builds standalone (scripts/build.ps1), never in the
-            # root tree, so build it at this candidate before smoking it.
-            Push-Location $wt
-            & pwsh (Join-Path $wt 'scripts\build.ps1') RegStudio -Config Debug *> (Join-Path $RunDir 'smoke-build.log')
-            $smokeBuildExit = $LASTEXITCODE
-            Pop-Location
-            if ($smokeBuildExit -ne 0) { $failures.Add("smoke: the RegStudio build at $head failed (exit $smokeBuildExit, see smoke-build.log)") }
+            # The launcher is the only tool this repository builds since 2026-11-16, and the
+            # Debug tree above already holds it: there is no standalone tool left to build first.
             $env:RESOLUTE_IDLE_COLLECT = '1'
             $smokeArgs = @((Join-Path $wt 'scripts\smoke-run.py'), '--flavor', 'Debug')
             if ($env:RESOLUTE_SMOKE_DRILL -eq '1') { $smokeArgs += '--drill' }

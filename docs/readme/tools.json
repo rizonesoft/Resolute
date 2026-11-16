@@ -1,7 +1,402 @@
 {
-  "about": "The README's tool gallery is generated from this map by scripts/readme-blocks.py (D00 T05 §2). Each row names its icon and the plan that owns its C++ build; the generator refuses a tool the tree has that this map lacks. A folded tool names what it folds into, from the product decisions in docs/brainstorm/2026-09-16-completion-brainstorm.md (decision 6). Re-pointed at D06 T01 §10's registry once that ships.",
+  "about": "The README's tool gallery is generated from this map by scripts/readme-blocks.py (D00 T05 §2). Since the split of 2026-11 every tool is developed in its own repository: `moved` lists them (written by tools/app-split/gallery_rows.py from each tool's spec and brand folder), and `tools` holds only what this repository still builds beside the launcher. Each row of `tools` names its icon and the plan that owns its C++ build; the generator refuses a tool the tree has that this map lacks. A folded tool names what it folds into, from the product decisions in docs/brainstorm/2026-09-16-completion-brainstorm.md (decision 6). Re-pointed at D06 T01 §10's registry once that ships.",
   "decision": "docs/brainstorm/2026-09-16-completion-brainstorm.md#product-count-after-decisions-6-and-11",
-  "tools": [
-    {"name": "RegStudio", "job": "Browse, search and edit the Windows registry, with every change reversible.", "icon": "extensions/RegStudio/resources/icon.ico", "plan": {"file": "todo/05-new-tools/TODO-02-regstudio.md"}, "frozen": false, "new": true}
+  "tools": [],
+  "moved": [
+    {
+      "name": "ActivationDiagnostics",
+      "display": "Activation Diagnostics",
+      "job": "Is Windows activated, and what does that error code mean."
+    },
+    {
+      "name": "AdapterManager",
+      "display": "Adapter Manager",
+      "job": "See your network adapters and choose which one Windows prefers."
+    },
+    {
+      "name": "AttributeRepair",
+      "display": "Attribute Repair",
+      "job": "Bring back files that a USB virus hid."
+    },
+    {
+      "name": "AudioDevices",
+      "display": "Audio Devices",
+      "job": "Choose where sound goes, bring back hidden devices, and fix no sound."
+    },
+    {
+      "name": "BatteryHealth",
+      "display": "Battery Health",
+      "job": "How worn is your battery? A plain answer."
+    },
+    {
+      "name": "BiosCodes",
+      "display": "BiosCodes",
+      "job": "What your computer's beeps are telling you."
+    },
+    {
+      "name": "BitLockerStatus",
+      "display": "BitLocker Status",
+      "job": "Are your drives encrypted, and do you still have the key."
+    },
+    {
+      "name": "BootManager",
+      "display": "Boot Manager",
+      "job": "Change the Windows boot menu, with a way back if it goes wrong."
+    },
+    {
+      "name": "BootOptions",
+      "display": "Boot Options",
+      "job": "Start in safe mode next time, and get back out again."
+    },
+    {
+      "name": "BootTimeAnalyzer",
+      "display": "Boot Time Analyzer",
+      "job": "How long your PC takes to start, and what is slowing it down."
+    },
+    {
+      "name": "CertificateManager",
+      "display": "Certificate Manager",
+      "job": "Find the certificates that break secure websites."
+    },
+    {
+      "name": "ChangeJournal",
+      "display": "Change Journal",
+      "job": "Your PC was fine last week. See what changed."
+    },
+    {
+      "name": "ColorProfiles",
+      "display": "Color Profiles",
+      "job": "See which colour profile each display uses, and put the right one back."
+    },
+    {
+      "name": "ComIntRep",
+      "display": "ComIntRep",
+      "job": "Repair your internet connection in one pass, and put it back."
+    },
+    {
+      "name": "CompleteWindowsRepair",
+      "display": "Complete Windows Repair",
+      "job": "Windows repairs that check their own work and can be undone."
+    },
+    {
+      "name": "ConnectionViewer",
+      "display": "Connection Viewer",
+      "job": "See what your PC is connected to, and which program is doing it."
+    },
+    {
+      "name": "CrashDecoder",
+      "display": "Crash Decoder",
+      "job": "Find out what crashed your PC."
+    },
+    {
+      "name": "CredentialViewer",
+      "display": "Credential Viewer",
+      "job": "See which sign-ins Windows has saved, with every secret kept hidden."
+    },
+    {
+      "name": "DefaultAppsRepair",
+      "display": "Default Apps Repair",
+      "job": "When a link or a file opens the wrong thing, or nothing."
+    },
+    {
+      "name": "DefenderManager",
+      "display": "Defender Manager",
+      "job": "See what your security software is doing, and what it has been told to ignore."
+    },
+    {
+      "name": "DiskHealth",
+      "display": "Disk Health",
+      "job": "Is your drive healthy? A plain answer."
+    },
+    {
+      "name": "DisplayInfo",
+      "display": "Display Info",
+      "job": "Everything about your monitors, in plain words."
+    },
+    {
+      "name": "DNSSelector",
+      "display": "DNS Selector",
+      "job": "Find the fastest DNS server from where you are, and switch to it."
+    },
+    {
+      "name": "DriveRepair",
+      "display": "Drive Repair",
+      "job": "Bring back a USB or DVD drive that Windows stopped showing."
+    },
+    {
+      "name": "DriverManager",
+      "display": "Driver Manager",
+      "job": "Back up your drivers and roll one back. It never updates them."
+    },
+    {
+      "name": "EnvironmentEditor",
+      "display": "Environment Editor",
+      "job": "Edit PATH and the other environment variables without breaking them."
+    },
+    {
+      "name": "EraseVerification",
+      "display": "Erase Verification",
+      "job": "Check that erased really means gone."
+    },
+    {
+      "name": "ExplorerPerformance",
+      "display": "Explorer Performance",
+      "job": "Find out why File Explorer is slow."
+    },
+    {
+      "name": "FileAssociationRepair",
+      "display": "File Association Repair",
+      "job": "When files stop opening, put the right program back."
+    },
+    {
+      "name": "FileUnlocker",
+      "display": "File Unlocker",
+      "job": "See what is holding a file open, then let it go."
+    },
+    {
+      "name": "Firemin",
+      "display": "Firemin",
+      "job": "Keep your browser's memory use small while it runs."
+    },
+    {
+      "name": "FirewallRules",
+      "display": "Firewall Rules",
+      "job": "See every firewall rule, and the ones that should not be there."
+    },
+    {
+      "name": "HashVerifier",
+      "display": "Hash Verifier",
+      "job": "Check that a download is exactly the file its publisher made."
+    },
+    {
+      "name": "HostsEditor",
+      "display": "Hosts Editor",
+      "job": "Edit the hosts file without breaking it."
+    },
+    {
+      "name": "IconCacheRepair",
+      "display": "Icon Cache Repair",
+      "job": "Fix blank, wrong and outdated icons."
+    },
+    {
+      "name": "Indicators",
+      "display": "Indicators",
+      "job": "See your lock keys at a glance."
+    },
+    {
+      "name": "LinkManager",
+      "display": "Link Manager",
+      "job": "Make and inspect junctions, symbolic links and hard links without the command line."
+    },
+    {
+      "name": "LocaleFixer",
+      "display": "Locale Fixer",
+      "job": "Fix garbled text in older programs."
+    },
+    {
+      "name": "LongPathEnabler",
+      "display": "Long Path Enabler",
+      "job": "Turn on long paths in Windows, and find out which programs can use them."
+    },
+    {
+      "name": "MemBoost",
+      "display": "MemBoost",
+      "job": "Free up memory, and see what each trim gave back."
+    },
+    {
+      "name": "Ownership",
+      "display": "Ownership",
+      "job": "Take ownership from the right-click menu, and put it back."
+    },
+    {
+      "name": "PageFileManager",
+      "display": "Page File Manager",
+      "job": "See where the Windows page file lives and how big it is, and change it safely."
+    },
+    {
+      "name": "PendingRebootInspector",
+      "display": "Pending Reboot Inspector",
+      "job": "Is Windows waiting for a restart, and what asked for it."
+    },
+    {
+      "name": "PermissionsCopier",
+      "display": "Permissions Copier",
+      "job": "Copy the permissions of one folder onto another, and see the change first."
+    },
+    {
+      "name": "PixRepair",
+      "display": "PixRepair",
+      "job": "Wake up a stuck pixel with fast colour patterns."
+    },
+    {
+      "name": "PolicyInspector",
+      "display": "Policy Inspector",
+      "job": "Find out why a Windows setting is locked."
+    },
+    {
+      "name": "PowerPlans",
+      "display": "Power Plans",
+      "job": "Power plans, and the power settings Windows hides."
+    },
+    {
+      "name": "PrinterManager",
+      "display": "Printer Manager",
+      "job": "Printers, queues and drivers in one place, and a fix for the queue that will not clear."
+    },
+    {
+      "name": "PrivacySettings",
+      "display": "Privacy Settings",
+      "job": "Every Windows privacy setting in one place, with what each change costs."
+    },
+    {
+      "name": "ProfileManager",
+      "display": "Profile Manager",
+      "job": "See every user profile on this PC and remove one properly."
+    },
+    {
+      "name": "ProxyInspector",
+      "display": "Proxy Inspector",
+      "job": "See every proxy and VPN setting on this PC, and where each one comes from."
+    },
+    {
+      "name": "QuickErase",
+      "display": "QuickErase",
+      "job": "Erase files for good, and know what that means on your drive."
+    },
+    {
+      "name": "RecoveryManager",
+      "display": "Recovery Manager",
+      "job": "Make sure Windows can repair itself, before you need it to."
+    },
+    {
+      "name": "RegStudio",
+      "display": "RegStudio",
+      "job": "A registry editor that shows what you changed and can put it back."
+    },
+    {
+      "name": "RepairHistory",
+      "display": "Repair History",
+      "job": "Every repair made on this PC, and a way to undo each one."
+    },
+    {
+      "name": "RescueImaging",
+      "display": "Rescue Imaging",
+      "job": "Copy a failing drive while it can still be read."
+    },
+    {
+      "name": "ResourceHistory",
+      "display": "Resource History",
+      "job": "What was slowing your PC down an hour ago."
+    },
+    {
+      "name": "RestorePointManager",
+      "display": "Restore Point Manager",
+      "job": "Make a restore point, and know what it covers."
+    },
+    {
+      "name": "SaveDesk",
+      "display": "SaveDesk",
+      "job": "Save where your desktop icons are, and put them back."
+    },
+    {
+      "name": "TaskManager",
+      "display": "Scheduled Tasks",
+      "job": "Every scheduled task on this PC, readable, editable, and undoable."
+    },
+    {
+      "name": "SearchManager",
+      "display": "Search Manager",
+      "job": "Find out why Windows search cannot find your file."
+    },
+    {
+      "name": "SecurityStatus",
+      "display": "Security Status",
+      "job": "Is this PC protected? One plain report."
+    },
+    {
+      "name": "ShadowBrowser",
+      "display": "Shadow Browser",
+      "job": "Bring back an earlier version of a file from the copies Windows keeps."
+    },
+    {
+      "name": "ShareDiagnostics",
+      "display": "Share Diagnostics",
+      "job": "Find out why a shared folder will not open."
+    },
+    {
+      "name": "ShellBisector",
+      "display": "Shell Bisector",
+      "job": "Find the add-on that keeps crashing File Explorer."
+    },
+    {
+      "name": "SleepWakeDiagnostics",
+      "display": "Sleep and Wake Diagnostics",
+      "job": "Why your PC will not sleep, and what keeps waking it."
+    },
+    {
+      "name": "SoftwareInventory",
+      "display": "Software Inventory",
+      "job": "Everything installed on this PC, with its version, publisher, size and date."
+    },
+    {
+      "name": "StartupManager",
+      "display": "Startup Manager",
+      "job": "See everything that starts by itself, and switch off what you do not want."
+    },
+    {
+      "name": "SystemReport",
+      "display": "System Report",
+      "job": "Everything a helper needs to know about your PC, in one file you have read first."
+    },
+    {
+      "name": "Undelete",
+      "display": "Undelete",
+      "job": "Get deleted files back, without touching the drive they were on."
+    },
+    {
+      "name": "UpdateBlocker",
+      "display": "Update Blocker",
+      "job": "Stop one Windows update, and have it stay stopped."
+    },
+    {
+      "name": "UpdateHistory",
+      "display": "Update History",
+      "job": "See every Windows update that was installed, and remove one that broke something."
+    },
+    {
+      "name": "USBHistory",
+      "display": "USB History",
+      "job": "Every USB device this PC has ever seen, and when."
+    },
+    {
+      "name": "UUIDGen",
+      "display": "UUIDGen",
+      "job": "Make UUIDs in the version and format you need."
+    },
+    {
+      "name": "WhyIsThisDenied",
+      "display": "Why Is This Denied",
+      "job": "Find out exactly why Windows says access denied."
+    },
+    {
+      "name": "WiFiDiagnostics",
+      "display": "Wi-Fi Diagnostics",
+      "job": "See your saved Wi-Fi networks and find out why the connection is poor."
+    },
+    {
+      "name": "WinClean",
+      "display": "WinClean",
+      "job": "Clean out what Windows left behind, and see how much first."
+    },
+    {
+      "name": "WindowsDiskSpace",
+      "display": "Windows Disk Space",
+      "job": "Why is Windows itself using so much space."
+    },
+    {
+      "name": "WindowsFeatures",
+      "display": "Windows Features",
+      "job": "Turn optional parts of Windows on and off, and see it actually happening."
+    }
   ]
 }

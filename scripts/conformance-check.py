@@ -49,16 +49,9 @@ TOOLS = {
         "tidy_target": "root",
         "shipped": ["Bin/Release/Resolute.exe"],
     },
-    "RegStudio": {
-        "target": "RegStudio",
-        "source_dir": "extensions/RegStudio",
-        "exe": "Bin/Release/System/RegStudio.exe",
-        "kind": "universal",  # joins repair kind when it consumes the repair contract
-        "budget": 4 * 1024 * 1024,
-        "tidy_target": "RegStudio",
-        "shipped": ["Bin/Release/System/RegStudio.exe"],
-    },
 }
+# RegStudio left on 2026-11-16 for its own repository (docs/plans/2026-11-15-app-split.md), the last tool to go: this
+# repository now ships the launcher only, and each tool is held to the profile in its own repository.
 
 # Test targets that land in Bin/Release but are not shipped tools.
 TEST_ARTIFACTS = {

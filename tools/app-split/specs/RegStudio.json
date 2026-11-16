@@ -1,0 +1,263 @@
+{
+  "name": "RegStudio",
+  "slug": "regstudio",
+  "display": "RegStudio",
+  "job": "it browses the Windows registry as a tree of keys and a list of values, edits, searches, exports and imports it, records what each change replaced so every change can be undone, and says by name what it cannot read or change.",
+  "tagline": "A registry editor that shows what you changed and can put it back",
+  "frozen": true,
+  "elevated": true,
+  "au3": [],
+  "hue": {
+    "name": "Teal",
+    "light": "#5EEAD4",
+    "dark": "#0F766E",
+    "social_ground": "#06261F",
+    "social_muted": "#BFEBE3"
+  },
+  "icon": {
+    "idea": "A cube built of smaller cubes, one lifted out: the registry, and one key in it.",
+    "points": [
+      "Free-standing with no tile behind it: an isometric cube of small cubes with one cube raised above the rest.",
+      "The cubes are Teal in three shades, one for each of the three faces.",
+      "The small drawing below 40 pixels uses fewer, larger cubes."
+    ],
+    "large": "<polygon points=\"48,41.1 57.9,46.05 48,51.0 38.1,46.05\" fill=\"#5EEAD4\"/><polygon points=\"38.1,46.05 48,51.0 48,60.9 38.1,55.95\" fill=\"#0F766E\"/><polygon points=\"57.9,46.05 48,51.0 48,60.9 57.9,55.95\" fill=\"#14B8A6\"/><polygon points=\"37,46.6 46.9,51.55 37,56.5 27.1,51.55\" fill=\"#5EEAD4\"/><polygon points=\"27.1,51.55 37,56.5 37,66.4 27.1,61.45\" fill=\"#0F766E\"/><polygon points=\"46.9,51.55 37,56.5 37,66.4 46.9,61.45\" fill=\"#14B8A6\"/><polygon points=\"59,46.6 68.9,51.55 59,56.5 49.1,51.55\" fill=\"#5EEAD4\"/><polygon points=\"49.1,51.55 59,56.5 59,66.4 49.1,61.45\" fill=\"#0F766E\"/><polygon points=\"68.9,51.55 59,56.5 59,66.4 68.9,61.45\" fill=\"#14B8A6\"/><polygon points=\"48,30.1 57.9,35.05 48,40.0 38.1,35.05\" fill=\"#5EEAD4\"/><polygon points=\"38.1,35.05 48,40.0 48,49.9 38.1,44.95\" fill=\"#0F766E\"/><polygon points=\"57.9,35.05 48,40.0 48,49.9 57.9,44.95\" fill=\"#14B8A6\"/><polygon points=\"26,52.1 35.9,57.05 26,62.0 16.1,57.05\" fill=\"#5EEAD4\"/><polygon points=\"16.1,57.05 26,62.0 26,71.9 16.1,66.95\" fill=\"#0F766E\"/><polygon points=\"35.9,57.05 26,62.0 26,71.9 35.9,66.95\" fill=\"#14B8A6\"/><polygon points=\"48,52.1 57.9,57.05 48,62.0 38.1,57.05\" fill=\"#5EEAD4\"/><polygon points=\"38.1,57.05 48,62.0 48,71.9 38.1,66.95\" fill=\"#0F766E\"/><polygon points=\"57.9,57.05 48,62.0 48,71.9 57.9,66.95\" fill=\"#14B8A6\"/><polygon points=\"70,52.1 79.9,57.05 70,62.0 60.1,57.05\" fill=\"#5EEAD4\"/><polygon points=\"60.1,57.05 70,62.0 70,71.9 60.1,66.95\" fill=\"#0F766E\"/><polygon points=\"79.9,57.05 70,62.0 70,71.9 79.9,66.95\" fill=\"#14B8A6\"/><polygon points=\"37,35.6 46.9,40.55 37,45.5 27.1,40.55\" fill=\"#5EEAD4\"/><polygon points=\"27.1,40.55 37,45.5 37,55.4 27.1,50.45\" fill=\"#0F766E\"/><polygon points=\"46.9,40.55 37,45.5 37,55.4 46.9,50.45\" fill=\"#14B8A6\"/><polygon points=\"59,35.6 68.9,40.55 59,45.5 49.1,40.55\" fill=\"#5EEAD4\"/><polygon points=\"49.1,40.55 59,45.5 59,55.4 49.1,50.45\" fill=\"#0F766E\"/><polygon points=\"68.9,40.55 59,45.5 59,55.4 68.9,50.45\" fill=\"#14B8A6\"/><polygon points=\"48,19.1 57.9,24.05 48,29.0 38.1,24.05\" fill=\"#5EEAD4\"/><polygon points=\"38.1,24.05 48,29.0 48,38.9 38.1,33.95\" fill=\"#0F766E\"/><polygon points=\"57.9,24.05 48,29.0 48,38.9 57.9,33.95\" fill=\"#14B8A6\"/><polygon points=\"37,57.6 46.9,62.55 37,67.5 27.1,62.55\" fill=\"#5EEAD4\"/><polygon points=\"27.1,62.55 37,67.5 37,77.4 27.1,72.45\" fill=\"#0F766E\"/><polygon points=\"46.9,62.55 37,67.5 37,77.4 46.9,72.45\" fill=\"#14B8A6\"/><polygon points=\"59,57.6 68.9,62.55 59,67.5 49.1,62.55\" fill=\"#5EEAD4\"/><polygon points=\"49.1,62.55 59,67.5 59,77.4 49.1,72.45\" fill=\"#0F766E\"/><polygon points=\"68.9,62.55 59,67.5 59,77.4 68.9,72.45\" fill=\"#14B8A6\"/><polygon points=\"26,41.1 35.9,46.05 26,51.0 16.1,46.05\" fill=\"#5EEAD4\"/><polygon points=\"16.1,46.05 26,51.0 26,60.9 16.1,55.95\" fill=\"#0F766E\"/><polygon points=\"35.9,46.05 26,51.0 26,60.9 35.9,55.95\" fill=\"#14B8A6\"/><polygon points=\"48,41.1 57.9,46.05 48,51.0 38.1,46.05\" fill=\"#5EEAD4\"/><polygon points=\"38.1,46.05 48,51.0 48,60.9 38.1,55.95\" fill=\"#0F766E\"/><polygon points=\"57.9,46.05 48,51.0 48,60.9 57.9,55.95\" fill=\"#14B8A6\"/><polygon points=\"37,24.6 46.9,29.55 37,34.5 27.1,29.55\" fill=\"#5EEAD4\"/><polygon points=\"27.1,29.55 37,34.5 37,44.4 27.1,39.45\" fill=\"#0F766E\"/><polygon points=\"46.9,29.55 37,34.5 37,44.4 46.9,39.45\" fill=\"#14B8A6\"/><polygon points=\"59,24.6 68.9,29.55 59,34.5 49.1,29.55\" fill=\"#5EEAD4\"/><polygon points=\"49.1,29.55 59,34.5 59,44.4 49.1,39.45\" fill=\"#0F766E\"/><polygon points=\"68.9,29.55 59,34.5 59,44.4 68.9,39.45\" fill=\"#14B8A6\"/><polygon points=\"48,63.1 57.9,68.05 48,73.0 38.1,68.05\" fill=\"#5EEAD4\"/><polygon points=\"38.1,68.05 48,73.0 48,82.9 38.1,77.95\" fill=\"#0F766E\"/><polygon points=\"57.9,68.05 48,73.0 48,82.9 57.9,77.95\" fill=\"#14B8A6\"/><polygon points=\"37,46.6 46.9,51.55 37,56.5 27.1,51.55\" fill=\"#5EEAD4\"/><polygon points=\"27.1,51.55 37,56.5 37,66.4 27.1,61.45\" fill=\"#0F766E\"/><polygon points=\"46.9,51.55 37,56.5 37,66.4 46.9,61.45\" fill=\"#14B8A6\"/><polygon points=\"59,46.6 68.9,51.55 59,56.5 49.1,51.55\" fill=\"#5EEAD4\"/><polygon points=\"49.1,51.55 59,56.5 59,66.4 49.1,61.45\" fill=\"#0F766E\"/><polygon points=\"68.9,51.55 59,56.5 59,66.4 68.9,61.45\" fill=\"#14B8A6\"/><polygon points=\"26,30.1 35.9,35.05 26,40.0 16.1,35.05\" fill=\"#5EEAD4\"/><polygon points=\"16.1,35.05 26,40.0 26,49.9 16.1,44.95\" fill=\"#0F766E\"/><polygon points=\"35.9,35.05 26,40.0 26,49.9 35.9,44.95\" fill=\"#14B8A6\"/><polygon points=\"48,30.1 57.9,35.05 48,40.0 38.1,35.05\" fill=\"#5EEAD4\"/><polygon points=\"38.1,35.05 48,40.0 48,49.9 38.1,44.95\" fill=\"#0F766E\"/><polygon points=\"57.9,35.05 48,40.0 48,49.9 57.9,44.95\" fill=\"#14B8A6\"/><polygon points=\"48,52.1 57.9,57.05 48,62.0 38.1,57.05\" fill=\"#5EEAD4\"/><polygon points=\"38.1,57.05 48,62.0 48,71.9 38.1,66.95\" fill=\"#0F766E\"/><polygon points=\"57.9,57.05 48,62.0 48,71.9 57.9,66.95\" fill=\"#14B8A6\"/><polygon points=\"37,35.6 46.9,40.55 37,45.5 27.1,40.55\" fill=\"#5EEAD4\"/><polygon points=\"27.1,40.55 37,45.5 37,55.4 27.1,50.45\" fill=\"#0F766E\"/><polygon points=\"46.9,40.55 37,45.5 37,55.4 46.9,50.45\" fill=\"#14B8A6\"/><polygon points=\"48,41.1 57.9,46.05 48,51.0 38.1,46.05\" fill=\"#5EEAD4\"/><polygon points=\"38.1,46.05 48,51.0 48,60.9 38.1,55.95\" fill=\"#0F766E\"/><polygon points=\"57.9,46.05 48,51.0 48,60.9 57.9,55.95\" fill=\"#14B8A6\"/><polygon points=\"70,15.800000000000002 79.9,20.750000000000004 70,25.700000000000003 60.1,20.750000000000004\" fill=\"#5EEAD4\"/><polygon points=\"60.1,20.750000000000004 70,25.700000000000003 70,35.6 60.1,30.650000000000002\" fill=\"#0F766E\"/><polygon points=\"79.9,20.750000000000004 70,25.700000000000003 70,35.6 79.9,30.650000000000002\" fill=\"#14B8A6\"/><polygon points=\"83.19999999999999,49.89999999999999 90.89999999999999,53.74999999999999 83.19999999999999,57.599999999999994 75.49999999999999,53.74999999999999\" fill=\"#5EEAD4\"/><polygon points=\"75.49999999999999,53.74999999999999 83.19999999999999,57.599999999999994 83.19999999999999,65.3 75.49999999999999,61.449999999999996\" fill=\"#0F766E\"/><polygon points=\"90.89999999999999,53.74999999999999 83.19999999999999,57.599999999999994 83.19999999999999,65.3 90.89999999999999,61.449999999999996\" fill=\"#14B8A6\"/>",
+    "small": "<polygon points=\"48,39.04 62.96,46.519999999999996 48,54.0 33.04,46.519999999999996\" fill=\"#5EEAD4\"/><polygon points=\"33.04,46.519999999999996 48,54.0 48,68.96000000000001 33.04,61.480000000000004\" fill=\"#0F766E\"/><polygon points=\"62.96,46.519999999999996 48,54.0 48,68.96000000000001 62.96,61.480000000000004\" fill=\"#14B8A6\"/><polygon points=\"31,47.54 45.96,55.019999999999996 31,62.5 16.04,55.019999999999996\" fill=\"#5EEAD4\"/><polygon points=\"16.04,55.019999999999996 31,62.5 31,77.46000000000001 16.04,69.98\" fill=\"#0F766E\"/><polygon points=\"45.96,55.019999999999996 31,62.5 31,77.46000000000001 45.96,69.98\" fill=\"#14B8A6\"/><polygon points=\"65,47.54 79.96000000000001,55.019999999999996 65,62.5 50.04,55.019999999999996\" fill=\"#5EEAD4\"/><polygon points=\"50.04,55.019999999999996 65,62.5 65,77.46000000000001 50.04,69.98\" fill=\"#0F766E\"/><polygon points=\"79.96000000000001,55.019999999999996 65,62.5 65,77.46000000000001 79.96000000000001,69.98\" fill=\"#14B8A6\"/><polygon points=\"48,22.04 62.96,29.52 48,37.0 33.04,29.52\" fill=\"#5EEAD4\"/><polygon points=\"33.04,29.52 48,37.0 48,51.96 33.04,44.480000000000004\" fill=\"#0F766E\"/><polygon points=\"62.96,29.52 48,37.0 48,51.96 62.96,44.480000000000004\" fill=\"#14B8A6\"/><polygon points=\"48,56.04 62.96,63.519999999999996 48,71.0 33.04,63.519999999999996\" fill=\"#5EEAD4\"/><polygon points=\"33.04,63.519999999999996 48,71.0 48,85.96000000000001 33.04,78.48\" fill=\"#0F766E\"/><polygon points=\"62.96,63.519999999999996 48,71.0 48,85.96000000000001 62.96,78.48\" fill=\"#14B8A6\"/><polygon points=\"31,30.54 45.96,38.019999999999996 31,45.5 16.04,38.019999999999996\" fill=\"#5EEAD4\"/><polygon points=\"16.04,38.019999999999996 31,45.5 31,60.46 16.04,52.980000000000004\" fill=\"#0F766E\"/><polygon points=\"45.96,38.019999999999996 31,45.5 31,60.46 45.96,52.980000000000004\" fill=\"#14B8A6\"/><polygon points=\"48,39.04 62.96,46.519999999999996 48,54.0 33.04,46.519999999999996\" fill=\"#5EEAD4\"/><polygon points=\"33.04,46.519999999999996 48,54.0 48,68.96000000000001 33.04,61.480000000000004\" fill=\"#0F766E\"/><polygon points=\"62.96,46.519999999999996 48,54.0 48,68.96000000000001 62.96,61.480000000000004\" fill=\"#14B8A6\"/><polygon points=\"65,15.240000000000002 79.96000000000001,22.720000000000002 65,30.200000000000003 50.04,22.720000000000002\" fill=\"#5EEAD4\"/><polygon points=\"50.04,22.720000000000002 65,30.200000000000003 65,45.160000000000004 50.04,37.68000000000001\" fill=\"#0F766E\"/><polygon points=\"79.96000000000001,22.720000000000002 65,30.200000000000003 65,45.160000000000004 79.96000000000001,37.68000000000001\" fill=\"#14B8A6\"/>"
+  },
+  "window": {
+    "sections": [
+      [
+        "Registry",
+        "The key tree at the left of the content area, and the selected key's values as rows with name, type and data"
+      ],
+      [
+        "Search",
+        "Search across hives by key name, value name or value data, with each hit naming its key"
+      ],
+      [
+        "Backups",
+        "What was changed and what was exported, each with its date and a Restore action"
+      ],
+      [
+        "Activity",
+        "What the tool did, newest first"
+      ],
+      [
+        "Settings",
+        "The suite's settings pages from the framework"
+      ],
+      [
+        "About",
+        "The framework's About page for this tool"
+      ]
+    ],
+    "job": "a person finds a key, reads its values and changes them, and can see what changed and put it back.",
+    "primary": "Save",
+    "secondary": "Undo",
+    "rows": [
+      [
+        "(Default)",
+        "String, not set"
+      ],
+      [
+        "DisplayName",
+        "String, set"
+      ],
+      [
+        "EnableLUA",
+        "Number, 32-bit"
+      ],
+      [
+        "ProductKeyHash",
+        "Binary, 16 bytes"
+      ],
+      [
+        "Restricted",
+        "Access denied"
+      ]
+    ],
+    "status": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Example, 5 values, 64-bit view",
+    "notes": [
+      "The tree is at the left of the content area, one level loaded at a time, with the hives as its roots. The selected key's values are rows with an icon for the kind (string, number or binary), the name, the type spelled out and the data, in monospace.",
+      "A row that cannot be read says so in words: Access denied is shown for a key the process may not open, and is never shown as an empty key. A key shows which registry view it came from, 64-bit or 32-bit.",
+      "An edit is staged first. Save is labelled with what it will do, for example Save 2 changes, and writes each change, reads it back and records the value it replaced. Deleting a key names its path and how many values and subkeys go with it, and declining changes nothing.",
+      "Undo reverses the last saved change from the recorded prior values, also after the tool was closed and opened again, and is disabled with a tooltip when there is nothing to undo.",
+      "A path that can stop Windows from running, such as a hive root or the Session Manager key, asks for a second confirmation that names the risk.",
+      "When the process is not elevated, the tree and the values still read and every write is refused by name before anything changes; Save explains that Windows asks for elevation.",
+      "The status bar names the key, the number of values and the view, for example \"HKEY_LOCAL_MACHINE\\SOFTWARE\\Example, 5 values, 64-bit view\"."
+    ],
+    "cut": "The skeleton's window is replaced, not restyled, and what it had that this one does not is cut and recorded in the plan. Its File, Edit, View and Help menu bar (`src/main.cpp:199-226`) is gone: Find becomes the Search section, About and Settings become sections, Refresh becomes an action in the content header, and Exit is the window's close. Its right-click menus (`:492-534`) are not carried as menus: New, Modify, Rename, Delete and Copy become actions in the Editing section of the plan. Its own splitter (`:894-900`, `:1003-1043`), its own dark title bar call (`:192-197`) and its stock folder icons (`:385-399`) are replaced by the SDK's controls and theme. It had no splash, animation or donate strip."
+  },
+  "readme": {
+    "lead": "RegStudio is a registry editor that shows what you changed and can put it back.",
+    "what": [
+      "RegStudio shows the Windows registry as a tree of keys with the selected key's values beside it: name, type and data, for every value type Windows defines. A key it cannot read is reported as denied, not shown as empty. It edits keys and values, searches names and data across the hives, and exports a subtree to a `.reg` file or imports one.",
+      "Before each change it records what was there, so the change can be undone, also after the tool was closed. An import is previewed as a list of what it will create, change and delete before anything is written. Changes need elevation, and without it the tool reads and refuses by name."
+    ],
+    "new_intro": "RegStudio is not a port: it grows out of a window skeleton from the Resolute repository, and the editing, undo, search and exchange are new.",
+    "new": [
+      [
+        "A real undo.",
+        "Each change records the value it replaced before it is written, so Undo restores what was there, also after a restart."
+      ],
+      [
+        "Imports you can read first.",
+        "A `.reg` file is checked and shown as create, modify and delete counts before any write, and the whole import undoes as one run."
+      ],
+      [
+        "Search across hives.",
+        "Key names, value names and value data are searched in the background, with a Cancel, and a part of the tree that could not be read is reported."
+      ],
+      [
+        "Large keys stay quick.",
+        "The tree loads one level at a time and the value list is virtual, so a key with thousands of values opens without waiting."
+      ]
+    ]
+  },
+  "reference": {
+    "note": ""
+  },
+  "plan": {
+    "scope": "The whole tool: build, engine, window, features, release",
+    "goal": "RegStudio ships as a complete, standalone C++ tool built on the SDK's framework and controls: it browses every hive with every value type shown correctly in both registry views, reports a key it cannot read as denied and not as empty, edits keys and values with the prior state recorded before each write, read back after it and restorable after a restart, searches key names, value names and value data across the hives without freezing, and exports and imports `.reg` files with the import checked and previewed first.",
+    "current_state": "There is no AutoIt original and no `reference/au3/` folder. What exists is a C++ window skeleton, moved here unchanged from the Resolute repository, and it is an early prototype: `src/main.cpp` is 1,086 lines in one file, `src/core/` and `src/ui/` hold only `.gitkeep`, and its own notes record 95 items done and 323 open (`docs/origin/resolute-extension-TODO.md`). It opens a 1024 by 768 window (`src/main.cpp:40-41`, `:145-156`) with a File, Edit, View and Help menu bar (`:199-226`), a Win32 TreeView of the five hives (`:233-244`, `:324-344`) that loads a key's children when it is expanded (`:571-649`), a virtual ListView of Name, Type and Data (`:256-316`, `:944-972`) fed from a value cache (`:686-759`), a draggable splitter whose ratio lives in memory only (`:106`, `:1003-1043`), a status bar showing path and value count (`:835-848`), a dark title bar call (`:192-197`), per-monitor DPI handling (`:1068-1080`) and an About message box (`:910-916`). It reads every value type it names (`:762-777`) and formats strings, DWORD, QWORD, multi-strings and the first 16 bytes of binary (`:780-831`). Only Exit, About and Refresh are wired (`:906-921`): Find, Copy and Paste (`:209-212`), every key and value context menu entry (`:495-530`) and the Ctrl+F accelerator (`:175`) post commands nothing handles, and the file contains no call that writes, creates or deletes a key or value, no search, no export or import and no elevation check. It opens keys with `KEY_READ` and no registry view flag (`:608`, `:694`), returns silently when a key cannot be opened (`:609`, `:695-696`), so a denied key looks empty, opens every child key just to count its subkeys (`:626-632`), reads every value of a key into memory when the key is selected (`:686-759`), assumes string data ends in a terminating character (`:786`) and joins multi-strings with spaces (`:810`), which loses what a write would need to restore. `resources/resource.rc` (16 lines) embeds one application icon and three value icons, `string.ico`, `num.ico` and `bin.ico` (`:8-13`), and `resources/app.manifest` requires administrator rights at start (`:27`). `CMakeLists.txt` (69 lines) globs `src/*.cpp` (`:34`) and links `comctl32`, `dwmapi` and `uxtheme` (`:59-65`) but includes the SDK's build policies by a path two folders up (`:10-12`) and not from the `sdk/` this repository fetches, so it will not configure as it stands. The SDK's framework, repair contract and chart control, which the tool consumes, are planned in Resolute-SDK and not built. The repository also holds the chosen identity to be built under `brand/`, `DESIGN.md` with the Sidebar window, and the kits.",
+    "inputs": [
+      "`docs/origin/resolute-D05-T02-regstudio.md`: the binding plan, six sections frozen, with the freeze checks and the fixture source `tests/fixtures/regstudio/`.",
+      "`src/main.cpp`, `resources/resource.rc`, `resources/app.manifest` and `CMakeLists.txt`: the skeleton this plan replaces piece by piece.",
+      "`docs/origin/resolute-extension-README.md` and `docs/origin/resolute-extension-TODO.md`: the skeleton's own older notes, background only where the plan file differs."
+    ],
+    "outcome": [
+      "`RegStudio.exe` shows every hive and every value type, in the 64-bit and 32-bit views, and reports a key it cannot read as denied, proven by headless tests over a fixture tree.",
+      "Every edit records the prior state before the write, is read back after it and can be undone also after a restart; a delete is confirmed by name and count, a protected path needs a second confirmation, and an unelevated write is refused by name.",
+      "Search, `.reg` export and previewed import work in the Sidebar window of `DESIGN.md`, in light and dark at every scale, by keyboard alone, and the tool ships with its settings, packs, documents and update file."
+    ],
+    "adjacency_rationale": "The list is the Registry screen, the tree with the selected key's values, and the Search results are a second list. Reporting and audit are the Activity section, one line per write and per refusal. Settings are the framework's pages, which hold the window geometry, the pane ratio and the last key the skeleton keeps in memory only (`src/main.cpp:106`). Permissions anchor on the engine, where an unelevated write is refused by name at the call and not at start. Reverse is the Editing section: the prior state is recorded before the write and Undo restores it after a restart. The `.reg` export and import belong to the Backup section; the generated adjacency line marks exchange and document not applicable, which this tool is the exception to.",
+    "baseline_items": [],
+    "inventory_items": [],
+    "parity_items": [],
+    "verification": [
+      "A search of `src/` finds no `comctl32` control, no `DwmSetWindowAttribute` call and no private settings writer, and every open item of `docs/origin/resolute-extension-TODO.md` is shipped by a section here or recorded as not planned in `docs/routing.md`.",
+      "Every registry write goes through the repair contract and is undone after a restart, the engine's fixtures under `tests/fixtures/regstudio/` are unchanged, and an exported fixture imports through `regedit` to identical state.",
+      "On a real machine the tool browses, edits, undoes, searches, exports and imports, in light and dark, by keyboard alone, and `RegStudio.exe` reads back a `RESEXT` resource holding its name, description and version, as the origin plan's launcher declaration requires."
+    ],
+    "engine": {
+      "title": "Registry Engine",
+      "intro": "The tool's whole registry access, with no window: handles, enumeration, every value type, the 32-bit and 64-bit views, a named denied outcome and guarded writes. Read before write, and types before either: an engine that drops a value type silently is worse than one that refuses to open. What the engine writes is frozen once it ships: a fixture tree, written and read back, gives byte-identical values and types.",
+      "needs": "windows-host",
+      "build": [
+        "Write the handle wrappers, enumeration and value types in `src/core/KeyHandle.h`, `src/core/Registry.cpp` and `src/core/Value.h`, read-only. Done when: a fixture tree enumerates completely with no write path present, proven by search.",
+        "Add the views, the denied outcome and the guarded writes in `src/core/Registry.cpp`. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes headlessly with no window created."
+      ],
+      "items": [
+        "Wrap every registry handle in `src/core/KeyHandle.h` so it closes on every path, replacing the bare `RegOpenKeyExW` and `RegCloseKey` pairs of `src/main.cpp:608-647`. Done when: a repeated-open assertion shows no handle leak.",
+        "Add `tests/fixtures/regstudio/tree.json`, a description of keys and values of every type, and a helper in `tests/engine_support.cpp` that builds it under a disposable key `HKCU\\Software\\RegStudioTest` and removes it after. Done when: the helper builds and removes the tree and leaves nothing behind.",
+        "Enumerate keys, then values, in `src/core/Registry.cpp`, returning each value as its raw bytes and type and not as formatted text, with the subkey count taken from one query on the key and not by opening every child as `src/main.cpp:626-632` does. Done when: the fixture tree enumerates completely with no write path present, proven by search.",
+        "Represent every value type in `src/core/Value.h`: `REG_SZ`, `REG_EXPAND_SZ`, `REG_MULTI_SZ`, `REG_DWORD`, `REG_DWORD_BIG_ENDIAN`, `REG_QWORD`, `REG_BINARY`, `REG_LINK`, the resource list types and unknown types, keeping each one's exact bytes, where `src/main.cpp:786` assumes a terminator and `:810` joins multi-strings with spaces. Done when: a fixture carrying every type, including a string with no terminator and an unknown type, round-trips byte-identically.",
+        "Take the registry view as a parameter of every open, `KEY_WOW64_64KEY` or `KEY_WOW64_32KEY`, and return which view was read, where `src/main.cpp:608` and `:694` pass `KEY_READ` alone. Done when: a value under the 32-bit view of `HKLM\\SOFTWARE` is told apart from its 64-bit counterpart in the return.",
+        "Return a named outcome from every read, `Ok`, `Denied`, `NotFound` or `Failed`, where `src/main.cpp:609` and `:695-696` return silently. Done when: an unreadable key reports `Denied` and an empty one reports `Ok` with no rows, and the two are told apart in a test.",
+        "Add the write primitives (create key, delete key, set value, delete value) in `src/core/Registry.cpp`, each checking elevation at the call and refusing by name, with the key path in the refusal, before any change. Done when: an unelevated run of each is refused naming the key and the fixture is unchanged. Cheaper substitute: checking elevation once at start, which lets a token change or a code path skip it.",
+        "Make the executable start unelevated by replacing `requireAdministrator` at `resources/app.manifest:27` with `asInvoker`, so the read paths work without elevation and the write guard has something to refuse. Done when: an unelevated start browses a key and the first write is refused by name, driven.",
+        "Cover every path in `tests/engine_test.cpp` over the fixture tree with no window created. Done when: `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes, and fails when a value type's bytes change in the round trip."
+      ],
+      "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L engine` passes: the fixture tree enumerates with no handle leak, every type round-trips byte-identically, the two views differ, a denied key reports denied, and an unelevated write is refused by name.",
+      "commit": "core: the registry engine, every type and both views"
+    },
+    "enhancements": [
+      {
+        "title": "Large Keys, Virtualized",
+        "intro": "A registry browser that stutters on a large key is one people stop trusting, and some real keys hold thousands of values. The skeleton reads a key's whole value list into memory on selection (`src/main.cpp:686-759`) and opens every child of an expanded key to count its subkeys (`:626-632`). This section makes the Registry screen read only what is on screen, and replaces the skeleton's four icons.",
+        "surface": {
+          "fidelity": "the tree and value list of the Registry screen, against `DESIGN.md` and `sdk/DESIGN.md` sections 4 and 16.",
+          "job": "a person navigates to a key and reads its values without waiting. Consumer: the rendered tree and list, driven against a key with thousands of values.",
+          "treatment": "the value list virtualized through the SDK's list and the tree loaded one level at a time. Cheaper substitute that fails the checkpoint: loading a key's whole subtree on expand, which hangs on the hives people most want to inspect."
+        },
+        "build": [
+          "Load the tree lazily and virtualize the value list in `src/ui/RegistryView.cpp`. Done when: expanding a large key and scrolling a 10,000-value fixture both stay responsive, timings quoted.",
+          "Replace the four icons in `resources/`. Done when: `resources/icon.ico`, `string.ico`, `num.ico` and `bin.ico` are gone and the window shows the new ones."
+        ],
+        "items": [
+          "Populate the tree one level at a time in `src/ui/RegistryView.cpp` from the engine's enumeration, with the expand arrow decided by the engine's subkey count. Done when: expanding `HKEY_LOCAL_MACHINE\\SOFTWARE` returns without waiting, the time quoted in the commit message. Cheaper substitute: loading the subtree on expand, which hangs on large hives.",
+          "Render values through the SDK's virtual list in `src/ui/RegistryView.cpp`, asking the engine only for the rows on screen. Done when: a 10,000-value fixture key built by `tests/engine_support.cpp` scrolls smoothly and the render cost is quoted. Cheaper substitute: filling a cache of every value as `src/main.cpp:686-759` does.",
+          "Show names, data and paths in monospace and make them selectable and copyable, per `sdk/DESIGN.md` section 4. Done when: a key path and a binary value are each selected and copied, both driven.",
+          "Show the full key path and the registry view in the content header, and update the status bar from them. Done when: both render and the view indicator changes when the 32-bit view is selected.",
+          "Handle a key that disappears while shown, in `src/ui/RegistryView.cpp` with `tests/browse_test.cpp`. Done when: deleting the shown key from outside produces a named message and an updated tree, not a stale list or a crash.",
+          "Replace the skeleton's icons: delete `resources/icon.ico`, `resources/string.ico`, `resources/num.ico` and `resources/bin.ico`, embed `brand/regstudio.ico` as the application icon and take the string, number and binary value icons from the SDK's icon set, keeping the grouping of `src/main.cpp:438-452` (string, expand and multi-string types as string, the number types as number, everything else as binary). Done when: no `.ico` file under `resources/` is from the skeleton and the three value kinds each show an icon from the SDK. Cheaper substitute: keeping the old files, which the operator decided against."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L browse` passes, expanding a large key and scrolling the 10,000-value fixture are timed and quoted, a path and a binary value are copied, and the icons are the new ones.",
+        "commit": "feature: lazy tree, virtual values, new icons"
+      },
+      {
+        "title": "Editing, With a Reverse",
+        "reverse": true,
+        "needs": "sdk-framework",
+        "intro": "Every registry editor can change a value; the one everybody already has cannot put it back. Prior state is captured through the repair contract's restore record before any write, so Undo restores what was actually there, also after the tool was closed. An in-memory undo stack would be gone at the moment the user finds they need it. The record and the undo are the SDK repair contract's, which this section consumes once it exists.",
+        "surface": {
+          "fidelity": "the edit dialogs and confirmations, reusing the framework's dialogs, against `DESIGN.md` section 2.",
+          "job": "a person changes the registry and undoes it, also after closing the tool. Consumer: the registry itself, read back, and the restore record on disk.",
+          "treatment": "prior state recorded through the repair contract before every write, and Save and Undo in the content header. Cheaper substitute that fails the checkpoint: an in-memory undo stack."
+        },
+        "build": [
+          "Declare the four operations as repair-contract items and record their prior state in `src/core/Edit.cpp`. Done when: each writes a record before its write.",
+          "Wire Save, Undo, the confirmations and the refusals in `src/ui/RegistryView.cpp`. Done when: an edit, a restart and an undo restores the fixture."
+        ],
+        "items": [
+          "Declare create, rename, modify and delete for keys and values as repair-contract items in `src/core/Edit.cpp`, a key rename recorded as one run, the skeleton's unwired menu entries (`src/main.cpp:495-530`) becoming their actions. Done when: all four are declared items and none writes outside the contract's loop, proven by search. Cheaper substitute: calling the engine's write primitives straight from the view.",
+          "Record the prior state before every write in the restore record on disk: target, value name, type and exact bytes, and the whole subtree for a key delete. Done when: each of the four operations against the fixture writes a record naming the target and its prior value and type before the write happens. Cheaper substitute: an in-memory undo stack, which is gone when the tool closes.",
+          "Verify every write by reading it back and report a mismatch by name. Done when: a write whose effect is suppressed in a test reports failed, not succeeded. Cheaper substitute: checking only the return code of the write.",
+          "Implement Undo in `src/ui/RegistryView.cpp`, disabled with a tooltip when there is nothing to undo, working after a restart. Done when: an edit, a full restart of the tool and an Undo return the fixture to its pre-edit state, compared value by value and type by type, and `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes.",
+          "Confirm a destructive operation by naming the key path and the count of values and subkeys, and ask a second confirmation naming the risk for a path in the set declared in `src/core/ProtectedPaths.h`: a hive root, `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager`, `HKLM\\SYSTEM\\CurrentControlSet\\Services`, `HKLM\\SAM`, `HKLM\\SECURITY` and `HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon`, each with its reason beside it. Done when: deleting a key with children names path and counts, declining performs nothing, and a protected path asks twice. Cheaper substitute: one generic Are you sure box.",
+          "Refuse an unelevated edit by naming the key in the view, and record each write and each refusal once in Activity. Done when: an unelevated delete is refused naming the key and a mixed session gives one Activity line per operation."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L undo` passes: all four operations are declared items with a record before the write, an edit then a restart then an Undo restores the fixture exactly, a suppressed write reports failed, and an unelevated delete is refused by name.",
+        "commit": "feature: registry editing with a real undo"
+      },
+      {
+        "title": "Search Across Hives",
+        "intro": "A registry editor is mostly used by someone who was told a key exists somewhere and cannot find it. Search runs off the window's thread so the window stays responsive, can be stopped, and reports any part of the tree it could not read, so the result is never silently incomplete. The skeleton's Find entry (`src/main.cpp:209`, `:175`) is not wired.",
+        "surface": {
+          "fidelity": "the Search section and its result list, against `DESIGN.md` and `sdk/DESIGN.md` section 16.",
+          "job": "a person who knows part of a name or a value finds where it lives. Consumer: the result list and the navigation from it.",
+          "treatment": "a background search with progress and Cancel, each hit naming its key. Cheaper substitute that fails the checkpoint: a synchronous search across `HKLM`, which appears to hang the window for minutes."
+        },
+        "build": [
+          "Write the search in `src/core/Search.cpp`. Done when: a planted fixture string is found by each of the three modes with no window.",
+          "Write the Search section in `src/ui/SearchView.cpp`. Done when: a large-hive search leaves the window responsive and cancels."
+        ],
+        "items": [
+          "Implement `src/core/Search.cpp` over the engine: key names, value names and value data, each independently selectable, over a chosen set of hives and a chosen registry view. Done when: a fixture planted with a distinct string is found by each of the three modes, each quoted.",
+          "Run the search on a background thread in `src/core/Search.cpp` with a progress count and a working cancel. Done when: a search across a large hive leaves the window responsive and cancel stops it after the key being read, shown by the progress count no longer rising. Cheaper substitute: a synchronous loop on the window's thread.",
+          "Show results in `src/ui/SearchView.cpp` as a list in which each hit names its key, the matched name or data, and the type. Done when: a search returns rows with the key path in each, driven.",
+          "Navigate from a result to the Registry section with the hit selected. Done when: selecting a result opens the containing key and selects the matching value or key, driven.",
+          "Report a subtree the search could not read, with the count, in the result header. Done when: a denied fixture subtree is reported and the result says it is incomplete, with `sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L search` passing."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L search` passes: a planted string is found by key name, value name and data, a large-hive search leaves the window responsive and cancels, selecting a result navigates to the hit, and a denied subtree is reported.",
+        "commit": "feature: search across hives, cancellable"
+      },
+      {
+        "title": "Backup, Restore and .reg Exchange",
+        "needs": "sdk-framework",
+        "intro": "A `.reg` file is the registry's exchange format, and importing one is the most dangerous single action here, because the file may have come from anywhere. Export writes a file Windows itself accepts; import treats the file as untrusted, previews what it will do and applies it through the repair contract so the whole import undoes as one run. The Backups section lists what was changed and exported, each restorable.",
+        "surface": {
+          "fidelity": "the Backups section and the import and export dialogs, reusing the framework's file dialogs and the SDK's list, against `DESIGN.md` section 2.",
+          "job": "a person exports a subtree, carries it elsewhere and imports it back, knowing what it will do before it does it. Consumer: the `.reg` file and the registry it is applied to.",
+          "treatment": "an import previewed as create, modify and delete per entry, applied through the repair contract. Cheaper substitute that fails the checkpoint: running `reg.exe import`, which applies an unknown change set with no preview and no undo."
+        },
+        "build": [
+          "Write the exporter and the checked parser in `src/core/RegFile.cpp`. Done when: an exported fixture imports through `regedit` to identical state, and a malformed, a truncated and a protected-path file are each refused with nothing written.",
+          "Write the Backups section in `src/ui/BackupsView.cpp`. Done when: each restore record and export is listed and restorable."
+        ],
+        "items": [
+          "Export a key subtree to a `.reg` file in `src/core/RegFile.cpp`, written to a temporary file, read back and then renamed into place, in the Windows Registry Editor Version 5.00 format. Done when: an exported fixture subtree is imported by `regedit` on a clean machine and produces identical state, and an export to a read-only target reports failure. Cheaper substitute: writing the target directly and reporting success without reading it back.",
+          "Parse an imported `.reg` as untrusted input in `src/core/RegFile.cpp`, refusing a malformed file, a truncated file and a file naming a path in `src/core/ProtectedPaths.h`. Done when: each of the three is refused with a named message and nothing is written, in `tests/regfile_test.cpp`.",
+          "Preview an import in `src/ui/BackupsView.cpp` as a change set of create, modify and delete per entry, before anything is written. Done when: the preview lists the three kinds and its counts equal what is applied.",
+          "Apply an import through the repair contract as one run, using the restore records of the Editing section. Done when: importing a fixture and then undoing it returns the registry to its pre-import state exactly, value by value and type by type. Cheaper substitute: shelling out to `reg.exe import`.",
+          "List in `src/ui/BackupsView.cpp` each restore record and each export with its date and scope, each with a Restore action that runs through the same contract. Done when: restoring an entry from the list returns the fixture to what the record holds, driven.",
+          "Decide the full-hive backup and record it in `docs/scope.md`: whole-hive files are out of scope, and `reg save` and `reg restore`, or a Windows restore point, are named as what the user should use. Done when: `docs/scope.md` states that, and the export dialog says it in one sentence beside its Save button."
+        ],
+        "checkpoint": "`sdk\\reskit\\cmake\\bin\\ctest.exe --preset debug -L regfile` passes: an exported fixture imports through `regedit` to identical state, a read-only target is refused, malformed, truncated and protected-path files write nothing, the preview counts match what is applied, and import then Undo restores the registry exactly.",
+        "commit": "feature: .reg export, previewed import, restorable backups"
+      }
+    ],
+    "no_reverse": ""
+  }
+}
