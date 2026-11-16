@@ -12,12 +12,10 @@ It is being **rewritten in C++** from a mature AutoIt3 implementation. The AutoI
 | ---- | ------- |
 | `src/` | The launcher shell |
 | `sdk/` | **Not tracked.** Resolute-SDK at the commit `sdk.json` pins, put there by `scripts/sdk.ps1`: the UI library and icon set (`sdk/shared/`), the CMake policies (`sdk/cmake/`), and the bootstrapped toolchain (`sdk/reskit/`). A clone on CI and a fresh machine, or a link to the developer's checkout named by `RESOLUTE_SDK_DIR`. See "The split" |
-| `extensions/` | The tools, each building as a standalone executable |
 | `sdk.json` | The SDK pin: the repository and the full commit hash this tree builds against. Taking a newer SDK is changing this commit, and nothing else |
 | `scripts/bootstrap.ps1` | The one entry point a build needs first: it puts the pinned SDK at `sdk/` (`scripts/sdk.ps1`), then runs the SDK's own bootstrap, which downloads the toolchain into `sdk/reskit/` |
 | `resources/` | Application icons and embedded resources |
-| `resolute_au3/` | The frozen AutoIt suite. **The executable specification**, not a maintenance target |
-| `resolute_au3/todo/` | The archived AutoIt plan, superseded 2026-09-16, kept for its per-tool analysis |
+| `resolute_au3/` | The AutoIt source of the launcher (`SDK/Concrete/Resolute`, `Resolute/`), of the shared framework (`SDK/Concrete/ReBar`, `SDK/Includes`) and of `Distro`, frozen. **The executable specification** of what this repository still ports, not a maintenance target. The whole AutoIt suite, with every tool, its resources and its own plan, is the private `rizonesoft/Resolute-Classic` (`D:\Resolute-Classic`), where classic builds are made |
 | `DESIGN.md` | **The design contract.** Every user-facing surface is held to it |
 | `todo/` | The live execution plan; read `todo/README.md` before authoring or implementing |
 | `todo/implementation-plan.md` | Ordered execution plan synchronized through `scripts/todo-graph.py` |
@@ -45,10 +43,11 @@ Recorded in `docs/brainstorm/2026-09-16-completion-brainstorm.md`. Read it befor
 
 Operator decision 2026-11-15, tracked in `docs/plans/2026-11-15-app-split.md`. It supersedes the brainstorm's decision 34 and every sentence here that places a tool or the shared code in this tree.
 
-- **This repository is the launcher.** Every tool moves to its own repository under `D:\Resolute_Bin\<Tool>` (`rizonesoft/<Tool>`), one at a time, in the tracker's order. The launcher imports the tools from their repositories only when a distribution is built.
+- **This repository is the launcher.** Every tool has its own repository under `D:\Resolute_Bin\<Tool>` (`rizonesoft/<Tool>`); the last one left on 2026-11-16 and `extensions/` is gone. The launcher imports the tools from their repositories only when a distribution is built.
 - **The shared code is Resolute-SDK** (`D:\Resolute-SDK`, `rizonesoft/Resolute-SDK`, MIT): the UI library, the icon set, the CMake policies and the toolchain today, and the framework and the repair contract when they are built. The launcher and every tool pin it by commit in `sdk.json`. A change to shared code is made in the SDK, committed and pushed there, and taken here by bumping the pin; `sdk/` in this tree is never edited as if it were this repository's.
 - **`pwsh scripts/sdk.ps1 -Check`** says whether `sdk/` is the pinned commit with a clean tree. A linked checkout at another commit builds with a warning and must not be pushed against: bump `sdk.json` first.
 - **Not moved yet, and why:** the UI library's tests (`tests/`), the design contract (`DESIGN.md`), the reference-data tooling and plan domains `01-framework` and `02-repair-contract` describe or exercise SDK code and still sit here. Each is owned by a section of the SDK's plan and leaves when that section is worked.
+- **The AutoIt edition is Resolute-Classic** (`D:\Resolute-Classic`, `rizonesoft/Resolute-Classic`, private): the whole suite as it stood at `8fca9fbf`, kept so final classic builds can be made. What `resolute_au3/` keeps here is only the specification of the launcher and the framework. `resolute_au3/SDK/Signing` was removed on 2026-11-16 and is in neither: it held a test certificate with its private key, which this public history still shows, so nothing is ever signed with it.
 - **Licence:** GPL v3 for the launcher and every tool; the SDK is MIT.
 
 ## The two shared layers
@@ -92,7 +91,6 @@ sdk/                    Resolute-SDK at the pinned commit, not tracked here
   shared/resolute-ui/   the Direct2D UI library, from the intake. Namespace `rui::`, include prefix `resolute/`, export macro `RESUI_API`
   shared/lucide/        icon set
   cmake/                the policies every consumer includes through ResoluteSdk.cmake
-extensions/<Tool>/      one directory per tool, one standalone executable
 tests/                  Catch2 suites, fixtures, and the parity driver
 ```
 
@@ -150,7 +148,7 @@ A checkpoint citing a gate that does not exist yet is unfalsifiable and is not a
 - **One suite, one framework:** shared behavior is consumed from the framework or the repair contract, never reimplemented in a tool. A second progress bar, About dialog, settings writer, or log format is a defect.
 - **Elevation is checked at the action**, not only at startup.
 - **`resolute_au3/` is read-only** except under the maintenance domain. It is the specification. Changing it changes what the port is measured against.
-- **Every tool lives in its own repository** (`D:\Resolute_Bin\<Tool>`, `rizonesoft/<Tool>`) and builds as its own standalone executable linking the SDK's library statically. `src/` is the launcher shell and nothing else. A tool still under `extensions/` or `resolute_au3/` is one the split has not reached yet (`docs/plans/2026-11-15-app-split.md`): it is moved, never extended here.
+- **Every tool lives in its own repository** (`D:\Resolute_Bin\<Tool>`, `rizonesoft/<Tool>`) and builds as its own standalone executable linking the SDK's library statically. `src/` is the launcher shell and nothing else. No tool is built here (`docs/plans/2026-11-15-app-split.md`): a tool is never added to this tree.
 - **The tree has no external dependencies** beyond the pinned SDK, the toolchain it bootstraps and the test framework. Adding one is a decision with a recorded reason, not a convenience. The one recorded so far: **MySQL 8.4 LTS on reference-data authoring machines only** (`D00 T06 §1`), because reviewed, versioned data shared by several authors needs rules every client obeys and a queryable history; it is installed on demand by `tools/refdata/server.ps1 -Install`, never by `scripts/bootstrap.ps1`, so no build, CI run or user machine needs it. Reversal: the committed export files become the source and the server is dropped. See `docs/reference-data.md`.
 - **Every surface answers to [`DESIGN.md`](./DESIGN.md).** A tool never draws a control the shared library provides, and never hardcodes a colour, a size, or a spacing value. Application icons are the one deliberate exception.
 - **No em dashes** in authored prose. One line per paragraph and list item in Markdown.
