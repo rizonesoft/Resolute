@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "counts": {
+    "src/main.cpp": {
+      "color-literal": 1
+    }
+  },
+  "history": [
+    {
+      "at": "2026-11-17T07:51:00Z",
+      "reason": "Initial shrink-only baseline on design-lint rollout",
+      "added": {
+        "src/main.cpp:color-literal": 1
+      }
+    }
+  ]
+}

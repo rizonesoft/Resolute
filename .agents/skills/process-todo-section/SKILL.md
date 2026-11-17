@@ -7,7 +7,7 @@ description: Process exactly one TODO section end to end. Resolve it, validate a
 
 The section is the contract, and a contract is checked before it is signed.
 
-Processing a section is two jobs, in order. First establish that the plan is sound: internally consistent, still true of the code and of its governing documents, buildable as written, and verifiable when built. Then implement it. Do not improvise around the plan, and do not implement a plan you have found to be wrong. Correct it in the file, visibly, then build the corrected version.
+Processing a section is two jobs, in order. Under Orchestrator (Carbon), Carbon performs the pre-build validation against the live repository and `DESIGN.md` in Plan Mode (naming exact design tokens, shared `Chrome:` controls, UI states, and verification commands) before calling `exit_plan_mode` for that one section, and sets `Re-plan if:` so Hydrogen hands back to Carbon (1) after `stamp`, push, `merge_prs.py`, and `ci_status.py` before resolving the next ready row whether `Surface` is `yes` or `no`, (2) when a needed design token or shared `Chrome:` control does not exist, (3) when the pinned reviewer returns `COMPLETION: gaps` or a `P1` or `P2` architectural or design-contract finding, or (4) when Hydrogen fails twice on the same fix. First establish that the plan is sound: internally consistent, still true of the code and of its governing documents, buildable as written, and verifiable when built. Then implement it. Do not improvise around the plan, and do not implement a plan you have found to be wrong. Correct it in the file, visibly, then build the corrected version.
 
 ## Use this skill when
 

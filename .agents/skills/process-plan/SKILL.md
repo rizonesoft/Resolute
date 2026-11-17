@@ -13,7 +13,7 @@ This skill does not ship a section and does not write a stamp. It audits, then c
 
 One continuous loop. You do not stop between sections or phases:
 
-1. Audit (below), then start `process-phase` on the first phase with a ready row, in this same turn.
+1. Audit (below), then start `process-phase` on the first phase with a ready row, in this same turn. Under Orchestrator (Carbon), Carbon plans one ready TODO section at a time before calling `exit_plan_mode`, and Hydrogen hands back to Carbon after each section's `stamp`, push, `merge_prs.py`, and `ci_status.py` check before resolving the next ready row (whether `Surface` is `yes` or `no`).
 2. After that phase's closeout or park, re-run `python scripts/todo-graph.py query ready` and start the next ready phase.
 3. Stop only when no phase has a ready row: every remaining `[ ]` row is blocked or waiting in this context, or the plan is done. That, and an operator stop, are the only halts.
 

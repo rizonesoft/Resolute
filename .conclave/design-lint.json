@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "mode": "strict",
+  "contract": "DESIGN.md",
+  "ui_roots": [
+    "src"
+  ],
+  "exclude": [
+    "sdk/",
+    "resolute_au3/"
+  ]
+}

@@ -49,6 +49,8 @@ Read the phase as a user would use it, end to end, against its governing documen
 
 ## Step 3: ship the phase, one row at a time
 
+Under Orchestrator (Carbon), Carbon plans one ready section per `exit_plan_mode` handoff, and Hydrogen hands back to Carbon via `enter_plan_mode` after each row's `stamp`, push, `merge_prs.py`, and `ci_status.py` check before resolving the next row (whether `Surface` is `yes` or `no`). Mid-section, Hydrogen hands back immediately to Carbon only when (a) a needed design token or shared `Chrome:` control does not exist, (b) the pinned reviewer returns `COMPLETION: gaps` or a `P1` or `P2` architectural or design-contract finding, or (c) Hydrogen fails twice on the same fix.
+
 In the generated plan's table order, for each open row: `process-todo-section`, then `review-todo-section`, whose review runs plan first, then rounds to a clean terminal round, then its one-pass completion and excellence review last, on pain of the dispatcher refusing the pass. Every gap it files becomes a new section through `add-todo` in this phase or the one that owns it. Record each outcome in the run file, with the completion verdict and any sections filed. Commit the section work, then its stamp commit.
 
 Long jobs never stall the run:
