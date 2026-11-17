@@ -5,12 +5,12 @@ description: Get an independent review of your own work from the reviewer pinned
 
 # Independent review
 
-Your own review is not enough for a nontrivial change: a different model reviews it. The supported writers are Claude Code (`claude`) and Antigravity (`gemini`, through `agy`). Codex is reviewer only: both routes use Astra (`gpt-6-astra` through `codex`), with `medium` plan, first round and completion, and `low` follow-ups and escalation. Plan, adversarial round 1, rotating follow-up lenses and completion-last ordering remain unchanged, with up to 32 follow-ups (33 rounds total). A timeout, empty response or malformed verdict is not approval. Historical receipts remain readable; removed writer routes cannot start or resume reviews. Pass `--writer <claude|gemini> --writer-model <exact-model-version>` and keep one findings file. `scripts/review-dispatch.py` writes the review to the `--record` findings file and appends the writer's settled items (`- Filed:`, `- Not taken:`, `- Settled:` lines in that file) to every prompt.
+Your own review is not enough for a nontrivial change: a different model reviews it. The supported writers are Claude Code (`claude`) and Antigravity (`gemini`, through `agy`). Codex is reviewer only: both routes use Astra (`gpt-6.2-astra` through `codex`), with `medium` plan, first round and completion, and `low` follow-ups and escalation. Plan, adversarial round 1, rotating follow-up lenses and completion-last ordering remain unchanged, with up to 32 follow-ups (33 rounds total). A timeout, empty response or malformed verdict is not approval. Historical receipts remain readable; removed writer routes cannot start or resume reviews. Pass `--writer <claude|gemini> --writer-model <exact-model-version>` and keep one findings file. `scripts/review-dispatch.py` writes the review to the `--record` findings file and appends the writer's settled items (`- Filed:`, `- Not taken:`, `- Settled:` lines in that file) to every prompt.
 
 | Work written by | `--writer` flag | Reviewer (explicit effort capped at `medium`) | Fallback |
 | --- | --- | --- | --- |
-| Claude (`claude`) | `--writer claude` | GPT-6 Astra (`codex`) | none |
-| Antigravity / Gemini (`agy`) | `--writer gemini` | GPT-6 Astra (`codex`) | none |
+| Claude (`claude`) | `--writer claude` | GPT-6.2 Astra (`codex`) | none |
+| Antigravity / Gemini (`agy`) | `--writer gemini` | GPT-6.2 Astra (`codex`) | none |
 
 The pin refuses an unknown writer or reviewer CLI, an effort above `medium`, a route with anything other than one reviewer, and a reviewer of the writer's own model family. A loop ends on the first clean round. The dispatcher judges cleanliness from declarations alone: exactly one standalone `HIGHEST: P3` or `HIGHEST: none` line (a missing, duplicate, or contradictory declaration is not clean). Declaring P3 or none while a `P1` or `P2` finding stands is a false declaration, not a clean round: the reviewer's duty is to report severity truthfully, and the dispatcher does not scan findings to check; an outage is no review, so run the round again.
 

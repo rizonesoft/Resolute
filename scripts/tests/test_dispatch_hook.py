@@ -43,7 +43,7 @@ class Background(unittest.TestCase):
             self.assertIsNone(hook.check_command(command, background=False), command)
 
     def test_a_direct_codex_exec_is_still_refused(self):
-        self.assertIn("codex exec", hook.check_command("codex exec -m gpt-6-astra -", background=True))
+        self.assertIn("codex exec", hook.check_command("codex exec -m gpt-6.2-astra -", background=True))
 
 
 if __name__ == "__main__":

@@ -441,7 +441,7 @@ class Dispatch(Harness):
         module.record(path, {**self.RESULT, "review": "Plain."}, "2026-10-20T00:00:01Z")
         self.assertEqual([r["number"] for r in module.read_rounds(path.read_text(encoding="utf-8"))], [1, 2])
         # A round recorded before the count (no Lines field) still reads, running to the next heading.
-        legacy = ("## Round 1: astra (`gpt-6-astra` via `codex`)\n\n- Writer: claude\n- Run: 2026-10-16T00:00:00Z\n\n"
+        legacy = ("## Round 1: astra (`gpt-6.2-astra` via `codex`)\n\n- Writer: claude\n- Run: 2026-10-16T00:00:00Z\n\n"
                   "Review.\n\n")
         self.assertEqual([r["number"] for r in module.read_rounds(legacy)], [1])
         # A hand edit that changes the review's line count is refused, not misread.
@@ -1076,7 +1076,7 @@ class MultiCli(Harness):
 
         [reviewers.astra]
         cli = "codex"
-        model = "gpt-6-astra"
+        model = "gpt-6.2-astra"
         effort = "medium"
 
         [reviewers.gemini]
@@ -1172,7 +1172,7 @@ class FixedModelSchedule(Harness):
         prompt = self.repo / "prompt.md"
         prompt.write_text("Review the pin.")
         for cli, model, default in (("agy", "gemini-pro-orchestrator", None),
-                                    ("codex", "gpt-6-astra", "medium")):
+                                    ("codex", "gpt-6.2-astra", "medium")):
             reviewer = {"cli": cli, "model": model}
             if default:
                 reviewer["effort"] = default
@@ -1250,7 +1250,7 @@ class RepositoryPin(unittest.TestCase):
     def test_the_repository_pin_is_one_reviewer_per_writer_on_the_schedule(self):
         with open(REPO_PIN, "rb") as handle:
             pin = tomllib.load(handle)
-        self.assertEqual(pin["reviewers"], {"astra": {"cli": "codex", "model": "gpt-6-astra", "effort": "medium"}})
+        self.assertEqual(pin["reviewers"], {"astra": {"cli": "codex", "model": "gpt-6.2-astra", "effort": "medium"}})
         self.assertEqual(pin["routes"], {"claude": ["astra"], "gemini": ["astra"]})
         schedule = pin["schedule"]
         self.assertEqual(schedule["completion_order"], "last")

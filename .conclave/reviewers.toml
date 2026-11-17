@@ -4,7 +4,7 @@ schema_version = 1
 
 [reviewers.astra]
 cli = "codex"
-model = "gpt-6-astra"
+model = "gpt-6.2-astra"
 effort = "medium"
 
 [routes]
