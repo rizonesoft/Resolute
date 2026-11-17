@@ -23,10 +23,10 @@ Every existing tool ported to the C++ framework, proven 1:1 against its AutoIt c
 ## In scope
 
 - The vertical slice through Ownership that proves the architecture
-- The five remaining frozen tools, each proven against its own fixture
+- The four remaining frozen tools, each proven against its own fixture
 - One browser optimizer with a browser picker
 - Drive Repair, merging USBRepair and DVDRepair
-- MemBoost and BiosCodes
+- MemBoost
 
 ## Out of scope
 

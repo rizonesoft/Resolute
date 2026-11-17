@@ -223,7 +223,7 @@ Two tools with near-identical shape become one. Neither can be fully proven with
 
 ## 5. MemBoost and BiosCodes
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` and `rizonesoft/BiosCodes` repositories (`D:\Resolute_Bin\MemBoost`, `D:\Resolute_Bin\BiosCodes`), each by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan. Its BiosCodes half left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite.
 
 The two tools that consume the framework but not the repair contract: one trims memory, one looks up a code. Both currently write no log at all.
 
@@ -236,9 +236,9 @@ The two tools that consume the framework but not the repair contract: one trims 
 - [x] **Specify** `MemBoost` in its own TODO file before building it. Required scope: the trim path with its source lines and frozen effect, the trim schedule and its settings, and the no-logging gap this section closes. Done when: the file exists, validates, and its sections appear in the plan. Done: `D04 T06` authored, validated, and planned. (`BiosCodes` already has `D04 T05`.)
 - [ ] ~~Capture both shipped tools first, with their effects and windows. Done when: two baselines are committed.~~ -> `rizonesoft/MemBoost`
 - [ ] ~~Port `MemBoost` with its trim path frozen. Done when: the parity report against the shipped build shows zero differing fields on the trim fixture.~~ -> `rizonesoft/MemBoost`
-- [ ] ~~Port `BiosCodes`, adding the logging it has never had. Done when: a driven lookup writes a log line naming the code.~~ -> `rizonesoft/MemBoost`
-- [ ] ~~Give `BiosCodes` the export its users need: save the looked-up result as a file, written atomically and read back. Done when: the saved content matches the rendered result and a read-only target reports failure.~~ -> `rizonesoft/MemBoost`
-- [ ] ~~Make the `BiosCodes` list findable: filter by manufacturer and by code fragment. Done when: a driven filter narrows and clearing restores.~~ -> `rizonesoft/MemBoost`
+- [ ] ~~Port `BiosCodes`, adding the logging it has never had. Done when: a driven lookup writes a log line naming the code.~~ -> left the suite
+- [ ] ~~Give `BiosCodes` the export its users need: save the looked-up result as a file, written atomically and read back. Done when: the saved content matches the rendered result and a read-only target reports failure.~~ -> left the suite
+- [ ] ~~Make the `BiosCodes` list findable: filter by manufacturer and by code fragment. Done when: a driven filter narrows and clearing restores.~~ -> left the suite
 - [ ] ~~Prove `MemBoost`'s statistics are measured rather than estimated. Done when: the reported figures are compared against an independent measurement and the method is recorded.~~ -> `rizonesoft/MemBoost`
 - [ ] ~~Account for both surfaces. Done when: two accounts are written and each deferral resolves.~~ -> `rizonesoft/MemBoost`
 - [ ] Commit: ~~`"memboost, bioscodes: port to the framework"`~~ -> `rizonesoft/MemBoost`

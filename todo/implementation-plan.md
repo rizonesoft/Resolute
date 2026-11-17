@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **97 of 170 sections complete (57%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **97 of 168 sections complete (58%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -188,13 +188,14 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T05 §4`  | Sidecar Reproduction Command Carries -Visible     |   3   |
 | [x] | `D00 T06 §1`  | MySQL Schema, Authoring Workflow                  |  26   |
 | [x] | `D00 T06 §2`  | Export, Embedding, Versioning                     |  12   |
-| [ ] | `D00 T06 §3`  | Beep Database Migration Off Packs                 |   5   |
-| [ ] | `D00 T06 §4`  | Data Extension: Vendors, Blink, POST              |   5   |
 | [ ] | `D00 T06 §5`  | Consumer Contract for Tools                       |   4   |
 | [ ] | `D10 T01 §1`  | About Bar, Topics, Social Preview                 |   4   |
 | [ ] | `D10 T01 §2`  | Branch Protection, Real Check Names               |   4   |
 | [ ] | `D10 T01 §3`  | Cold-Reader Taste Pass                            |   3   |
 | [ ] | `D10 T01 §4`  | Demo Clip Recorded and Embedded                   |   5   |
+
+> **Moved:** `D00 T06 §3` -- 2026-11-17 to docs/plans/2026-11-15-app-split.md (operator instruction); the beep data left the suite with BiosCodes and is folded into a separate product outside the suite, so this section is not worked.
+> **Moved:** `D00 T06 §4` -- 2026-11-17 to docs/plans/2026-11-15-app-split.md (operator instruction); the beep data left the suite with BiosCodes and is folded into a separate product outside the suite, so this section is not worked.
 
 > **Moved:** `D00 T04 §42` -- 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
 > **Moved:** `D00 T04 §43` -- 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
@@ -269,8 +270,8 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 > **Moved:** `D04 T03 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ComIntRep` repository (`D:\Resolute_Bin\ComIntRep`) by its own plan.
 > **Moved:** `D04 T04 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PixRepair` repository (`D:\Resolute_Bin\PixRepair`) by its own plan.
 > **Moved:** `D04 T04 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PixRepair` repository (`D:\Resolute_Bin\PixRepair`) by its own plan.
-> **Moved:** `D04 T05 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
-> **Moved:** `D04 T05 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** `D04 T05 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
+> **Moved:** `D04 T05 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
 > **Moved:** `D04 T06 §1` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
 > **Moved:** `D04 T06 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
 > **Moved:** `D04 T01 §2` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/ComIntRep` and `rizonesoft/PixRepair` repositories (`D:\Resolute_Bin\ComIntRep`, `D:\Resolute_Bin\PixRepair`), each by its own plan.
@@ -284,12 +285,12 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 > **Moved:** `D04 T04 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/PixRepair` repository (`D:\Resolute_Bin\PixRepair`) by its own plan.
 > **Moved:** `D04 T01 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/Firemin` repository (`D:\Resolute_Bin\Firemin`) by its own plan.
 > **Moved:** `D04 T01 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/DriveRepair` repository (`D:\Resolute_Bin\DriveRepair`) by its own plan.
-> **Moved:** `D04 T01 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` and `rizonesoft/BiosCodes` repositories (`D:\Resolute_Bin\MemBoost`, `D:\Resolute_Bin\BiosCodes`), each by its own plan.
-> **Moved:** `D04 T05 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
-> **Moved:** `D04 T05 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
-> **Moved:** `D04 T05 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
-> **Moved:** `D04 T05 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
-> **Moved:** `D04 T05 §7` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** `D04 T01 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan. Its BiosCodes half left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite.
+> **Moved:** `D04 T05 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
+> **Moved:** `D04 T05 §6` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
+> **Moved:** `D04 T05 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
+> **Moved:** `D04 T05 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
+> **Moved:** `D04 T05 §7` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
 > **Moved:** `D04 T06 §3` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
 > **Moved:** `D04 T06 §4` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.
 > **Moved:** `D04 T06 §5` -- 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/MemBoost` repository (`D:\Resolute_Bin\MemBoost`) by its own plan.

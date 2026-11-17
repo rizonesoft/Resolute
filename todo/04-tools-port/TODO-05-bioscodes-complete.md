@@ -51,45 +51,45 @@ track: P2
 
 ## 1. Beep Data and WMI Inventory
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
 
 The frozen content, pinned. Seven `_Display*BeepCodes` functions (`BiosCodes.au3:783-1263`): AMI (`:783`, 15 patterns), AST (`:831`), Award (`:888`), Compaq (`:917`), Dell (`:950`), IBM (`:983`), Phoenix (`:1022-1263`, the long table including the Intel 1-3-3-3 combo description). Each composes meanings from `[BeepInformation]` pack indices plus footer keys; the index arithmetic is the frozen mapping. The WMI page (`__WMI_BaseBoard` `:1355`, `__WMI_Bios` `:1405`) reads Win32_BaseBoard and Win32_BIOS into 30-column arrays with characteristic decode, bool-to-Yes/No, and date conversion.
 
 **Fidelity:** no surface of its own; this section is the record parity is measured against.
 **Needs:** C++ toolchain (compile)
 
-- [ ] ~~Pin all 7 vendor tables: pattern count per vendor, every meaning-composition rule with its pack indices, and the footer keys. Done when: each vendor names its count and rules, and the 244-key total is reconciled against the tables.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Verdict the Intel and Insyde keys (`Button_BIOS_Intel`, `Button_BIOS_Insyde`, `Label_Intel_Desc`): the sidebar builds 8 buttons (BIOS Info plus 7 vendors) with no Intel or Insyde button, so these keys are either read inside the Phoenix display or dead. Done when: each key is traced to its read or cut as dead with the trace quoted.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Pin the WMI mappings: every Win32_BaseBoard and Win32_BIOS property read, its display column, and the decode helpers (characteristic, bool, date, state, array-join), plus the WMI error presentation (`__ReturnWMIError`, `MyErrFunc`). Done when: every property names its column and every helper names its rule.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Record the system-parameter verdict: the window procs toggle `SPI_SETDRAGFULLWINDOWS` off during resize and restore after (`:1637-1674`). Done when: the verdict is recorded (cut: the Direct2D window resizes live and no tool writes a system parameter to move its own window) with the resize behavior it replaces stated.~~ -> `rizonesoft/BiosCodes`
-- [ ] Commit: ~~`"bioscodes: beep data and WMI inventory"`~~ -> `rizonesoft/BiosCodes`
+- [ ] ~~Pin all 7 vendor tables: pattern count per vendor, every meaning-composition rule with its pack indices, and the footer keys. Done when: each vendor names its count and rules, and the 244-key total is reconciled against the tables.~~ -> left the suite
+- [ ] ~~Verdict the Intel and Insyde keys (`Button_BIOS_Intel`, `Button_BIOS_Insyde`, `Label_Intel_Desc`): the sidebar builds 8 buttons (BIOS Info plus 7 vendors) with no Intel or Insyde button, so these keys are either read inside the Phoenix display or dead. Done when: each key is traced to its read or cut as dead with the trace quoted.~~ -> left the suite
+- [ ] ~~Pin the WMI mappings: every Win32_BaseBoard and Win32_BIOS property read, its display column, and the decode helpers (characteristic, bool, date, state, array-join), plus the WMI error presentation (`__ReturnWMIError`, `MyErrFunc`). Done when: every property names its column and every helper names its rule.~~ -> left the suite
+- [ ] ~~Record the system-parameter verdict: the window procs toggle `SPI_SETDRAGFULLWINDOWS` off during resize and restore after (`:1637-1674`). Done when: the verdict is recorded (cut: the Direct2D window resizes live and no tool writes a system parameter to move its own window) with the resize behavior it replaces stated.~~ -> left the suite
+- [ ] Commit: ~~`"bioscodes: beep data and WMI inventory"`~~ -> left the suite
 
-**Test checkpoint:** Moved with the section. The `rizonesoft/BiosCodes` repository's plan carries it.
+**Test checkpoint:** Moved with the section. It left the suite with BiosCodes on 2026-11-17.
 
 -> XREF: D04 T01 §5 -- the build that proves parity from this inventory
 
 ## 2. Surface Inventory With Shared-Layer Map
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
 
 Every BiosCodes window, control, string, setting, and shipped file, with `file:line`, mapped to framework or tool code. The main window (`:536`, resizable `OVERLAPPEDWINDOW` with min/max proc): heading, subheading, 8 pushlike sidebar buttons (`:600-604`, BIOS Info plus 7 vendors), a hidden-button tab control (`:608`), the BIOS Info page (3 pushlike section buttons `:614-616`, 2-column ListView `:621-629`), 7 vendor tabs each with a pattern List (`:640-`, 200 wide except Compaq 300), the shared details Edit, status icon and label, donate strip, update animation. File/Help menus standard. Preferences (`:1968`, 450x500, three framework tabs, no tool page).
 
 **Fidelity:** no surface of its own; this section is the record the build renders from.
 **Needs:** C++ toolchain (compile)
 
-- [ ] ~~Inventory the main window control by control with string sources: all 8 sidebar buttons, the BIOS Info section buttons and both ListView columns with widths, all 7 pattern Lists with widths, the details Edit, the heading and subheading, and the status elements. Done when: every control names its strings and the Compaq width exception is recorded with its content reason.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Inventory the event model: sidebar click selects the page, list click shows the meaning, vendor-button click with no list selection shows the default text (`_ExecuteButtonAction` `:1581`, `Case Else`), hover tooltips on icons. Done when: every event names its handler and the default-text rule is stated.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Inventory settings, logging, and distribution: the framework-only `.ini` keys (no tool-specific key; vendor selection and list position are unpersisted, kept so for parity), the absent logging (the tool writes no log at all; `D04 T01 §5` adds it, not this file), and the `.sni` ship list (exe pair, ini, three docs, two `.ani` files cut; no pack ships at all, recorded as a ship-list gap §3 closes). Done when: every key and shipped file carries keep, cut, or remapped.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Map every inventoried piece to framework or tool code: window, menus, prefs host, log, update, About, crash, singleton, F1 to the framework; vendor tabs, lists, details Edit, WMI page, and decodes to the tool; nothing to the repair contract (recorded: a lookup changes nothing, per the `D04 T01 §5` treatment). Done when: no piece maps to two homes and the contract exclusion is stated.~~ -> `rizonesoft/BiosCodes`
-- [ ] Commit: ~~`"bioscodes: surface inventory with shared-layer map"`~~ -> `rizonesoft/BiosCodes`
+- [ ] ~~Inventory the main window control by control with string sources: all 8 sidebar buttons, the BIOS Info section buttons and both ListView columns with widths, all 7 pattern Lists with widths, the details Edit, the heading and subheading, and the status elements. Done when: every control names its strings and the Compaq width exception is recorded with its content reason.~~ -> left the suite
+- [ ] ~~Inventory the event model: sidebar click selects the page, list click shows the meaning, vendor-button click with no list selection shows the default text (`_ExecuteButtonAction` `:1581`, `Case Else`), hover tooltips on icons. Done when: every event names its handler and the default-text rule is stated.~~ -> left the suite
+- [ ] ~~Inventory settings, logging, and distribution: the framework-only `.ini` keys (no tool-specific key; vendor selection and list position are unpersisted, kept so for parity), the absent logging (the tool writes no log at all; `D04 T01 §5` adds it, not this file), and the `.sni` ship list (exe pair, ini, three docs, two `.ani` files cut; no pack ships at all, recorded as a ship-list gap §3 closes). Done when: every key and shipped file carries keep, cut, or remapped.~~ -> left the suite
+- [ ] ~~Map every inventoried piece to framework or tool code: window, menus, prefs host, log, update, About, crash, singleton, F1 to the framework; vendor tabs, lists, details Edit, WMI page, and decodes to the tool; nothing to the repair contract (recorded: a lookup changes nothing, per the `D04 T01 §5` treatment). Done when: no piece maps to two homes and the contract exclusion is stated.~~ -> left the suite
+- [ ] Commit: ~~`"bioscodes: surface inventory with shared-layer map"`~~ -> left the suite
 
-**Test checkpoint:** Moved with the section. The `rizonesoft/BiosCodes` repository's plan carries it.
+**Test checkpoint:** Moved with the section. It left the suite with BiosCodes on 2026-11-17.
 
 -> XREF: D04 T01 §5 -- the build that renders from this inventory
 
 ## 3. Distribution Completeness
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
 
 Everything that makes the ported tool shippable: settings migration, 3 packs, docs, icon, installer and update entries, About, F1, guide page, tests, and conformance. Runs after `D04 T01 §5` proves parity on the core. The §5 export is that section's scope, not this file's; this section ships everything around it.
 
@@ -99,21 +99,21 @@ Everything that makes the ported tool shippable: settings migration, 3 packs, do
 **Chrome:** consume the framework installer entries, About, and help. No tool-side installer logic.
 **Needs:** Windows host (build/test)
 
-- [ ] ~~Migrate settings and ship the packs: an existing AutoIt `.ini` migrates its framework keys with a log line; all 3 packs ship (closing the §2 ship-list gap) and the pack-hygiene rules from `D08 T01 §3` hold. Done when: a fixture `.ini` migrates and the pack check passes on all 3, both quoted.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Ship the docs set from the three templates: every template renders with generated metadata (no typed version or date) and the set matches the `D08 T01 §1` contract. Done when: all three render and the conformance check agrees.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Register installer and update-file entries per `D06 T01 §3` and `D06 T01 §5`: portable and installed modes, the application icon, and the update descriptor. Done when: both modes install and remove cleanly on a fixture machine.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Wire About, F1, and the guide page: About from the registry for the BiosCodes descriptor, F1 through the surface map, and the user-guide page in the same commit as the behavior it documents. Done when: all three resolve and the guide page shares its commit.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Prove tests and conformance: unit tests for the tool-specific logic (table lookups, composition rules, WMI decode helpers) run under the harness, and the `D07 T01 §3` check passes for the tool. Done when: `ctest` names the suites green and the conformance report is quoted.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Prove first-run and upgrade: a clean machine goes from install to working with no manual step, and a machine carrying the AutoIt BiosCodes upgrades with settings preserved and one copy left. Done when: both paths are driven and quoted. Cheaper substitute that fails the checkpoint: testing upgrade by reading the code, which is how two copies ship.~~ -> `rizonesoft/BiosCodes`
-- [ ] Commit: ~~`"bioscodes: distribution completeness"`~~ -> `rizonesoft/BiosCodes`
+- [ ] ~~Migrate settings and ship the packs: an existing AutoIt `.ini` migrates its framework keys with a log line; all 3 packs ship (closing the §2 ship-list gap) and the pack-hygiene rules from `D08 T01 §3` hold. Done when: a fixture `.ini` migrates and the pack check passes on all 3, both quoted.~~ -> left the suite
+- [ ] ~~Ship the docs set from the three templates: every template renders with generated metadata (no typed version or date) and the set matches the `D08 T01 §1` contract. Done when: all three render and the conformance check agrees.~~ -> left the suite
+- [ ] ~~Register installer and update-file entries per `D06 T01 §3` and `D06 T01 §5`: portable and installed modes, the application icon, and the update descriptor. Done when: both modes install and remove cleanly on a fixture machine.~~ -> left the suite
+- [ ] ~~Wire About, F1, and the guide page: About from the registry for the BiosCodes descriptor, F1 through the surface map, and the user-guide page in the same commit as the behavior it documents. Done when: all three resolve and the guide page shares its commit.~~ -> left the suite
+- [ ] ~~Prove tests and conformance: unit tests for the tool-specific logic (table lookups, composition rules, WMI decode helpers) run under the harness, and the `D07 T01 §3` check passes for the tool. Done when: `ctest` names the suites green and the conformance report is quoted.~~ -> left the suite
+- [ ] ~~Prove first-run and upgrade: a clean machine goes from install to working with no manual step, and a machine carrying the AutoIt BiosCodes upgrades with settings preserved and one copy left. Done when: both paths are driven and quoted. Cheaper substitute that fails the checkpoint: testing upgrade by reading the code, which is how two copies ship.~~ -> left the suite
+- [ ] Commit: ~~`"bioscodes: distribution completeness"`~~ -> left the suite
 
-**Test checkpoint:** Moved with the section. The `rizonesoft/BiosCodes` repository's plan carries it.
+**Test checkpoint:** Moved with the section. It left the suite with BiosCodes on 2026-11-17.
 
 -> XREF: D04 T01 §5 -- the parity core this section ships
 
 ## 4. Cross-Vendor Pattern Search
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
 
 **Deliberate new behavior.** The AutoIt tool browses one vendor's list at a time; a user who does not know their BIOS vendor hunts through seven tabs. This section adds a pattern search across all vendors ("1 long 2 short" finds every vendor's matching entry with its meaning). Read-only over frozen data: no lookup answer changes.
 
@@ -125,19 +125,19 @@ Competitor context (source-based, hands-on owed at build): web references (Compu
 **Chrome:** consume the framework input and list surfaces. No bespoke search control.
 **Needs:** Windows host (build/test)
 
-- [ ] ~~Confirm the competitor table hands-on: use the named web references and one system-info tool, verify the documented behaviors above, and correct the table. Done when: each row names the version or page used and what was observed, quoted.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Search every vendor's patterns: the input, the exact matching rule (words, numbers, long/short synonyms), the ranking rule, the result rows naming vendor plus meaning, and the no-match presentation with its pack key. Done when: a pattern known to two vendors returns both in ranked order, and an unknown pattern renders no-match, both quoted.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Cover the finer details: keyboard path, screen-reader names and result announcements, both themes and DPI scalings, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Prove non-interference: the `D04 T01 §5` parity check re-runs clean with this section shipped. Done when: the comparison is quoted showing no difference.~~ -> `rizonesoft/BiosCodes`
-- [ ] Commit: ~~`"bioscodes: cross-vendor pattern search"`~~ -> `rizonesoft/BiosCodes`
+- [ ] ~~Confirm the competitor table hands-on: use the named web references and one system-info tool, verify the documented behaviors above, and correct the table. Done when: each row names the version or page used and what was observed, quoted.~~ -> left the suite
+- [ ] ~~Search every vendor's patterns: the input, the exact matching rule (words, numbers, long/short synonyms), the ranking rule, the result rows naming vendor plus meaning, and the no-match presentation with its pack key. Done when: a pattern known to two vendors returns both in ranked order, and an unknown pattern renders no-match, both quoted.~~ -> left the suite
+- [ ] ~~Cover the finer details: keyboard path, screen-reader names and result announcements, both themes and DPI scalings, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.~~ -> left the suite
+- [ ] ~~Prove non-interference: the `D04 T01 §5` parity check re-runs clean with this section shipped. Done when: the comparison is quoted showing no difference.~~ -> left the suite
+- [ ] Commit: ~~`"bioscodes: cross-vendor pattern search"`~~ -> left the suite
 
-**Test checkpoint:** Moved with the section. The `rizonesoft/BiosCodes` repository's plan carries it.
+**Test checkpoint:** Moved with the section. It left the suite with BiosCodes on 2026-11-17.
 
 -> XREF: D04 T01 §5 -- the parity check this section must not disturb
 
 ## 5. Vendor Auto-Detect From WMI
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
 
 **Deliberate new behavior.** The tool already reads the BIOS manufacturer over WMI, then ignores it and opens on the BIOS Info page. This section matches the manufacturer string to a vendor tab and opens that tab first, falling back to the Info page when nothing matches. Navigation only: no data changes, and the user can still browse every tab.
 
@@ -147,18 +147,18 @@ Competitor context (source-based, hands-on owed at build): web references (Compu
 **Chrome:** none; this section selects a tab.
 **Needs:** Windows host (build/test)
 
-- [ ] ~~Open the detected vendor first: the normalization and match table (AMI, Award/Phoenix, Dell, IBM/Lenovo, Compaq/HP, AST) with each entry's substrings, the unknown fallback, and the WMI-unreadable fallback. Done when: fixtures for three matched vendors and both fallbacks open the right page, quoted.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Cover the finer details: screen-reader announcement of the selected tab, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Prove non-interference: the `D04 T01 §5` parity check re-runs clean with this section shipped. Done when: the comparison is quoted showing no difference.~~ -> `rizonesoft/BiosCodes`
-- [ ] Commit: ~~`"bioscodes: vendor auto-detect from WMI"`~~ -> `rizonesoft/BiosCodes`
+- [ ] ~~Open the detected vendor first: the normalization and match table (AMI, Award/Phoenix, Dell, IBM/Lenovo, Compaq/HP, AST) with each entry's substrings, the unknown fallback, and the WMI-unreadable fallback. Done when: fixtures for three matched vendors and both fallbacks open the right page, quoted.~~ -> left the suite
+- [ ] ~~Cover the finer details: screen-reader announcement of the selected tab, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.~~ -> left the suite
+- [ ] ~~Prove non-interference: the `D04 T01 §5` parity check re-runs clean with this section shipped. Done when: the comparison is quoted showing no difference.~~ -> left the suite
+- [ ] Commit: ~~`"bioscodes: vendor auto-detect from WMI"`~~ -> left the suite
 
-**Test checkpoint:** Moved with the section. The `rizonesoft/BiosCodes` repository's plan carries it.
+**Test checkpoint:** Moved with the section. It left the suite with BiosCodes on 2026-11-17.
 
 -> XREF: D04 T01 §5 -- the parity check this section must not disturb
 
 ## 6. Migrate Beep Data to the Reference Database
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
 
 BiosCodes becomes the platform's first consumer: its lookups read the embedded beep dataset through the framework loader instead of the packs, and the extended data from `D00 T06 §4` (new vendors, blink codes, POST codes) ships in the tool with its surfaces. A migration, not a rewrite: every original answer stays identical.
 
@@ -168,20 +168,20 @@ BiosCodes becomes the platform's first consumer: its lookups read the embedded b
 **Chrome:** consume the framework list surfaces and the loader. No new dialog for the migration itself.
 **Needs:** Windows host (build/test)
 
-- [ ] ~~Migrate lookups to the loader: every vendor table and the WMI page read through `D01 T01 §14`, and the packs carry UI strings only. Done when: the pack-driven code path is gone and the lookup diff from `D00 T06 §3` still shows zero differences, quoted.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Ship the extended data: new vendor tabs, the blink family as a typed presentation distinct from beeps, and POST codes, all with pack-keyed UI strings. Done when: every new entry from `D00 T06 §4` is reachable and rendered, quoted.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Cover the finer details: keyboard path, screen-reader names and announcements, both themes and DPI scalings, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Prove non-interference: the `D04 T01 §5` parity check re-runs clean with this section shipped. Done when: the comparison is quoted showing no difference.~~ -> `rizonesoft/BiosCodes`
-- [ ] Commit: ~~`"bioscodes: migrate beep data to the reference database"`~~ -> `rizonesoft/BiosCodes`
+- [ ] ~~Migrate lookups to the loader: every vendor table and the WMI page read through `D01 T01 §14`, and the packs carry UI strings only. Done when: the pack-driven code path is gone and the lookup diff from `D00 T06 §3` still shows zero differences, quoted.~~ -> left the suite
+- [ ] ~~Ship the extended data: new vendor tabs, the blink family as a typed presentation distinct from beeps, and POST codes, all with pack-keyed UI strings. Done when: every new entry from `D00 T06 §4` is reachable and rendered, quoted.~~ -> left the suite
+- [ ] ~~Cover the finer details: keyboard path, screen-reader names and announcements, both themes and DPI scalings, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.~~ -> left the suite
+- [ ] ~~Prove non-interference: the `D04 T01 §5` parity check re-runs clean with this section shipped. Done when: the comparison is quoted showing no difference.~~ -> left the suite
+- [ ] Commit: ~~`"bioscodes: migrate beep data to the reference database"`~~ -> left the suite
 
-**Test checkpoint:** Moved with the section. The `rizonesoft/BiosCodes` repository's plan carries it.
+**Test checkpoint:** Moved with the section. It left the suite with BiosCodes on 2026-11-17.
 
 -> XREF: D00 T06 §3 -- the migrated dataset this section consumes
 -> XREF: D04 T01 §5 -- the parity check this section must not disturb
 
 ## 7. User-Editable Database (CRUD)
 
-> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); worked in the `rizonesoft/BiosCodes` repository (`D:\Resolute_Bin\BiosCodes`) by its own plan.
+> **Moved:** 2026-11-15 to docs/plans/2026-11-15-app-split.md (operator instruction); BiosCodes left the suite on 2026-11-17 (operator instruction, logged there) and is folded into a separate product outside the suite, so this section is not worked.
 
 **Deliberate new behavior.** The shipped database is frozen and read-only; this section layers a user stratum over it: the user adds, edits, and deletes their own beep, blink, and POST entries, stored per-user, badged as user data, and included in lookup and search. Nobody waits for a release to record a code they just decoded.
 
@@ -191,15 +191,15 @@ BiosCodes becomes the platform's first consumer: its lookups read the embedded b
 **Chrome:** consume the framework list surfaces, dialog, and message layer. No new dialog chrome beyond the editor.
 **Needs:** Windows host (build/test)
 
-- [ ] ~~Store the user stratum per-user with atomic write and readback: add, edit, and delete entries across all three families with validation (pattern shape, required meaning, vendor exists). Done when: all three operations round-trip through a forced restart, and invalid input is refused naming the field, quoted.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Keep shipped entries immutable and badge user entries: shipped rows render locked with no edit path, user rows render badged, and a user entry never overwrites a shipped answer (same pattern plus vendor renders both, shipped first). Done when: the lock and badge rules hold on fixtures, quoted.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Include user entries in lookup and cross-vendor search with their badge, and in F1 results. Done when: a user entry is found by lookup, by search, and by F1, quoted.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Export and import the user stratum: one file out with the entries plus their versions, one file in with validation refusing bad rows by number, so entries carry to another machine. Done when: a round-trip preserves every entry and a corrupt file is refused naming its row, quoted.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Cover the finer details: keyboard path, screen-reader names and announcements, both themes and DPI scalings, empty-stratum presentation, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.~~ -> `rizonesoft/BiosCodes`
-- [ ] ~~Prove non-interference: the `D04 T01 §5` parity check re-runs clean with this section shipped, and a populated user stratum leaves every shipped answer unchanged. Done when: both comparisons are quoted showing no difference.~~ -> `rizonesoft/BiosCodes`
-- [ ] Commit: ~~`"bioscodes: user-editable database"`~~ -> `rizonesoft/BiosCodes`
+- [ ] ~~Store the user stratum per-user with atomic write and readback: add, edit, and delete entries across all three families with validation (pattern shape, required meaning, vendor exists). Done when: all three operations round-trip through a forced restart, and invalid input is refused naming the field, quoted.~~ -> left the suite
+- [ ] ~~Keep shipped entries immutable and badge user entries: shipped rows render locked with no edit path, user rows render badged, and a user entry never overwrites a shipped answer (same pattern plus vendor renders both, shipped first). Done when: the lock and badge rules hold on fixtures, quoted.~~ -> left the suite
+- [ ] ~~Include user entries in lookup and cross-vendor search with their badge, and in F1 results. Done when: a user entry is found by lookup, by search, and by F1, quoted.~~ -> left the suite
+- [ ] ~~Export and import the user stratum: one file out with the entries plus their versions, one file in with validation refusing bad rows by number, so entries carry to another machine. Done when: a round-trip preserves every entry and a corrupt file is refused naming its row, quoted.~~ -> left the suite
+- [ ] ~~Cover the finer details: keyboard path, screen-reader names and announcements, both themes and DPI scalings, empty-stratum presentation, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.~~ -> left the suite
+- [ ] ~~Prove non-interference: the `D04 T01 §5` parity check re-runs clean with this section shipped, and a populated user stratum leaves every shipped answer unchanged. Done when: both comparisons are quoted showing no difference.~~ -> left the suite
+- [ ] Commit: ~~`"bioscodes: user-editable database"`~~ -> left the suite
 
-**Test checkpoint:** Moved with the section. The `rizonesoft/BiosCodes` repository's plan carries it.
+**Test checkpoint:** Moved with the section. It left the suite with BiosCodes on 2026-11-17.
 
 -> XREF: D04 T01 §5 -- the parity check this section must not disturb
 

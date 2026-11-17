@@ -37,7 +37,7 @@ Proportionality: list only needs that arise in this repository's real operation:
 
 Resolute replaces the mature `resolute_au3/` suite with a DPI-aware, dark-mode-capable C++23 suite built on `src/framework/`, `src/repair/`, and `shared/resolute-ui`. For this feature, compare against the `resolute_au3/` counterpart and `DESIGN.md`, then list each concrete way the delivered feature falls short:
 
-- Behavioral parity: every effect the `resolute_au3/` counterpart has on a system (especially frozen behavior for `Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`, `BiosCodes`).
+- Behavioral parity: every effect the `resolute_au3/` counterpart has on a system (especially frozen behavior for `Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`).
 - Speed and responsiveness: time to first result, background execution without freezing the UI thread.
 - Steps: clicks, keystrokes and dialogs for the common case.
 - Defaults: what the user gets without changing anything.

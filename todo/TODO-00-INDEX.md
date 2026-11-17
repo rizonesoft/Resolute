@@ -57,7 +57,7 @@ Every shipped tool lives at `extensions/<Tool>/` and builds as its own standalon
 | Ownership | 04-tools-port | TODO written, frozen, vertical slice |
 | ComIntRep (Complete Internet Repair) | 04-tools-port | TODO written, frozen |
 | PixRepair | 04-tools-port | TODO written, frozen |
-| BiosCodes | 04-tools-port | TODO written, frozen |
+| BiosCodes | 04-tools-port | Left the suite 2026-11-17, folded into a separate product |
 | MemBoost | 04-tools-port | TODO written |
 | Firemin (absorbing Chromin, Edgemin, Watermin) | 04-tools-port | TODO written, consolidation |
 | Drive Repair (USBRepair plus DVDRepair) | 04-tools-port | TODO written, frozen, consolidation |

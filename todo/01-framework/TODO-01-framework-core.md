@@ -395,10 +395,10 @@ The framework runtime half of the reference-data platform: tools declare dataset
 
 - [ ] Implement the loader API: open by dataset name, query entries by stable ID, read dataset version, with the exact failure rules from the §5 contract. Done when: the API matches the contract call for call, quoted against it.
 - [ ] Render missing-or-stale through the message layer with the contract's texts, and log one line naming dataset and versions. Done when: both failures render exactly as specified, quoted by drive.
-- [ ] Prove isolation: a tool sees exactly its declared datasets; an undeclared open fails naming the dataset. Done when: quoted, with the beep dataset visible to BiosCodes and invisible elsewhere.
+- [ ] Prove isolation: a tool sees exactly its declared datasets; an undeclared open fails naming the dataset. Done when: quoted, with a fixture dataset visible to the tool that declares it and invisible elsewhere.
 - [ ] Commit: `"framework: embedded dataset loader"`
 
-**Test checkpoint:** API matches the contract; both failures render with texts and log lines; undeclared opens fail naming the dataset. Cheaper substitute that fails the checkpoint: testing the loader only through BiosCodes, which proves one consumer rather than the contract.
+**Test checkpoint:** API matches the contract; both failures render with texts and log lines; undeclared opens fail naming the dataset. Cheaper substitute that fails the checkpoint: testing the loader only through one tool, which proves one consumer rather than the contract.
 
 -> XREF: D00 T06 §2 -- the pipeline whose output this loader reads
 -> XREF: D00 T06 §5 -- the contract this loader implements

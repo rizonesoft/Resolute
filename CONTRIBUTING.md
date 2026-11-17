@@ -36,7 +36,7 @@ At least one of these, quoted from a real run in the pull request:
 2. **Static analysis clean**: `clang-tidy` reports nothing new on the files you touched.
 3. **A unit test** under Catch2 in `tests/`, shown failing without your change.
 4. **A driven run with evidence**: a log line, a settings read-back, or a capture under `docs/captures/` with its provenance file.
-5. **Parity**: for a ported tool, the C++ tool and its AutoIt original run against the same fixture and change the system the same way. The six tools that change a system in ways hard to undo (`Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`, `BiosCodes`) are frozen: their effect may not change, only their structure.
+5. **Parity**: for a ported tool, the C++ tool and its AutoIt original run against the same fixture and change the system the same way. The five tools that change a system in ways hard to undo (`Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`) are frozen: their effect may not change, only their structure.
 
 ## How should prose read?
 

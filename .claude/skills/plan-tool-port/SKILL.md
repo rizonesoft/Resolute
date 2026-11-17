@@ -27,7 +27,7 @@ For a **merge** (N tools into one, such as the four browser optimizers), run thi
 
 For a **C++ source** (a sample or existing `extensions/` app with no AutoIt), replace the AutoIt reads with the C++ equivalents: the build files, the headers plus public interfaces, the tests if any, the bug list as scope (every known defect is a port item or a cut-with-reason, never inherited silently), and whatever docs exist. Steps 2 through 6 run unchanged against that inventory.
 
-Check whether the tool is frozen: `Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`, `BiosCodes` (AGENTS.md). A frozen tool's computed effect is reproduced exactly; enhancements to a frozen tool add surfaces and conveniences around the effect, never change the effect.
+Check whether the tool is frozen: `Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair` (AGENTS.md). A frozen tool's computed effect is reproduced exactly; enhancements to a frozen tool add surfaces and conveniences around the effect, never change the effect.
 
 ### 2. Inventory everything
 
@@ -59,7 +59,7 @@ A second settings writer, log format, About dialog, progress bar, or message box
 
 One section per surface or behavior cluster, each born complete per `create-todo`: context, micro-step checklist with Done-when per item, Test checkpoint with a cheaper-substitute-that-fails line, Fidelity/Job/Treatment/Chrome on UI sections, Commit item. UI sections owe the D00 T02 §9 capture matrix (light/dark by 100/150 percent with TXT sidecars) as checkpoint evidence.
 
-Every parity section owes the parity proof: the C++ tool and its `resolute_au3/` counterpart run against the same fixture and produce the same effect, compared field by field. Frozen tools prove byte-for-byte effect on the surface each tool actually freezes: registry, ACLs, or drive contents for the mutating tools, the displayed sequences and timing for PixRepair, and the lookup answers for BiosCodes; the section names the fixture and the comparison.
+Every parity section owes the parity proof: the C++ tool and its `resolute_au3/` counterpart run against the same fixture and produce the same effect, compared field by field. Frozen tools prove byte-for-byte effect on the surface each tool actually freezes: registry, ACLs, or drive contents for the mutating tools, and the displayed sequences and timing for PixRepair; the section names the fixture and the comparison.
 
 ### 5. Plan enhancements (the ultimate tool)
 

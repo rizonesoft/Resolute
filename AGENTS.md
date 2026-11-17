@@ -49,6 +49,7 @@ Operator decision 2026-11-15, tracked in `docs/plans/2026-11-15-app-split.md`. I
 - **Not moved yet, and why:** the UI library's tests (`tests/`), the design contract (`DESIGN.md`), the reference-data tooling and plan domains `01-framework` and `02-repair-contract` describe or exercise SDK code and still sit here. Each is owned by a section of the SDK's plan and leaves when that section is worked.
 - **The AutoIt edition is Resolute-Classic** (`D:\Resolute-Classic`, `rizonesoft/Resolute-Classic`, private): the whole suite as it stood at `8fca9fbf`, kept so final classic builds can be made. What `resolute_au3/` keeps here is only the specification of the launcher and the framework. `resolute_au3/SDK/Signing` was removed on 2026-11-16 and is in neither: it held a test certificate with its private key, which this public history still shows, so nothing is ever signed with it.
 - **Licence:** GPL v3 for the launcher and every tool; the SDK is MIT.
+- **BiosCodes left the suite (operator decision 2026-11-17).** It is folded into a separate product that is not a Resolute tool. Its repository `rizonesoft/BiosCodes` is deleted; the operator keeps the last clone, with its history, outside the suite. The suite is 78 tools. The plan sections that were BiosCodes' (`D04 T05`, its half of `D04 T01 §5`, and the beep data of `D00 T06 §3` and `§4`) carry a `Moved:` marker and are not worked here, so the reference-data platform has no consumer until another tool declares a dataset. The AutoIt BiosCodes still ships in Resolute-Classic. Cost of reversing: restore the repository from that clone and re-add its spec under `tools/app-split/specs/`.
 
 ## The two shared layers
 
@@ -190,11 +191,13 @@ The aim is the best Windows system utility suite in its class, and the best-run 
 
 ## Frozen behavior
 
-Six tools change a user's system in ways that are hard to undo: `Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`, `BiosCodes`.
+Five tools change a user's system in ways that are hard to undo: `Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`.
 
 What they compute and write is **frozen**. The C++ port reproduces the effect exactly and proves it with a parity check. Restructuring is allowed, changing the effect is not, because the effect lands on somebody's registry, ACLs, or drive.
 
 `ReBar` is not in this set. It is the framework, it changes nothing on a user's system, and it is internal tooling rather than a product. The archived AutoIt plan says otherwise and is wrong.
+
+`BiosCodes` was on this list until it left the suite on 2026-11-17 (see "The split"). It looked codes up and changed nothing on a system.
 
 ## A measurement recorded is a measurement re-checked
 

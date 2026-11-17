@@ -29,11 +29,6 @@
       "job": "How worn is your battery? A plain answer."
     },
     {
-      "name": "BiosCodes",
-      "display": "BiosCodes",
-      "job": "What your computer's beeps are telling you."
-    },
-    {
       "name": "BitLockerStatus",
       "display": "BitLocker Status",
       "job": "Are your drives encrypted, and do you still have the key."

@@ -10,7 +10,7 @@ track: N0
 
 # TODO-06 -- Reference Data Platform
 
-> **Goal:** Tools that need reference data get it from one platform: a MySQL database authors and versions the datasets, the build exports each tool's dataset into its executable, and no tool ever touches a database server at runtime. BiosCodes is the first consumer; the platform is built for every tool that requires it.
+> **Goal:** Tools that need reference data get it from one platform: a MySQL database authors and versions the datasets, the build exports each tool's dataset into its executable, and no tool ever touches a database server at runtime. BiosCodes was to be the first consumer and left the suite on 2026-11-17, so the platform has no consumer yet; it is built for every tool that requires it.
 
 > [!IMPORTANT]
 > **Current state:** **Corrected 2026-11-13 (§1 built):** the authoring side exists: the pinned private server (`tools/refdata/server.json`, `tools/refdata/server.ps1`), the schema with the workflow's rules as stored procedures (`data/refdata/schema.sql`), the authoring tool and its self-test (`tools/refdata/refdata.py`), the fixture proposals (`data/refdata/fixtures/`), and `docs/reference-data.md`. **Corrected 2026-11-13 (§2 built):** the path from the database to an executable exists: `refdata.py export` and its `--check`, the no-server gate `scripts/refdata-verify.py`, the build declaration `resolute_embed_refdata` in `cmake/ResoluteRefdata.cmake`, the packer `scripts/refdata-embed.py`, and the embedded form documented in `docs/reference-data.md`. No shipped dataset exists yet (`data/refdata/export/` is empty until §3), so the pipeline is proven on the fixture datasets the test executable embeds, and no tool reads a dataset. Before §1, nothing existed. BiosCodes carries its 244-key beep database inside language packs (`D04 T05 §1`); no other shipped tool carries reference data (verified by source walk: USBRepair, DVDRepair, MemBoost, and ComIntRep hold no lookup tables). MySQL is a new external dependency, allowed here with a recorded reason: it runs on authoring machines only, never on build machines, CI, or user machines. The build exports datasets to committed generated files, and CI verifies committed output matches a fresh export exactly as it does the plan projection, so nobody needs a server to build.
@@ -38,7 +38,7 @@ track: N0
 
 - A MySQL schema versions reference datasets with changelogs, and a documented workflow authors them.
 - The build exports each tool's declared datasets to committed files and embeds them; CI fails on drift.
-- The beep database migrates from packs to the platform with zero lookup changes, then grows: more manufacturers, blink codes, more codes.
+- ~~The beep database migrates from packs to the platform with zero lookup changes, then grows: more manufacturers, blink codes, more codes.~~ Left the suite with BiosCodes on 2026-11-17 (§3 and §4 are Moved).
 - Every tool declares the datasets it embeds through one consumer contract, and the framework loader reads them.
 
 **Adjacency:** list=applicable @ D00 T06 §1; document=applicable @ D00 T06 §2; settings=not-applicable (connection details live outside the repo as authoring-machine configuration, never in a tracked file); reporting=applicable @ D00 T06 §2; notifications=not-applicable (no notify channel is added); permissions=not-applicable (one authoring role; the database grants are outside the repo); audit=applicable @ D00 T06 §1; exchange=applicable @ D00 T06 §2; reverse=not-applicable (a bad dataset is replaced by re-export, never rolled back in the tool)
@@ -163,35 +163,39 @@ The pipeline from database to executable: export each tool's declared datasets t
 
 ## 3. Beep Database Migration Off Packs
 
+> **Moved:** 2026-11-17 to docs/plans/2026-11-15-app-split.md (operator instruction); the beep data left the suite with BiosCodes and is folded into a separate product outside the suite, so this section is not worked.
+
 The 244-key `[BeepInformation]` database moves from language packs to the platform: every key becomes an entry with a stable ID, every vendor table keeps its composition rule, and the packs keep UI strings only. Zero lookup changes: the migration moves bytes, not answers.
 
-- [ ] Model the beep dataset: vendors, patterns, meanings, footers, and the composition rules from `D04 T05 §1` as schema rows. Done when: every one of the 244 keys maps to an entry and every composition rule maps to a relation.
-- [ ] Migrate and verify equality: export the dataset and diff every lookup answer against the pack-driven answers on a fixture. Done when: zero differing answers across all vendors, quoted.
-- [ ] Strip the packs: `[BeepInformation]` leaves the packs once the dataset verifies, and pack hygiene passes on what remains. Done when: no pack carries a beep key and the hygiene check is quoted green. Cheaper substitute that fails the checkpoint: leaving the keys in the packs "just in case", which ships two databases that drift.
-- [ ] Version the dataset at 1.0 with a changelog recording the migration. Done when: the version stamps and the changelog names the source.
-- [ ] Commit: `"data: beep database migration off packs"`
+- [ ] ~~Model the beep dataset: vendors, patterns, meanings, footers, and the composition rules from `D04 T05 §1` as schema rows. Done when: every one of the 244 keys maps to an entry and every composition rule maps to a relation.~~ -> left the suite
+- [ ] ~~Migrate and verify equality: export the dataset and diff every lookup answer against the pack-driven answers on a fixture. Done when: zero differing answers across all vendors, quoted.~~ -> left the suite
+- [ ] ~~Strip the packs: `[BeepInformation]` leaves the packs once the dataset verifies, and pack hygiene passes on what remains. Done when: no pack carries a beep key and the hygiene check is quoted green. Cheaper substitute that fails the checkpoint: leaving the keys in the packs "just in case", which ships two databases that drift.~~ -> left the suite
+- [ ] ~~Version the dataset at 1.0 with a changelog recording the migration. Done when: the version stamps and the changelog names the source.~~ -> left the suite
+- [ ] Commit: ~~`"data: beep database migration off packs"`~~ -> left the suite
 
-**Test checkpoint:** All 244 keys map to entries; the lookup diff shows zero differences; packs carry no beep key with hygiene green; version 1.0 stamps with a changelog. Cheaper substitute that fails the checkpoint: a migrated dataset without the lookup diff, which trusts the move rather than proving it.
+**Test checkpoint:** Moved with the section. It left the suite with BiosCodes on 2026-11-17.
 
 -> XREF: D04 T05 §6 -- the tool migration this dataset enables
 
 ## 4. Data Extension: Vendors, Blink, More Codes
 
+> **Moved:** 2026-11-17 to docs/plans/2026-11-15-app-split.md (operator instruction); the beep data left the suite with BiosCodes and is folded into a separate product outside the suite, so this section is not worked.
+
 The database grows past the AutoIt set: more manufacturers (Lenovo, HP, ASUS, Acer, MSI, Insyde as a full vendor), blink and LED codes (Dell blink patterns, HP blink codes, Lenovo beep-plus-blink), and POST card hex codes for the covered vendors. Every addition cites its vendor documentation; nothing enters from memory.
 
-- [ ] Add the manufacturers: each new vendor gets its pattern table with meanings, following the §3 model. Done when: every new entry cites its vendor document and the per-vendor counts are recorded.
-- [ ] Add blink and LED codes as a distinct family (patterns of blinks, not beeps) with its own composition rules. Done when: the family is modeled, populated for Dell and HP at minimum, and distinguishable from beep entries by type. Cheaper substitute that fails the checkpoint: stuffing blink patterns into beep tables, which answers "3 blinks" with a beep meaning.
-- [ ] Add POST hex codes for the covered vendors with their checkpoint meanings. Done when: every code cites its vendor document.
-- [ ] Version the dataset minor-by-minor with a changelog per addition, and re-verify the §3 equality diff still shows zero differences on the original vendors. Done when: versions stamp, changelogs name sources, and the original answers are untouched, quoted.
-- [ ] Commit: `"data: extended vendors, blink, and POST codes"`
+- [ ] ~~Add the manufacturers: each new vendor gets its pattern table with meanings, following the §3 model. Done when: every new entry cites its vendor document and the per-vendor counts are recorded.~~ -> left the suite
+- [ ] ~~Add blink and LED codes as a distinct family (patterns of blinks, not beeps) with its own composition rules. Done when: the family is modeled, populated for Dell and HP at minimum, and distinguishable from beep entries by type. Cheaper substitute that fails the checkpoint: stuffing blink patterns into beep tables, which answers "3 blinks" with a beep meaning.~~ -> left the suite
+- [ ] ~~Add POST hex codes for the covered vendors with their checkpoint meanings. Done when: every code cites its vendor document.~~ -> left the suite
+- [ ] ~~Version the dataset minor-by-minor with a changelog per addition, and re-verify the §3 equality diff still shows zero differences on the original vendors. Done when: versions stamp, changelogs name sources, and the original answers are untouched, quoted.~~ -> left the suite
+- [ ] Commit: ~~`"data: extended vendors, blink, and POST codes"`~~ -> left the suite
 
-**Test checkpoint:** New vendors cite documents; blink is a distinct typed family; POST codes cite documents; versions and changelogs record each addition; the original 244 answers are unchanged. Cheaper substitute that fails the checkpoint: additions without cited sources, which grow the database with folklore.
+**Test checkpoint:** Moved with the section. It left the suite with BiosCodes on 2026-11-17.
 
 -> XREF: D04 T05 §6 -- the tool that ships this extended data
 
 ## 5. Consumer Contract for Tools
 
-How a tool declares and consumes datasets: the declaration file naming dataset plus minimum version, the loader API the framework provides, the failure presentation when a dataset is missing or too old, and the rule for adding a dataset (new tools file it here with their plan). BiosCodes is the first consumer; the named next candidate is a USB ID database for a future USBRepair need, recorded as a candidate, not a promise.
+How a tool declares and consumes datasets: the declaration file naming dataset plus minimum version, the loader API the framework provides, the failure presentation when a dataset is missing or too old, and the rule for adding a dataset (new tools file it here with their plan). BiosCodes was to be the first consumer and left the suite on 2026-11-17; the named next candidate is a USB ID database for a future USBRepair need, recorded as a candidate, not a promise.
 
 **Groomed 2026-11-13 (from `§2`):** the build-level declaration exists once `§2` ships: `resolute_embed_refdata(<target> <dataset>...)` in `cmake/ResoluteRefdata.cmake`. This section's declaration item adds what that call lacks (minimum versions and their validation) and writes the contract around it, without a second place to name a tool's datasets.
 
@@ -209,6 +213,6 @@ How a tool declares and consumes datasets: the declaration file naming dataset p
 
 - [ ] The schema builds fresh and the fixture dataset versions with a changelog
 - [ ] Exports are byte-stable, drift fails CI, tools embed exactly their declared sets
-- [ ] All 244 beep answers are unchanged with the packs carrying no beep key
-- [ ] Every added entry cites its vendor document and versions stamp
+- [ ] ~~All 244 beep answers are unchanged with the packs carrying no beep key~~ -> left the suite
+- [ ] ~~Every added entry cites its vendor document and versions stamp~~ -> left the suite
 - [ ] `python scripts/todo-graph.py validate` clean
