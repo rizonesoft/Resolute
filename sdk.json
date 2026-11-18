@@ -1,5 +1,5 @@
 {
   "about": "The Resolute-SDK commit this repository builds against. scripts/sdk.ps1 puts it at sdk/. Bump the commit to take a newer SDK.",
   "repository": "https://github.com/rizonesoft/Resolute-SDK.git",
-  "commit": "06c952ce28fcaea7fb436808da3ab89c12e4599c"
+  "commit": "d23b8b8ee4b95bee69090c012d96d6c2b1ea6f49"
 }

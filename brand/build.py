@@ -5,9 +5,10 @@
     python brand/build.py --check    exit 1 when a tracked asset differs from what this script builds
 
 The icon was chosen by the operator on 2026-11-16: a gold spanner crossed under a steel screwdriver with a blue handle,
-drawn new for the launcher after the tools left for their own repositories. It is the one icon of the suite with
-gradients: the tools' icons are flat and two-tone, and the launcher is the suite's front door. sdk/brand/brandkit.py
-turns this description into the files. Run `pwsh scripts/sdk.ps1` first: the kit and the fonts come from the pinned SDK.
+drawn new for the launcher after the tools left for their own repositories. It is the one icon of the suite whose
+gradients are drawn by hand, so it passes finish=False: the tools are drawn flat and brandkit gives them the suite's
+"Deep with gloss" finish (SDK DESIGN.md section 14, operator 2026-11-18). sdk/brand/brandkit.py turns this description
+into the files. Run `pwsh scripts/sdk.ps1` first: the kit and the fonts come from the pinned SDK.
 
 The application icon the executable embeds (src/Resolute.rc.in) is resources/icons/Resolute.ico. This script owns that
 file too, so the brand and the executable cannot drift apart.
@@ -27,7 +28,7 @@ SMALL = '<defs><linearGradient id="rsg" gradientUnits="userSpaceOnUse" x1="34" y
 if __name__ == "__main__":
     files = brandkit.app_assets(
         slug="resolute", name="Resolute", tagline="Windows repair and system tools that fix the problem, show what they changed, and can put it back",
-        large=LARGE, small=SMALL, social_ground="#17191E", social_muted="#D9D5CC", credit="By Rizonesoft")
+        large=LARGE, small=SMALL, social_ground="#17191E", social_muted="#D9D5CC", credit="By Rizonesoft", finish=False)
     # What the executable and the campaign shortcuts read (scripts/campaign-icon.py), kept the same as the brand's.
     files["../resources/icons/Resolute.ico"] = files["resolute.ico"]
     files["../resources/icons/Resolute_48.png"] = files["resolute-icon-48.png"]
